@@ -1,0 +1,27 @@
+[coverage]
+# 忽略测试文件本身
+exclude-files = ["tests/**/*", "src/test_utils/**/*", "src/main.rs"]
+
+# 忽略行
+exclude-lines = ["#\[derive", "#\[test", "todo!", "unimplemented!"]
+
+# 输出格式
+out = ["Html", "Xml", "Terminal"]
+
+# 输出目录
+output-dir = "target/tarpaulin"
+
+# 超时（秒）
+timeout = "120s"
+
+# 并行测试线程数
+jobs = 4
+
+# 包含测试
+run-types = ["Tests"]
+
+# 忽略 panic 处理
+ignore-panics = true
+
+# 忽略测试函数
+ignore-tests = true
