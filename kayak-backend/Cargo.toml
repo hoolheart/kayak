@@ -27,13 +27,21 @@ config = "0.14"
 
 # Time
 time = { version = "0.3", features = ["formatting", "local-offset"] }
+chrono = { version = "0.4", features = ["serde"] }
 
 # Error Handling
 thiserror = "1.0"
 anyhow = "1.0"
 
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "sqlite", "uuid", "chrono", "json", "migrate"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
 # Environment
 dotenvy = "0.15"
+
+# Async trait
+async-trait = "0.1"
 
 [dev-dependencies]
 # Testing

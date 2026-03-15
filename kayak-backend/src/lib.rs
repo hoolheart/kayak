@@ -15,6 +15,8 @@ pub mod core {
     pub mod result;
 }
 
+pub mod db;
+pub mod models;
 pub mod services;
 
 // 重新导出常用类型
