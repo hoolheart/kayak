@@ -185,7 +185,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_user_repository() {
-        let pool = init_db("sqlite::memory:").await.unwrap();
+        // 使用唯一的数据库URL避免测试冲突
+        let db_id = uuid::Uuid::new_v4().to_string();
+        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id)).await.unwrap();
         let repo = UserRepository::new(pool);
 
         // 创建用户
