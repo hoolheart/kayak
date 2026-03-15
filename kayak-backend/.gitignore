@@ -1,0 +1,22 @@
+# Rust build artifacts
+/target
+**/target
+# Note: Cargo.lock is committed for binary projects to ensure reproducible builds
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test artifacts
+*.profraw
