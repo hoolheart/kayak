@@ -1,0 +1,27 @@
+{
+  "@@locale": "zh",
+  "appTitle": "Kayak",
+  "@appTitle": {
+    "description": "应用标题"
+  },
+  "welcomeMessage": "欢迎使用 Kayak",
+  "@welcomeMessage": {
+    "description": "首页欢迎信息"
+  },
+  "subtitle": "科学研究支持平台",
+  "@subtitle": {
+    "description": "应用副标题"
+  },
+  "enterWorkbench": "进入工作台",
+  "@enterWorkbench": {
+    "description": "进入工作台按钮"
+  },
+  "settings": "设置",
+  "@settings": {
+    "description": "设置按钮"
+  },
+  "toggleTheme": "切换主题",
+  "@toggleTheme": {
+    "description": "主题切换按钮提示"
+  }
+}

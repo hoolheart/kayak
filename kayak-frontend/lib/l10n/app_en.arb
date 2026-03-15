@@ -1,0 +1,27 @@
+{
+  "@@locale": "en",
+  "appTitle": "Kayak",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "welcomeMessage": "Welcome to Kayak",
+  "@welcomeMessage": {
+    "description": "Welcome message on home screen"
+  },
+  "subtitle": "Scientific Research Support Platform",
+  "@subtitle": {
+    "description": "Application subtitle"
+  },
+  "enterWorkbench": "Enter Workbench",
+  "@enterWorkbench": {
+    "description": "Button to enter workbench"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings button"
+  },
+  "toggleTheme": "Toggle Theme",
+  "@toggleTheme": {
+    "description": "Theme toggle button tooltip"
+  }
+}
