@@ -4,13 +4,15 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 use uuid::Uuid;
 
 /// 用户账户状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum UserStatus {
     /// 正常激活状态
+    #[default]
     Active,
     /// 已禁用
     Inactive,
@@ -18,18 +20,12 @@ pub enum UserStatus {
     Banned,
 }
 
-impl Default for UserStatus {
-    fn default() -> Self {
-        UserStatus::Active
-    }
-}
-
-impl ToString for UserStatus {
-    fn to_string(&self) -> String {
+impl Display for UserStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            UserStatus::Active => "active".to_string(),
-            UserStatus::Inactive => "inactive".to_string(),
-            UserStatus::Banned => "banned".to_string(),
+            UserStatus::Active => write!(f, "active"),
+            UserStatus::Inactive => write!(f, "inactive"),
+            UserStatus::Banned => write!(f, "banned"),
         }
     }
 }

@@ -4,13 +4,10 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use uuid::Uuid;
 
 /// 所有者类型枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum OwnerType {
     /// 个人用户
@@ -20,12 +17,11 @@ pub enum OwnerType {
 }
 
 /// 工作台状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkbenchStatus {
     /// 正常
+    #[default]
     Active,
     /// 已归档
     Archived,
@@ -33,14 +29,8 @@ pub enum WorkbenchStatus {
     Deleted,
 }
 
-impl Default for WorkbenchStatus {
-    fn default() -> Self {
-        WorkbenchStatus::Active
-    }
-}
-
 /// 工作台实体
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Workbench {
     /// 工作台ID (UUID)
     pub id: Uuid,

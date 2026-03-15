@@ -3,9 +3,8 @@
 //! 提供用户实体的数据访问操作
 
 use crate::db::connection::DbPool;
-use crate::models::entities::{CreateUserRequest, UpdateUserRequest, User};
-use async_trait::async_trait;
-use sqlx::Error;
+use crate::models::entities::user::{CreateUserRequest, UpdateUserRequest, User};
+use sqlx::{Error, Row};
 use uuid::Uuid;
 
 pub struct UserRepository {
@@ -19,7 +18,7 @@ impl UserRepository {
 
     /// 根据ID查找用户
     pub async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, Error> {
-        sqlx::query_as::<_, User>(
+        let row = sqlx::query(
             r#"
             SELECT id, email, password_hash, username, avatar_url, status, created_at, updated_at
             FROM users
@@ -28,12 +27,26 @@ impl UserRepository {
         )
         .bind(id.to_string())
         .fetch_optional(&self.pool)
-        .await
+        .await?;
+
+        Ok(row.map(|r| User {
+            id: Uuid::parse_str(r.get::<String, _>("id").as_str()).unwrap_or_default(),
+            email: r.get("email"),
+            password_hash: r.get("password_hash"),
+            username: r.get("username"),
+            avatar_url: r.get("avatar_url"),
+            status: r.get("status"),
+            created_at: r.get("created_at"),
+            updated_at: r.get("updated_at"),
+        }))
     }
 
     /// 根据邮箱查找用户
-    pub async fn find_by_email(&self, email: &str) -> Result<Option<User>, Error> {
-        sqlx::query_as::<_, User>(
+    pub async fn find_by_email(
+        &self,
+        email: &str,
+    ) -> Result<Option<User>, Error> {
+        let row = sqlx::query(
             r#"
             SELECT id, email, password_hash, username, avatar_url, status, created_at, updated_at
             FROM users
@@ -42,12 +55,24 @@ impl UserRepository {
         )
         .bind(email)
         .fetch_optional(&self.pool)
-        .await
+        .await?;
+
+        Ok(row.map(|r| User {
+            id: Uuid::parse_str(r.get::<String, _>("id").as_str()).unwrap_or_default(),
+            email: r.get("email"),
+            password_hash: r.get("password_hash"),
+            username: r.get("username"),
+            avatar_url: r.get("avatar_url"),
+            status: r.get("status"),
+            created_at: r.get("created_at"),
+            updated_at: r.get("updated_at"),
+        }))
     }
 
     /// 查找所有用户
-    pub async fn find_all(&self) -> Result<Vec<User>, Error> {
-        sqlx::query_as::<_, User>(
+    pub async fn find_all(&self,
+    ) -> Result<Vec<User>, Error> {
+        let rows = sqlx::query(
             r#"
             SELECT id, email, password_hash, username, avatar_url, status, created_at, updated_at
             FROM users
@@ -55,11 +80,28 @@ impl UserRepository {
             "#,
         )
         .fetch_all(&self.pool)
-        .await
+        .await?;
+
+        Ok(rows
+            .into_iter()
+            .map(|r| User {
+                id: Uuid::parse_str(r.get::<String, _>("id").as_str()).unwrap_or_default(),
+                email: r.get("email"),
+                password_hash: r.get("password_hash"),
+                username: r.get("username"),
+                avatar_url: r.get("avatar_url"),
+                status: r.get("status"),
+                created_at: r.get("created_at"),
+                updated_at: r.get("updated_at"),
+            })
+            .collect())
     }
 
     /// 创建用户
-    pub async fn create(&self, req: CreateUserRequest) -> Result<User, Error> {
+    pub async fn create(
+        &self,
+        req: CreateUserRequest,
+    ) -> Result<User, Error> {
         let user = User::new(req.email, req.password_hash, req.username);
 
         sqlx::query(
@@ -102,7 +144,7 @@ impl UserRepository {
             user.avatar_url = Some(avatar_url);
         }
         if let Some(status) = req.status {
-            user.status = status;
+            user.status = status.to_string();
         }
 
         sqlx::query(
@@ -123,7 +165,10 @@ impl UserRepository {
     }
 
     /// 删除用户
-    pub async fn delete(&self, id: Uuid) -> Result<u64, Error> {
+    pub async fn delete(
+        &self,
+        id: Uuid,
+    ) -> Result<u64, Error> {
         let result = sqlx::query("DELETE FROM users WHERE id = ?")
             .bind(id.to_string())
             .execute(&self.pool)

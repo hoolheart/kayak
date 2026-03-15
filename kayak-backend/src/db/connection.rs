@@ -21,8 +21,7 @@ pub async fn init_db(database_url: &str) -> Result<DbPool, sqlx::Error> {
     if let Some(parent) = Path::new(database_url.trim_start_matches("sqlite://")).parent() {
         std::fs::create_dir_all(parent).map_err(|e| {
             error!("Failed to create database directory: {}", e);
-            sqlx::Error::Io(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            sqlx::Error::Io(std::io::Error::other(
                 format!("Failed to create database directory: {}", e),
             ))
         })?;
@@ -54,7 +53,7 @@ pub async fn init_db(database_url: &str) -> Result<DbPool, sqlx::Error> {
         }
         Err(e) => {
             error!("Failed to run migrations: {}", e);
-            return Err(sqlx::Error::Migrate(e));
+            return Err(sqlx::Error::Migrate(Box::new(e)));
         }
     }
 

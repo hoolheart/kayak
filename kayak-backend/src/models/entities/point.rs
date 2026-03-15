@@ -4,13 +4,10 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use uuid::Uuid;
 
 /// 数据类型枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum DataType {
     /// 整数
@@ -24,9 +21,7 @@ pub enum DataType {
 }
 
 /// 访问类型枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum AccessType {
     /// 只读
@@ -38,25 +33,18 @@ pub enum AccessType {
 }
 
 /// 测点状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum PointStatus {
     /// 正常
+    #[default]
     Active,
     /// 禁用
     Disabled,
 }
 
-impl Default for PointStatus {
-    fn default() -> Self {
-        PointStatus::Active
-    }
-}
-
 /// 测点实体
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Point {
     /// 测点ID (UUID)
     pub id: Uuid,

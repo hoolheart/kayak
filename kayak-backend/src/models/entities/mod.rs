@@ -12,5 +12,7 @@ pub mod workbench;
 pub use data_file::{DataFile, DataFileStatus, SourceType};
 pub use device::{Device, DeviceStatus, ProtocolType};
 pub use point::{AccessType, DataType, Point, PointStatus};
-pub use user::{User, UserStatus};
-pub use workbench::{OwnerType, Workbench, WorkbenchStatus};
+pub use user::{CreateUserRequest, UpdateUserRequest, User, UserStatus};
+pub use workbench::{
+    CreateWorkbenchRequest, OwnerType, UpdateWorkbenchRequest, Workbench, WorkbenchStatus,
+};

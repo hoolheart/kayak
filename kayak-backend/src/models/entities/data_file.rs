@@ -4,13 +4,10 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use uuid::Uuid;
 
 /// 数据来源类型枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceType {
     /// 试验生成
@@ -22,12 +19,11 @@ pub enum SourceType {
 }
 
 /// 数据文件状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum DataFileStatus {
     /// 正常
+    #[default]
     Active,
     /// 已归档
     Archived,
@@ -35,14 +31,8 @@ pub enum DataFileStatus {
     Deleted,
 }
 
-impl Default for DataFileStatus {
-    fn default() -> Self {
-        DataFileStatus::Active
-    }
-}
-
 /// 数据文件实体
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataFile {
     /// 文件ID (UUID)
     pub id: Uuid,

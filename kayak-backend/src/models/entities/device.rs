@@ -4,13 +4,10 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 use uuid::Uuid;
 
 /// 协议类型枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ProtocolType {
     /// 虚拟设备
@@ -28,12 +25,11 @@ pub enum ProtocolType {
 }
 
 /// 设备状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
-#[sqlx(rename = "TEXT")]
-#[sqlx(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum DeviceStatus {
     /// 离线
+    #[default]
     Offline,
     /// 在线
     Online,
@@ -41,14 +37,8 @@ pub enum DeviceStatus {
     Error,
 }
 
-impl Default for DeviceStatus {
-    fn default() -> Self {
-        DeviceStatus::Offline
-    }
-}
-
 /// 设备实体
-#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Device {
     /// 设备ID (UUID)
     pub id: Uuid,
