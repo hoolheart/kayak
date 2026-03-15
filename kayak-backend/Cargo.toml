@@ -1,0 +1,51 @@
+[package]
+name = "kayak-backend"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kayak Team"]
+description = "Kayak Scientific Research Support Platform - Backend API"
+license = "MIT OR Apache-2.0"
+rust-version = "1.75"
+
+[dependencies]
+# Web Framework
+axum = { version = "0.7", features = ["tokio", "http1", "http2"] }
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Logging & Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "time", "fmt", "json"] }
+tower-http = { version = "0.5", features = ["trace", "cors", "timeout", "compression-full"] }
+tower = { version = "0.4", features = ["full"] }
+
+# Configuration
+config = "0.14"
+
+# Time
+time = { version = "0.3", features = ["formatting", "local-offset"] }
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Environment
+dotenvy = "0.15"
+
+[dev-dependencies]
+# Testing
+tokio-test = "0.4"
+reqwest = { version = "0.11", features = ["json"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
