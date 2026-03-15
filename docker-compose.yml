@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # 单容器部署：包含前端Web和后端
+  kayak:
+    build:
+      context: .
+      dockerfile: Dockerfile.single
+    image: kayak:single
+    container_name: kayak-single
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - KAYAK_DATA_DIR=/app/data
+      - DATABASE_URL=sqlite:///app/data/kayak.db
+      - RUST_LOG=info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 可选：分离部署时的前端服务
+  # kayak-frontend:
+  #   build:
+  #     context: ./kayak-frontend
+  #     dockerfile: Dockerfile
+  #   image: kayak-frontend:latest
+  #   container_name: kayak-frontend
+  #   ports:
+  #     - "80:80"
+  #   environment:
+  #     - API_URL=http://kayak-backend:8080
+  #   depends_on:
+  #     - kayak-backend
+
+  # 可选：分离部署时的后端服务
+  # kayak-backend:
+  #   build:
+  #     context: ./kayak-backend
+  #     dockerfile: Dockerfile
+  #   image: kayak-backend:latest
+  #   container_name: kayak-backend
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./data:/app/data
+  #   environment:
+  #     - KAYAK_DATA_DIR=/app/data
+  #     - DATABASE_URL=sqlite:///app/data/kayak.db
+  #     - RUST_LOG=info
+  #   restart: unless-stopped
