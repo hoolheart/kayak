@@ -1,0 +1,107 @@
+name: kayak_frontend
+description: Kayak Scientific Research Support Platform - Flutter Frontend
+
+publish_to: 'none'
+
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.19.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # ==================== UI & 主题 ====================
+  # Material Design 3 图标
+  material_design_icons_flutter: ^7.0.7296
+  # 响应式布局支持
+  flutter_adaptive_scaffold: ^0.1.10
+  # 自适应布局
+  adaptive_breakpoints: ^0.1.6
+
+  # ==================== 状态管理 ====================
+  # Riverpod - 状态管理方案
+  flutter_riverpod: ^2.4.10
+  # Riverpod代码生成（可选，用于复杂状态管理）
+  riverpod_annotation: ^2.3.4
+
+  # ==================== 路由 ====================
+  # 声明式路由
+  go_router: ^13.2.0
+
+  # ==================== 网络通信 ====================
+  # HTTP客户端
+  dio: ^5.4.1
+  # WebSocket客户端
+  web_socket_channel: ^2.4.4
+
+  # ==================== 本地存储 ====================
+  # 轻量级键值存储（用于主题、语言等偏好设置）
+  shared_preferences: ^2.2.2
+
+  # ==================== 国际化 ====================
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.1
+
+  # ==================== 数据序列化 ====================
+  # JSON序列化
+  json_annotation: ^4.8.1
+  freezed_annotation: ^2.4.1
+
+  # ==================== 图表与数据可视化 ====================
+  # 图表组件
+  fl_chart: ^0.66.0
+
+  # ==================== 桌面平台支持 ====================
+  # 窗口管理（桌面平台）
+  window_manager: ^0.3.7
+  # 托盘图标支持
+  system_tray: ^2.0.3
+
+  # ==================== 工具库 ====================
+  # 函数式编程工具
+  dartz: ^0.10.1
+  #  equatable替代，用于值比较
+  freezed: ^2.4.7
+  # 路径操作
+  path: ^1.9.0
+  # 日志
+  logger: ^2.0.2
+  # 结果类型
+  multiple_result: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+  # 代码生成工具
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+  freezed: ^2.4.7
+  riverpod_generator: ^2.3.11
+  go_router_builder: ^2.4.1
+
+  # 测试工具
+  mockito: ^5.4.4
+  mocktail: ^1.0.3
+
+flutter:
+  # 启用Material Design
+  uses-material-design: true
+
+  # 静态资源配置
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # 字体配置（可选，使用系统默认字体也可）
+  # fonts:
+  #   - family: NotoSansSC
+  #     fonts:
+  #       - asset: assets/fonts/NotoSansSC-Regular.otf
+  #       - asset: assets/fonts/NotoSansSC-Bold.otf
+  #         weight: 700
