@@ -15,6 +15,12 @@ class AppTheme {
   AppTheme._();
 
   /// 浅色主题
+  static ThemeData get lightTheme => light;
+
+  /// 深色主题
+  static ThemeData get darkTheme => dark;
+
+  /// 浅色主题
   static ThemeData get light {
     final colorScheme = AppColorSchemes.light;
 
@@ -39,7 +45,7 @@ class AppTheme {
       ),
 
       // 卡片主题
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -145,7 +151,7 @@ class AppTheme {
       ),
 
       // 对话框主题
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         backgroundColor: colorScheme.surfaceContainerHigh,
       ),
@@ -184,15 +190,12 @@ class AppTheme {
     return light.copyWith(
       brightness: Brightness.dark,
       colorScheme: colorScheme,
-
       appBarTheme: light.appBarTheme.copyWith(
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-
       scaffoldBackgroundColor: colorScheme.surface,
-
       cardTheme: light.cardTheme.copyWith(
         color: colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
@@ -203,11 +206,9 @@ class AppTheme {
           ),
         ),
       ),
-
       inputDecorationTheme: light.inputDecorationTheme.copyWith(
         fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.4),
       ),
-
       bottomNavigationBarTheme: light.bottomNavigationBarTheme.copyWith(
         backgroundColor: colorScheme.surfaceContainer,
       ),

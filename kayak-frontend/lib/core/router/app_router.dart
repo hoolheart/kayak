@@ -8,8 +8,21 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../screens/home_screen.dart';
-import '../../screens/splash_screen.dart';
+import '../../screens/home/home_screen.dart';
+
+/// 简单的启动页，后续可以替换为真正的SplashScreen
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+}
 
 /// 应用路由路径常量
 class AppRoutes {

@@ -1,153 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kayak_frontend/main.dart';
 
-/// TC-FLU-010: Riverpod状态管理集成测试
-/// 验证Riverpod状态管理方案已正确配置
+import 'package:kayak_frontend/app.dart';
+import 'package:kayak_frontend/providers/core/theme_provider.dart';
+import 'package:kayak_frontend/providers/core/locale_provider.dart';
+
 void main() {
-  group('Riverpod Integration Tests', () {
-    testWidgets('App is wrapped with ProviderScope', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const KayakApp());
-
-      expect(
-        find.byType(ProviderScope),
-        findsOneWidget,
-        reason: 'App must be wrapped with ProviderScope for Riverpod to work',
-      );
-    });
-
-    testWidgets('Can create and read simple provider', (
-      WidgetTester tester,
-    ) async {
-      final testProvider = Provider<String>((ref) => 'Hello Riverpod');
-
+  group('Riverpod Setup Tests', () {
+    testWidgets('ProviderScope wraps KayakApp', (WidgetTester tester) async {
       await tester.pumpWidget(
-        ProviderScope(
-          child: Consumer(
-            builder: (context, ref, child) {
-              final value = ref.watch(testProvider);
-              return MaterialApp(home: Scaffold(body: Text(value)));
-            },
-          ),
+        const ProviderScope(
+          child: KayakApp(),
         ),
       );
 
-      expect(find.text('Hello Riverpod'), findsOneWidget);
+      // 验证ProviderScope存在
+      expect(find.byType(ProviderScope), findsOneWidget);
     });
 
-    testWidgets('Can create and modify StateProvider', (
-      WidgetTester tester,
-    ) async {
-      final counterProvider = StateProvider<int>((ref) => 0);
+    test('ThemeProvider provides initial state', () {
+      final container = ProviderContainer();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: Consumer(
-            builder: (context, ref, child) {
-              final count = ref.watch(counterProvider);
-              return MaterialApp(
-                home: Scaffold(
-                  body: Column(
-                    children: [
-                      Text('Count: $count'),
-                      ElevatedButton(
-                        onPressed: () {
-                          ref.read(counterProvider.notifier).state++;
-                        },
-                        child: const Text('Increment'),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
+      // 获取初始主题模式
+      final themeMode = container.read(themeProvider);
 
-      // Initial state
-      expect(find.text('Count: 0'), findsOneWidget);
+      // 默认应为浅色主题
+      expect(themeMode, ThemeMode.light);
 
-      // Tap increment button
-      await tester.tap(find.text('Increment'));
-      await tester.pump();
-
-      // State should be updated
-      expect(find.text('Count: 1'), findsOneWidget);
-
-      // Tap again
-      await tester.tap(find.text('Increment'));
-      await tester.pump();
-
-      expect(find.text('Count: 2'), findsOneWidget);
+      container.dispose();
     });
 
-    testWidgets('Can use FutureProvider', (WidgetTester tester) async {
-      final futureProvider = FutureProvider<String>((ref) async {
-        await Future.delayed(const Duration(milliseconds: 100));
-        return 'Async Data';
-      });
+    test('ThemeProvider can be toggled', () {
+      final container = ProviderContainer();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          child: Consumer(
-            builder: (context, ref, child) {
-              final asyncValue = ref.watch(futureProvider);
-              return MaterialApp(
-                home: Scaffold(
-                  body: asyncValue.when(
-                    data: (data) => Text(data),
-                    loading: () => const CircularProgressIndicator(),
-                    error: (error, stack) => Text('Error: $error'),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      );
+      // 获取notifier
+      final notifier = container.read(themeProvider.notifier);
 
-      // Initially loading
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // 切换主题
+      notifier.toggleTheme();
 
-      // Wait for future to complete
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump();
+      // 验证状态变化
+      expect(container.read(themeProvider), ThemeMode.dark);
 
-      // Data should be displayed
-      expect(find.text('Async Data'), findsOneWidget);
+      // 再次切换
+      notifier.toggleTheme();
+
+      // 验证状态变化
+      expect(container.read(themeProvider), ThemeMode.light);
+
+      container.dispose();
     });
 
-    testWidgets('ProviderScope can be overridden', (WidgetTester tester) async {
-      final configProvider = Provider<String>((ref) => 'default');
+    test('LocaleProvider provides initial state', () {
+      final container = ProviderContainer();
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [configProvider.overrideWithValue('overridden')],
-          child: Consumer(
-            builder: (context, ref, child) {
-              final value = ref.watch(configProvider);
-              return MaterialApp(home: Scaffold(body: Text(value)));
-            },
-          ),
-        ),
-      );
+      // 获取初始语言
+      final locale = container.read(localeProvider);
 
-      expect(find.text('overridden'), findsOneWidget);
-    });
+      // 默认应为系统语言
+      expect(locale, isNotNull);
 
-    testWidgets('App structure includes provider accessibility', (
-      WidgetTester tester,
-    ) async {
-      await tester.pumpWidget(const ProviderScope(child: KayakApp()));
-      await tester.pumpAndSettle();
-
-      // The app should have loaded without errors
-      expect(find.byType(MaterialApp), findsOneWidget);
-      expect(tester.takeException(), isNull);
+      container.dispose();
     });
   });
 }

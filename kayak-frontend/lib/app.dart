@@ -13,7 +13,7 @@ class KayakApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-    final themeMode = ref.watch(themeModeProvider);
+    final themeMode = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
 
     return MaterialApp.router(

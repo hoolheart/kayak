@@ -9,7 +9,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final themeMode = ref.watch(themeProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
@@ -23,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
               themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
             ),
             onPressed: () {
-              ref.read(themeModeProvider.notifier).toggle();
+              ref.read(themeProvider.notifier).toggleTheme();
             },
             tooltip: '切换主题',
           ),
@@ -38,16 +38,16 @@ class HomeScreen extends ConsumerWidget {
             Text(
               'Kayak 科学研究支持平台',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               'Flutter + Rust 跨平台解决方案',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+                    color: colorScheme.onSurfaceVariant,
+                  ),
             ),
             const SizedBox(height: 32),
             FilledButton.icon(
