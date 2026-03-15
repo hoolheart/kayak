@@ -43,8 +43,8 @@ Phase 5: Sprint 1开发准备就绪
   - [x] 测试用例创建 (sw-mike)
   - [x] 详细设计 (sw-tom)
   - [x] 开发实现 (sw-tom)
-  - [ ] 代码审查 (sw-jerry)
-  - [ ] 测试验证 (sw-mike)
+  - [x] 代码审查 (sw-jerry)
+  - [x] 测试验证 (sw-mike)
 - [ ] S1-003: SQLite数据库Schema设计
 - [ ] S1-004: API路由与错误处理框架
 - [ ] S1-005: 后端单元测试框架搭建
