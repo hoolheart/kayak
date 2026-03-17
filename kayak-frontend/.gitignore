@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter Widget Testing - Golden Test exclusions
+/test/golden_files/failures/
+**/.test_runner.dart
+/test/widget_tests.temp.dart
+
+# Golden test generated temporary files
+*.diff.png
+*.masked.png

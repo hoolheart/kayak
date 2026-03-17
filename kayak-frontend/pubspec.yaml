@@ -88,6 +88,7 @@ dev_dependencies:
   # 测试工具
   mockito: ^5.4.4
   mocktail: ^1.0.3
+  golden_toolkit: ^0.15.0  # Golden测试工具
 
 flutter:
   # 启用Material Design
