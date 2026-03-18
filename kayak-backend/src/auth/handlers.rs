@@ -45,21 +45,18 @@ pub async fn login<S: AuthService>(
     req.validate()
         .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
 
-    // 执行登录 - 需要返回用户信息和token
-    let token_pair = auth_service.login(req).await?;
-    
-    // 为了获取用户信息，需要重新查询
-    // 这里简化处理，实际AuthService.login应该返回用户信息
-    // 暂时使用Token中的信息构建UserAuthInfo
+    // 执行登录
+    let login_response = auth_service.login(req).await?;
+
     let response = TokenResponse {
-        access_token: token_pair.access_token,
-        refresh_token: token_pair.refresh_token,
-        token_type: token_pair.token_type,
-        expires_in: token_pair.expires_in,
+        access_token: login_response.access_token,
+        refresh_token: login_response.refresh_token,
+        token_type: "Bearer".to_string(),
+        expires_in: login_response.expires_in,
         user: UserAuthInfo {
-            id: uuid::Uuid::new_v4(),
-            email: "from_token@example.com".to_string(),
-            username: None,
+            id: login_response.user_id,
+            email: login_response.email,
+            username: login_response.username,
         },
     };
 
@@ -76,17 +73,17 @@ pub async fn refresh_token<S: AuthService>(
         .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
 
     // 刷新Token
-    let token_pair = auth_service.refresh_token(req).await?;
+    let login_response = auth_service.refresh_token(req).await?;
 
     let response = TokenResponse {
-        access_token: token_pair.access_token,
-        refresh_token: token_pair.refresh_token,
-        token_type: token_pair.token_type,
-        expires_in: token_pair.expires_in,
+        access_token: login_response.access_token,
+        refresh_token: login_response.refresh_token,
+        token_type: "Bearer".to_string(),
+        expires_in: login_response.expires_in,
         user: UserAuthInfo {
-            id: uuid::Uuid::new_v4(),
-            email: "from_token@example.com".to_string(),
-            username: None,
+            id: login_response.user_id,
+            email: login_response.email,
+            username: login_response.username,
         },
     };
 

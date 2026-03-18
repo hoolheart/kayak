@@ -46,19 +46,6 @@ pub struct TokenRefreshRequest {
     pub refresh_token: String,
 }
 
-/// Token对响应
-#[derive(Debug, Serialize)]
-pub struct TokenPair {
-    /// 访问Token
-    pub access_token: String,
-    /// 刷新Token
-    pub refresh_token: String,
-    /// Token类型
-    pub token_type: String,
-    /// Access Token过期时间（秒）
-    pub expires_in: i64,
-}
-
 /// Token响应DTO
 #[derive(Debug, Serialize)]
 pub struct TokenResponse {

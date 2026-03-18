@@ -5,7 +5,7 @@
 use async_trait::async_trait;
 use crate::core::error::AppError;
 use crate::models::entities::user::User;
-use super::dtos::{LoginRequest, RegisterRequest, TokenPair, TokenRefreshRequest};
+use super::dtos::{LoginRequest, RegisterRequest, TokenRefreshRequest};
 
 /// 认证服务接口
 #[async_trait]
@@ -14,13 +14,24 @@ pub trait AuthService: Send + Sync {
     async fn register(&self, req: RegisterRequest) -> Result<User, AppError>;
 
     /// 用户登录
-    async fn login(&self, req: LoginRequest) -> Result<TokenPair, AppError>;
+    async fn login(&self, req: LoginRequest) -> Result<LoginResponse, AppError>;
 
     /// 刷新Token
-    async fn refresh_token(&self, req: TokenRefreshRequest) -> Result<TokenPair, AppError>;
+    async fn refresh_token(&self, req: TokenRefreshRequest) -> Result<LoginResponse, AppError>;
 
     /// 用户登出
     async fn logout(&self, user_id: uuid::Uuid) -> Result<(), AppError>;
+}
+
+/// 登录响应
+#[derive(Debug, Clone)]
+pub struct LoginResponse {
+    pub user_id: uuid::Uuid,
+    pub email: String,
+    pub username: Option<String>,
+    pub access_token: String,
+    pub refresh_token: String,
+    pub expires_in: i64,
 }
 
 /// Token服务接口
@@ -34,6 +45,15 @@ pub trait TokenService: Send + Sync {
 
     /// 验证Refresh Token
     fn verify_refresh_token(&self, token: &str) -> Result<TokenClaims, AppError>;
+}
+
+/// Token对
+#[derive(Debug, Clone)]
+pub struct TokenPair {
+    pub access_token: String,
+    pub refresh_token: String,
+    pub token_type: String,
+    pub expires_in: i64,
 }
 
 /// Token声明

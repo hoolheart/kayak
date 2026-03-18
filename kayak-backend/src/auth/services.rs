@@ -15,9 +15,9 @@ use crate::core::error::AppError;
 use crate::models::entities::user::{User, UserStatus};
 
 use super::{
-    dtos::{LoginRequest, RegisterRequest, TokenPair, TokenRefreshRequest},
+    dtos::{LoginRequest, RegisterRequest, TokenRefreshRequest},
     error::AuthError,
-    traits::{AuthService, PasswordHasher, TokenClaims, TokenService, TokenType},
+    traits::{AuthService, LoginResponse, PasswordHasher, TokenClaims, TokenPair, TokenService, TokenType},
 };
 
 // JWT配置常量
@@ -90,7 +90,7 @@ impl AuthService for AuthServiceImpl {
         Ok(user)
     }
 
-    async fn login(&self, req: LoginRequest) -> Result<TokenPair, AppError> {
+    async fn login(&self, req: LoginRequest) -> Result<LoginResponse, AppError> {
         // 查找用户
         let user = self
             .user_repo
@@ -118,13 +118,20 @@ impl AuthService for AuthServiceImpl {
             .token_service
             .generate_token_pair(user.id, &user.email)?;
 
-        Ok(token_pair)
+        Ok(LoginResponse {
+            user_id: user.id,
+            email: user.email,
+            username: user.username,
+            access_token: token_pair.access_token,
+            refresh_token: token_pair.refresh_token,
+            expires_in: token_pair.expires_in,
+        })
     }
 
     async fn refresh_token(
         &self,
         req: TokenRefreshRequest,
-    ) -> Result<TokenPair, AppError> {
+    ) -> Result<LoginResponse, AppError> {
         // 验证刷新Token
         let claims = self
             .token_service
@@ -152,7 +159,14 @@ impl AuthService for AuthServiceImpl {
             .token_service
             .generate_token_pair(user.id, &user.email)?;
 
-        Ok(token_pair)
+        Ok(LoginResponse {
+            user_id: user.id,
+            email: user.email,
+            username: user.username,
+            access_token: token_pair.access_token,
+            refresh_token: token_pair.refresh_token,
+            expires_in: token_pair.expires_in,
+        })
     }
 
     async fn logout(&self, _user_id: Uuid) -> Result<(), AppError> {
