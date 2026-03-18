@@ -58,8 +58,8 @@ dependencies:
   # ==================== 桌面平台支持 ====================
   # 窗口管理（桌面平台）
   window_manager: ^0.3.7
-  # 托盘图标支持
-  system_tray: ^2.0.3
+  # 托盘图标支持 - 暂时注释，需要系统库 libayatana-appindicator3-dev
+  # system_tray: ^2.0.3
 
   # ==================== 工具库 ====================
   # 函数式编程工具
@@ -93,6 +93,9 @@ dev_dependencies:
 flutter:
   # 启用Material Design
   uses-material-design: true
+
+  # 启用代码生成（用于国际化）
+  generate: true
 
   # 静态资源配置
   assets:
