@@ -43,6 +43,11 @@ dotenvy = "0.15"
 # Async trait
 async-trait = "0.1"
 
+# Authentication
+jsonwebtoken = "9"
+bcrypt = "0.15"
+validator = { version = "0.18", features = ["derive"] }
+
 [dev-dependencies]
 # Testing
 tokio-test = "0.4"

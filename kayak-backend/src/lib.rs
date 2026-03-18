@@ -15,6 +15,7 @@ pub mod core {
     pub mod result;
 }
 
+pub mod auth;
 pub mod db;
 pub mod models;
 pub mod services;

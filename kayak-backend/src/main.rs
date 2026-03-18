@@ -6,6 +6,7 @@ use kayak_backend::{
     api::routes::create_router,
     api::middleware::MiddlewareStack,
     core::config::AppConfig,
+    db::connection::init_db,
 };
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -24,13 +25,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Starting Kayak Backend v{}", env!("CARGO_PKG_VERSION"));
 
-    // 4. 创建路由
-    let app = create_router();
+    // 4. 初始化数据库
+    let database_url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "sqlite://./data/kayak.db".to_string());
+    let pool = init_db(&database_url).await?;
 
-    // 5. 应用中间件
+    // 5. 创建路由
+    let app = create_router(pool);
+
+    // 6. 应用中间件
     let app = MiddlewareStack::apply(app, &config);
 
-    // 6. 绑定地址
+    // 7. 绑定地址
     let bind_addr = config.bind_address();
     info!("Binding to {}", bind_addr);
 
@@ -39,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Server listening on http://{}", actual_addr);
 
-    // 7. 启动服务
+    // 8. 启动服务
     axum::serve(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
