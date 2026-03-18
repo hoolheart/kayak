@@ -1,5 +1,6 @@
 # Kayak - 科学研究支持软件
 
+[![CI](https://github.com/your-org/kayak/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/kayak/actions/workflows/ci.yml)
 [![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.16%2B-blue.svg)](https://flutter.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -194,6 +195,36 @@ docker-compose up -d
 ```bash
 docker-compose -f docker-compose.separate.yml up -d
 ```
+
+## CI/CD
+
+本项目使用 GitHub Actions 实现持续集成和持续部署：
+
+### 工作流
+- **CI 工作流** (`.github/workflows/ci.yml`): 每次推送和 PR 时自动运行
+  - 代码格式化检查 (rustfmt, dart format)
+  - 静态代码分析 (clippy, flutter analyze)
+  - 单元测试执行 (cargo test, flutter test)
+  - 代码覆盖率报告 (cargo-tarpaulin, lcov)
+  - 构建验证 (Release 构建)
+
+### 本地验证
+在提交代码前，建议运行本地 CI 检查脚本：
+
+```bash
+# 运行所有 CI 检查
+./scripts/ci-check.sh
+
+# 生成覆盖率报告
+./scripts/generate-coverage.sh all
+./scripts/generate-coverage.sh backend
+./scripts/generate-coverage.sh frontend
+```
+
+### 分支保护
+- `main` 分支受到保护，必须通过 Pull Request 合并
+- 所有 CI 检查必须通过才能合并
+- 需要代码审查批准
 
 ## 路线图
 
