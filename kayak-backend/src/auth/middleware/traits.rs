@@ -37,7 +37,8 @@ pub trait AuthMiddleware: Clone + Send + Sync + 'static {
 ///
 /// # 实现要求
 ///
-/// 需要实现Clone以便中间件可以安全地在多个请求间共享
+/// - Send + Sync: 异步运行时要求
+/// - 使用Arc包装实现以支持克隆
 pub trait TokenExtractor: Send + Sync {
     /// 从请求中提取Token
     ///
@@ -45,14 +46,6 @@ pub trait TokenExtractor: Send + Sync {
     /// * `Some(String)` - 提取到Token
     /// * `None` - 未找到Token
     fn extract(&self, parts: &mut Parts) -> Option<String>;
-}
-
-impl Clone for Box<dyn TokenExtractor> {
-    fn clone(&self) -> Self {
-        // This is a workaround for cloning boxed trait objects
-        // In practice, implementations should be cloneable
-        panic!("TokenExtractor implementations must use concrete types for cloning")
-    }
 }
 
 /// 认证配置接口

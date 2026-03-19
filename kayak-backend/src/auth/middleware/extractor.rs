@@ -79,16 +79,6 @@ impl CompositeTokenExtractor {
     }
 }
 
-impl Clone for CompositeTokenExtractor {
-    fn clone(&self) -> Self {
-        // Note: This requires all boxed extractors to be cloneable
-        // In practice, use concrete types or wrap in Arc
-        Self {
-            extractors: Vec::new(),
-        }
-    }
-}
-
 impl TokenExtractor for CompositeTokenExtractor {
     fn extract(&self, parts: &mut Parts) -> Option<String> {
         for extractor in &self.extractors {
