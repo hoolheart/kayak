@@ -84,9 +84,9 @@ class _PasswordFieldState extends ConsumerState<PasswordField> {
           ref.read(passwordValidationProvider.notifier).state = null;
         }
       },
-      onFieldSubmitted: (_) {
+      onFieldSubmitted: (value) {
         if (widget.onSubmitted != null) {
-          widget.onSubmitted!('');
+          widget.onSubmitted!(value);
         }
       },
     );
