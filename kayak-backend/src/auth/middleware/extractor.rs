@@ -103,20 +103,26 @@ impl TokenExtractor for CompositeTokenExtractor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use axum::http::HeaderMap;
+    use axum::http::Request;
+
+    fn create_parts_with_auth(auth_value: &str) -> Parts {
+        let request = Request::builder()
+            .uri("/test")
+            .header(header::AUTHORIZATION, auth_value)
+            .body(())
+            .unwrap();
+        request.into_parts().0
+    }
+
+    fn create_empty_parts() -> Parts {
+        let request = Request::builder().uri("/test").body(()).unwrap();
+        request.into_parts().0
+    }
 
     #[test]
     fn test_bearer_token_extraction_success() {
         let extractor = BearerTokenExtractor;
-
-        // 测试有效Bearer Token
-        let mut headers = HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            "Bearer valid_token_123".parse().unwrap(),
-        );
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("Bearer valid_token_123");
         assert_eq!(
             extractor.extract(&mut parts),
             Some("valid_token_123".to_string())
@@ -126,15 +132,7 @@ mod tests {
     #[test]
     fn test_bearer_token_extraction_lowercase() {
         let extractor = BearerTokenExtractor;
-
-        // 测试小写bearer
-        let mut headers = HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            "bearer lowercase_token".parse().unwrap(),
-        );
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("bearer lowercase_token");
         assert_eq!(
             extractor.extract(&mut parts),
             Some("lowercase_token".to_string())
@@ -144,63 +142,35 @@ mod tests {
     #[test]
     fn test_bearer_token_extraction_no_bearer_prefix() {
         let extractor = BearerTokenExtractor;
-
-        // 测试无Bearer前缀
-        let mut headers = HeaderMap::new();
-        headers.insert(header::AUTHORIZATION, "Basic dXNlcjpwYXNz".parse().unwrap());
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("Basic dXNlcjpwYXNz");
         assert_eq!(extractor.extract(&mut parts), None);
     }
 
     #[test]
     fn test_bearer_token_extraction_empty_token() {
         let extractor = BearerTokenExtractor;
-
-        // 测试空Token
-        let mut headers = HeaderMap::new();
-        headers.insert(header::AUTHORIZATION, "Bearer ".parse().unwrap());
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("Bearer ");
         assert_eq!(extractor.extract(&mut parts), None);
     }
 
     #[test]
     fn test_bearer_token_extraction_no_space() {
         let extractor = BearerTokenExtractor;
-
-        // 测试Bearer后无空格
-        let mut headers = HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            "Bearertoken_without_space".parse().unwrap(),
-        );
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("Bearertoken_without_space");
         assert_eq!(extractor.extract(&mut parts), None);
     }
 
     #[test]
     fn test_bearer_token_extraction_missing_header() {
         let extractor = BearerTokenExtractor;
-
-        // 测试缺少Authorization头部
-        let parts = Parts::default();
-        assert_eq!(extractor.extract(&mut parts.clone()), None);
+        let mut parts = create_empty_parts();
+        assert_eq!(extractor.extract(&mut parts), None);
     }
 
     #[test]
     fn test_bearer_token_extraction_with_whitespace() {
         let extractor = BearerTokenExtractor;
-
-        // 测试Token前后有空格
-        let mut headers = HeaderMap::new();
-        headers.insert(
-            header::AUTHORIZATION,
-            "Bearer  token_with_spaces  ".parse().unwrap(),
-        );
-        let mut parts = Parts::default();
-        parts.headers = headers;
+        let mut parts = create_parts_with_auth("Bearer  token_with_spaces  ");
         assert_eq!(
             extractor.extract(&mut parts),
             Some("token_with_spaces".to_string())
@@ -210,7 +180,7 @@ mod tests {
     #[test]
     fn test_composite_token_extractor_empty() {
         let extractor = CompositeTokenExtractor::new();
-        let parts = Parts::default();
-        assert_eq!(extractor.extract(&mut parts.clone()), None);
+        let mut parts = create_empty_parts();
+        assert_eq!(extractor.extract(&mut parts), None);
     }
 }

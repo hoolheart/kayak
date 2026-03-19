@@ -22,4 +22,4 @@ Thumbs.db
 *.profraw
 
 # sqlite file
-sqlite:file:*
+sqlite:*

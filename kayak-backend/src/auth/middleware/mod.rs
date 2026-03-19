@@ -30,7 +30,7 @@ pub mod traits;
 
 // 公共导出
 pub use context::UserContext;
-pub use extractor::{BearerTokenExtractor, CompositeTokenExtractor, TokenExtractor};
+pub use extractor::{BearerTokenExtractor, CompositeTokenExtractor};
 pub use layer::{AuthLayer, AuthMiddlewareService, JwtAuthMiddleware};
 pub use require_auth::{OptionalAuth, RequireAuth};
-pub use traits::{AuthConfig, AuthMiddleware};
+pub use traits::{AuthConfig, AuthMiddleware, TokenExtractor};
