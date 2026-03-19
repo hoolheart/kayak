@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/screens/login_screen.dart';
 import '../../screens/home/home_screen.dart';
 
 /// 简单的启动页，后续可以替换为真正的SplashScreen
@@ -31,6 +32,9 @@ class AppRoutes {
   /// 启动页
   static const String splash = '/';
 
+  /// 登录页
+  static const String login = '/login';
+
   /// 首页
   static const String home = '/home';
 }
@@ -45,6 +49,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashScreen(),
+      ),
+
+      // 登录页
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (context, state) => const LoginScreen(),
       ),
 
       // 首页
