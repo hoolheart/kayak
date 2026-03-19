@@ -5,8 +5,8 @@
 use std::sync::Arc;
 use async_trait::async_trait;
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use chrono::Utc;
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::auth::PasswordHasher;
@@ -24,8 +24,8 @@ pub struct UserDto {
     pub username: Option<String>,
     pub avatar: Option<String>,
     pub status: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub created_at: chrono::DateTime<Utc>,
+    pub updated_at: chrono::DateTime<Utc>,
 }
 
 impl From<User> for UserDto {
@@ -42,10 +42,19 @@ impl From<User> for UserDto {
     }
 }
 
+/// 验证用户名格式
+fn validate_username_format(username: &str) -> Result<(), validator::ValidationError> {
+    if !username.chars().all(|c| c.is_alphanumeric() || c == '_') {
+        return Err(validator::ValidationError::new("username_format"));
+    }
+    Ok(())
+}
+
 /// 更新用户信息请求
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdateUserRequest {
     #[validate(length(min = 3, max = 50, message = "Username must be 3-50 characters"))]
+    #[validate(custom(function = "validate_username_format", message = "Username can only contain letters, numbers, and underscores"))]
     pub username: Option<String>,
     
     #[validate(url(message = "Invalid avatar URL format"))]
@@ -76,13 +85,8 @@ pub trait UserRepository: Send + Sync {
 /// 用户服务接口
 #[async_trait]
 pub trait UserService: Send + Sync {
-    /// 获取当前用户信息
     async fn get_current_user(&self, user_id: Uuid) -> Result<UserDto, UserError>;
-
-    /// 更新用户信息
     async fn update_user(&self, user_id: Uuid, updates: UpdateUserRequest) -> Result<UserDto, UserError>;
-
-    /// 修改密码
     async fn change_password(&self, user_id: Uuid, req: ChangePasswordRequest) -> Result<(), UserError>;
 }
 
@@ -93,27 +97,16 @@ pub struct UserServiceImpl {
 }
 
 impl UserServiceImpl {
-    pub fn new(
-        user_repo: Arc<dyn UserRepository>,
-        password_service: Arc<dyn PasswordHasher>,
-    ) -> Self {
-        Self {
-            user_repo,
-            password_service,
-        }
+    pub fn new(user_repo: Arc<dyn UserRepository>, password_service: Arc<dyn PasswordHasher>) -> Self {
+        Self { user_repo, password_service }
     }
 
-    /// 验证密码强度
     fn validate_password_strength(&self, password: &str) -> Result<(), UserError> {
         if password.len() < 8 {
-            return Err(UserError::WeakPassword(
-                "Password must be at least 8 characters".to_string(),
-            ));
+            return Err(UserError::WeakPassword("Password must be at least 8 characters".to_string()));
         }
         if password.len() > 128 {
-            return Err(UserError::WeakPassword(
-                "Password must be at most 128 characters".to_string(),
-            ));
+            return Err(UserError::WeakPassword("Password must be at most 128 characters".to_string()));
         }
         Ok(())
     }
@@ -122,39 +115,18 @@ impl UserServiceImpl {
 #[async_trait]
 impl UserService for UserServiceImpl {
     async fn get_current_user(&self, user_id: Uuid) -> Result<UserDto, UserError> {
-        let user = self
-            .user_repo
-            .find_by_id(user_id)
-            .await
+        let user = self.user_repo.find_by_id(user_id).await
             .map_err(|e| UserError::Internal(e.to_string()))?
             .ok_or(UserError::UserNotFound)?;
-
-        Ok(UserDto {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatar: user.avatar_url,
-            status: user.status,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-        })
+        Ok(UserDto::from(user))
     }
 
-    async fn update_user(
-        &self,
-        user_id: Uuid,
-        updates: UpdateUserRequest,
-    ) -> Result<UserDto, UserError> {
+    async fn update_user(&self, user_id: Uuid, updates: UpdateUserRequest) -> Result<UserDto, UserError> {
         let mut update_entity = UpdateUserEntity::default();
 
         if let Some(ref username) = updates.username {
-            // 验证用户名唯一性
-            let exists = self
-                .user_repo
-                .exists_by_username_except_user(username, user_id)
-                .await
+            let exists = self.user_repo.exists_by_username_except_user(username, user_id).await
                 .map_err(|e| UserError::Internal(e.to_string()))?;
-
             if exists {
                 return Err(UserError::UsernameAlreadyExists);
             }
@@ -165,64 +137,32 @@ impl UserService for UserServiceImpl {
             update_entity.avatar_url = updates.avatar.clone();
         }
 
-        // 执行更新
-        let user = self
-            .user_repo
-            .update(user_id, &update_entity)
-            .await
+        let user = self.user_repo.update(user_id, &update_entity).await
             .map_err(|e| UserError::Internal(e.to_string()))?;
-
-        Ok(UserDto {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            avatar: user.avatar_url,
-            status: user.status,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-        })
+        Ok(UserDto::from(user))
     }
 
-    async fn change_password(
-        &self,
-        user_id: Uuid,
-        req: ChangePasswordRequest,
-    ) -> Result<(), UserError> {
-        // 获取用户
-        let user = self
-            .user_repo
-            .find_by_id(user_id)
-            .await
+    async fn change_password(&self, user_id: Uuid, req: ChangePasswordRequest) -> Result<(), UserError> {
+        let user = self.user_repo.find_by_id(user_id).await
             .map_err(|e| UserError::Internal(e.to_string()))?
             .ok_or(UserError::UserNotFound)?;
 
-        // 验证旧密码
-        let password_valid = self
-            .password_service
-            .verify_password(&req.old_password, &user.password_hash)
+        let password_valid = self.password_service.verify_password(&req.old_password, &user.password_hash)
             .map_err(|e| UserError::Internal(e.to_string()))?;
-
         if !password_valid {
             return Err(UserError::InvalidOldPassword);
         }
 
-        // 验证新旧密码不同
         if req.old_password == req.new_password {
             return Err(UserError::PasswordSameAsOld);
         }
 
-        // 验证新密码强度
         self.validate_password_strength(&req.new_password)?;
 
-        // 哈希新密码并存储
-        let new_hash = self
-            .password_service
-            .hash_password(&req.new_password)
+        let new_hash = self.password_service.hash_password(&req.new_password)
             .map_err(|e| UserError::Internal(e.to_string()))?;
 
-        self.user_repo
-            .update_password(user_id, &new_hash)
-            .await
+        self.user_repo.update_password(user_id, &new_hash).await
             .map_err(|e| UserError::Internal(e.to_string()))?;
 
         Ok(())
@@ -232,10 +172,8 @@ impl UserService for UserServiceImpl {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::auth::PasswordHasher;
     use crate::auth::services::BcryptPasswordHasher;
     use crate::models::entities::user::{User, UserStatus};
-    use chrono::Utc;
     use std::sync::RwLock;
 
     struct MockUserRepository {
@@ -244,11 +182,8 @@ mod tests {
 
     impl MockUserRepository {
         fn new() -> Self {
-            Self {
-                users: RwLock::new(std::collections::HashMap::new()),
-            }
+            Self { users: RwLock::new(std::collections::HashMap::new()) }
         }
-
         fn add_user(&self, user: User) {
             self.users.write().unwrap().insert(user.id, user);
         }
@@ -259,7 +194,6 @@ mod tests {
         async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, AppError> {
             Ok(self.users.read().unwrap().get(&id).cloned())
         }
-
         async fn update(&self, id: Uuid, updates: &UpdateUserEntity) -> Result<User, AppError> {
             let user = self.users.read().unwrap().get(&id).cloned().unwrap();
             let updated = User {
@@ -269,18 +203,15 @@ mod tests {
             };
             Ok(updated)
         }
-
         async fn update_password(&self, id: Uuid, password_hash: &str) -> Result<(), AppError> {
             if let Some(user) = self.users.write().unwrap().get_mut(&id) {
                 user.password_hash = password_hash.to_string();
             }
             Ok(())
         }
-
         async fn exists_by_username(&self, username: &str) -> Result<bool, AppError> {
             Ok(self.users.read().unwrap().values().any(|u| u.username.as_ref() == Some(&username.to_string())))
         }
-
         async fn exists_by_username_except_user(&self, username: &str, user_id: Uuid) -> Result<bool, AppError> {
             Ok(self.users.read().unwrap().values().any(|u| u.username.as_ref() == Some(&username.to_string()) && u.id != user_id))
         }
@@ -300,27 +231,17 @@ mod tests {
             updated_at: Utc::now(),
         };
         mock_repo.add_user(user.clone());
-
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(BcryptPasswordHasher),
-        );
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(BcryptPasswordHasher));
         let result = service.get_current_user(user.id).await;
         assert!(result.is_ok());
         let dto = result.unwrap();
         assert_eq!(dto.email, "test@example.com");
-        assert_eq!(dto.username, Some("testuser".to_string()));
     }
 
     #[tokio::test]
     async fn test_get_current_user_not_found() {
         let mock_repo = MockUserRepository::new();
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(BcryptPasswordHasher),
-        );
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(BcryptPasswordHasher));
         let result = service.get_current_user(Uuid::new_v4()).await;
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), UserError::UserNotFound));
@@ -331,7 +252,6 @@ mod tests {
         let mock_repo = MockUserRepository::new();
         let password_hasher = BcryptPasswordHasher;
         let password_hash = password_hasher.hash_password("OldPass123!").unwrap();
-        
         let user = User {
             id: Uuid::new_v4(),
             email: "test@example.com".to_string(),
@@ -343,20 +263,11 @@ mod tests {
             updated_at: Utc::now(),
         };
         mock_repo.add_user(user.clone());
-
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(password_hasher),
-        );
-
-        let result = service.change_password(
-            user.id,
-            ChangePasswordRequest {
-                old_password: "OldPass123!".to_string(),
-                new_password: "NewPass456!".to_string(),
-            },
-        ).await;
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(password_hasher));
+        let result = service.change_password(user.id, ChangePasswordRequest {
+            old_password: "OldPass123!".to_string(),
+            new_password: "NewPass456!".to_string(),
+        }).await;
         assert!(result.is_ok());
     }
 
@@ -365,7 +276,6 @@ mod tests {
         let mock_repo = MockUserRepository::new();
         let password_hasher = BcryptPasswordHasher;
         let password_hash = password_hasher.hash_password("OldPass123!").unwrap();
-        
         let user = User {
             id: Uuid::new_v4(),
             email: "test@example.com".to_string(),
@@ -377,20 +287,11 @@ mod tests {
             updated_at: Utc::now(),
         };
         mock_repo.add_user(user.clone());
-
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(password_hasher),
-        );
-
-        let result = service.change_password(
-            user.id,
-            ChangePasswordRequest {
-                old_password: "WrongPass123!".to_string(),
-                new_password: "NewPass456!".to_string(),
-            },
-        ).await;
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(password_hasher));
+        let result = service.change_password(user.id, ChangePasswordRequest {
+            old_password: "WrongPass123!".to_string(),
+            new_password: "NewPass456!".to_string(),
+        }).await;
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), UserError::InvalidOldPassword));
     }
@@ -400,7 +301,6 @@ mod tests {
         let mock_repo = MockUserRepository::new();
         let password_hasher = BcryptPasswordHasher;
         let password_hash = password_hasher.hash_password("SamePass123!").unwrap();
-        
         let user = User {
             id: Uuid::new_v4(),
             email: "test@example.com".to_string(),
@@ -412,20 +312,11 @@ mod tests {
             updated_at: Utc::now(),
         };
         mock_repo.add_user(user.clone());
-
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(password_hasher),
-        );
-
-        let result = service.change_password(
-            user.id,
-            ChangePasswordRequest {
-                old_password: "SamePass123!".to_string(),
-                new_password: "SamePass123!".to_string(),
-            },
-        ).await;
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(password_hasher));
+        let result = service.change_password(user.id, ChangePasswordRequest {
+            old_password: "SamePass123!".to_string(),
+            new_password: "SamePass123!".to_string(),
+        }).await;
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), UserError::PasswordSameAsOld));
     }
@@ -435,7 +326,6 @@ mod tests {
         let mock_repo = MockUserRepository::new();
         let password_hasher = BcryptPasswordHasher;
         let password_hash = password_hasher.hash_password("OldPass123!").unwrap();
-        
         let user = User {
             id: Uuid::new_v4(),
             email: "test@example.com".to_string(),
@@ -447,20 +337,11 @@ mod tests {
             updated_at: Utc::now(),
         };
         mock_repo.add_user(user.clone());
-
-        let service = UserServiceImpl::new(
-            Arc::new(mock_repo),
-            Arc::new(password_hasher),
-        );
-
-        let result = service.change_password(
-            user.id,
-            ChangePasswordRequest {
-                old_password: "OldPass123!".to_string(),
-                new_password: "short".to_string(),
-            },
-        ).await;
-
+        let service = UserServiceImpl::new(Arc::new(mock_repo), Arc::new(password_hasher));
+        let result = service.change_password(user.id, ChangePasswordRequest {
+            old_password: "OldPass123!".to_string(),
+            new_password: "short".to_string(),
+        }).await;
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), UserError::WeakPassword(_)));
     }

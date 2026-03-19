@@ -5,7 +5,6 @@
 use async_trait::async_trait;
 use uuid::Uuid;
 
-use crate::auth::traits::UserRepository as AuthUserRepository;
 use crate::core::error::AppError;
 use crate::db::repository::user_repo::UserRepository as DbUserRepository;
 use crate::models::entities::user::User;
