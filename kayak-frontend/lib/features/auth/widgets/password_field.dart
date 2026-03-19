@@ -53,7 +53,7 @@ class _PasswordFieldState extends ConsumerState<PasswordField> {
   Widget build(BuildContext context) {
     final errorText = ref.watch(passwordValidationProvider);
 
-    return TextField(
+    return TextFormField(
       controller: widget.controller,
       focusNode: widget.focusNode,
       enabled: widget.enabled,
@@ -84,7 +84,11 @@ class _PasswordFieldState extends ConsumerState<PasswordField> {
           ref.read(passwordValidationProvider.notifier).state = null;
         }
       },
-      onSubmitted: widget.onSubmitted,
+      onFieldSubmitted: (_) {
+        if (widget.onSubmitted != null) {
+          widget.onSubmitted!('');
+        }
+      },
     );
   }
 }

@@ -49,7 +49,7 @@ class _EmailFieldState extends ConsumerState<EmailField> {
   Widget build(BuildContext context) {
     final errorText = ref.watch(emailValidationProvider);
 
-    return TextField(
+    return TextFormField(
       controller: widget.controller,
       focusNode: widget.focusNode,
       enabled: widget.enabled,
