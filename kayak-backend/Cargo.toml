@@ -43,6 +43,9 @@ dotenvy = "0.15"
 # Async trait
 async-trait = "0.1"
 
+# Async futures
+futures = "0.3"
+
 # Authentication
 jsonwebtoken = "9"
 bcrypt = "0.15"

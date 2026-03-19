@@ -3,7 +3,9 @@
 //! 提供用户实体的数据访问操作
 
 use crate::db::connection::DbPool;
-use crate::models::entities::user::{CreateUserRequest, UpdateUserRequest, User};
+use crate::models::entities::user::{CreateUserRequest, UpdateUserRequest as EntityUpdateUserRequest, User};
+use crate::services::user::UpdateUserEntity;
+use chrono::Utc;
 use sqlx::{Error, Row};
 use uuid::Uuid;
 
@@ -124,26 +126,26 @@ impl UserRepository {
         Ok(user)
     }
 
-    /// 更新用户
+    /// 更新用户信息（使用EntityUpdateUserRequest，用于auth模块）
     pub async fn update(
         &self,
         id: Uuid,
-        req: UpdateUserRequest,
-    ) -> Result<Option<User>, Error> {
+        req: &EntityUpdateUserRequest,
+    ) -> Result<User, Error> {
         let existing = self.find_by_id(id).await?;
         if existing.is_none() {
-            return Ok(None);
+            return Err(Error::RowNotFound);
         }
 
         let mut user = existing.unwrap();
 
-        if let Some(username) = req.username {
-            user.username = Some(username);
+        if let Some(username) = &req.username {
+            user.username = Some(username.clone());
         }
-        if let Some(avatar_url) = req.avatar_url {
-            user.avatar_url = Some(avatar_url);
+        if let Some(avatar_url) = &req.avatar_url {
+            user.avatar_url = Some(avatar_url.clone());
         }
-        if let Some(status) = req.status {
+        if let Some(status) = &req.status {
             user.status = status.to_string();
         }
 
@@ -161,7 +163,94 @@ impl UserRepository {
         .execute(&self.pool)
         .await?;
 
-        Ok(Some(user))
+        Ok(user)
+    }
+
+    /// 更新用户信息（使用UpdateUserEntity，用于用户服务模块）
+    pub async fn update_with_entity(
+        &self,
+        id: Uuid,
+        updates: &UpdateUserEntity,
+    ) -> Result<User, Error> {
+        // 检查是否有更新
+        if updates.username.is_none() && updates.avatar_url.is_none() {
+            // 没有更新，直接返回当前用户
+            return self.find_by_id(id).await?.ok_or(
+                Error::RowNotFound
+            );
+        }
+
+        let now = Utc::now();
+        
+        // 构建更新查询
+        sqlx::query(
+            r#"
+            UPDATE users
+            SET updated_at = ?, username = COALESCE(?, username), avatar_url = COALESCE(?, avatar_url)
+            WHERE id = ?
+            "#,
+        )
+        .bind(now)
+        .bind(&updates.username)
+        .bind(&updates.avatar_url)
+        .bind(id.to_string())
+        .execute(&self.pool)
+        .await?;
+
+        // 返回更新后的用户
+        self.find_by_id(id).await?.ok_or(Error::RowNotFound)
+    }
+
+    /// 更新用户密码
+    pub async fn update_password(
+        &self,
+        id: Uuid,
+        password_hash: &str,
+    ) -> Result<(), Error> {
+        let now = Utc::now();
+        sqlx::query(
+            r#"
+            UPDATE users
+            SET password_hash = ?, updated_at = ?
+            WHERE id = ?
+            "#,
+        )
+        .bind(password_hash)
+        .bind(now)
+        .bind(id.to_string())
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
+
+    /// 检查用户名是否存在
+    pub async fn exists_by_username(&self, username: &str) -> Result<bool, Error> {
+        let exists: bool = sqlx::query_scalar(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)",
+        )
+        .bind(username)
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(exists)
+    }
+
+    /// 检查用户名是否存在（排除指定用户）
+    pub async fn exists_by_username_except_user(
+        &self,
+        username: &str,
+        user_id: Uuid,
+    ) -> Result<bool, Error> {
+        let exists: bool = sqlx::query_scalar(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE username = ? AND id != ?)",
+        )
+        .bind(username)
+        .bind(user_id.to_string())
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(exists)
     }
 
     /// 删除用户
@@ -182,6 +271,7 @@ impl UserRepository {
 mod tests {
     use super::*;
     use crate::db::connection::init_db;
+    use crate::services::user::UpdateUserEntity;
 
     #[tokio::test]
     async fn test_user_repository() {
@@ -206,13 +296,12 @@ mod tests {
         assert_eq!(found.unwrap().email, "test@example.com");
 
         // 更新用户
-        let update_req = UpdateUserRequest {
+        let update_req = UpdateUserEntity {
             username: Some("Updated Name".to_string()),
-            ..Default::default()
+            avatar_url: None,
         };
-        let updated = repo.update(user.id, update_req).await.unwrap();
-        assert!(updated.is_some());
-        assert_eq!(updated.unwrap().username, Some("Updated Name".to_string()));
+        let updated = repo.update_with_entity(user.id, &update_req).await.unwrap();
+        assert_eq!(updated.username, Some("Updated Name".to_string()));
 
         // 删除用户
         let deleted = repo.delete(user.id).await.unwrap();
@@ -220,5 +309,44 @@ mod tests {
 
         let not_found = repo.find_by_id(user.id).await.unwrap();
         assert!(not_found.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_exists_by_username() {
+        let db_id = uuid::Uuid::new_v4().to_string();
+        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id)).await.unwrap();
+        let repo = UserRepository::new(pool);
+
+        // 创建用户
+        let req = CreateUserRequest {
+            email: "test@example.com".to_string(),
+            password_hash: "hashed_password".to_string(),
+            username: Some("uniqueuser".to_string()),
+        };
+        let user = repo.create(req).await.unwrap();
+
+        // 检查用户名存在
+        let exists = repo.exists_by_username("uniqueuser").await.unwrap();
+        assert!(exists);
+
+        // 检查不存在的用户名
+        let exists = repo.exists_by_username("nonexistent").await.unwrap();
+        assert!(!exists);
+
+        // 检查用户名排除自身
+        let exists = repo.exists_by_username_except_user("uniqueuser", user.id).await.unwrap();
+        assert!(!exists);
+
+        // 创建另一个用户使用相同用户名
+        let req2 = CreateUserRequest {
+            email: "test2@example.com".to_string(),
+            password_hash: "hashed_password".to_string(),
+            username: Some("uniqueuser".to_string()),
+        };
+        let _ = repo.create(req2).await.unwrap();
+
+        // 现在检查应该返回true
+        let exists = repo.exists_by_username_except_user("uniqueuser", user.id).await.unwrap();
+        assert!(exists);
     }
 }

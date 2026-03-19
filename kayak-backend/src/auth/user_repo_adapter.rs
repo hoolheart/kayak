@@ -50,7 +50,7 @@ impl UserRepositoryTrait for UserRepositoryAdapter {
             status: Some(crate::models::entities::user::UserStatus::from(user.status.clone())),
         };
 
-        self.inner.update(user.id, req).await.map_err(AppError::from)?;
+        self.inner.update(user.id, &req).await.map_err(AppError::from)?;
         Ok(())
     }
 }
