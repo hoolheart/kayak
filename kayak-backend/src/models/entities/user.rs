@@ -42,7 +42,7 @@ impl From<String> for UserStatus {
 }
 
 /// 用户实体
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct User {
     /// 用户ID (UUID)
     pub id: Uuid,
