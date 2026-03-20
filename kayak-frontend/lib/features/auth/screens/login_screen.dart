@@ -10,13 +10,26 @@ import 'login_view.dart';
 
 /// 登录页面主入口
 class LoginScreen extends ConsumerWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({
+    super.key,
+    this.redirectPath,
+    this.sessionExpired = false,
+  });
+
+  /// 登录成功后重定向的路径
+  final String? redirectPath;
+
+  /// 会话是否已过期
+  final bool sessionExpired;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
-        child: LoginView(),
+        child: LoginView(
+          redirectPath: redirectPath,
+          sessionExpired: sessionExpired,
+        ),
       ),
     );
   }

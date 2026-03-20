@@ -40,6 +40,8 @@ dependencies:
   # ==================== 本地存储 ====================
   # 轻量级键值存储（用于主题、语言等偏好设置）
   shared_preferences: ^2.2.2
+  # 安全存储（用于Token等敏感信息）
+  flutter_secure_storage: ^9.0.0
 
   # ==================== 国际化 ====================
   flutter_localizations:

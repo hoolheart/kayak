@@ -1,0 +1,61 @@
+/// Auth API Service Interface
+///
+/// 定义认证相关API的抽象，遵循依赖倒置原则
+import 'package:dio/dio.dart';
+import 'auth_state.dart';
+
+abstract class AuthApiServiceInterface {
+  /// 登录
+  Future<LoginResponse> login(String email, String password);
+
+  /// 刷新Token
+  Future<TokenPair> refreshToken(String refreshToken);
+
+  /// 获取当前用户信息
+  Future<User> getCurrentUser(String accessToken);
+}
+
+/// 认证API服务实现
+///
+/// 实现AuthApiServiceInterface接口
+class AuthApiService implements AuthApiServiceInterface {
+  final Dio _dio;
+  final String _baseUrl;
+
+  AuthApiService({
+    required Dio dio,
+    required String baseUrl,
+  })  : _dio = dio,
+        _baseUrl = baseUrl;
+
+  @override
+  Future<LoginResponse> login(String email, String password) async {
+    final response = await _dio.post(
+      '$_baseUrl/api/v1/auth/login',
+      data: {'email': email, 'password': password},
+    );
+
+    return LoginResponse.fromJson(
+        response.data['data'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<TokenPair> refreshToken(String refreshToken) async {
+    final response = await _dio.post(
+      '$_baseUrl/api/v1/auth/refresh',
+      data: {'refresh_token': refreshToken},
+    );
+
+    return TokenPair.fromJson(response.data['data'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<User> getCurrentUser(String accessToken) async {
+    final response = await _dio.get(
+      '$_baseUrl/api/v1/auth/me',
+      options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+    );
+
+    return User.fromJson(response.data['data'] as Map<String, dynamic>);
+  }
+}
