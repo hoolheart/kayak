@@ -202,9 +202,18 @@ impl WorkbenchRepository for SqlxWorkbenchRepository {
     }
 
     async fn delete(&self, id: Uuid) -> Result<(), WorkbenchRepositoryError> {
-        // Soft delete by setting status to deleted
-        sqlx::query("UPDATE workbenches SET status = 'deleted', updated_at = ? WHERE id = ?")
-            .bind(chrono::Utc::now().to_rfc3339())
+        // First check if workbench exists and is not already deleted
+        let workbench = self.find_by_id(id).await?;
+        if workbench.is_none() {
+            return Err(WorkbenchRepositoryError::NotFound);
+        }
+        
+        // Hard delete - cascade will handle device/point deletion via FK CASCADE
+        // S1-003 schema defines:
+        // - devices.workbench_id REFERENCES workbenches(id) ON DELETE CASCADE
+        // - points.device_id REFERENCES devices(id) ON DELETE CASCADE
+        // - devices.parent_id REFERENCES devices(id) ON DELETE CASCADE
+        sqlx::query("DELETE FROM workbenches WHERE id = ?")
             .bind(id.to_string())
             .execute(&self.pool)
             .await?;

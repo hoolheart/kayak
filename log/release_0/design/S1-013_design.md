@@ -788,7 +788,10 @@ Authorization: Bearer <access_token>
 
 #### 级联删除说明
 
-删除工作台时，数据库外键约束会自动级联删除：
+当前实现使用软删除（status = 'deleted'），设备不会自动级联删除。
+
+**未来硬删除时的级联删除设计**：
+当实现硬删除时，数据库外键约束会自动级联删除：
 1. 删除所有关联的设备（`devices.workbench_id` → `CASCADE`）
 2. 删除所有设备的测点（`points.device_id` → `CASCADE`）
 3. 删除所有嵌套子设备（`devices.parent_id` → `CASCADE`）
