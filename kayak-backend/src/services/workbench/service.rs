@@ -17,13 +17,13 @@ pub trait WorkbenchService: Send + Sync {
     async fn delete_workbench(&self, user_id: Uuid, workbench_id: Uuid) -> Result<(), WorkbenchError>;
 }
 
-/// 工作台服务实现
-pub struct WorkbenchServiceImpl<R: WorkbenchRepository> {
-    workbench_repo: Arc<R>,
+/// 工作台服务实现 (使用dyn trait进行依赖注入)
+pub struct WorkbenchServiceImpl {
+    workbench_repo: Arc<dyn WorkbenchRepository>,
 }
 
-impl<R: WorkbenchRepository> WorkbenchServiceImpl<R> {
-    pub fn new(workbench_repo: Arc<R>) -> Self {
+impl WorkbenchServiceImpl {
+    pub fn new(workbench_repo: Arc<dyn WorkbenchRepository>) -> Self {
         Self { workbench_repo }
     }
 
@@ -41,7 +41,7 @@ impl<R: WorkbenchRepository> WorkbenchServiceImpl<R> {
 }
 
 #[async_trait]
-impl<R: WorkbenchRepository> WorkbenchService for WorkbenchServiceImpl<R> {
+impl WorkbenchService for WorkbenchServiceImpl {
     async fn create_workbench(&self, owner_id: Uuid, req: CreateWorkbenchEntity) -> Result<WorkbenchDto, WorkbenchError> {
         // Validation
         if req.name.is_empty() {

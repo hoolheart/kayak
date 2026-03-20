@@ -10,10 +10,10 @@ use uuid::Uuid;
 use crate::auth::middleware::require_auth::RequireAuth;
 use crate::core::error::{ApiResponse, AppError};
 use crate::models::entities::workbench::{CreateWorkbenchRequest, UpdateWorkbenchRequest};
-use crate::services::workbench::{WorkbenchService, WorkbenchServiceImpl, SqlxWorkbenchRepository, WorkbenchDto, PagedWorkbenchDto, CreateWorkbenchEntity, UpdateWorkbenchEntity, ListWorkbenchesQuery, WorkbenchError};
+use crate::services::workbench::{WorkbenchService, WorkbenchDto, PagedWorkbenchDto, CreateWorkbenchEntity, UpdateWorkbenchEntity, ListWorkbenchesQuery, WorkbenchError};
 
 /// 应用状态类型
-type AppState = Arc<WorkbenchServiceImpl<SqlxWorkbenchRepository>>;
+type AppState = Arc<dyn WorkbenchService>;
 
 /// POST /api/v1/workbenches - 创建工作台
 pub async fn create_workbench(
@@ -78,18 +78,6 @@ pub async fn update_workbench(
     Path(id): Path<Uuid>,
     Json(req): Json<UpdateWorkbenchRequest>,
 ) -> Result<Json<ApiResponse<WorkbenchDto>>, AppError> {
-    // Validation
-    if let Some(ref name) = req.name {
-        if name.is_empty() {
-            return Err(AppError::BadRequest("Name cannot be empty".to_string()));
-        }
-    }
-    if let Some(ref desc) = req.description {
-        if desc.len() > 1000 {
-            return Err(AppError::BadRequest("Description too long".to_string()));
-        }
-    }
-
     let entity = UpdateWorkbenchEntity {
         name: req.name,
         description: req.description,
@@ -112,7 +100,7 @@ pub async fn delete_workbench(
     State(handler): State<AppState>,
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
-) -> Result<(StatusCode, Json<serde_json::Value>), AppError> {
+) -> Result<StatusCode, AppError> {
     handler.delete_workbench(user_ctx.user_id, id).await
         .map_err(|e| match e {
             WorkbenchError::NotFound => AppError::NotFound("Workbench not found".to_string()),
@@ -120,10 +108,5 @@ pub async fn delete_workbench(
             _ => AppError::InternalError(e.to_string()),
         })?;
 
-    let body = serde_json::json!({
-        "code": 204,
-        "message": "Workbench deleted successfully"
-    });
-
-    Ok((StatusCode::NO_CONTENT, Json(body)))
+    Ok(StatusCode::NO_CONTENT)
 }

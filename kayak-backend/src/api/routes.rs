@@ -23,7 +23,7 @@ use crate::db::repository::user_repo::UserRepository;
 use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
-use crate::services::workbench::WorkbenchServiceImpl;
+use crate::services::workbench::{WorkbenchService, WorkbenchServiceImpl};
 
 /// 创建应用路由
 pub fn create_router(pool: DbPool) -> Router {
@@ -58,7 +58,7 @@ pub fn create_router(pool: DbPool) -> Router {
 
     // 创建工作台服务
     let workbench_repo = SqlxWorkbenchRepository::new(pool);
-    let workbench_service: Arc<WorkbenchServiceImpl<SqlxWorkbenchRepository>> =
+    let workbench_service: Arc<dyn WorkbenchService> =
         Arc::new(WorkbenchServiceImpl::new(Arc::new(workbench_repo)));
 
     Router::new()
@@ -100,9 +100,7 @@ fn user_routes(user_service: Arc<dyn UserService>) -> Router {
 }
 
 /// 工作台路由组
-fn workbench_routes(
-    workbench_service: Arc<WorkbenchServiceImpl<SqlxWorkbenchRepository>>,
-) -> Router {
+fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router {
     Router::new().nest(
         "/api/v1/workbenches",
         Router::new()
