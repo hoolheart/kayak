@@ -5,12 +5,13 @@
 use std::sync::Arc;
 
 use axum::{
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
     Router,
 };
 
 use crate::api::handlers::health;
 use crate::api::handlers::user;
+use crate::api::handlers::workbench;
 use crate::api::middleware::error::not_found_handler;
 use crate::auth::{
     handlers::{login, refresh_token, register},
@@ -19,8 +20,10 @@ use crate::auth::{
 };
 use crate::db::connection::DbPool;
 use crate::db::repository::user_repo::UserRepository;
+use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
+use crate::services::workbench::WorkbenchServiceImpl;
 
 /// 创建应用路由
 pub fn create_router(pool: DbPool) -> Router {
@@ -53,12 +56,18 @@ pub fn create_router(pool: DbPool) -> Router {
         password_hasher,
     ));
 
+    // 创建工作台服务
+    let workbench_repo = SqlxWorkbenchRepository::new(pool);
+    let workbench_service: Arc<WorkbenchServiceImpl<SqlxWorkbenchRepository>> =
+        Arc::new(WorkbenchServiceImpl::new(Arc::new(workbench_repo)));
+
     Router::new()
         // 健康检查（最优先，无中间件限制）
         .route("/health", get(health::health_check))
         // API路由
         .merge(auth_routes(auth_service))
         .merge(user_routes(user_service))
+        .merge(workbench_routes(workbench_service))
         // 404处理
         .fallback(not_found_handler)
 }
@@ -90,8 +99,27 @@ fn user_routes(user_service: Arc<dyn UserService>) -> Router {
     )
 }
 
+/// 工作台路由组
+fn workbench_routes(
+    workbench_service: Arc<WorkbenchServiceImpl<SqlxWorkbenchRepository>>,
+) -> Router {
+    Router::new().nest(
+        "/api/v1/workbenches",
+        Router::new()
+            .route("/", post(workbench::create_workbench))
+            .route("/", get(workbench::list_workbenches))
+            .route("/{id}", get(workbench::get_workbench))
+            .route("/{id}", put(workbench::update_workbench))
+            .route("/{id}", delete(workbench::delete_workbench))
+            .with_state(workbench_service),
+    )
+}
+
 // Re-export for use in tests or other modules
 pub use user::{change_password, get_current_user, update_current_user};
+pub use workbench::{
+    create_workbench, delete_workbench, get_workbench, list_workbenches, update_workbench,
+};
 
 /// 获取健康检查路由（用于测试）
 pub fn health_routes() -> Router {

@@ -3,6 +3,7 @@
 //! 提供实体的CRUD操作
 
 pub mod user_repo;
+pub mod workbench_repo;
 
 // 基础Repository trait
 use async_trait::async_trait;
