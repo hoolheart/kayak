@@ -198,7 +198,6 @@ class WorkbenchListState with _$WorkbenchListState {
   const factory WorkbenchListState({
     @Default([]) List<Workbench> workbenches,
     @Default(false) bool isLoading,
-    @Default(false) bool isRefreshing,
     String? error,
     @Default(1) int currentPage,
     @Default(20) int pageSize,
@@ -235,21 +234,22 @@ enum ViewMode {
 /// 工作台列表Provider
 @riverpod
 class WorkbenchList extends _$WorkbenchList {
-  late final WorkbenchService _service;
-
   @override
   Future<WorkbenchListState> build() async {
-    _service = ref.read(workbenchServiceProvider);
-    return _loadWorkbenches();
+    final service = ref.read(workbenchServiceProvider);
+    return _loadWorkbenches(service: service);
   }
 
-  Future<WorkbenchListState> _loadWorkbenches({int page = 1}) async {
+  Future<WorkbenchListState> _loadWorkbenches({WorkbenchService? service, int page = 1}) async {
+    // Use provided service or get from provider
+    final svc = service ?? ref.read(workbenchServiceProvider);
+    
     try {
-      final response = await _service.getWorkbenches(page: page);
+      final response = await svc.getWorkbenches(page: page);
       return WorkbenchListState(
         workbenches: response.items,
         currentPage: page,
-        hasMore: response.items.length >= response.size,
+        hasMore: (response.page * response.size) < response.total,
       );
     } catch (e) {
       return WorkbenchListState(error: e.toString());
@@ -269,12 +269,13 @@ class WorkbenchList extends _$WorkbenchList {
     
     try {
       final nextPage = current.currentPage + 1;
-      final response = await _service.getWorkbenches(page: nextPage);
+      final service = ref.read(workbenchServiceProvider);
+      final response = await service.getWorkbenches(page: nextPage);
       
       state = AsyncValue.data(current.copyWith(
         workbenches: [...current.workbenches, ...response.items],
         currentPage: nextPage,
-        hasMore: response.items.length >= response.size,
+        hasMore: (response.page * response.size) < response.total,
         isLoading: false,
       ));
     } catch (e) {
@@ -287,7 +288,8 @@ class WorkbenchList extends _$WorkbenchList {
 
   Future<bool> createWorkbench(String name, String? description) async {
     try {
-      final workbench = await _service.createWorkbench(
+      final service = ref.read(workbenchServiceProvider);
+      final workbench = await service.createWorkbench(
         name: name,
         description: description,
       );
@@ -306,7 +308,8 @@ class WorkbenchList extends _$WorkbenchList {
 
   Future<bool> updateWorkbench(String id, String name, String? description) async {
     try {
-      final updated = await _service.updateWorkbench(
+      final service = ref.read(workbenchServiceProvider);
+      final updated = await service.updateWorkbench(
         id: id,
         name: name,
         description: description,
@@ -328,7 +331,8 @@ class WorkbenchList extends _$WorkbenchList {
 
   Future<bool> deleteWorkbench(String id) async {
     try {
-      await _service.deleteWorkbench(id);
+      final service = ref.read(workbenchServiceProvider);
+      await service.deleteWorkbench(id);
       
       final current = state.valueOrNull;
       if (current != null) {
@@ -1346,33 +1350,35 @@ class UpdateWorkbenchRequest with _$UpdateWorkbenchRequest {
 ### 6.2 服务层接口
 
 ```dart
-/// 工作台服务接口
-abstract class WorkbenchServiceInterface {
-  /// 获取工作台列表
-  Future<PagedWorkbenchResponse> getWorkbenches({
-    int page = 1,
-    int size = 20,
-  });
+  /// 工作台服务接口
+  abstract class WorkbenchServiceInterface {
+    /// 获取工作台列表
+    Future<PagedWorkbenchResponse> getWorkbenches({
+      int page = 1,
+      int size = 20,
+    });
 
-  /// 获取单个工作台详情
-  Future<Workbench> getWorkbench(String id);
+    /// 创建工作台
+    Future<Workbench> createWorkbench({
+      required String name,
+      String? description,
+    });
 
-  /// 创建工作台
-  Future<Workbench> createWorkbench({
-    required String name,
-    String? description,
-  });
+    /// 更新工作台
+    Future<Workbench> updateWorkbench({
+      required String id,
+      String? name,
+      String? description,
+    });
 
-  /// 更新工作台
-  Future<Workbench> updateWorkbench({
-    required String id,
-    String? name,
-    String? description,
-  });
+    /// 删除工作台
+    Future<void> deleteWorkbench(String id);
+  }
 
-  /// 删除工作台
-  Future<void> deleteWorkbench(String id);
-}
+  /// @deprecated 此方法已废弃，不再需要单个工作台详情的独立获取方法
+  /// 工作台列表接口已包含完整的工作台信息，无需额外调用
+  /// 如需获取单个工作台详情，应从列表缓存中查找
+  // Future<Workbench> getWorkbench(String id);
 
 /// 工作台服务实现
 @riverpod
@@ -1398,12 +1404,6 @@ class WorkbenchService implements WorkbenchServiceInterface {
     );
     
     return PagedWorkbenchResponse.fromJson(response.data);
-  }
-
-  @override
-  Future<Workbench> getWorkbench(String id) async {
-    final response = await _apiClient.get('/api/v1/workbenches/$id');
-    return Workbench.fromJson(response.data);
   }
 
   @override
@@ -1591,7 +1591,7 @@ classDiagram
         +deleteWorkbench()
     }
     
-    class WorkbenchFormNotifier {
+    class workbenchFormProvider {
         <<StateNotifier>>
         +WorkbenchFormState state
         +updateName()
@@ -1611,7 +1611,6 @@ classDiagram
     class WorkbenchServiceInterface {
         <<interface>>
         +getWorkbenches() Future~PagedWorkbenchResponse~
-        +getWorkbench() Future~Workbench~
         +createWorkbench() Future~Workbench~
         +updateWorkbench() Future~Workbench~
         +deleteWorkbench() Future~void~
@@ -1620,7 +1619,6 @@ classDiagram
     class WorkbenchService {
         -ApiClientInterface _apiClient
         +getWorkbenches()
-        +getWorkbench()
         +createWorkbench()
         +updateWorkbench()
         +deleteWorkbench()
@@ -1643,7 +1641,6 @@ classDiagram
     class WorkbenchListState {
         +List~Workbench~ workbenches
         +bool isLoading
-        +bool isRefreshing
         +String? error
         +int currentPage
         +bool hasMore
@@ -1681,7 +1678,7 @@ classDiagram
     WorkbenchServiceInterface <|.. WorkbenchService : implements
     
     WorkbenchList --> WorkbenchListState : manages
-    WorkbenchFormNotifier --> WorkbenchFormState : manages
+    workbenchFormProvider --> WorkbenchFormState : manages
     
     WorkbenchCard --> Workbench : displays
     WorkbenchListTile --> Workbench : displays
