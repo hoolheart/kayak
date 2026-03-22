@@ -199,6 +199,9 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-016 |
 | **验收标准** | 1. 定义DeviceDriver trait接口<br>2. VirtualDriver实现数据读取<br>3. 设备可配置参数(如随机范围) |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-22 |
+| **分支** | `feature/S1-017-virtual-device-protocol` |
 
 #### S1-018: 设备与测点CRUD API
 | 字段 | 内容 |
