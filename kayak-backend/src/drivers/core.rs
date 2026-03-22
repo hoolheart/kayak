@@ -2,11 +2,12 @@
 
 use uuid::Uuid;
 use async_trait::async_trait;
+use serde::{Serialize, Deserialize};
 
 pub use super::error::{DriverError, VirtualConfigError};
 
 /// 表示测点的值，支持多种数据类型
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub enum PointValue {
     /// 浮点数
     Number(f64),
@@ -41,7 +42,7 @@ impl PointValue {
 }
 
 /// 虚拟设备的数据生成模式
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum VirtualMode {
     /// 随机数据模式
     #[default]
@@ -55,7 +56,7 @@ pub enum VirtualMode {
 }
 
 /// 支持的数据类型
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum DataType {
     /// 浮点数（默认）
     #[default]
@@ -69,7 +70,7 @@ pub enum DataType {
 }
 
 /// 测点访问类型
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum AccessType {
     /// 只读
     #[default]
