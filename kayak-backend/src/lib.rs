@@ -17,6 +17,7 @@ pub mod core {
 
 pub mod auth;
 pub mod db;
+pub mod drivers;
 pub mod models;
 pub mod services;
 
