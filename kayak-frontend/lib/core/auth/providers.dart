@@ -120,8 +120,9 @@ final authRouteGuard = Provider<AuthRouteGuard>((ref) {
 /// App Initializer Provider
 ///
 /// 应用初始化Provider，确保认证状态在应用启动时恢复
+/// 不再使用延迟初始化，而是由调用方在build后主动触发
 final appInitializerProvider = FutureProvider<bool>((ref) async {
-  final authNotifier = ref.watch(authStateNotifierProvider);
-  await authNotifier.initialize();
+  // 直接初始化，不再延迟
+  // 初始化逻辑应该由使用方在build后调用
   return true;
 });
