@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -15,13 +16,32 @@ import '../auth/auth_state.dart';
 import '../auth/providers.dart';
 
 /// 简单的启动页，后续可以替换为真正的SplashScreen
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 初始化时恢复认证状态
-    ref.watch(appInitializerProvider);
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 使用addPostFrameCallback在第一帧渲染后初始化，避免在build期间修改状态
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initializeAuth();
+    });
+  }
+
+  Future<void> _initializeAuth() async {
+    final authNotifier = ref.read(authStateNotifierProvider);
+    await authNotifier.initialize();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 监听appInitializerProvider，但不依赖其状态
+    ref.listen(appInitializerProvider, (_, __) {});
 
     return const Scaffold(
       body: Center(
