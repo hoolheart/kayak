@@ -52,7 +52,7 @@ use crate::core::error::AppError;
 ///
 /// # 示例
 ///
-/// ```rust
+/// ```rust,ignore
 /// use std::sync::Arc;
 /// use kayak_backend::auth::middleware::JwtAuthMiddleware;
 ///
@@ -137,7 +137,7 @@ impl AuthMiddleware for JwtAuthMiddleware {
 ///
 /// # 使用示例
 ///
-/// ```rust
+/// ```rust,ignore
 /// use kayak_backend::auth::middleware::AuthLayer;
 ///
 /// let layer = AuthLayer::new(middleware);

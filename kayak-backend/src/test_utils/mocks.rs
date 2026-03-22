@@ -3,7 +3,6 @@
 //! 提供测试用的 Mock 实现
 
 use crate::models::entities::*;
-use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;

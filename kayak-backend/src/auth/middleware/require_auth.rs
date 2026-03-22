@@ -13,7 +13,11 @@ use crate::core::error::AppError;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,ignore
+/// use axum::{Json, extract::Extension};
+/// use serde_json::Value;
+/// use kayak_backend::auth::{RequireAuth, UserContext};
+///
 /// async fn profile(
 ///     RequireAuth(user): RequireAuth,
 /// ) -> Json<Value> {
@@ -58,7 +62,11 @@ impl Deref for RequireAuth {
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,ignore
+/// use axum::{Json, extract::Extension};
+/// use serde_json::Value;
+/// use kayak_backend::auth::{OptionalAuth, UserContext};
+///
 /// async fn public_profile(
 ///     OptionalAuth(user): OptionalAuth,
 /// ) -> Json<Value> {

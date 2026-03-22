@@ -7,7 +7,6 @@ pub mod mocks;
 
 use crate::db::connection::DbPool;
 use sqlx::SqlitePool;
-use std::sync::Arc;
 use uuid::Uuid;
 
 /// 测试数据库上下文
@@ -15,6 +14,7 @@ use uuid::Uuid;
 /// 为每个测试提供独立的数据库连接池
 pub struct TestDbContext {
     pub pool: DbPool,
+    #[allow(dead_code)]
     db_name: String,
 }
 

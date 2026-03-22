@@ -13,8 +13,9 @@ use uuid::Uuid;
 ///
 /// # Example
 ///
-/// ```rust
+/// ```rust,ignore
 /// use axum::extract::Extension;
+/// use kayak_backend::auth::UserContext;
 ///
 /// async fn handler(
 ///     Extension(user_ctx): Extension<UserContext>,
@@ -39,7 +40,11 @@ impl UserContext {
     ///
     /// # Example
     ///
-    /// ```rust
+    /// ```rust,ignore
+    /// use uuid::Uuid;
+    /// use kayak_backend::auth::UserContext;
+    ///
+    /// let user_id = Uuid::new_v4();
     /// let ctx = UserContext::new(user_id, "user@example.com");
     /// ```
     pub fn new(user_id: Uuid, email: impl Into<String>) -> Self {

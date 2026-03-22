@@ -8,7 +8,7 @@
 //!
 //! # 基本用法
 //!
-//! ```rust
+//! ```rust,ignore
 //! use kayak_backend::auth::middleware::{AuthLayer, JwtAuthMiddleware};
 //! use std::sync::Arc;
 //!

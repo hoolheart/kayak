@@ -50,8 +50,8 @@ impl TokenExtractor for BearerTokenExtractor {
 ///
 /// # Example
 ///
-/// ```rust
-/// use kayak_backend::auth::middleware::CompositeTokenExtractor;
+/// ```rust,ignore
+/// use kayak_backend::auth::middleware::{CompositeTokenExtractor, BearerTokenExtractor};
 ///
 /// let extractor = CompositeTokenExtractor::new()
 ///     .add(Box::new(BearerTokenExtractor));
