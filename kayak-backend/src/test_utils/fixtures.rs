@@ -118,7 +118,7 @@ impl PointFactory {
             id: Uuid::new_v4(),
             device_id,
             name: "Test Point".to_string(),
-            data_type: DataType::Float,
+            data_type: DataType::Number,
             access_type: AccessType::Ro,
             unit: Some("°C".to_string()),
             min_value: Some(-50.0),
