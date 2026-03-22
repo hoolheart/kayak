@@ -2,13 +2,12 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/workbench.dart';
 
 /// 工作台详情Header组件
 ///
 /// 显示工作台名称、描述和创建时间
-class DetailHeader extends ConsumerWidget {
+class DetailHeader extends StatelessWidget {
   final Workbench workbench;
 
   const DetailHeader({
@@ -17,7 +16,7 @@ class DetailHeader extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

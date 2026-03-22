@@ -9,7 +9,12 @@ import 'package:flutter/material.dart';
 ///
 /// 显示占位符内容，提示用户此功能即将到来
 class DeviceListTab extends StatelessWidget {
-  const DeviceListTab({super.key});
+  final String workbenchId;
+
+  const DeviceListTab({
+    super.key,
+    required this.workbenchId,
+  });
 
   @override
   Widget build(BuildContext context) {

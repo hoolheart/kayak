@@ -8,6 +8,7 @@ import '../../models/workbench.dart';
 import '../../models/workbench_detail_state.dart';
 import '../../providers/workbench_detail_provider.dart';
 import '../../widgets/detail/detail_header.dart';
+import '../../widgets/detail/detail_tab_bar.dart';
 import '../../widgets/detail/device_list_tab.dart';
 import '../../widgets/detail/settings_tab.dart';
 
@@ -51,7 +52,7 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/home/workbench'),
+          onPressed: () => context.go('/home'),
         ),
         title: Text(detailState.workbench?.name ?? '工作台详情'),
       ),
@@ -75,20 +76,21 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
     return Column(
       children: [
         DetailHeader(workbench: detailState.workbench!),
-        TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.devices_outlined), text: '设备列表'),
-            Tab(icon: Icon(Icons.settings_outlined), text: '设置'),
-          ],
-        ),
+        DetailTabBar(tabController: _tabController),
         Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              const DeviceListTab(),
-              SettingsTab(workbench: detailState.workbench!),
-            ],
+          child: RefreshIndicator(
+            onRefresh: () async {
+              ref
+                  .read(workbenchDetailProvider(widget.workbenchId).notifier)
+                  .refresh();
+            },
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                DeviceListTab(workbenchId: widget.workbenchId),
+                SettingsTab(workbench: detailState.workbench!),
+              ],
+            ),
           ),
         ),
       ],

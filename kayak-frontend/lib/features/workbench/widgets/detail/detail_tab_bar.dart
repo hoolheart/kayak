@@ -2,13 +2,11 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/detail_tab_index_provider.dart';
 
 /// 工作台详情TabBar组件
 ///
 /// 提供设备列表和设置两个Tab
-class DetailTabBar extends ConsumerWidget {
+class DetailTabBar extends StatelessWidget {
   final TabController tabController;
 
   const DetailTabBar({
@@ -17,7 +15,7 @@ class DetailTabBar extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
