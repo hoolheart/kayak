@@ -26,6 +26,7 @@ mixin _$Workbench {
   String get ownerId => throw _privateConstructorUsedError;
   @JsonKey(name: 'ownerType')
   String get ownerType => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -50,6 +51,7 @@ abstract class $WorkbenchCopyWith<$Res> {
       String? description,
       String ownerId,
       @JsonKey(name: 'ownerType') String ownerType,
+      String status,
       DateTime createdAt,
       DateTime updatedAt});
 }
@@ -74,6 +76,7 @@ class _$WorkbenchCopyWithImpl<$Res, $Val extends Workbench>
     Object? description = freezed,
     Object? ownerId = null,
     Object? ownerType = null,
+    Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -97,6 +100,10 @@ class _$WorkbenchCopyWithImpl<$Res, $Val extends Workbench>
       ownerType: null == ownerType
           ? _value.ownerType
           : ownerType // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
               as String,
       createdAt: null == createdAt
           ? _value.createdAt
@@ -124,6 +131,7 @@ abstract class _$$WorkbenchImplCopyWith<$Res>
       String? description,
       String ownerId,
       @JsonKey(name: 'ownerType') String ownerType,
+      String status,
       DateTime createdAt,
       DateTime updatedAt});
 }
@@ -146,6 +154,7 @@ class __$$WorkbenchImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? ownerId = null,
     Object? ownerType = null,
+    Object? status = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -170,6 +179,10 @@ class __$$WorkbenchImplCopyWithImpl<$Res>
           ? _value.ownerType
           : ownerType // ignore: cast_nullable_to_non_nullable
               as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -191,6 +204,7 @@ class _$WorkbenchImpl implements _Workbench {
       this.description,
       required this.ownerId,
       @JsonKey(name: 'ownerType') required this.ownerType,
+      required this.status,
       required this.createdAt,
       required this.updatedAt});
 
@@ -209,13 +223,15 @@ class _$WorkbenchImpl implements _Workbench {
   @JsonKey(name: 'ownerType')
   final String ownerType;
   @override
+  final String status;
+  @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
 
   @override
   String toString() {
-    return 'Workbench(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerType: $ownerType, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Workbench(id: $id, name: $name, description: $description, ownerId: $ownerId, ownerType: $ownerType, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -230,6 +246,7 @@ class _$WorkbenchImpl implements _Workbench {
             (identical(other.ownerId, ownerId) || other.ownerId == ownerId) &&
             (identical(other.ownerType, ownerType) ||
                 other.ownerType == ownerType) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -239,7 +256,7 @@ class _$WorkbenchImpl implements _Workbench {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, name, description, ownerId,
-      ownerType, createdAt, updatedAt);
+      ownerType, status, createdAt, updatedAt);
 
   /// Create a copy of Workbench
   /// with the given fields replaced by the non-null parameter values.
@@ -264,6 +281,7 @@ abstract class _Workbench implements Workbench {
       final String? description,
       required final String ownerId,
       @JsonKey(name: 'ownerType') required final String ownerType,
+      required final String status,
       required final DateTime createdAt,
       required final DateTime updatedAt}) = _$WorkbenchImpl;
 
@@ -281,6 +299,8 @@ abstract class _Workbench implements Workbench {
   @override
   @JsonKey(name: 'ownerType')
   String get ownerType;
+  @override
+  String get status;
   @override
   DateTime get createdAt;
   @override

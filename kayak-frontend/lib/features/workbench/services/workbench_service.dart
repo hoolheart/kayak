@@ -3,8 +3,8 @@
 /// 处理工作台相关的API调用
 library;
 
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/auth/authenticated_api_client.dart';
 import '../../../core/auth/providers.dart';
 import '../models/workbench.dart';
 
@@ -20,21 +20,21 @@ abstract class WorkbenchServiceInterface {
 
 /// 工作台服务实现
 class WorkbenchService implements WorkbenchServiceInterface {
-  final Dio _dio;
+  final ApiClientInterface _apiClient;
 
-  WorkbenchService(this._dio);
+  WorkbenchService(this._apiClient);
 
   @override
   Future<PagedWorkbenchResponse> getWorkbenches({
     int page = 1,
     int size = 20,
   }) async {
-    final response = await _dio.get(
+    final response = await _apiClient.get(
       '/api/v1/workbenches',
       queryParameters: {'page': page, 'size': size},
     );
 
-    final data = response.data['data'] as Map<String, dynamic>;
+    final data = (response as Map)['data'] as Map<String, dynamic>;
     final items = (data['items'] as List)
         .map((e) => Workbench.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -49,13 +49,14 @@ class WorkbenchService implements WorkbenchServiceInterface {
 
   @override
   Future<Workbench> getWorkbench(String id) async {
-    final response = await _dio.get('/api/v1/workbenches/$id');
-    return Workbench.fromJson(response.data['data'] as Map<String, dynamic>);
+    final response = await _apiClient.get('/api/v1/workbenches/$id');
+    return Workbench.fromJson(
+        (response as Map)['data'] as Map<String, dynamic>);
   }
 
   @override
   Future<Workbench> createWorkbench(String name, String? description) async {
-    final response = await _dio.post(
+    final response = await _apiClient.post(
       '/api/v1/workbenches',
       data: {
         'name': name,
@@ -63,7 +64,8 @@ class WorkbenchService implements WorkbenchServiceInterface {
           'description': description,
       },
     );
-    return Workbench.fromJson(response.data['data'] as Map<String, dynamic>);
+    return Workbench.fromJson(
+        (response as Map)['data'] as Map<String, dynamic>);
   }
 
   @override
@@ -72,24 +74,25 @@ class WorkbenchService implements WorkbenchServiceInterface {
     String name,
     String? description,
   ) async {
-    final response = await _dio.put(
+    final response = await _apiClient.put(
       '/api/v1/workbenches/$id',
       data: {
         'name': name,
         if (description != null) 'description': description,
       },
     );
-    return Workbench.fromJson(response.data['data'] as Map<String, dynamic>);
+    return Workbench.fromJson(
+        (response as Map)['data'] as Map<String, dynamic>);
   }
 
   @override
   Future<void> deleteWorkbench(String id) async {
-    await _dio.delete('/api/v1/workbenches/$id');
+    await _apiClient.delete('/api/v1/workbenches/$id');
   }
 }
 
 /// Workbench Service Provider
 final workbenchServiceProvider = Provider<WorkbenchServiceInterface>((ref) {
-  final dio = ref.watch(dioProvider);
-  return WorkbenchService(dio);
+  final apiClient = ref.watch(apiClientProvider);
+  return WorkbenchService(apiClient);
 });

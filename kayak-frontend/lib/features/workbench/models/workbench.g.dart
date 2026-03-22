@@ -13,6 +13,7 @@ _$WorkbenchImpl _$$WorkbenchImplFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String?,
       ownerId: json['ownerId'] as String,
       ownerType: json['ownerType'] as String,
+      status: json['status'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -24,6 +25,7 @@ Map<String, dynamic> _$$WorkbenchImplToJson(_$WorkbenchImpl instance) =>
       'description': instance.description,
       'ownerId': instance.ownerId,
       'ownerType': instance.ownerType,
+      'status': instance.status,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
     };

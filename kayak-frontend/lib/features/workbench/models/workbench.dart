@@ -17,6 +17,7 @@ class Workbench with _$Workbench {
     String? description,
     required String ownerId,
     @JsonKey(name: 'ownerType') required String ownerType,
+    required String status,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _Workbench;
