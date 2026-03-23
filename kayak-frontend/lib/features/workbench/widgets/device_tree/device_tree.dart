@@ -5,7 +5,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/device.dart';
 import '../../providers/device_tree_provider.dart';
+import '../../services/device_service.dart';
+import '../device/device_form_dialog.dart';
 import 'device_tree_node.dart';
 
 /// 设备树组件
@@ -46,6 +49,8 @@ class DeviceTree extends ConsumerWidget {
           onExpand: () => ref
               .read(deviceTreeProvider(workbenchId).notifier)
               .toggleExpanded(node.device.id),
+          onEdit: () => _showEditDialog(context, ref, node.device),
+          onDelete: () => _showDeleteConfirmation(context, ref, node.device),
         );
       },
     );
@@ -108,5 +113,58 @@ class DeviceTree extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showEditDialog(
+      BuildContext context, WidgetRef ref, Device device) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => DeviceFormDialog(
+        device: device,
+        workbenchId: workbenchId,
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      ref.read(deviceTreeProvider(workbenchId).notifier).refresh();
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(
+      BuildContext context, WidgetRef ref, Device device) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确认删除'),
+        content: Text('确定要删除设备 "${device.name}" 吗？此操作不可撤销。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final deviceService = ref.read(deviceServiceProvider);
+        await deviceService.deleteDevice(device.id);
+        ref.read(deviceTreeProvider(workbenchId).notifier).refresh();
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('删除失败: $e')),
+          );
+        }
+      }
+    }
   }
 }

@@ -97,6 +97,8 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
               onExpand: () => ref
                   .read(deviceTreeProvider(node.device.workbenchId).notifier)
                   .toggleExpanded(child.device.id),
+              onEdit: onEdit,
+              onDelete: onDelete,
             ),
           ),
       ],
