@@ -4,6 +4,12 @@
 
 pub mod user_repo;
 pub mod workbench_repo;
+pub mod device_repo;
+pub mod point_repo;
+
+// Re-exports for convenience
+pub use device_repo::{DeviceRepository, DeviceRepositoryError, SqlxDeviceRepository};
+pub use point_repo::{PointRepository, PointRepositoryError, SqlxPointRepository};
 
 // 基础Repository trait
 use async_trait::async_trait;

@@ -125,6 +125,12 @@ pub struct UpdatePointRequest {
     pub status: Option<PointStatus>,
 }
 
+/// 写入测点值请求DTO
+#[derive(Debug, Deserialize)]
+pub struct WritePointValueRequest {
+    pub value: f64,
+}
+
 /// 测点响应DTO
 #[derive(Debug, Serialize)]
 pub struct PointResponse {

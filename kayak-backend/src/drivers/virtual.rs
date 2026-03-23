@@ -198,7 +198,7 @@ impl DeviceDriver for VirtualDriver {
         Ok(())
     }
 
-    async fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error> {
+    fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error> {
         if !self.connected {
             return Err(DriverError::NotConnected);
         }
@@ -212,7 +212,7 @@ impl DeviceDriver for VirtualDriver {
         Ok(self.generate_value())
     }
 
-    async fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error> {
+    fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error> {
         if !self.connected {
             return Err(DriverError::NotConnected);
         }

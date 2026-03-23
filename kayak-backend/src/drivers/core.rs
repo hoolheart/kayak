@@ -106,14 +106,14 @@ pub trait DeviceDriver: Send + Sync {
     /// # Returns
     /// * `Ok(PointValue)` - 读取成功
     /// * `Err(DriverError::NotConnected)` - 设备未连接
-    async fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error>;
+    fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error>;
 
     /// 写入测点值
     ///
     /// # Arguments
     /// * `point_id` - 测点UUID
     /// * `value` - 要写入的值
-    async fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error>;
+    fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error>;
 
     /// 检查设备是否已连接
     fn is_connected(&self) -> bool;

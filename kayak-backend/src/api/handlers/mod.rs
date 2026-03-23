@@ -6,3 +6,5 @@ pub mod common;
 pub mod health;
 pub mod user;
 pub mod workbench;
+pub mod device;
+pub mod point;

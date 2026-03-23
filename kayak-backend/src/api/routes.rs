@@ -9,7 +9,9 @@ use axum::{
     Router,
 };
 
+use crate::api::handlers::device;
 use crate::api::handlers::health;
+use crate::api::handlers::point;
 use crate::api::handlers::user;
 use crate::api::handlers::workbench;
 use crate::api::middleware::error::not_found_handler;
@@ -19,11 +21,21 @@ use crate::auth::{
     user_repo_adapter::UserRepositoryAdapter,
 };
 use crate::db::connection::DbPool;
+use crate::db::repository::device_repo::SqlxDeviceRepository;
+use crate::db::repository::point_repo::SqlxPointRepository;
 use crate::db::repository::user_repo::UserRepository;
 use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
+use crate::drivers::DeviceManager;
+use crate::services::device::{DeviceService, DeviceServiceImpl};
+use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
 use crate::services::workbench::{WorkbenchService, WorkbenchServiceImpl};
+
+/// 创建设备管理器（全局单例）
+fn create_device_manager() -> Arc<DeviceManager> {
+    Arc::new(DeviceManager::new())
+}
 
 /// 创建应用路由
 pub fn create_router(pool: DbPool) -> Router {
@@ -57,9 +69,36 @@ pub fn create_router(pool: DbPool) -> Router {
     ));
 
     // 创建工作台服务
-    let workbench_repo = SqlxWorkbenchRepository::new(pool);
+    let workbench_repo = SqlxWorkbenchRepository::new(pool.clone());
+    let workbench_repo_for_device = workbench_repo.clone();
+    let workbench_repo_for_point = workbench_repo.clone();
     let workbench_service: Arc<dyn WorkbenchService> =
         Arc::new(WorkbenchServiceImpl::new(Arc::new(workbench_repo)));
+
+    // 创建设备管理器
+    let device_manager = create_device_manager();
+
+    // 创建设备仓储
+    let device_repo: Arc<dyn crate::db::repository::device_repo::DeviceRepository> =
+        Arc::new(SqlxDeviceRepository::new(pool.clone()));
+    let point_repo: Arc<dyn crate::db::repository::point_repo::PointRepository> =
+        Arc::new(SqlxPointRepository::new(pool.clone()));
+
+    // 创建设备服务
+    let device_service: Arc<dyn DeviceService> = Arc::new(DeviceServiceImpl::new(
+        device_repo.clone(),
+        point_repo.clone(),
+        Arc::new(workbench_repo_for_device),
+        device_manager.clone(),
+    ));
+
+    // 创建测点服务
+    let point_service: Arc<dyn PointService> = Arc::new(PointServiceImpl::new(
+        device_repo,
+        point_repo,
+        Arc::new(workbench_repo_for_point),
+        device_manager,
+    ));
 
     Router::new()
         // 健康检查（最优先，无中间件限制）
@@ -68,6 +107,8 @@ pub fn create_router(pool: DbPool) -> Router {
         .merge(auth_routes(auth_service))
         .merge(user_routes(user_service))
         .merge(workbench_routes(workbench_service))
+        .merge(device_routes(device_service))
+        .merge(point_routes(point_service))
         // 404处理
         .fallback(not_found_handler)
 }
@@ -110,6 +151,47 @@ fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router {
             .route("/{id}", put(workbench::update_workbench))
             .route("/{id}", delete(workbench::delete_workbench))
             .with_state(workbench_service),
+    )
+}
+
+/// 设备路由组
+fn device_routes(device_service: Arc<dyn DeviceService>) -> Router {
+    Router::new().nest(
+        "/api/v1",
+        Router::new()
+            // 设备路由（嵌套在工作台下）
+            .route(
+                "/workbenches/{workbench_id}/devices",
+                post(device::create_device),
+            )
+            .route(
+                "/workbenches/{workbench_id}/devices",
+                get(device::list_devices),
+            )
+            // 独立设备路由
+            .route("/devices/{id}", get(device::get_device))
+            .route("/devices/{id}", put(device::update_device))
+            .route("/devices/{id}", delete(device::delete_device))
+            .with_state(device_service),
+    )
+}
+
+/// 测点路由组
+fn point_routes(point_service: Arc<dyn PointService>) -> Router {
+    Router::new().nest(
+        "/api/v1",
+        Router::new()
+            // 测点路由（嵌套在设备下）
+            .route("/devices/{device_id}/points", post(point::create_point))
+            .route("/devices/{device_id}/points", get(point::list_points))
+            // 独立测点路由
+            .route("/points/{id}", get(point::get_point))
+            .route("/points/{id}", put(point::update_point))
+            .route("/points/{id}", delete(point::delete_point))
+            // 测点值路由
+            .route("/points/{id}/value", get(point::read_point_value))
+            .route("/points/{id}/value", put(point::write_point_value))
+            .with_state(point_service),
     )
 }
 
