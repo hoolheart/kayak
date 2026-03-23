@@ -15,8 +15,8 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
   final int depth;
   final VoidCallback? onTap;
   final VoidCallback? onExpand;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
+  final void Function(Device device)? onEdit;
+  final void Function(Device device)? onDelete;
 
   const DeviceTreeNodeWidget({
     super.key,
@@ -139,9 +139,9 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
       ],
     ).then((value) {
       if (value == 'edit') {
-        onEdit?.call();
+        onEdit?.call(node.device);
       } else if (value == 'delete') {
-        onDelete?.call();
+        onDelete?.call(node.device);
       }
     });
   }

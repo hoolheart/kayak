@@ -49,8 +49,8 @@ class DeviceTree extends ConsumerWidget {
           onExpand: () => ref
               .read(deviceTreeProvider(workbenchId).notifier)
               .toggleExpanded(node.device.id),
-          onEdit: () => _showEditDialog(context, ref, node.device),
-          onDelete: () => _showDeleteConfirmation(context, ref, node.device),
+          onEdit: (device) => _showEditDialog(context, ref, device),
+          onDelete: (device) => _showDeleteConfirmation(context, ref, device),
         );
       },
     );
