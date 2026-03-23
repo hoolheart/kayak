@@ -5,7 +5,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/point.dart';
 import '../../providers/device_tree_provider.dart';
 import '../../providers/point_list_provider.dart';
 import 'point_list_item.dart';
@@ -72,6 +71,7 @@ class PointListPanel extends ConsumerWidget {
             onPressed: () {
               final device = ref.read(selectedDeviceProvider);
               if (device != null) {
+                // ignore: unused_result
                 ref.refresh(pointListProvider(device.id));
               }
             },

@@ -24,7 +24,7 @@ class PointValueDisplay extends StatelessWidget {
     if (dataType == DataType.boolean) {
       final bool boolValue = value.value is bool
           ? value.value as bool
-          : (value.value is num && (value.value as num) != 0) as bool;
+          : (value.value is num && (value.value as num) != 0);
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
