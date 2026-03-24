@@ -3,6 +3,7 @@
 /// 使用Riverpod管理应用主题状态
 /// 支持浅色/深色/跟随系统三种模式
 /// 主题设置持久化到SharedPreferences
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

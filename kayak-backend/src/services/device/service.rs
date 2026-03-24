@@ -279,7 +279,7 @@ impl DeviceService for DeviceServiceImpl {
         let _workbench_id = self.verify_device_ownership(user_id, device_id).await?;
 
         // 如果要更新parent_id，检查循环引用
-        if let Some(_new_parent_id) = entity.status.as_ref().and_then(|_| entity.protocol_params.as_ref()) {
+        if let Some(_new_parent_id) = entity.status.as_ref().and(entity.protocol_params.as_ref()) {
             // 这里简化处理，实际应该检查parent_id变化
         }
 

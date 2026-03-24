@@ -1,6 +1,7 @@
 /// API Client Interface
 ///
 /// 定义HTTP请求的抽象，支持自动Token刷新
+library;
 
 import 'dart:async';
 

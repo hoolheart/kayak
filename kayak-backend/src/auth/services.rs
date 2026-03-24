@@ -74,7 +74,7 @@ impl AuthServiceImpl {
 impl AuthService for AuthServiceImpl {
     async fn register(&self, req: RegisterRequest) -> Result<User, AppError> {
         // 检查邮箱是否已存在
-        if let Some(_) = self.user_repo.find_by_email(&req.email).await? {
+        if self.user_repo.find_by_email(&req.email).await?.is_some() {
             return Err(AuthError::UserAlreadyExists.into());
         }
 

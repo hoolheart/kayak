@@ -50,6 +50,7 @@ struct WorkbenchRow {
 }
 
 impl WorkbenchRow {
+    #[allow(clippy::wrong_self_convention)]
     fn to_entity(self) -> Workbench {
         Workbench {
             id: Uuid::parse_str(&self.id).unwrap(),

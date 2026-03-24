@@ -1,6 +1,8 @@
 /// Auth API Service Interface
 ///
 /// 定义认证相关API的抽象，遵循依赖倒置原则
+library;
+
 import 'package:dio/dio.dart';
 import 'auth_state.dart';
 

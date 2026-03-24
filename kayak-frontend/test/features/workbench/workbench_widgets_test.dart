@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/workbench/models/workbench.dart';
 import 'package:kayak_frontend/features/workbench/models/workbench_list_state.dart';
 import 'package:kayak_frontend/features/workbench/models/workbench_form_state.dart';
-import 'package:kayak_frontend/features/workbench/providers/workbench_list_provider.dart';
-import 'package:kayak_frontend/features/workbench/providers/view_mode_provider.dart';
 import 'package:kayak_frontend/features/workbench/widgets/empty_state_widget.dart';
 import 'package:kayak_frontend/features/workbench/widgets/delete_confirmation_dialog.dart';
 import 'package:kayak_frontend/features/workbench/widgets/workbench_card.dart';

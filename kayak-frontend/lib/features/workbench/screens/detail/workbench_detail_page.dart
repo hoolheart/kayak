@@ -4,7 +4,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../models/workbench.dart';
 import '../../models/workbench_detail_state.dart';
 import '../../providers/workbench_detail_provider.dart';
 import '../../widgets/detail/detail_header.dart';

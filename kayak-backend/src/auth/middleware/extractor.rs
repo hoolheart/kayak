@@ -73,7 +73,7 @@ impl CompositeTokenExtractor {
     ///
     /// # Arguments
     /// * `extractor` - 要添加的提取器
-    pub fn add(mut self, extractor: Box<dyn TokenExtractor>) -> Self {
+    pub fn add_extractor(mut self, extractor: Box<dyn TokenExtractor>) -> Self {
         self.extractors.push(extractor);
         self
     }

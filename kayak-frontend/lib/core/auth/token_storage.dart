@@ -1,6 +1,8 @@
 /// Token Storage Interface
 ///
 /// 遵循依赖倒置原则，抽象Token存储实现
+library;
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class TokenStorageInterface {

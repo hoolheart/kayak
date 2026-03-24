@@ -17,6 +17,7 @@ pub enum DeviceRepositoryError {
 
 /// 设备仓库 trait
 #[async_trait]
+#[allow(clippy::too_many_arguments)]
 pub trait DeviceRepository: Send + Sync {
     async fn create(&self, device: &Device) -> Result<Device, DeviceRepositoryError>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Device>, DeviceRepositoryError>;
@@ -77,6 +78,7 @@ struct DeviceRow {
 }
 
 impl DeviceRow {
+    #[allow(clippy::wrong_self_convention)]
     fn to_entity(self) -> Device {
         Device {
             id: Uuid::parse_str(&self.id).unwrap(),

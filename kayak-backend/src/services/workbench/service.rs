@@ -87,7 +87,7 @@ impl WorkbenchService for WorkbenchServiceImpl {
         if page < 1 {
             return Err(WorkbenchError::ValidationError("page must be >= 1".to_string()));
         }
-        if size < 1 || size > 1000 {
+        if !(1..=1000).contains(&size) {
             return Err(WorkbenchError::ValidationError("size must be 1-1000".to_string()));
         }
 

@@ -21,10 +21,12 @@ pub use super::r#virtual::VirtualConfig;
 /// 1. 通过 `Arc<RwLock<...>>` 提供安全的共享访问
 /// 2. 使用 `.write().unwrap()` 获取 `&mut dyn DeviceDriver` 来调用需要可变引用的方法
 /// 3. 保持线程安全性，同时支持可变操作
+#[allow(clippy::type_complexity)]
 pub struct DeviceManager {
     devices: Arc<RwLock<HashMap<Uuid, Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>>>>,
 }
 
+#[allow(clippy::await_holding_lock)]
 impl DeviceManager {
     /// 创建新的设备管理器
     pub fn new() -> Self {

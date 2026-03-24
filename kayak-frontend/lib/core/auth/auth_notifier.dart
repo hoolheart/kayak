@@ -2,6 +2,8 @@
 ///
 /// 全局认证状态管理，使用Riverpod StateNotifier
 /// 实现AuthStateNotifierInterface接口，依赖抽象而非具体实现
+library;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_state.dart';
 import 'auth_notifier_interface.dart';

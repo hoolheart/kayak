@@ -28,7 +28,7 @@ pub async fn update_current_user(
 ) -> Result<Json<ApiResponse<UserDto>>, AppError> {
     // Validate the request
     payload.validate()
-        .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
+        .map_err(|e| AppError::validation_error_single("validation", e.to_string()))?;
 
     let user = user_service.update_user(user_ctx.user_id, payload).await?;
     Ok(Json(ApiResponse::success_with_message(user, "User updated successfully")))
@@ -42,7 +42,7 @@ pub async fn change_password(
 ) -> Result<Json<ApiResponse<()>>, AppError> {
     // Validate the request
     payload.validate()
-        .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
+        .map_err(|e| AppError::validation_error_single("validation", e.to_string()))?;
 
     user_service.change_password(user_ctx.user_id, payload).await?;
     Ok(Json(ApiResponse::success_with_message((), "Password updated successfully")))

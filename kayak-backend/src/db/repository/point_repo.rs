@@ -17,6 +17,7 @@ pub enum PointRepositoryError {
 
 /// 测点仓库 trait
 #[async_trait]
+#[allow(clippy::too_many_arguments)]
 pub trait PointRepository: Send + Sync {
     async fn create(&self, point: &Point) -> Result<Point, PointRepositoryError>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Point>, PointRepositoryError>;
@@ -70,6 +71,7 @@ struct PointRow {
 }
 
 impl PointRow {
+    #[allow(clippy::wrong_self_convention)]
     fn to_entity(self) -> Point {
         Point {
             id: Uuid::parse_str(&self.id).unwrap(),
