@@ -105,7 +105,7 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
                 // 协议类型 - 仅支持Virtual
                 DropdownButtonFormField<ProtocolType>(
                   key: const Key('protocol-type-dropdown'),
-                  value: _protocolType,
+                  initialValue: _protocolType,
                   decoration: const InputDecoration(
                     labelText: '协议类型 *',
                     border: OutlineInputBorder(),
@@ -120,8 +120,8 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
                         .where((p) => p != ProtocolType.virtual)
                         .map((p) => DropdownMenuItem(
                               value: p,
-                              child: Text(p.name.toUpperCase()),
                               enabled: false,
+                              child: Text(p.name.toUpperCase()),
                             )),
                   ],
                   onChanged: isEdit

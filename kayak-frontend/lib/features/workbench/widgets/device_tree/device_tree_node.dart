@@ -125,18 +125,27 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
   }
 
   void _showContextMenu(BuildContext context) {
+    final items = <PopupMenuEntry<String>>[];
+
+    if (onEdit != null) {
+      items.add(const PopupMenuItem<String>(
+        value: 'edit',
+        child: Text('编辑'),
+      ));
+    }
+
+    if (onDelete != null) {
+      items.add(const PopupMenuItem<String>(
+        value: 'delete',
+        child: Text('删除'),
+      ));
+    }
+
+    if (items.isEmpty) return;
+
     showMenu<String>(
       context: context,
-      items: [
-        const PopupMenuItem<String>(
-          value: 'edit',
-          child: Text('编辑'),
-        ),
-        const PopupMenuItem<String>(
-          value: 'delete',
-          child: Text('删除'),
-        ),
-      ],
+      items: items,
     ).then((value) {
       if (value == 'edit') {
         onEdit?.call(node.device);
