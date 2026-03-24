@@ -3,9 +3,7 @@
 //! 应用启动入口，负责初始化配置并启动服务器
 
 use kayak_backend::{
-    api::routes::create_router,
-    api::middleware::MiddlewareStack,
-    core::config::AppConfig,
+    api::middleware::MiddlewareStack, api::routes::create_router, core::config::AppConfig,
     db::connection::init_db,
 };
 use std::net::SocketAddr;
@@ -26,8 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("Starting Kayak Backend v{}", env!("CARGO_PKG_VERSION"));
 
     // 4. 初始化数据库
-    let database_url = std::env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "sqlite://./data/kayak.db".to_string());
+    let database_url =
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://./data/kayak.db".to_string());
     let pool = init_db(&database_url).await?;
 
     // 5. 创建路由

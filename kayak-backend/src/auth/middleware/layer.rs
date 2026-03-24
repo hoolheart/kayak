@@ -232,11 +232,9 @@ where
                         inner.call(request).await
                     } else {
                         // 需要认证，返回401（带WWW-Authenticate头）
-                        Ok(create_unauthorized_response(
-                            AppError::Unauthorized(
-                                "Missing authentication token".to_string()
-                            )
-                        ))
+                        Ok(create_unauthorized_response(AppError::Unauthorized(
+                            "Missing authentication token".to_string(),
+                        )))
                     }
                 }
             }
@@ -262,7 +260,7 @@ fn create_unauthorized_response(err: AppError) -> Response {
             "code": 401,
             "message": err.to_string()
         })
-        .to_string()
+        .to_string(),
     );
 
     Response::builder()
@@ -296,8 +294,7 @@ mod tests {
     #[tokio::test]
     async fn test_jwt_middleware_allow_anonymous() {
         let token_service = create_mock_token_service();
-        let middleware = JwtAuthMiddleware::new(token_service)
-            .allow_anonymous(true);
+        let middleware = JwtAuthMiddleware::new(token_service).allow_anonymous(true);
         assert!(middleware.allow_anonymous);
     }
 
@@ -307,7 +304,13 @@ mod tests {
         let response = create_unauthorized_response(err);
 
         assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
-        assert_eq!(response.headers().get("WWW-Authenticate").unwrap(), "Bearer");
-        assert_eq!(response.headers().get("Content-Type").unwrap(), "application/json");
+        assert_eq!(
+            response.headers().get("WWW-Authenticate").unwrap(),
+            "Bearer"
+        );
+        assert_eq!(
+            response.headers().get("Content-Type").unwrap(),
+            "application/json"
+        );
     }
 }

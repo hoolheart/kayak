@@ -1,17 +1,17 @@
 //! 测点服务实现
 
+use async_trait::async_trait;
 use std::sync::Arc;
 use uuid::Uuid;
-use async_trait::async_trait;
 
 use crate::db::repository::device_repo::{DeviceRepository, DeviceRepositoryError};
 use crate::db::repository::point_repo::{PointRepository, PointRepositoryError};
 use crate::db::repository::workbench_repo::WorkbenchRepository;
-use crate::drivers::{DeviceManager, PointValue, DriverError};
-use crate::models::entities::point::{Point, AccessType};
+use crate::drivers::{DeviceManager, DriverError, PointValue};
+use crate::models::entities::point::{AccessType, Point};
 
 use super::error::{CreatePointEntity, PointError, UpdatePointEntity};
-use super::types::{PointDto, PagedPointDto, PointValueDto};
+use super::types::{PagedPointDto, PointDto, PointValueDto};
 
 /// 测点服务接口
 #[async_trait]
@@ -22,14 +22,10 @@ pub trait PointService: Send + Sync {
         user_id: Uuid,
         entity: CreatePointEntity,
     ) -> Result<PointDto, PointError>;
-    
+
     /// 获取测点详情
-    async fn get_point(
-        &self,
-        user_id: Uuid,
-        point_id: Uuid,
-    ) -> Result<PointDto, PointError>;
-    
+    async fn get_point(&self, user_id: Uuid, point_id: Uuid) -> Result<PointDto, PointError>;
+
     /// 查询测点列表
     async fn list_points(
         &self,
@@ -38,7 +34,7 @@ pub trait PointService: Send + Sync {
         page: i64,
         size: i64,
     ) -> Result<PagedPointDto, PointError>;
-    
+
     /// 更新测点
     async fn update_point(
         &self,
@@ -46,21 +42,17 @@ pub trait PointService: Send + Sync {
         point_id: Uuid,
         entity: UpdatePointEntity,
     ) -> Result<PointDto, PointError>;
-    
+
     /// 删除测点
-    async fn delete_point(
-        &self,
-        user_id: Uuid,
-        point_id: Uuid,
-    ) -> Result<(), PointError>;
-    
+    async fn delete_point(&self, user_id: Uuid, point_id: Uuid) -> Result<(), PointError>;
+
     /// 读取测点值
     async fn read_point_value(
         &self,
         user_id: Uuid,
         point_id: Uuid,
     ) -> Result<PointValueDto, PointError>;
-    
+
     /// 写入测点值
     async fn write_point_value(
         &self,
@@ -94,19 +86,25 @@ impl PointServiceImpl {
     }
 
     /// 验证用户是否拥有设备所属的工作台
-    async fn verify_device_ownership(&self, user_id: Uuid, device_id: Uuid) -> Result<Uuid, PointError> {
-        let device = self.device_repo
+    async fn verify_device_ownership(
+        &self,
+        user_id: Uuid,
+        device_id: Uuid,
+    ) -> Result<Uuid, PointError> {
+        let device = self
+            .device_repo
             .find_by_id(device_id)
             .await
             .map_err(|e| PointError::DatabaseError(e.to_string()))?;
-        
+
         match device {
             Some(d) => {
-                let workbench = self.workbench_repo
+                let workbench = self
+                    .workbench_repo
                     .find_by_id(d.workbench_id)
                     .await
                     .map_err(|e| PointError::DatabaseError(e.to_string()))?;
-                
+
                 match workbench {
                     Some(wb) if wb.owner_id == user_id => Ok(d.workbench_id),
                     Some(_) => Err(PointError::AccessDenied),
@@ -118,12 +116,17 @@ impl PointServiceImpl {
     }
 
     /// 验证测点所有权
-    async fn verify_point_ownership(&self, user_id: Uuid, point_id: Uuid) -> Result<Uuid, PointError> {
-        let point = self.point_repo
+    async fn verify_point_ownership(
+        &self,
+        user_id: Uuid,
+        point_id: Uuid,
+    ) -> Result<Uuid, PointError> {
+        let point = self
+            .point_repo
             .find_by_id(point_id)
             .await
             .map_err(|e| PointError::DatabaseError(e.to_string()))?;
-        
+
         match point {
             Some(p) => self.verify_device_ownership(user_id, p.device_id).await,
             None => Err(PointError::NotFound),
@@ -186,7 +189,8 @@ impl PointService for PointServiceImpl {
         entity: CreatePointEntity,
     ) -> Result<PointDto, PointError> {
         // 验证设备所有权
-        self.verify_device_ownership(user_id, entity.device_id).await?;
+        self.verify_device_ownership(user_id, entity.device_id)
+            .await?;
 
         // 创建测点
         let mut point = Point::new(
@@ -201,21 +205,16 @@ impl PointService for PointServiceImpl {
         point.max_value = entity.max_value;
         point.default_value = entity.default_value;
 
-        self.point_repo
-            .create(&point)
-            .await?;
+        self.point_repo.create(&point).await?;
 
         Ok(Self::to_dto(point))
     }
 
-    async fn get_point(
-        &self,
-        user_id: Uuid,
-        point_id: Uuid,
-    ) -> Result<PointDto, PointError> {
+    async fn get_point(&self, user_id: Uuid, point_id: Uuid) -> Result<PointDto, PointError> {
         let _workbench_id = self.verify_point_ownership(user_id, point_id).await?;
-        
-        let point = self.point_repo
+
+        let point = self
+            .point_repo
             .find_by_id(point_id)
             .await?
             .ok_or(PointError::NotFound)?;
@@ -233,7 +232,8 @@ impl PointService for PointServiceImpl {
         // 验证设备所有权
         self.verify_device_ownership(user_id, device_id).await?;
 
-        let (points, total) = self.point_repo
+        let (points, total) = self
+            .point_repo
             .find_by_device_id(device_id, page, size)
             .await
             .map_err(|e| PointError::DatabaseError(e.to_string()))?;
@@ -254,7 +254,8 @@ impl PointService for PointServiceImpl {
     ) -> Result<PointDto, PointError> {
         let _workbench_id = self.verify_point_ownership(user_id, point_id).await?;
 
-        let point = self.point_repo
+        let point = self
+            .point_repo
             .update(
                 point_id,
                 entity.name,
@@ -269,16 +270,10 @@ impl PointService for PointServiceImpl {
         Ok(Self::to_dto(point))
     }
 
-    async fn delete_point(
-        &self,
-        user_id: Uuid,
-        point_id: Uuid,
-    ) -> Result<(), PointError> {
+    async fn delete_point(&self, user_id: Uuid, point_id: Uuid) -> Result<(), PointError> {
         let _workbench_id = self.verify_point_ownership(user_id, point_id).await?;
 
-        self.point_repo
-            .delete(point_id)
-            .await?;
+        self.point_repo.delete(point_id).await?;
 
         Ok(())
     }
@@ -289,14 +284,16 @@ impl PointService for PointServiceImpl {
         point_id: Uuid,
     ) -> Result<PointValueDto, PointError> {
         let _workbench_id = self.verify_point_ownership(user_id, point_id).await?;
-        
-        let point = self.point_repo
+
+        let point = self
+            .point_repo
             .find_by_id(point_id)
             .await?
             .ok_or(PointError::NotFound)?;
 
         // 获取设备驱动
-        let driver_arc = self.device_manager
+        let driver_arc = self
+            .device_manager
             .get_device(point.device_id)
             .ok_or(PointError::DeviceNotConnected)?;
 
@@ -320,8 +317,9 @@ impl PointService for PointServiceImpl {
         value: PointValue,
     ) -> Result<(), PointError> {
         let _workbench_id = self.verify_point_ownership(user_id, point_id).await?;
-        
-        let point = self.point_repo
+
+        let point = self
+            .point_repo
             .find_by_id(point_id)
             .await?
             .ok_or(PointError::NotFound)?;
@@ -332,7 +330,8 @@ impl PointService for PointServiceImpl {
         }
 
         // 获取设备驱动
-        let driver_arc = self.device_manager
+        let driver_arc = self
+            .device_manager
             .get_device(point.device_id)
             .ok_or(PointError::DeviceNotConnected)?;
 

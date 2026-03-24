@@ -1,5 +1,15 @@
 //! 测点请求处理器
 
+use crate::auth::middleware::require_auth::RequireAuth;
+use crate::core::error::{ApiResponse, AppError};
+use crate::drivers::PointValue;
+use crate::models::entities::point::{
+    CreatePointRequest, UpdatePointRequest, WritePointValueRequest,
+};
+use crate::services::point::{
+    CreatePointEntity, PagedPointDto, PointDto, PointError, PointService, PointValueDto,
+    UpdatePointEntity,
+};
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
@@ -7,11 +17,6 @@ use axum::{
 };
 use std::sync::Arc;
 use uuid::Uuid;
-use crate::auth::middleware::require_auth::RequireAuth;
-use crate::core::error::{ApiResponse, AppError};
-use crate::models::entities::point::{CreatePointRequest, UpdatePointRequest, WritePointValueRequest};
-use crate::services::point::{PointService, PointDto, PagedPointDto, CreatePointEntity, UpdatePointEntity, PointError, PointValueDto};
-use crate::drivers::PointValue;
 
 /// 应用状态类型
 type AppState = Arc<dyn PointService>;
@@ -35,7 +40,8 @@ pub async fn create_point(
         default_value: req.default_value,
     };
 
-    let point = handler.create_point(user_ctx.user_id, entity)
+    let point = handler
+        .create_point(user_ctx.user_id, entity)
         .await
         .map_err(|e| match e {
             PointError::DeviceNotFound => AppError::NotFound("Device not found".to_string()),
@@ -57,7 +63,8 @@ pub async fn list_points(
     let page = query.page.unwrap_or(1);
     let size = query.size.unwrap_or(10);
 
-    let result = handler.list_points(user_ctx.user_id, device_id, page, size)
+    let result = handler
+        .list_points(user_ctx.user_id, device_id, page, size)
         .await
         .map_err(|e| match e {
             PointError::DeviceNotFound => AppError::NotFound("Device not found".to_string()),
@@ -74,7 +81,8 @@ pub async fn get_point(
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApiResponse<PointDto>>, AppError> {
-    let point = handler.get_point(user_ctx.user_id, id)
+    let point = handler
+        .get_point(user_ctx.user_id, id)
         .await
         .map_err(|e| match e {
             PointError::NotFound => AppError::NotFound("Point not found".to_string()),
@@ -102,7 +110,8 @@ pub async fn update_point(
         status: req.status,
     };
 
-    let point = handler.update_point(user_ctx.user_id, id, entity)
+    let point = handler
+        .update_point(user_ctx.user_id, id, entity)
         .await
         .map_err(|e| match e {
             PointError::NotFound => AppError::NotFound("Point not found".to_string()),
@@ -120,7 +129,8 @@ pub async fn delete_point(
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    handler.delete_point(user_ctx.user_id, id)
+    handler
+        .delete_point(user_ctx.user_id, id)
         .await
         .map_err(|e| match e {
             PointError::NotFound => AppError::NotFound("Point not found".to_string()),
@@ -137,12 +147,15 @@ pub async fn read_point_value(
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApiResponse<PointValueDto>>, AppError> {
-    let value = handler.read_point_value(user_ctx.user_id, id)
+    let value = handler
+        .read_point_value(user_ctx.user_id, id)
         .await
         .map_err(|e| match e {
             PointError::NotFound => AppError::NotFound("Point not found".to_string()),
             PointError::AccessDenied => AppError::Forbidden("Access denied".to_string()),
-            PointError::DeviceNotConnected => AppError::BadRequest("Device not connected".to_string()),
+            PointError::DeviceNotConnected => {
+                AppError::BadRequest("Device not connected".to_string())
+            }
             _ => AppError::InternalError(e.to_string()),
         })?;
 
@@ -159,13 +172,16 @@ pub async fn write_point_value(
     // 将请求中的值转换为PointValue
     let value = PointValue::Number(req.value);
 
-    handler.write_point_value(user_ctx.user_id, id, value)
+    handler
+        .write_point_value(user_ctx.user_id, id, value)
         .await
         .map_err(|e| match e {
             PointError::NotFound => AppError::NotFound("Point not found".to_string()),
             PointError::AccessDenied => AppError::Forbidden("Access denied".to_string()),
             PointError::ReadOnlyPoint => AppError::BadRequest("Point is read-only".to_string()),
-            PointError::DeviceNotConnected => AppError::BadRequest("Device not connected".to_string()),
+            PointError::DeviceNotConnected => {
+                AppError::BadRequest("Device not connected".to_string())
+            }
             PointError::ValidationError(msg) => AppError::BadRequest(msg),
             _ => AppError::InternalError(e.to_string()),
         })?;

@@ -1,12 +1,15 @@
 //! 工作台服务模块
 
-mod service;
 mod error;
+mod service;
 mod types;
 
 pub use error::WorkbenchError;
-pub use types::{WorkbenchDto, PagedWorkbenchDto, CreateWorkbenchEntity, UpdateWorkbenchEntity, ListWorkbenchesQuery};
 pub use service::{WorkbenchService, WorkbenchServiceImpl};
+pub use types::{
+    CreateWorkbenchEntity, ListWorkbenchesQuery, PagedWorkbenchDto, UpdateWorkbenchEntity,
+    WorkbenchDto,
+};
 
 /// Re-export for convenience
-pub use crate::db::repository::workbench_repo::{WorkbenchRepository, SqlxWorkbenchRepository};
+pub use crate::db::repository::workbench_repo::{SqlxWorkbenchRepository, WorkbenchRepository};

@@ -7,5 +7,7 @@ pub mod service;
 pub mod types;
 
 pub use error::UserError;
-pub use service::{UserService, UserServiceImpl, UserDto, UpdateUserRequest, ChangePasswordRequest};
+pub use service::{
+    ChangePasswordRequest, UpdateUserRequest, UserDto, UserService, UserServiceImpl,
+};
 pub use types::UpdateUserEntity;

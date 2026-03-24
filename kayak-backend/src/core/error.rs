@@ -284,9 +284,7 @@ impl From<QueryRejection> for AppError {
 impl From<sqlx::Error> for AppError {
     fn from(err: sqlx::Error) -> Self {
         match err {
-            sqlx::Error::RowNotFound => {
-                AppError::NotFound("Resource not found".to_string())
-            }
+            sqlx::Error::RowNotFound => AppError::NotFound("Resource not found".to_string()),
             sqlx::Error::Database(db_err) => {
                 if db_err.is_unique_violation() {
                     AppError::Conflict("Resource already exists".to_string())
@@ -345,14 +343,32 @@ mod tests {
     #[test]
     fn test_app_error_status_codes() {
         // 4xx errors
-        assert_eq!(AppError::BadRequest("test".to_string()).status_code(), StatusCode::BAD_REQUEST);
-        assert_eq!(AppError::Unauthorized("test".to_string()).status_code(), StatusCode::UNAUTHORIZED);
-        assert_eq!(AppError::NotFound("test".to_string()).status_code(), StatusCode::NOT_FOUND);
-        assert_eq!(AppError::Conflict("test".to_string()).status_code(), StatusCode::CONFLICT);
+        assert_eq!(
+            AppError::BadRequest("test".to_string()).status_code(),
+            StatusCode::BAD_REQUEST
+        );
+        assert_eq!(
+            AppError::Unauthorized("test".to_string()).status_code(),
+            StatusCode::UNAUTHORIZED
+        );
+        assert_eq!(
+            AppError::NotFound("test".to_string()).status_code(),
+            StatusCode::NOT_FOUND
+        );
+        assert_eq!(
+            AppError::Conflict("test".to_string()).status_code(),
+            StatusCode::CONFLICT
+        );
 
         // 5xx errors
-        assert_eq!(AppError::InternalError("test".to_string()).status_code(), StatusCode::INTERNAL_SERVER_ERROR);
-        assert_eq!(AppError::DatabaseError("test".to_string()).status_code(), StatusCode::INTERNAL_SERVER_ERROR);
+        assert_eq!(
+            AppError::InternalError("test".to_string()).status_code(),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
+        assert_eq!(
+            AppError::DatabaseError("test".to_string()).status_code(),
+            StatusCode::INTERNAL_SERVER_ERROR
+        );
     }
 
     #[test]

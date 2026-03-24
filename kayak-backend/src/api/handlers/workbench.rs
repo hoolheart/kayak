@@ -1,5 +1,12 @@
 //! 工作台请求处理器
 
+use crate::auth::middleware::require_auth::RequireAuth;
+use crate::core::error::{ApiResponse, AppError};
+use crate::models::entities::workbench::{CreateWorkbenchRequest, UpdateWorkbenchRequest};
+use crate::services::workbench::{
+    CreateWorkbenchEntity, ListWorkbenchesQuery, PagedWorkbenchDto, UpdateWorkbenchEntity,
+    WorkbenchDto, WorkbenchError, WorkbenchService,
+};
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
@@ -7,10 +14,6 @@ use axum::{
 };
 use std::sync::Arc;
 use uuid::Uuid;
-use crate::auth::middleware::require_auth::RequireAuth;
-use crate::core::error::{ApiResponse, AppError};
-use crate::models::entities::workbench::{CreateWorkbenchRequest, UpdateWorkbenchRequest};
-use crate::services::workbench::{WorkbenchService, WorkbenchDto, PagedWorkbenchDto, CreateWorkbenchEntity, UpdateWorkbenchEntity, ListWorkbenchesQuery, WorkbenchError};
 
 /// 应用状态类型
 type AppState = Arc<dyn WorkbenchService>;
@@ -28,7 +31,9 @@ pub async fn create_workbench(
         owner_id: user_ctx.user_id,
     };
 
-    let workbench = handler.create_workbench(user_ctx.user_id, entity).await
+    let workbench = handler
+        .create_workbench(user_ctx.user_id, entity)
+        .await
         .map_err(|e| match e {
             WorkbenchError::ValidationError(msg) => AppError::BadRequest(msg),
             _ => AppError::InternalError(e.to_string()),
@@ -46,7 +51,9 @@ pub async fn list_workbenches(
     let page = query.page;
     let size = query.size;
 
-    let result = handler.list_workbenches(user_ctx.user_id, page, size).await
+    let result = handler
+        .list_workbenches(user_ctx.user_id, page, size)
+        .await
         .map_err(|e| match e {
             WorkbenchError::ValidationError(msg) => AppError::BadRequest(msg),
             _ => AppError::InternalError(e.to_string()),
@@ -61,10 +68,14 @@ pub async fn get_workbench(
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApiResponse<WorkbenchDto>>, AppError> {
-    let workbench = handler.get_workbench(user_ctx.user_id, id).await
+    let workbench = handler
+        .get_workbench(user_ctx.user_id, id)
+        .await
         .map_err(|e| match e {
             WorkbenchError::NotFound => AppError::NotFound("Workbench not found".to_string()),
-            WorkbenchError::AccessDenied => AppError::Forbidden("Access denied: you do not own this workbench".to_string()),
+            WorkbenchError::AccessDenied => {
+                AppError::Forbidden("Access denied: you do not own this workbench".to_string())
+            }
             _ => AppError::InternalError(e.to_string()),
         })?;
 
@@ -84,10 +95,14 @@ pub async fn update_workbench(
         status: req.status,
     };
 
-    let workbench = handler.update_workbench(user_ctx.user_id, id, entity).await
+    let workbench = handler
+        .update_workbench(user_ctx.user_id, id, entity)
+        .await
         .map_err(|e| match e {
             WorkbenchError::NotFound => AppError::NotFound("Workbench not found".to_string()),
-            WorkbenchError::AccessDenied => AppError::Forbidden("Access denied: you do not own this workbench".to_string()),
+            WorkbenchError::AccessDenied => {
+                AppError::Forbidden("Access denied: you do not own this workbench".to_string())
+            }
             WorkbenchError::ValidationError(msg) => AppError::BadRequest(msg),
             _ => AppError::InternalError(e.to_string()),
         })?;
@@ -101,10 +116,14 @@ pub async fn delete_workbench(
     RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, AppError> {
-    handler.delete_workbench(user_ctx.user_id, id).await
+    handler
+        .delete_workbench(user_ctx.user_id, id)
+        .await
         .map_err(|e| match e {
             WorkbenchError::NotFound => AppError::NotFound("Workbench not found".to_string()),
-            WorkbenchError::AccessDenied => AppError::Forbidden("Access denied: you do not own this workbench".to_string()),
+            WorkbenchError::AccessDenied => {
+                AppError::Forbidden("Access denied: you do not own this workbench".to_string())
+            }
             _ => AppError::InternalError(e.to_string()),
         })?;
 

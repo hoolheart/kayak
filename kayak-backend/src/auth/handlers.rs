@@ -7,11 +7,11 @@ use std::sync::Arc;
 use axum::{extract::State, Json};
 use validator::Validate;
 
-use crate::auth::traits::AuthService;
 use crate::auth::dtos::{
-    LoginRequest, RegisterRequest, RegisterResponse, TokenRefreshRequest,
-    TokenResponse, UserAuthInfo,
+    LoginRequest, RegisterRequest, RegisterResponse, TokenRefreshRequest, TokenResponse,
+    UserAuthInfo,
 };
+use crate::auth::traits::AuthService;
 use crate::core::error::{ApiResponse, AppError};
 
 /// 处理用户注册

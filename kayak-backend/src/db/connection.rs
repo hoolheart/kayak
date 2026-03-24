@@ -21,9 +21,10 @@ pub async fn init_db(database_url: &str) -> Result<DbPool, sqlx::Error> {
     if let Some(parent) = Path::new(database_url.trim_start_matches("sqlite://")).parent() {
         std::fs::create_dir_all(parent).map_err(|e| {
             error!("Failed to create database directory: {}", e);
-            sqlx::Error::Io(std::io::Error::other(
-                format!("Failed to create database directory: {}", e),
-            ))
+            sqlx::Error::Io(std::io::Error::other(format!(
+                "Failed to create database directory: {}",
+                e
+            )))
         })?;
     }
 
@@ -63,7 +64,9 @@ pub async fn init_db(database_url: &str) -> Result<DbPool, sqlx::Error> {
 /// 获取数据库连接
 ///
 /// 从连接池获取一个连接
-pub async fn get_conn(pool: &DbPool) -> Result<sqlx::pool::PoolConnection<sqlx::Sqlite>, sqlx::Error> {
+pub async fn get_conn(
+    pool: &DbPool,
+) -> Result<sqlx::pool::PoolConnection<sqlx::Sqlite>, sqlx::Error> {
     pool.acquire().await
 }
 

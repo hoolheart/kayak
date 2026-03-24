@@ -173,6 +173,7 @@ cleanup() {
     echo -e "${YELLOW}\nShutting down...${NC}"
     pkill -f "kayak-backend" || true
     exit 0
+}
 trap cleanup SIGINT SIGTERM
 
 main "$@"

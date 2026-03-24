@@ -25,5 +25,5 @@ pub mod services;
 pub mod test_utils;
 
 // 重新导出常用类型
-pub use core::error::AppError;
 pub use core::config::AppConfig;
+pub use core::error::AppError;

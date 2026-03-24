@@ -3,8 +3,8 @@
 //! 包含所有HTTP请求处理器
 
 pub mod common;
+pub mod device;
 pub mod health;
+pub mod point;
 pub mod user;
 pub mod workbench;
-pub mod device;
-pub mod point;

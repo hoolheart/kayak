@@ -1,8 +1,8 @@
 //! 设备驱动核心 trait 和数据类型定义
 
-use uuid::Uuid;
 use async_trait::async_trait;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 pub use super::error::{DriverError, VirtualConfigError};
 

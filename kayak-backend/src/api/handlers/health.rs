@@ -2,10 +2,7 @@
 //!
 //! 提供服务健康状态检查接口
 
-use axum::{
-    response::IntoResponse,
-    Json,
-};
+use axum::{response::IntoResponse, Json};
 use serde::Serialize;
 
 /// 健康检查响应结构

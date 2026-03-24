@@ -1,16 +1,16 @@
 //! 设备仓库模块
 
+use crate::models::entities::device::{Device, DeviceStatus, ProtocolType};
 use async_trait::async_trait;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
-use crate::models::entities::device::{Device, DeviceStatus, ProtocolType};
 
 /// 仓库错误类型
 #[derive(Debug, thiserror::Error)]
 pub enum DeviceRepositoryError {
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
-    
+
     #[error("Not found")]
     NotFound,
 }
@@ -94,7 +94,9 @@ impl DeviceRow {
                 "mqtt" => ProtocolType::Mqtt,
                 _ => ProtocolType::Virtual,
             },
-            protocol_params: self.protocol_params.and_then(|s| serde_json::from_str(&s).ok()),
+            protocol_params: self
+                .protocol_params
+                .and_then(|s| serde_json::from_str(&s).ok()),
             manufacturer: self.manufacturer,
             model: self.model,
             sn: self.sn,
@@ -165,12 +167,10 @@ impl DeviceRepository for SqlxDeviceRepository {
     }
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Device>, DeviceRepositoryError> {
-        let row: Option<DeviceRow> = sqlx::query_as(
-            "SELECT * FROM devices WHERE id = ?",
-        )
-        .bind(id.to_string())
-        .fetch_optional(&self.pool)
-        .await?;
+        let row: Option<DeviceRow> = sqlx::query_as("SELECT * FROM devices WHERE id = ?")
+            .bind(id.to_string())
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(row.map(|r| r.to_entity()))
     }
@@ -183,12 +183,11 @@ impl DeviceRepository for SqlxDeviceRepository {
     ) -> Result<(Vec<Device>, i64), DeviceRepositoryError> {
         let offset = (page - 1) * size;
 
-        let count_row: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM devices WHERE workbench_id = ?",
-        )
-        .bind(workbench_id.to_string())
-        .fetch_one(&self.pool)
-        .await?;
+        let count_row: (i64,) =
+            sqlx::query_as("SELECT COUNT(*) FROM devices WHERE workbench_id = ?")
+                .bind(workbench_id.to_string())
+                .fetch_one(&self.pool)
+                .await?;
 
         let total = count_row.0;
 
@@ -310,10 +309,7 @@ impl DeviceRepository for SqlxDeviceRepository {
         updates.push("updated_at = ?");
         values.push(chrono::Utc::now().to_rfc3339());
 
-        let query = format!(
-            "UPDATE devices SET {} WHERE id = ?",
-            updates.join(", ")
-        );
+        let query = format!("UPDATE devices SET {} WHERE id = ?", updates.join(", "));
 
         let mut q = sqlx::query(&query);
         for v in &values {
@@ -350,12 +346,11 @@ impl DeviceRepository for SqlxDeviceRepository {
         let mut to_process = vec![id];
 
         while let Some(current_id) = to_process.pop() {
-            let children: Vec<DeviceRow> = sqlx::query_as(
-                "SELECT * FROM devices WHERE parent_id = ?",
-            )
-            .bind(current_id.to_string())
-            .fetch_all(&self.pool)
-            .await?;
+            let children: Vec<DeviceRow> =
+                sqlx::query_as("SELECT * FROM devices WHERE parent_id = ?")
+                    .bind(current_id.to_string())
+                    .fetch_all(&self.pool)
+                    .await?;
 
             for child in children {
                 let child_id = Uuid::parse_str(&child.id).unwrap();
@@ -368,12 +363,10 @@ impl DeviceRepository for SqlxDeviceRepository {
     }
 
     async fn find_children(&self, parent_id: Uuid) -> Result<Vec<Device>, DeviceRepositoryError> {
-        let rows: Vec<DeviceRow> = sqlx::query_as(
-            "SELECT * FROM devices WHERE parent_id = ?",
-        )
-        .bind(parent_id.to_string())
-        .fetch_all(&self.pool)
-        .await?;
+        let rows: Vec<DeviceRow> = sqlx::query_as("SELECT * FROM devices WHERE parent_id = ?")
+            .bind(parent_id.to_string())
+            .fetch_all(&self.pool)
+            .await?;
 
         Ok(rows.into_iter().map(|r| r.to_entity()).collect())
     }
