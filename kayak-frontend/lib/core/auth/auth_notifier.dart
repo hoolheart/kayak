@@ -4,6 +4,7 @@
 /// 实现AuthStateNotifierInterface接口，依赖抽象而非具体实现
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_state.dart';
 import 'auth_notifier_interface.dart';
@@ -44,21 +45,28 @@ class AuthStateNotifier extends StateNotifier<AuthState>
   Future<void> initialize() async {
     if (state.isLoading) return;
 
+    debugPrint('AuthStateNotifier.initialize: Starting');
     state = AuthState.loading();
 
     try {
+      debugPrint('AuthStateNotifier.initialize: Getting tokens');
       final accessToken = await _tokenStorage.getAccessToken();
       final refreshToken = await _tokenStorage.getRefreshToken();
+      debugPrint(
+          'AuthStateNotifier.initialize: accessToken=${accessToken != null}, refreshToken=${refreshToken != null}');
 
       if (accessToken == null || refreshToken == null) {
+        debugPrint('AuthStateNotifier.initialize: No tokens, going to initial');
         state = AuthState.initial();
         return;
       }
 
       // 检查Token是否需要刷新
       if (await _tokenStorage.shouldRefreshToken()) {
+        debugPrint('AuthStateNotifier.initialize: Refreshing tokens');
         final success = await _refreshTokens();
         if (!success) {
+          debugPrint('AuthStateNotifier.initialize: Refresh failed');
           await _tokenStorage.clearTokens();
           state = AuthState.initial();
           return;
@@ -68,19 +76,27 @@ class AuthStateNotifier extends StateNotifier<AuthState>
       // 获取新的access token
       final currentAccessToken = await _tokenStorage.getAccessToken();
       if (currentAccessToken == null) {
+        debugPrint('AuthStateNotifier.initialize: No current access token');
         state = AuthState.initial();
         return;
       }
 
       // 获取用户信息
+      debugPrint('AuthStateNotifier.initialize: Fetching user with token');
       final user = await _fetchCurrentUser(currentAccessToken);
+      debugPrint('AuthStateNotifier.initialize: User fetched: ${user != null}');
+
       if (user != null) {
         state = AuthState.authenticated(user, currentAccessToken);
+        debugPrint('AuthStateNotifier.initialize: SUCCESS');
       } else {
+        debugPrint('AuthStateNotifier.initialize: No user, going to initial');
         await _tokenStorage.clearTokens();
         state = AuthState.initial();
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('AuthStateNotifier.initialize: EXCEPTION: $e');
+      debugPrint('AuthStateNotifier.initialize: Stack: $st');
       await _tokenStorage.clearTokens();
       state = AuthState.initial();
     }
