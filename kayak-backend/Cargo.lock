@@ -1440,6 +1440,7 @@ dependencies = [
  "futures",
  "hdf5",
  "jsonwebtoken",
+ "ndarray",
  "rand",
  "reqwest",
  "serde",
