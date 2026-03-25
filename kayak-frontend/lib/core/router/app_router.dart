@@ -23,6 +23,8 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
@@ -43,12 +45,35 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       debugPrint('SplashScreen: Auth initialization failed: $e');
       debugPrint('Stack: $stack');
     }
+    _initialized = true;
+    // Trigger rebuild to update UI
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 监听appInitializerProvider，但不依赖其状态
-    ref.listen(appInitializerProvider, (_, __) {});
+    // 监听auth state变化，完成后跳转
+    final authState = ref.watch(authStateProvider);
+
+    debugPrint(
+        'SplashScreen build: authState.isAuthenticated=${authState.isAuthenticated}, _initialized=$_initialized');
+
+    // 初始化完成后根据状态跳转
+    if (_initialized) {
+      if (authState.isAuthenticated) {
+        debugPrint('SplashScreen: Navigating to home');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(AppRoutes.home);
+        });
+      } else {
+        debugPrint('SplashScreen: Navigating to login');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(AppRoutes.login);
+        });
+      }
+    }
 
     return const Scaffold(
       body: Center(
