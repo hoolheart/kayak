@@ -133,9 +133,21 @@ start_frontend() {
     # 获取依赖
     flutter pub get
     
+    # 检查后端是否可连接
+    echo -e "${YELLOW}Checking backend connection...${NC}"
+    if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        echo -e "${GREEN}Backend is running and accessible at http://localhost:8080${NC}"
+    else
+        echo -e "${RED}Warning: Backend is not accessible at http://localhost:8080${NC}"
+        echo -e "${YELLOW}Please ensure backend is running with: ./scripts/start-desktop.sh --backend-only${NC}"
+    fi
+    
     # 启动桌面应用
     echo -e "${YELLOW}Launching Flutter desktop (this may take a moment)...${NC}"
-    flutter run -d linux
+    flutter run -d linux 2>&1 | head -50 || {
+        echo -e "${RED}Flutter run failed. Trying with more verbose output...${NC}"
+        flutter run -d linux -v 2>&1 | tail -30
+    }
 }
 
 # 显示帮助
