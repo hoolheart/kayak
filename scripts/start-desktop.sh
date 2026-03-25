@@ -40,7 +40,39 @@ check_dependencies() {
         exit 1
     fi
     
+    # 检查Flutter桌面支持
+    if ! flutter config --enable-linux-desktop 2>/dev/null; then
+        echo -e "${YELLOW}Warning: Flutter Linux desktop may not be fully configured${NC}"
+    fi
+    
     echo -e "${GREEN}All dependencies found${NC}"
+}
+
+# 检查系统依赖
+check_system_deps() {
+    echo -e "${YELLOW}Checking system dependencies...${NC}"
+    
+    # 检查 libsecret (flutter_secure_storage 需要)
+    if ! pkg-config --exists libsecret-1 2>/dev/null; then
+        echo -e "${YELLOW}Warning: libsecret-1 is not installed${NC}"
+        echo -e "${YELLOW}This is required for secure token storage on Linux${NC}"
+        echo ""
+        echo "To fix, run:"
+        echo "  sudo apt-get install libsecret-1-dev"
+        echo ""
+        echo "Or use web mode instead: ./scripts/start-web.sh"
+        echo ""
+        read -p "Try to install libsecret-1-dev now? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            sudo apt-get install libsecret-1-dev
+        else
+            echo -e "${RED}Cannot proceed without libsecret-1${NC}"
+            return 1
+        fi
+    fi
+    
+    echo -e "${GREEN}System dependencies OK${NC}"
 }
 
 # 构建后端
@@ -101,7 +133,8 @@ start_frontend() {
     flutter pub get
     
     # 启动桌面应用
-    flutter run -d linux || flutter run -d windows || flutter run -d macos
+    echo -e "${YELLOW}Launching Flutter desktop (this may take a moment)...${NC}"
+    flutter run -d linux
 }
 
 # 显示帮助
@@ -148,6 +181,7 @@ main() {
             check_dependencies
             build_backend
             start_backend
+            check_system_deps
             start_frontend
             ;;
         *)
