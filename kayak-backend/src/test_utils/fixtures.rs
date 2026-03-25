@@ -11,7 +11,7 @@ pub struct UserFactory;
 
 impl UserFactory {
     /// 创建默认用户
-    pub fn default() -> User {
+    pub fn create() -> User {
         User {
             id: Uuid::new_v4(),
             email: "user@example.com".to_string(),
@@ -26,7 +26,7 @@ impl UserFactory {
 
     /// 创建带自定义邮箱的用户
     pub fn with_email(email: impl Into<String>) -> User {
-        let mut user = Self::default();
+        let mut user = Self::create();
         user.email = email.into();
         user
     }
@@ -46,7 +46,7 @@ pub struct WorkbenchFactory;
 
 impl WorkbenchFactory {
     /// 创建默认工作台
-    pub fn default() -> Workbench {
+    pub fn create() -> Workbench {
         Workbench {
             id: Uuid::new_v4(),
             name: "Test Workbench".to_string(),
@@ -61,7 +61,7 @@ impl WorkbenchFactory {
 
     /// 创建带名称的工作台
     pub fn with_name(name: impl Into<String>) -> Workbench {
-        let mut wb = Self::default();
+        let mut wb = Self::create();
         wb.name = name.into();
         wb
     }
@@ -82,7 +82,7 @@ pub struct DeviceFactory;
 
 impl DeviceFactory {
     /// 创建默认设备
-    pub fn default(workbench_id: Uuid) -> Device {
+    pub fn create(workbench_id: Uuid) -> Device {
         Device {
             id: Uuid::new_v4(),
             workbench_id,
@@ -101,7 +101,7 @@ impl DeviceFactory {
 
     /// 创建子设备
     pub fn child(workbench_id: Uuid, parent_id: Uuid) -> Device {
-        let mut device = Self::default(workbench_id);
+        let mut device = Self::create(workbench_id);
         device.parent_id = Some(parent_id);
         device.name = "Child Device".to_string();
         device
@@ -113,7 +113,7 @@ pub struct PointFactory;
 
 impl PointFactory {
     /// 创建默认测点
-    pub fn default(device_id: Uuid) -> Point {
+    pub fn create(device_id: Uuid) -> Point {
         Point {
             id: Uuid::new_v4(),
             device_id,
@@ -133,7 +133,7 @@ impl PointFactory {
 
     /// 创建温度测点
     pub fn temperature(device_id: Uuid) -> Point {
-        let mut point = Self::default(device_id);
+        let mut point = Self::create(device_id);
         point.name = "Temperature".to_string();
         point.unit = Some("°C".to_string());
         point
@@ -141,7 +141,7 @@ impl PointFactory {
 
     /// 创建控制测点
     pub fn control(device_id: Uuid) -> Point {
-        let mut point = Self::default(device_id);
+        let mut point = Self::create(device_id);
         point.name = "Control".to_string();
         point.access_type = AccessType::Rw;
         point.data_type = DataType::Boolean;
