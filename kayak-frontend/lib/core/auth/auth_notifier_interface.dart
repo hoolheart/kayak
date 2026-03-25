@@ -28,6 +28,9 @@ abstract class AuthStateNotifierInterface {
   /// 登录
   Future<bool> login(String email, String password);
 
+  /// 注册
+  Future<bool> register(String email, String password, [String? username]);
+
   /// 登出
   Future<void> logout();
 

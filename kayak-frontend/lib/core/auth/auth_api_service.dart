@@ -11,6 +11,9 @@ abstract class AuthApiServiceInterface {
   /// 登录
   Future<LoginResponse> login(String email, String password);
 
+  /// 注册
+  Future<void> register(String email, String password, [String? username]);
+
   /// 刷新Token
   Future<TokenPair> refreshToken(String refreshToken);
 
@@ -46,6 +49,30 @@ class AuthApiService implements AuthApiServiceInterface {
           response.data['data'] as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('AuthApiService: Login failed with error: $e');
+      debugPrint('AuthApiService: Stack trace: $st');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> register(String email, String password,
+      [String? username]) async {
+    final url = '$_baseUrl/api/v1/auth/register';
+    debugPrint(
+        'AuthApiService: Attempting register to $url with email: $email');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {
+          'email': email,
+          'password': password,
+          if (username != null) 'username': username,
+        },
+      );
+      debugPrint(
+          'AuthApiService: Register successful, response: ${response.data}');
+    } catch (e, st) {
+      debugPrint('AuthApiService: Register failed with error: $e');
       debugPrint('AuthApiService: Stack trace: $st');
       rethrow;
     }

@@ -130,6 +130,22 @@ class AuthStateNotifier extends StateNotifier<AuthState>
     }
   }
 
+  /// 注册
+  @override
+  Future<bool> register(String email, String password,
+      [String? username]) async {
+    state = AuthState.loading();
+
+    try {
+      await _authApiService.register(email, password, username);
+      state = AuthState.initial();
+      return true;
+    } catch (e) {
+      state = AuthState.error(e.toString());
+      return false;
+    }
+  }
+
   /// 登出
   @override
   Future<void> logout() async {

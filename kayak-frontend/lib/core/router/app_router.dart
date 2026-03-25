@@ -11,6 +11,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/register_screen.dart';
 import '../../screens/home/home_screen.dart';
 import '../auth/providers.dart';
 
@@ -130,7 +131,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final path = state.uri.path;
 
       // 公共路由
-      const publicRoutes = ['/login', '/'];
+      const publicRoutes = ['/login', '/register', '/'];
       final isPublicRoute = publicRoutes.contains(path);
 
       // 未登录访问受保护路由 -> 重定向到登录
@@ -164,6 +165,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             sessionExpired: sessionExpired == 'true',
           );
         },
+      ),
+
+      // 注册页
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
       ),
 
       // 首页
