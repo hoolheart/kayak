@@ -7,10 +7,11 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// 试验状态枚举
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum ExperimentStatus {
     /// 初始状态，试验未开始
+    #[default]
     Idle,
     /// 试验正在运行
     Running,
@@ -20,12 +21,6 @@ pub enum ExperimentStatus {
     Completed,
     /// 试验被中止
     Aborted,
-}
-
-impl Default for ExperimentStatus {
-    fn default() -> Self {
-        ExperimentStatus::Idle
-    }
 }
 
 /// 试验实体
