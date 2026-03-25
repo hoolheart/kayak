@@ -38,7 +38,7 @@ class LoginView extends ConsumerWidget {
         if (redirectPath != null) {
           context.go(Uri.decodeComponent(redirectPath!));
         } else {
-          context.go(AppRoutes.home);
+          context.go(AppRoutes.dashboard);
         }
       }
     });
