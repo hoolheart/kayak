@@ -7,11 +7,11 @@ use std::sync::Arc;
 use axum::{extract::State, Json};
 use validator::Validate;
 
-use crate::auth::traits::AuthService;
 use crate::auth::dtos::{
-    LoginRequest, RegisterRequest, RegisterResponse, TokenRefreshRequest,
-    TokenResponse, UserAuthInfo,
+    LoginRequest, RegisterRequest, RegisterResponse, TokenRefreshRequest, TokenResponse,
+    UserAuthInfo,
 };
+use crate::auth::traits::AuthService;
 use crate::core::error::{ApiResponse, AppError};
 
 /// 处理用户注册
@@ -21,7 +21,7 @@ pub async fn register<S: AuthService>(
 ) -> Result<Json<ApiResponse<RegisterResponse>>, AppError> {
     // 验证请求
     req.validate()
-        .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
+        .map_err(|e| AppError::validation_error_single("validation", e.to_string()))?;
 
     // 注册用户
     let user = auth_service.register(req).await?;
@@ -43,7 +43,7 @@ pub async fn login<S: AuthService>(
 ) -> Result<Json<ApiResponse<TokenResponse>>, AppError> {
     // 验证请求
     req.validate()
-        .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
+        .map_err(|e| AppError::validation_error_single("validation", e.to_string()))?;
 
     // 执行登录
     let login_response = auth_service.login(req).await?;
@@ -70,7 +70,7 @@ pub async fn refresh_token<S: AuthService>(
 ) -> Result<Json<ApiResponse<TokenResponse>>, AppError> {
     // 验证请求
     req.validate()
-        .map_err(|e| AppError::validation_error_single("validation", &e.to_string()))?;
+        .map_err(|e| AppError::validation_error_single("validation", e.to_string()))?;
 
     // 刷新Token
     let login_response = auth_service.refresh_token(req).await?;

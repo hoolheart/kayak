@@ -306,14 +306,12 @@ void main() {
 
     group('drag', () {
       testWidgets('drags widget', (WidgetTester tester) async {
-        Offset? dragEndPosition;
-
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: GestureDetector(
                 onPanEnd: (details) {
-                  dragEndPosition = details.velocity.pixelsPerSecond;
+                  // Drag completed - velocity available in details
                 },
                 child: Container(
                   width: 200,

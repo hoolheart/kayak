@@ -1,13 +1,15 @@
 //! 虚拟设备驱动实现
 
+use async_trait::async_trait;
+use rand::{Rng, SeedableRng};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, RwLock};
 use uuid::Uuid;
-use async_trait::async_trait;
-use rand::{Rng, SeedableRng};
-use serde::{Serialize, Deserialize};
 
-pub use super::core::{PointValue, VirtualMode, DataType, AccessType, DeviceDriver, DriverError, VirtualConfigError};
+pub use super::core::{
+    AccessType, DataType, DeviceDriver, DriverError, PointValue, VirtualConfigError, VirtualMode,
+};
 
 /// 虚拟设备驱动配置
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -234,7 +236,10 @@ impl DeviceDriver for VirtualDriver {
             (DataType::Boolean, PointValue::Boolean(_)) => {}
             _ => {
                 return Err(DriverError::InvalidValue {
-                    message: format!("Type mismatch: expected {:?}, got {:?}", self.config.data_type, value)
+                    message: format!(
+                        "Type mismatch: expected {:?}, got {:?}",
+                        self.config.data_type, value
+                    ),
                 });
             }
         }

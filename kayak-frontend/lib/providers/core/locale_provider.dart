@@ -3,6 +3,7 @@
 /// 使用Riverpod管理应用语言状态
 /// 支持多语言切换
 /// 语言设置持久化到SharedPreferences
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

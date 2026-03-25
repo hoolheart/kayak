@@ -1,22 +1,23 @@
 //! 测点仓库模块
 
+use crate::models::entities::point::{AccessType, DataType, Point, PointStatus};
 use async_trait::async_trait;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
-use crate::models::entities::point::{Point, PointStatus, DataType, AccessType};
 
 /// 仓库错误类型
 #[derive(Debug, thiserror::Error)]
 pub enum PointRepositoryError {
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
-    
+
     #[error("Not found")]
     NotFound,
 }
 
 /// 测点仓库 trait
 #[async_trait]
+#[allow(clippy::too_many_arguments)]
 pub trait PointRepository: Send + Sync {
     async fn create(&self, point: &Point) -> Result<Point, PointRepositoryError>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Point>, PointRepositoryError>;
@@ -38,7 +39,10 @@ pub trait PointRepository: Send + Sync {
     ) -> Result<Point, PointRepositoryError>;
     async fn delete(&self, id: Uuid) -> Result<(), PointRepositoryError>;
     async fn delete_by_device_id(&self, device_id: Uuid) -> Result<(), PointRepositoryError>;
-    async fn find_ids_by_device_id(&self, device_id: Uuid) -> Result<Vec<Uuid>, PointRepositoryError>;
+    async fn find_ids_by_device_id(
+        &self,
+        device_id: Uuid,
+    ) -> Result<Vec<Uuid>, PointRepositoryError>;
 }
 
 /// SQLx测点仓库实现
@@ -70,6 +74,7 @@ struct PointRow {
 }
 
 impl PointRow {
+    #[allow(clippy::wrong_self_convention)]
     fn to_entity(self) -> Point {
         Point {
             id: Uuid::parse_str(&self.id).unwrap(),
@@ -159,12 +164,10 @@ impl PointRepository for SqlxPointRepository {
     }
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Point>, PointRepositoryError> {
-        let row: Option<PointRow> = sqlx::query_as(
-            "SELECT * FROM points WHERE id = ?",
-        )
-        .bind(id.to_string())
-        .fetch_optional(&self.pool)
-        .await?;
+        let row: Option<PointRow> = sqlx::query_as("SELECT * FROM points WHERE id = ?")
+            .bind(id.to_string())
+            .fetch_optional(&self.pool)
+            .await?;
 
         Ok(row.map(|r| r.to_entity()))
     }
@@ -177,12 +180,10 @@ impl PointRepository for SqlxPointRepository {
     ) -> Result<(Vec<Point>, i64), PointRepositoryError> {
         let offset = (page - 1) * size;
 
-        let count_row: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM points WHERE device_id = ?",
-        )
-        .bind(device_id.to_string())
-        .fetch_one(&self.pool)
-        .await?;
+        let count_row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM points WHERE device_id = ?")
+            .bind(device_id.to_string())
+            .fetch_one(&self.pool)
+            .await?;
 
         let total = count_row.0;
 
@@ -247,10 +248,7 @@ impl PointRepository for SqlxPointRepository {
         updates.push("updated_at = ?");
         values.push(chrono::Utc::now().to_rfc3339());
 
-        let query = format!(
-            "UPDATE points SET {} WHERE id = ?",
-            updates.join(", ")
-        );
+        let query = format!("UPDATE points SET {} WHERE id = ?", updates.join(", "));
 
         let mut q = sqlx::query(&query);
         for v in &values {
@@ -291,13 +289,14 @@ impl PointRepository for SqlxPointRepository {
         Ok(())
     }
 
-    async fn find_ids_by_device_id(&self, device_id: Uuid) -> Result<Vec<Uuid>, PointRepositoryError> {
-        let rows: Vec<(String,)> = sqlx::query_as(
-            "SELECT id FROM points WHERE device_id = ?",
-        )
-        .bind(device_id.to_string())
-        .fetch_all(&self.pool)
-        .await?;
+    async fn find_ids_by_device_id(
+        &self,
+        device_id: Uuid,
+    ) -> Result<Vec<Uuid>, PointRepositoryError> {
+        let rows: Vec<(String,)> = sqlx::query_as("SELECT id FROM points WHERE device_id = ?")
+            .bind(device_id.to_string())
+            .fetch_all(&self.pool)
+            .await?;
 
         Ok(rows
             .into_iter()

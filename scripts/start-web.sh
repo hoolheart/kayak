@@ -70,9 +70,10 @@ start_web() {
         return
     fi
     
+    # 使用绝对路径确保无论从哪里运行都能找到数据库
     export KAYAK_DATA_DIR="$DATA_DIR"
     export KAYAK_LOG_LEVEL="info"
-    export DATABASE_URL="sqlite://$DATA_DIR/kayak.db"
+    export DATABASE_URL="sqlite://$(realpath $DATA_DIR)/kayak.db"
     export KAYAK_SERVE_STATIC="$FRONTEND_DIR/build/web"
     export RUST_BACKTRACE=1
     
@@ -173,6 +174,7 @@ cleanup() {
     echo -e "${YELLOW}\nShutting down...${NC}"
     pkill -f "kayak-backend" || true
     exit 0
+}
 trap cleanup SIGINT SIGTERM
 
 main "$@"

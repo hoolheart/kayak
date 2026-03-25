@@ -24,10 +24,7 @@ impl TestDbContext {
     /// 使用唯一的内存数据库URL，确保测试隔离
     pub async fn new() -> Self {
         let db_id = Uuid::new_v4().to_string();
-        let db_url = format!(
-            "sqlite:file:{}?mode=memory&cache=shared",
-            db_id
-        );
+        let db_url = format!("sqlite:file:{}?mode=memory&cache=shared", db_id);
 
         let pool = SqlitePool::connect(&db_url)
             .await
@@ -39,7 +36,10 @@ impl TestDbContext {
             .await
             .expect("Failed to run migrations");
 
-        Self { pool, db_name: db_id }
+        Self {
+            pool,
+            db_name: db_id,
+        }
     }
 
     /// 获取数据库连接池

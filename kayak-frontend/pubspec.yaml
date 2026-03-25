@@ -83,7 +83,6 @@ dev_dependencies:
   # 代码生成工具
   build_runner: ^2.4.8
   json_serializable: ^6.7.1
-  freezed: ^2.4.7
   riverpod_generator: ^2.3.11
   go_router_builder: ^2.4.1
 
@@ -91,6 +90,7 @@ dev_dependencies:
   mockito: ^5.4.4
   mocktail: ^1.0.3
   golden_toolkit: ^0.15.0  # Golden测试工具
+  # freezed removed from dev_dependencies since it's already in dependencies
 
 flutter:
   # 启用Material Design

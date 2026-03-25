@@ -17,7 +17,9 @@ use crate::models::entities::user::{User, UserStatus};
 use super::{
     dtos::{LoginRequest, RegisterRequest, TokenRefreshRequest},
     error::AuthError,
-    traits::{AuthService, LoginResponse, PasswordHasher, TokenClaims, TokenPair, TokenService, TokenType},
+    traits::{
+        AuthService, LoginResponse, PasswordHasher, TokenClaims, TokenPair, TokenService, TokenType,
+    },
 };
 
 // JWT配置常量
@@ -74,7 +76,7 @@ impl AuthServiceImpl {
 impl AuthService for AuthServiceImpl {
     async fn register(&self, req: RegisterRequest) -> Result<User, AppError> {
         // 检查邮箱是否已存在
-        if let Some(_) = self.user_repo.find_by_email(&req.email).await? {
+        if self.user_repo.find_by_email(&req.email).await?.is_some() {
             return Err(AuthError::UserAlreadyExists.into());
         }
 
@@ -128,10 +130,7 @@ impl AuthService for AuthServiceImpl {
         })
     }
 
-    async fn refresh_token(
-        &self,
-        req: TokenRefreshRequest,
-    ) -> Result<LoginResponse, AppError> {
+    async fn refresh_token(&self, req: TokenRefreshRequest) -> Result<LoginResponse, AppError> {
         // 验证刷新Token
         let claims = self
             .token_service
@@ -192,11 +191,7 @@ impl JwtTokenService {
 }
 
 impl TokenService for JwtTokenService {
-    fn generate_token_pair(
-        &self,
-        user_id: Uuid,
-        email: &str,
-    ) -> Result<TokenPair, AppError> {
+    fn generate_token_pair(&self, user_id: Uuid, email: &str) -> Result<TokenPair, AppError> {
         let now = Utc::now();
 
         // 生成Access Token
@@ -241,9 +236,7 @@ impl TokenService for JwtTokenService {
         })
     }
 
-    fn verify_access_token(&self,
-        token: &str,
-    ) -> Result<TokenClaims, AppError> {
+    fn verify_access_token(&self, token: &str) -> Result<TokenClaims, AppError> {
         let validation = Validation::default();
         let token_data = decode::<JwtClaims>(
             token,
@@ -251,9 +244,7 @@ impl TokenService for JwtTokenService {
             &validation,
         )
         .map_err(|e| match e.kind() {
-            jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
-                AuthError::TokenExpired
-            }
+            jsonwebtoken::errors::ErrorKind::ExpiredSignature => AuthError::TokenExpired,
             _ => AuthError::InvalidToken,
         })?;
 
@@ -263,8 +254,7 @@ impl TokenService for JwtTokenService {
         }
 
         Ok(TokenClaims {
-            sub: Uuid::parse_str(&claims.sub)
-                .map_err(|_| AuthError::InvalidToken)?,
+            sub: Uuid::parse_str(&claims.sub).map_err(|_| AuthError::InvalidToken)?,
             email: claims.email,
             token_type: TokenType::Access,
             exp: claims.exp,
@@ -272,10 +262,7 @@ impl TokenService for JwtTokenService {
         })
     }
 
-    fn verify_refresh_token(
-        &self,
-        token: &str,
-    ) -> Result<TokenClaims, AppError> {
+    fn verify_refresh_token(&self, token: &str) -> Result<TokenClaims, AppError> {
         let validation = Validation::default();
         let token_data = decode::<JwtClaims>(
             token,
@@ -283,9 +270,7 @@ impl TokenService for JwtTokenService {
             &validation,
         )
         .map_err(|e| match e.kind() {
-            jsonwebtoken::errors::ErrorKind::ExpiredSignature => {
-                AuthError::TokenExpired
-            }
+            jsonwebtoken::errors::ErrorKind::ExpiredSignature => AuthError::TokenExpired,
             _ => AuthError::InvalidToken,
         })?;
 
@@ -295,8 +280,7 @@ impl TokenService for JwtTokenService {
         }
 
         Ok(TokenClaims {
-            sub: Uuid::parse_str(&claims.sub)
-                .map_err(|_| AuthError::InvalidToken)?,
+            sub: Uuid::parse_str(&claims.sub).map_err(|_| AuthError::InvalidToken)?,
             email: claims.email,
             token_type: TokenType::Refresh,
             exp: claims.exp,
@@ -309,20 +293,12 @@ impl TokenService for JwtTokenService {
 pub struct BcryptPasswordHasher;
 
 impl PasswordHasher for BcryptPasswordHasher {
-    fn hash_password(&self,
-        password: &str,
-    ) -> Result<String, AppError> {
-        hash(password, DEFAULT_COST)
-            .map_err(|e| AuthError::HashingError(e.to_string()).into())
+    fn hash_password(&self, password: &str) -> Result<String, AppError> {
+        hash(password, DEFAULT_COST).map_err(|e| AuthError::HashingError(e.to_string()).into())
     }
 
-    fn verify_password(
-        &self,
-        password: &str,
-        hash: &str,
-    ) -> Result<bool, AppError> {
-        verify(password, hash)
-            .map_err(|e| AuthError::HashingError(e.to_string()).into())
+    fn verify_password(&self, password: &str, hash: &str) -> Result<bool, AppError> {
+        verify(password, hash).map_err(|e| AuthError::HashingError(e.to_string()).into())
     }
 }
 

@@ -11,8 +11,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/register_screen.dart';
 import '../../screens/home/home_screen.dart';
-import '../auth/auth_state.dart';
 import '../auth/providers.dart';
 
 /// 简单的启动页，后续可以替换为真正的SplashScreen
@@ -24,6 +24,8 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  bool _initialized = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,18 +36,56 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _initializeAuth() async {
-    final authNotifier = ref.read(authStateNotifierProvider);
-    await authNotifier.initialize();
+    try {
+      debugPrint('SplashScreen: Starting auth initialization...');
+      final authNotifier = ref.read(authStateNotifierProvider);
+      debugPrint('SplashScreen: Got authNotifier, calling initialize...');
+      await authNotifier.initialize();
+      debugPrint('SplashScreen: Auth initialization complete');
+    } catch (e, stack) {
+      debugPrint('SplashScreen: Auth initialization failed: $e');
+      debugPrint('Stack: $stack');
+    }
+    _initialized = true;
+    // Trigger rebuild to update UI
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 监听appInitializerProvider，但不依赖其状态
-    ref.listen(appInitializerProvider, (_, __) {});
+    // 监听auth state变化，完成后跳转
+    final authState = ref.watch(authStateProvider);
+
+    debugPrint(
+        'SplashScreen build: authState.isAuthenticated=${authState.isAuthenticated}, _initialized=$_initialized');
+
+    // 初始化完成后根据状态跳转
+    if (_initialized) {
+      if (authState.isAuthenticated) {
+        debugPrint('SplashScreen: Navigating to home');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(AppRoutes.home);
+        });
+      } else {
+        debugPrint('SplashScreen: Navigating to login');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(AppRoutes.login);
+        });
+      }
+    }
 
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Initializing...'),
+          ],
+        ),
       ),
     );
   }
@@ -91,7 +131,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final path = state.uri.path;
 
       // 公共路由
-      const publicRoutes = ['/login', '/'];
+      const publicRoutes = ['/login', '/register', '/'];
       final isPublicRoute = publicRoutes.contains(path);
 
       // 未登录访问受保护路由 -> 重定向到登录
@@ -125,6 +165,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             sessionExpired: sessionExpired == 'true',
           );
         },
+      ),
+
+      // 注册页
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
       ),
 
       // 首页

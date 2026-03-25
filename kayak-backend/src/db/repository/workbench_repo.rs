@@ -1,16 +1,16 @@
 //! 工作台仓库模块
 
+use crate::models::entities::workbench::{OwnerType, Workbench, WorkbenchStatus};
 use async_trait::async_trait;
 use sqlx::{FromRow, SqlitePool};
 use uuid::Uuid;
-use crate::models::entities::workbench::{Workbench, OwnerType, WorkbenchStatus};
 
 /// 仓库错误类型
 #[derive(Debug, thiserror::Error)]
 pub enum WorkbenchRepositoryError {
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
-    
+
     #[error("Not found")]
     NotFound,
 }
@@ -20,8 +20,19 @@ pub enum WorkbenchRepositoryError {
 pub trait WorkbenchRepository: Send + Sync {
     async fn create(&self, workbench: &Workbench) -> Result<Workbench, WorkbenchRepositoryError>;
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Workbench>, WorkbenchRepositoryError>;
-    async fn list_by_owner(&self, owner_id: Uuid, page: i64, size: i64) -> Result<(Vec<Workbench>, i64), WorkbenchRepositoryError>;
-    async fn update(&self, id: Uuid, name: Option<String>, description: Option<String>, status: Option<WorkbenchStatus>) -> Result<Workbench, WorkbenchRepositoryError>;
+    async fn list_by_owner(
+        &self,
+        owner_id: Uuid,
+        page: i64,
+        size: i64,
+    ) -> Result<(Vec<Workbench>, i64), WorkbenchRepositoryError>;
+    async fn update(
+        &self,
+        id: Uuid,
+        name: Option<String>,
+        description: Option<String>,
+        status: Option<WorkbenchStatus>,
+    ) -> Result<Workbench, WorkbenchRepositoryError>;
     async fn delete(&self, id: Uuid) -> Result<(), WorkbenchRepositoryError>;
 }
 
@@ -50,6 +61,7 @@ struct WorkbenchRow {
 }
 
 impl WorkbenchRow {
+    #[allow(clippy::wrong_self_convention)]
     fn to_entity(self) -> Workbench {
         Workbench {
             id: Uuid::parse_str(&self.id).unwrap(),
@@ -109,22 +121,26 @@ impl WorkbenchRepository for SqlxWorkbenchRepository {
     }
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Workbench>, WorkbenchRepositoryError> {
-        let row: Option<WorkbenchRow> = sqlx::query_as(
-            "SELECT * FROM workbenches WHERE id = ? AND status != 'deleted'"
-        )
-        .bind(id.to_string())
-        .fetch_optional(&self.pool)
-        .await?;
+        let row: Option<WorkbenchRow> =
+            sqlx::query_as("SELECT * FROM workbenches WHERE id = ? AND status != 'deleted'")
+                .bind(id.to_string())
+                .fetch_optional(&self.pool)
+                .await?;
 
         Ok(row.map(|r| r.to_entity()))
     }
 
-    async fn list_by_owner(&self, owner_id: Uuid, page: i64, size: i64) -> Result<(Vec<Workbench>, i64), WorkbenchRepositoryError> {
+    async fn list_by_owner(
+        &self,
+        owner_id: Uuid,
+        page: i64,
+        size: i64,
+    ) -> Result<(Vec<Workbench>, i64), WorkbenchRepositoryError> {
         let offset = (page - 1) * size;
 
         // Get total count
         let count_row: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM workbenches WHERE owner_id = ? AND status != 'deleted'"
+            "SELECT COUNT(*) FROM workbenches WHERE owner_id = ? AND status != 'deleted'",
         )
         .bind(owner_id.to_string())
         .fetch_one(&self.pool)
@@ -146,7 +162,13 @@ impl WorkbenchRepository for SqlxWorkbenchRepository {
         Ok((workbenches, total))
     }
 
-    async fn update(&self, id: Uuid, name: Option<String>, description: Option<String>, status: Option<WorkbenchStatus>) -> Result<Workbench, WorkbenchRepositoryError> {
+    async fn update(
+        &self,
+        id: Uuid,
+        name: Option<String>,
+        description: Option<String>,
+        status: Option<WorkbenchStatus>,
+    ) -> Result<Workbench, WorkbenchRepositoryError> {
         // Build dynamic update query
         let mut updates = Vec::new();
         let mut values: Vec<String> = Vec::new();
@@ -171,7 +193,8 @@ impl WorkbenchRepository for SqlxWorkbenchRepository {
 
         if updates.is_empty() {
             // No updates, just return the current workbench
-            return self.find_by_id(id)
+            return self
+                .find_by_id(id)
                 .await?
                 .ok_or(WorkbenchRepositoryError::NotFound);
         }
@@ -207,7 +230,7 @@ impl WorkbenchRepository for SqlxWorkbenchRepository {
         if workbench.is_none() {
             return Err(WorkbenchRepositoryError::NotFound);
         }
-        
+
         // Hard delete - cascade will handle device/point deletion via FK CASCADE
         // S1-003 schema defines:
         // - devices.workbench_id REFERENCES workbenches(id) ON DELETE CASCADE

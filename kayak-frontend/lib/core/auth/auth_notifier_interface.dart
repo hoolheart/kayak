@@ -2,6 +2,8 @@
 ///
 /// 定义全局认证状态的抽象接口，遵循依赖倒置原则
 /// 不继承任何具体实现类（如StateNotifier）
+library;
+
 import 'auth_state.dart';
 
 abstract class AuthStateNotifierInterface {
@@ -25,6 +27,9 @@ abstract class AuthStateNotifierInterface {
 
   /// 登录
   Future<bool> login(String email, String password);
+
+  /// 注册
+  Future<bool> register(String email, String password, [String? username]);
 
   /// 登出
   Future<void> logout();

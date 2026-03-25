@@ -6,15 +6,12 @@ pub mod cors;
 pub mod error;
 pub mod trace;
 
-use axum::Router;
-use tower_http::{
-    cors::CorsLayer,
-    trace::TraceLayer,
-    timeout::TimeoutLayer,
-    compression::CompressionLayer,
-};
-use std::time::Duration;
 use crate::core::config::AppConfig;
+use axum::Router;
+use std::time::Duration;
+use tower_http::{
+    compression::CompressionLayer, cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer,
+};
 
 /// 应用中间件栈
 pub struct MiddlewareStack;
@@ -42,21 +39,12 @@ impl MiddlewareStack {
     /// - 记录请求方法和URI
     /// - 记录响应状态和延迟
     fn create_trace_layer() -> TraceLayer<
-        tower_http::classify::SharedClassifier<tower_http::classify::ServerErrorsAsFailures>
+        tower_http::classify::SharedClassifier<tower_http::classify::ServerErrorsAsFailures>,
     > {
         TraceLayer::new_for_http()
-            .make_span_with(
-                tower_http::trace::DefaultMakeSpan::new()
-                    .include_headers(false)
-            )
-            .on_request(
-                tower_http::trace::DefaultOnRequest::new()
-                    .level(tracing::Level::INFO)
-            )
-            .on_response(
-                tower_http::trace::DefaultOnResponse::new()
-                    .level(tracing::Level::INFO)
-            )
+            .make_span_with(tower_http::trace::DefaultMakeSpan::new().include_headers(false))
+            .on_request(tower_http::trace::DefaultOnRequest::new().level(tracing::Level::INFO))
+            .on_response(tower_http::trace::DefaultOnResponse::new().level(tracing::Level::INFO))
     }
 
     /// 创建CORS中间件
@@ -80,7 +68,9 @@ impl MiddlewareStack {
             cors = cors.allow_origin(tower_http::cors::Any);
         } else {
             // 生产环境使用配置的允许来源
-            let origins: Vec<_> = config.cors.allowed_origins
+            let origins: Vec<_> = config
+                .cors
+                .allowed_origins
                 .iter()
                 .filter_map(|o| o.parse().ok())
                 .collect();

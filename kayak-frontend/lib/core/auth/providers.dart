@@ -6,7 +6,6 @@ library;
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'api_exceptions.dart';
 import 'auth_api_service.dart';
 import 'auth_notifier.dart';
 import 'auth_notifier_interface.dart';
@@ -49,8 +48,9 @@ final dioProvider = Provider<Dio>((ref) {
 /// Token Storage Provider
 ///
 /// 提供Token安全存储实例
+/// 使用工厂方法创建，会自动选择合适的存储实现
 final tokenStorageProvider = Provider<TokenStorageInterface>((ref) {
-  return SecureTokenStorage();
+  return TokenStorageInterface.create();
 });
 
 /// Auth API Service Provider

@@ -256,6 +256,20 @@ class _LoginFormState extends State<_LoginForm> {
               child: const Text('登录'),
             ),
           ),
+          const SizedBox(height: 16),
+          // 注册链接
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('还没有账号？'),
+              TextButton(
+                onPressed: () {
+                  context.push('/register');
+                },
+                child: const Text('注册账号'),
+              ),
+            ],
+          ),
         ],
       ),
     );

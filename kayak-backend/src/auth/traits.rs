@@ -2,10 +2,10 @@
 //!
 //! 定义认证相关的trait接口，遵循依赖倒置原则
 
-use async_trait::async_trait;
+use super::dtos::{LoginRequest, RegisterRequest, TokenRefreshRequest};
 use crate::core::error::AppError;
 use crate::models::entities::user::User;
-use super::dtos::{LoginRequest, RegisterRequest, TokenRefreshRequest};
+use async_trait::async_trait;
 
 /// 认证服务接口
 #[async_trait]

@@ -24,7 +24,10 @@ impl UserRepositoryAdapter {
 #[async_trait]
 impl UserRepositoryTrait for UserRepositoryAdapter {
     async fn find_by_email(&self, email: &str) -> Result<Option<User>, AppError> {
-        self.inner.find_by_email(email).await.map_err(AppError::from)
+        self.inner
+            .find_by_email(email)
+            .await
+            .map_err(AppError::from)
     }
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<User>, AppError> {
@@ -47,10 +50,15 @@ impl UserRepositoryTrait for UserRepositoryAdapter {
         let req = crate::models::entities::user::UpdateUserRequest {
             username: user.username.clone(),
             avatar_url: user.avatar_url.clone(),
-            status: Some(crate::models::entities::user::UserStatus::from(user.status.clone())),
+            status: Some(crate::models::entities::user::UserStatus::from(
+                user.status.clone(),
+            )),
         };
 
-        self.inner.update(user.id, &req).await.map_err(AppError::from)?;
+        self.inner
+            .update(user.id, &req)
+            .await
+            .map_err(AppError::from)?;
         Ok(())
     }
 }

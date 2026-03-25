@@ -1,12 +1,18 @@
 /// Auth API Service Interface
 ///
 /// 定义认证相关API的抽象，遵循依赖倒置原则
+library;
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'auth_state.dart';
 
 abstract class AuthApiServiceInterface {
   /// 登录
   Future<LoginResponse> login(String email, String password);
+
+  /// 注册
+  Future<void> register(String email, String password, [String? username]);
 
   /// 刷新Token
   Future<TokenPair> refreshToken(String refreshToken);
@@ -30,13 +36,46 @@ class AuthApiService implements AuthApiServiceInterface {
 
   @override
   Future<LoginResponse> login(String email, String password) async {
-    final response = await _dio.post(
-      '$_baseUrl/api/v1/auth/login',
-      data: {'email': email, 'password': password},
-    );
+    final url = '$_baseUrl/api/v1/auth/login';
+    debugPrint('AuthApiService: Attempting login to $url with email: $email');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {'email': email, 'password': password},
+      );
+      debugPrint(
+          'AuthApiService: Login successful, response: ${response.data}');
+      return LoginResponse.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } catch (e, st) {
+      debugPrint('AuthApiService: Login failed with error: $e');
+      debugPrint('AuthApiService: Stack trace: $st');
+      rethrow;
+    }
+  }
 
-    return LoginResponse.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+  @override
+  Future<void> register(String email, String password,
+      [String? username]) async {
+    final url = '$_baseUrl/api/v1/auth/register';
+    debugPrint(
+        'AuthApiService: Attempting register to $url with email: $email');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {
+          'email': email,
+          'password': password,
+          if (username != null) 'username': username,
+        },
+      );
+      debugPrint(
+          'AuthApiService: Register successful, response: ${response.data}');
+    } catch (e, st) {
+      debugPrint('AuthApiService: Register failed with error: $e');
+      debugPrint('AuthApiService: Stack trace: $st');
+      rethrow;
+    }
   }
 
   @override

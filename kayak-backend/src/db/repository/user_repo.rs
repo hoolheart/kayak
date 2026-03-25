@@ -3,7 +3,9 @@
 //! 提供用户实体的数据访问操作
 
 use crate::db::connection::DbPool;
-use crate::models::entities::user::{CreateUserRequest, UpdateUserRequest as EntityUpdateUserRequest, User};
+use crate::models::entities::user::{
+    CreateUserRequest, UpdateUserRequest as EntityUpdateUserRequest, User,
+};
 use crate::services::user::UpdateUserEntity;
 use chrono::Utc;
 use sqlx::{Error, Row};
@@ -44,10 +46,7 @@ impl UserRepository {
     }
 
     /// 根据邮箱查找用户
-    pub async fn find_by_email(
-        &self,
-        email: &str,
-    ) -> Result<Option<User>, Error> {
+    pub async fn find_by_email(&self, email: &str) -> Result<Option<User>, Error> {
         let row = sqlx::query(
             r#"
             SELECT id, email, password_hash, username, avatar_url, status, created_at, updated_at
@@ -72,8 +71,7 @@ impl UserRepository {
     }
 
     /// 查找所有用户
-    pub async fn find_all(&self,
-    ) -> Result<Vec<User>, Error> {
+    pub async fn find_all(&self) -> Result<Vec<User>, Error> {
         let rows = sqlx::query(
             r#"
             SELECT id, email, password_hash, username, avatar_url, status, created_at, updated_at
@@ -100,10 +98,7 @@ impl UserRepository {
     }
 
     /// 创建用户
-    pub async fn create(
-        &self,
-        req: CreateUserRequest,
-    ) -> Result<User, Error> {
+    pub async fn create(&self, req: CreateUserRequest) -> Result<User, Error> {
         let user = User::new(req.email, req.password_hash, req.username);
 
         sqlx::query(
@@ -127,11 +122,7 @@ impl UserRepository {
     }
 
     /// 更新用户信息（使用EntityUpdateUserRequest，用于auth模块）
-    pub async fn update(
-        &self,
-        id: Uuid,
-        req: &EntityUpdateUserRequest,
-    ) -> Result<User, Error> {
+    pub async fn update(&self, id: Uuid, req: &EntityUpdateUserRequest) -> Result<User, Error> {
         let existing = self.find_by_id(id).await?;
         if existing.is_none() {
             return Err(Error::RowNotFound);
@@ -175,13 +166,11 @@ impl UserRepository {
         // 检查是否有更新
         if updates.username.is_none() && updates.avatar_url.is_none() {
             // 没有更新，直接返回当前用户
-            return self.find_by_id(id).await?.ok_or(
-                Error::RowNotFound
-            );
+            return self.find_by_id(id).await?.ok_or(Error::RowNotFound);
         }
 
         let now = Utc::now();
-        
+
         // 构建更新查询
         sqlx::query(
             r#"
@@ -202,11 +191,7 @@ impl UserRepository {
     }
 
     /// 更新用户密码
-    pub async fn update_password(
-        &self,
-        id: Uuid,
-        password_hash: &str,
-    ) -> Result<(), Error> {
+    pub async fn update_password(&self, id: Uuid, password_hash: &str) -> Result<(), Error> {
         let now = Utc::now();
         sqlx::query(
             r#"
@@ -226,12 +211,11 @@ impl UserRepository {
 
     /// 检查用户名是否存在
     pub async fn exists_by_username(&self, username: &str) -> Result<bool, Error> {
-        let exists: bool = sqlx::query_scalar(
-            "SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)",
-        )
-        .bind(username)
-        .fetch_one(&self.pool)
-        .await?;
+        let exists: bool =
+            sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM users WHERE username = ?)")
+                .bind(username)
+                .fetch_one(&self.pool)
+                .await?;
 
         Ok(exists)
     }
@@ -242,22 +226,18 @@ impl UserRepository {
         username: &str,
         user_id: Uuid,
     ) -> Result<bool, Error> {
-        let exists: bool = sqlx::query_scalar(
-            "SELECT EXISTS(SELECT 1 FROM users WHERE username = ? AND id != ?)",
-        )
-        .bind(username)
-        .bind(user_id.to_string())
-        .fetch_one(&self.pool)
-        .await?;
+        let exists: bool =
+            sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM users WHERE username = ? AND id != ?)")
+                .bind(username)
+                .bind(user_id.to_string())
+                .fetch_one(&self.pool)
+                .await?;
 
         Ok(exists)
     }
 
     /// 删除用户
-    pub async fn delete(
-        &self,
-        id: Uuid,
-    ) -> Result<u64, Error> {
+    pub async fn delete(&self, id: Uuid) -> Result<u64, Error> {
         let result = sqlx::query("DELETE FROM users WHERE id = ?")
             .bind(id.to_string())
             .execute(&self.pool)
@@ -277,7 +257,9 @@ mod tests {
     async fn test_user_repository() {
         // 使用唯一的数据库URL避免测试冲突
         let db_id = uuid::Uuid::new_v4().to_string();
-        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id)).await.unwrap();
+        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id))
+            .await
+            .unwrap();
         let repo = UserRepository::new(pool);
 
         // 创建用户
@@ -314,7 +296,9 @@ mod tests {
     #[tokio::test]
     async fn test_exists_by_username() {
         let db_id = uuid::Uuid::new_v4().to_string();
-        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id)).await.unwrap();
+        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id))
+            .await
+            .unwrap();
         let repo = UserRepository::new(pool);
 
         // 创建用户
@@ -334,7 +318,10 @@ mod tests {
         assert!(!exists);
 
         // 检查用户名排除自身
-        let exists = repo.exists_by_username_except_user("uniqueuser", user.id).await.unwrap();
+        let exists = repo
+            .exists_by_username_except_user("uniqueuser", user.id)
+            .await
+            .unwrap();
         assert!(!exists);
 
         // 创建另一个用户使用相同用户名
@@ -346,7 +333,10 @@ mod tests {
         let _ = repo.create(req2).await.unwrap();
 
         // 现在检查应该返回true
-        let exists = repo.exists_by_username_except_user("uniqueuser", user.id).await.unwrap();
+        let exists = repo
+            .exists_by_username_except_user("uniqueuser", user.id)
+            .await
+            .unwrap();
         assert!(exists);
     }
 }

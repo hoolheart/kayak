@@ -29,18 +29,34 @@ impl UserRepository for UserServiceRepositoryAdapter {
     }
 
     async fn update(&self, id: Uuid, updates: &UpdateUserEntity) -> Result<User, AppError> {
-        self.inner.update_with_entity(id, updates).await.map_err(AppError::from)
+        self.inner
+            .update_with_entity(id, updates)
+            .await
+            .map_err(AppError::from)
     }
 
     async fn update_password(&self, id: Uuid, password_hash: &str) -> Result<(), AppError> {
-        self.inner.update_password(id, password_hash).await.map_err(AppError::from)
+        self.inner
+            .update_password(id, password_hash)
+            .await
+            .map_err(AppError::from)
     }
 
     async fn exists_by_username(&self, username: &str) -> Result<bool, AppError> {
-        self.inner.exists_by_username(username).await.map_err(AppError::from)
+        self.inner
+            .exists_by_username(username)
+            .await
+            .map_err(AppError::from)
     }
 
-    async fn exists_by_username_except_user(&self, username: &str, user_id: Uuid) -> Result<bool, AppError> {
-        self.inner.exists_by_username_except_user(username, user_id).await.map_err(AppError::from)
+    async fn exists_by_username_except_user(
+        &self,
+        username: &str,
+        user_id: Uuid,
+    ) -> Result<bool, AppError> {
+        self.inner
+            .exists_by_username_except_user(username, user_id)
+            .await
+            .map_err(AppError::from)
     }
 }

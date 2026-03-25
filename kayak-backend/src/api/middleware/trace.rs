@@ -24,7 +24,8 @@ pub async fn trace_requests(req: Request, next: Next) -> Response {
 
     let method = req.method().to_string();
     let uri = req.uri().to_string();
-    let remote_addr = req.extensions()
+    let remote_addr = req
+        .extensions()
         .get::<ConnectInfo<SocketAddr>>()
         .map(|info| info.0);
 

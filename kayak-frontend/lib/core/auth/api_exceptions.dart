@@ -1,6 +1,7 @@
 /// API Exceptions
 ///
 /// 定义认证和API相关的异常类型
+library;
 
 /// 认证异常
 ///

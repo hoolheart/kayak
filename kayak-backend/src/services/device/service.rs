@@ -1,13 +1,13 @@
 //! 设备服务实现
 
+use async_trait::async_trait;
 use std::sync::Arc;
 use uuid::Uuid;
-use async_trait::async_trait;
 
 use crate::db::repository::device_repo::{DeviceRepository, DeviceRepositoryError};
 use crate::db::repository::point_repo::PointRepository;
 use crate::db::repository::workbench_repo::WorkbenchRepository;
-use crate::drivers::{DeviceManager, VirtualDriver, VirtualConfig};
+use crate::drivers::{DeviceManager, VirtualConfig, VirtualDriver};
 use crate::models::entities::device::{Device, ProtocolType};
 
 use super::error::{CreateDeviceEntity, DeviceError, UpdateDeviceEntity};
@@ -22,14 +22,10 @@ pub trait DeviceService: Send + Sync {
         user_id: Uuid,
         entity: CreateDeviceEntity,
     ) -> Result<DeviceDto, DeviceError>;
-    
+
     /// 获取设备详情
-    async fn get_device(
-        &self,
-        user_id: Uuid,
-        device_id: Uuid,
-    ) -> Result<DeviceDto, DeviceError>;
-    
+    async fn get_device(&self, user_id: Uuid, device_id: Uuid) -> Result<DeviceDto, DeviceError>;
+
     /// 查询设备列表
     async fn list_devices(
         &self,
@@ -39,7 +35,7 @@ pub trait DeviceService: Send + Sync {
         page: i64,
         size: i64,
     ) -> Result<PagedDeviceDto, DeviceError>;
-    
+
     /// 更新设备
     async fn update_device(
         &self,
@@ -47,13 +43,9 @@ pub trait DeviceService: Send + Sync {
         device_id: Uuid,
         entity: UpdateDeviceEntity,
     ) -> Result<DeviceDto, DeviceError>;
-    
+
     /// 删除设备
-    async fn delete_device(
-        &self,
-        user_id: Uuid,
-        device_id: Uuid,
-    ) -> Result<(), DeviceError>;
+    async fn delete_device(&self, user_id: Uuid, device_id: Uuid) -> Result<(), DeviceError>;
 }
 
 /// 设备服务实现
@@ -80,12 +72,17 @@ impl DeviceServiceImpl {
     }
 
     /// 验证用户是否拥有工作台
-    async fn verify_workbench_ownership(&self, user_id: Uuid, workbench_id: Uuid) -> Result<(), DeviceError> {
-        let workbench = self.workbench_repo
+    async fn verify_workbench_ownership(
+        &self,
+        user_id: Uuid,
+        workbench_id: Uuid,
+    ) -> Result<(), DeviceError> {
+        let workbench = self
+            .workbench_repo
             .find_by_id(workbench_id)
             .await
             .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-        
+
         match workbench {
             Some(wb) if wb.owner_id == user_id => Ok(()),
             Some(_) => Err(DeviceError::AccessDenied),
@@ -94,15 +91,21 @@ impl DeviceServiceImpl {
     }
 
     /// 验证设备所属工作台的所有权
-    async fn verify_device_ownership(&self, user_id: Uuid, device_id: Uuid) -> Result<Uuid, DeviceError> {
-        let device = self.device_repo
+    async fn verify_device_ownership(
+        &self,
+        user_id: Uuid,
+        device_id: Uuid,
+    ) -> Result<Uuid, DeviceError> {
+        let device = self
+            .device_repo
             .find_by_id(device_id)
             .await
             .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-        
+
         match device {
             Some(d) => {
-                self.verify_workbench_ownership(user_id, d.workbench_id).await?;
+                self.verify_workbench_ownership(user_id, d.workbench_id)
+                    .await?;
                 Ok(d.workbench_id)
             }
             None => Err(DeviceError::NotFound),
@@ -118,12 +121,13 @@ impl DeviceServiceImpl {
         if device_id == new_parent_id {
             return Ok(true);
         }
-        
-        let descendants = self.device_repo
+
+        let descendants = self
+            .device_repo
             .find_all_descendant_ids(device_id)
             .await
             .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-        
+
         Ok(descendants.contains(&new_parent_id))
     }
 
@@ -163,29 +167,38 @@ impl DeviceService for DeviceServiceImpl {
         entity: CreateDeviceEntity,
     ) -> Result<DeviceDto, DeviceError> {
         // 验证工作台所有权
-        self.verify_workbench_ownership(user_id, entity.workbench_id).await?;
+        self.verify_workbench_ownership(user_id, entity.workbench_id)
+            .await?;
 
         // 如果指定了父设备，检查循环引用
         if let Some(parent_id) = entity.parent_id {
             // 验证父设备存在且属于同一工作台
-            let parent = self.device_repo
+            let parent = self
+                .device_repo
                 .find_by_id(parent_id)
                 .await
                 .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-            
+
             match parent {
                 Some(p) if p.workbench_id == entity.workbench_id => {
                     // 检查循环引用
-                    if self.check_circular_reference(parent_id, entity.workbench_id).await? {
+                    if self
+                        .check_circular_reference(parent_id, entity.workbench_id)
+                        .await?
+                    {
                         return Err(DeviceError::CircularReference);
                     }
                 }
-                Some(_) => return Err(DeviceError::ValidationError(
-                    "Parent device does not belong to the same workbench".to_string(),
-                )),
-                None => return Err(DeviceError::ValidationError(
-                    "Parent device not found".to_string(),
-                )),
+                Some(_) => {
+                    return Err(DeviceError::ValidationError(
+                        "Parent device does not belong to the same workbench".to_string(),
+                    ))
+                }
+                None => {
+                    return Err(DeviceError::ValidationError(
+                        "Parent device not found".to_string(),
+                    ))
+                }
             }
         }
 
@@ -205,33 +218,29 @@ impl DeviceService for DeviceServiceImpl {
         device.sn = entity.sn;
 
         // 保存到数据库
-        self.device_repo
-            .create(&device)
-            .await?;
+        self.device_repo.create(&device).await?;
 
         // 如果是虚拟设备，注册到DeviceManager
         if device.protocol_type == ProtocolType::Virtual {
-            let config: VirtualConfig = entity.protocol_params
+            let config: VirtualConfig = entity
+                .protocol_params
                 .and_then(|p| serde_json::from_value(p).ok())
                 .unwrap_or_default();
-            
+
             let driver = VirtualDriver::with_config(config)
                 .map_err(|e| DeviceError::ValidationError(e.to_string()))?;
-            
+
             let _ = self.device_manager.register_device(device.id, driver);
         }
 
         Ok(Self::to_dto(device))
     }
 
-    async fn get_device(
-        &self,
-        user_id: Uuid,
-        device_id: Uuid,
-    ) -> Result<DeviceDto, DeviceError> {
+    async fn get_device(&self, user_id: Uuid, device_id: Uuid) -> Result<DeviceDto, DeviceError> {
         let _workbench_id = self.verify_device_ownership(user_id, device_id).await?;
-        
-        let device = self.device_repo
+
+        let device = self
+            .device_repo
             .find_by_id(device_id)
             .await?
             .ok_or(DeviceError::NotFound)?;
@@ -248,7 +257,8 @@ impl DeviceService for DeviceServiceImpl {
         size: i64,
     ) -> Result<PagedDeviceDto, DeviceError> {
         // 验证工作台所有权
-        self.verify_workbench_ownership(user_id, workbench_id).await?;
+        self.verify_workbench_ownership(user_id, workbench_id)
+            .await?;
 
         let (devices, total) = if let Some(pid) = parent_id {
             self.device_repo
@@ -279,11 +289,12 @@ impl DeviceService for DeviceServiceImpl {
         let _workbench_id = self.verify_device_ownership(user_id, device_id).await?;
 
         // 如果要更新parent_id，检查循环引用
-        if let Some(_new_parent_id) = entity.status.as_ref().and_then(|_| entity.protocol_params.as_ref()) {
+        if let Some(_new_parent_id) = entity.status.as_ref().and(entity.protocol_params.as_ref()) {
             // 这里简化处理，实际应该检查parent_id变化
         }
 
-        let device = self.device_repo
+        let device = self
+            .device_repo
             .update(
                 device_id,
                 entity.name,
@@ -298,19 +309,16 @@ impl DeviceService for DeviceServiceImpl {
         Ok(Self::to_dto(device))
     }
 
-    async fn delete_device(
-        &self,
-        user_id: Uuid,
-        device_id: Uuid,
-    ) -> Result<(), DeviceError> {
+    async fn delete_device(&self, user_id: Uuid, device_id: Uuid) -> Result<(), DeviceError> {
         let _workbench_id = self.verify_device_ownership(user_id, device_id).await?;
 
         // 获取所有子设备ID（递归）
-        let all_device_ids = self.device_repo
+        let all_device_ids = self
+            .device_repo
             .find_all_descendant_ids(device_id)
             .await
             .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-        
+
         // 添加要删除的设备本身
         let mut all_ids = all_device_ids;
         all_ids.push(device_id);
@@ -322,10 +330,10 @@ impl DeviceService for DeviceServiceImpl {
                 .delete_by_device_id(*dev_id)
                 .await
                 .map_err(|e| DeviceError::DatabaseError(e.to_string()))?;
-            
+
             // 从DeviceManager注销虚拟设备
             let _ = self.device_manager.unregister_device(*dev_id);
-            
+
             // 删除设备
             self.device_repo
                 .delete(*dev_id)

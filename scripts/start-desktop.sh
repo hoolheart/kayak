@@ -40,7 +40,39 @@ check_dependencies() {
         exit 1
     fi
     
+    # 检查Flutter桌面支持
+    if ! flutter config --enable-linux-desktop 2>/dev/null; then
+        echo -e "${YELLOW}Warning: Flutter Linux desktop may not be fully configured${NC}"
+    fi
+    
     echo -e "${GREEN}All dependencies found${NC}"
+}
+
+# 检查系统依赖
+check_system_deps() {
+    echo -e "${YELLOW}Checking system dependencies...${NC}"
+    
+    # 检查 libsecret (flutter_secure_storage 需要)
+    if ! pkg-config --exists libsecret-1 2>/dev/null; then
+        echo -e "${YELLOW}Warning: libsecret-1 is not installed${NC}"
+        echo -e "${YELLOW}This is required for secure token storage on Linux${NC}"
+        echo ""
+        echo "To fix, run:"
+        echo "  sudo apt-get install libsecret-1-dev"
+        echo ""
+        echo "Or use web mode instead: ./scripts/start-web.sh"
+        echo ""
+        read -p "Try to install libsecret-1-dev now? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            sudo apt-get install libsecret-1-dev
+        else
+            echo -e "${RED}Cannot proceed without libsecret-1${NC}"
+            return 1
+        fi
+    fi
+    
+    echo -e "${GREEN}System dependencies OK${NC}"
 }
 
 # 构建后端
@@ -70,9 +102,10 @@ start_backend() {
     fi
     
     # 启动后端（后台运行）
+    # 使用绝对路径确保无论从哪里运行都能找到数据库
     export KAYAK_DATA_DIR="$DATA_DIR"
     export KAYAK_LOG_LEVEL="info"
-    export DATABASE_URL="sqlite://$DATA_DIR/kayak.db"
+    export DATABASE_URL="sqlite://$(realpath $DATA_DIR)/kayak.db"
     export RUST_BACKTRACE=1
     
     nohup cargo run --release > "$LOG_DIR/backend.log" 2>&1 &
@@ -100,8 +133,21 @@ start_frontend() {
     # 获取依赖
     flutter pub get
     
+    # 检查后端是否可连接
+    echo -e "${YELLOW}Checking backend connection...${NC}"
+    if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        echo -e "${GREEN}Backend is running and accessible at http://localhost:8080${NC}"
+    else
+        echo -e "${RED}Warning: Backend is not accessible at http://localhost:8080${NC}"
+        echo -e "${YELLOW}Please ensure backend is running with: ./scripts/start-desktop.sh --backend-only${NC}"
+    fi
+    
     # 启动桌面应用
-    flutter run -d linux || flutter run -d windows || flutter run -d macos
+    echo -e "${YELLOW}Launching Flutter desktop (this may take a moment)...${NC}"
+    flutter run -d linux 2>&1 | head -50 || {
+        echo -e "${RED}Flutter run failed. Trying with more verbose output...${NC}"
+        flutter run -d linux -v 2>&1 | tail -30
+    }
 }
 
 # 显示帮助
@@ -148,6 +194,7 @@ main() {
             check_dependencies
             build_backend
             start_backend
+            check_system_deps
             start_frontend
             ;;
         *)

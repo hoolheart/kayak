@@ -1,9 +1,9 @@
 //! 设备管理器实现
 
+use futures::future::join_all;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
-use futures::future::join_all;
 
 pub use super::core::{DeviceDriver, DriverError};
 pub use super::r#virtual::VirtualConfig;
@@ -21,10 +21,19 @@ pub use super::r#virtual::VirtualConfig;
 /// 1. 通过 `Arc<RwLock<...>>` 提供安全的共享访问
 /// 2. 使用 `.write().unwrap()` 获取 `&mut dyn DeviceDriver` 来调用需要可变引用的方法
 /// 3. 保持线程安全性，同时支持可变操作
+#[allow(clippy::type_complexity)]
 pub struct DeviceManager {
-    devices: Arc<RwLock<HashMap<Uuid, Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>>>>,
+    devices: Arc<
+        RwLock<
+            HashMap<
+                Uuid,
+                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
+            >,
+        >,
+    >,
 }
 
+#[allow(clippy::await_holding_lock)]
 impl DeviceManager {
     /// 创建新的设备管理器
     pub fn new() -> Self {
@@ -38,7 +47,9 @@ impl DeviceManager {
     /// # Arguments
     /// * `id` - 设备唯一标识
     /// * `driver` - 设备驱动实例
-    pub fn register_device<D: DeviceDriver<Config = VirtualConfig, Error = DriverError> + 'static>(
+    pub fn register_device<
+        D: DeviceDriver<Config = VirtualConfig, Error = DriverError> + 'static,
+    >(
         &self,
         id: Uuid,
         driver: D,
@@ -46,7 +57,8 @@ impl DeviceManager {
         let mut devices = self.devices.write().unwrap();
         if devices.contains_key(&id) {
             return Err(DriverError::ConfigError(format!(
-                "Device {} already registered", id
+                "Device {} already registered",
+                id
             )));
         }
         // 将驱动包装在 RwLock 中以支持可变访问
@@ -58,9 +70,7 @@ impl DeviceManager {
     pub fn unregister_device(&self, id: Uuid) -> Result<(), DriverError> {
         let mut devices = self.devices.write().unwrap();
         if devices.remove(&id).is_none() {
-            return Err(DriverError::ConfigError(format!(
-                "Device {} not found", id
-            )));
+            return Err(DriverError::ConfigError(format!("Device {} not found", id)));
         }
         Ok(())
     }
@@ -77,7 +87,10 @@ impl DeviceManager {
     ///     driver.connect().await?;
     /// }
     /// ```
-    pub fn get_device(&self, id: Uuid) -> Option<Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>> {
+    pub fn get_device(
+        &self,
+        id: Uuid,
+    ) -> Option<Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>> {
         let devices = self.devices.read().unwrap();
         devices.get(&id).cloned()
     }
@@ -89,19 +102,25 @@ impl DeviceManager {
     pub async fn connect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
-            devices.iter()
+            devices
+                .iter()
                 .map(|(id, driver_lock)| (*id, Arc::clone(driver_lock)))
                 .collect()
         };
 
-        let futures = device_locks.into_iter().map(|(id, driver_lock): (Uuid, Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>)| async move {
-            // 获取可变访问权限
-            let mut driver = driver_lock.write().unwrap();
-            match driver.connect().await {
-                Ok(()) => Ok(id),
-                Err(e) => Err((id, e)),
-            }
-        });
+        let futures = device_locks.into_iter().map(
+            |(id, driver_lock): (
+                Uuid,
+                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
+            )| async move {
+                // 获取可变访问权限
+                let mut driver = driver_lock.write().unwrap();
+                match driver.connect().await {
+                    Ok(()) => Ok(id),
+                    Err(e) => Err((id, e)),
+                }
+            },
+        );
 
         join_all(futures).await
     }
@@ -113,19 +132,25 @@ impl DeviceManager {
     pub async fn disconnect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
-            devices.iter()
+            devices
+                .iter()
                 .map(|(id, driver_lock)| (*id, Arc::clone(driver_lock)))
                 .collect()
         };
 
-        let futures = device_locks.into_iter().map(|(id, driver_lock): (Uuid, Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>)| async move {
-            // 获取可变访问权限
-            let mut driver = driver_lock.write().unwrap();
-            match driver.disconnect().await {
-                Ok(()) => Ok(id),
-                Err(e) => Err((id, e)),
-            }
-        });
+        let futures = device_locks.into_iter().map(
+            |(id, driver_lock): (
+                Uuid,
+                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
+            )| async move {
+                // 获取可变访问权限
+                let mut driver = driver_lock.write().unwrap();
+                match driver.disconnect().await {
+                    Ok(()) => Ok(id),
+                    Err(e) => Err((id, e)),
+                }
+            },
+        );
 
         join_all(futures).await
     }

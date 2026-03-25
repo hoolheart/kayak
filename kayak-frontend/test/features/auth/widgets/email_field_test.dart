@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/features/auth/widgets/email_field.dart';
-import 'package:kayak_frontend/validators/validators.dart';
 
 void main() {
   group('EmailField', () {

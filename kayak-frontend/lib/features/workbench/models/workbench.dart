@@ -16,6 +16,7 @@ class Workbench with _$Workbench {
     required String name,
     String? description,
     required String ownerId,
+    // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
     @JsonKey(name: 'ownerType') required String ownerType,
     required String status,
     required DateTime createdAt,
@@ -59,6 +60,7 @@ class CreateWorkbenchRequest with _$CreateWorkbenchRequest {
   const factory CreateWorkbenchRequest({
     required String name,
     String? description,
+    // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
     @JsonKey(name: 'ownerType') String? ownerType,
   }) = _CreateWorkbenchRequest;
 

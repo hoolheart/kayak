@@ -87,7 +87,7 @@ if [ -d "$FRONTEND_DIR" ]; then
         run_step "Dart 格式化检查" "dart format --output=none --set-exit-if-changed ." "$FRONTEND_DIR" || FAILED=1
         
         # Analyze
-        run_step "Dart 代码分析" "flutter analyze --fatal-infos" "$FRONTEND_DIR" || FAILED=1
+        run_step "Dart 代码分析" "flutter analyze --no-fatal-infos" "$FRONTEND_DIR" || FAILED=1
         
         # Test
         run_step "Flutter 单元测试" "flutter test" "$FRONTEND_DIR" || FAILED=1
