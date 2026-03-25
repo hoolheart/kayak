@@ -4,6 +4,7 @@
 library;
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'auth_state.dart';
 
 abstract class AuthApiServiceInterface {
@@ -32,13 +33,22 @@ class AuthApiService implements AuthApiServiceInterface {
 
   @override
   Future<LoginResponse> login(String email, String password) async {
-    final response = await _dio.post(
-      '$_baseUrl/api/v1/auth/login',
-      data: {'email': email, 'password': password},
-    );
-
-    return LoginResponse.fromJson(
-        response.data['data'] as Map<String, dynamic>);
+    final url = '$_baseUrl/api/v1/auth/login';
+    debugPrint('AuthApiService: Attempting login to $url with email: $email');
+    try {
+      final response = await _dio.post(
+        url,
+        data: {'email': email, 'password': password},
+      );
+      debugPrint(
+          'AuthApiService: Login successful, response: ${response.data}');
+      return LoginResponse.fromJson(
+          response.data['data'] as Map<String, dynamic>);
+    } catch (e, st) {
+      debugPrint('AuthApiService: Login failed with error: $e');
+      debugPrint('AuthApiService: Stack trace: $st');
+      rethrow;
+    }
   }
 
   @override
