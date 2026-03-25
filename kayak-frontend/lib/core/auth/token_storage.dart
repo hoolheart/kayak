@@ -38,13 +38,23 @@ abstract class TokenStorageInterface {
   static TokenStorageInterface create() {
     // 桌面平台(Linux/Windows/Mac)使用SharedPreferences，因为libsecret不可靠
     // 移动平台和Web使用flutter_secure_storage
-    if (!kIsWeb &&
-        (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
-      debugPrint('Using SharedPreferences token storage for desktop');
-      return SharedPrefsTokenStorage();
+    if (!kIsWeb) {
+      if (Platform.isLinux) {
+        debugPrint(
+            'TokenStorage: Using SharedPrefsTokenStorage for Linux desktop');
+        return SharedPrefsTokenStorage();
+      } else if (Platform.isWindows) {
+        debugPrint(
+            'TokenStorage: Using SharedPrefsTokenStorage for Windows desktop');
+        return SharedPrefsTokenStorage();
+      } else if (Platform.isMacOS) {
+        debugPrint(
+            'TokenStorage: Using SharedPrefsTokenStorage for macOS desktop');
+        return SharedPrefsTokenStorage();
+      }
     }
 
-    debugPrint('Using SecureTokenStorage for mobile/Web');
+    debugPrint('TokenStorage: Using SecureTokenStorage for mobile/Web');
     return SecureTokenStorage();
   }
 }

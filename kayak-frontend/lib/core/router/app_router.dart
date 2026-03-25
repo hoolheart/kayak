@@ -33,8 +33,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _initializeAuth() async {
-    final authNotifier = ref.read(authStateNotifierProvider);
-    await authNotifier.initialize();
+    try {
+      debugPrint('SplashScreen: Starting auth initialization...');
+      final authNotifier = ref.read(authStateNotifierProvider);
+      debugPrint('SplashScreen: Got authNotifier, calling initialize...');
+      await authNotifier.initialize();
+      debugPrint('SplashScreen: Auth initialization complete');
+    } catch (e, stack) {
+      debugPrint('SplashScreen: Auth initialization failed: $e');
+      debugPrint('Stack: $stack');
+    }
   }
 
   @override
@@ -44,7 +52,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Initializing...'),
+          ],
+        ),
       ),
     );
   }
