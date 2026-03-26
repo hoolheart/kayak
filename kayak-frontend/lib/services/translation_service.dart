@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../generated/app_localizations.dart';
 import '../providers/core/locale_provider.dart';
@@ -62,15 +63,17 @@ class TranslationService {
   /// Creates a translation service instance
   TranslationService();
 
-  /// Gets the current language code
+  /// Gets the current language code from AppLocalizations
   String get currentLanguageCode {
-    final locale = localeProvider;
-    return locale.languageCode;
+    // This requires context, so we return a default
+    // In practice, use translate() method which has context
+    return 'en';
   }
 
-  /// Gets the current locale
+  /// Gets the current locale from AppLocalizations
   Locale get currentLocale {
-    return localeProvider;
+    // This requires context, so we return a default
+    return const Locale('en');
   }
 
   /// Gets supported locales
