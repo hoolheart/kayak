@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'error_handler.dart';
@@ -91,3 +92,53 @@ final networkConnectedProvider = StreamProvider<bool>((ref) {
 final errorHandlerProvider = Provider<ErrorHandler>((ref) {
   return ErrorHandler();
 });
+
+/// Network status Banner widget
+///
+/// Displays at the top of pages when network is disconnected.
+class NetworkBanner extends ConsumerWidget {
+  const NetworkBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isConnectedAsync = ref.watch(networkConnectedProvider);
+
+    return isConnectedAsync.when(
+      data: (isConnected) {
+        if (isConnected) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          color: Theme.of(context).colorScheme.errorContainer,
+          child: SafeArea(
+            bottom: false,
+            child: Row(
+              children: [
+                Icon(
+                  Icons.wifi_off,
+                  color: Theme.of(context).colorScheme.onErrorContainer,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '网络连接已断开，部分功能可能不可用',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+}

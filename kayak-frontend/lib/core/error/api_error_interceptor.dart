@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import 'error_handler.dart';
 import 'error_models.dart';
+import 'error_messages.dart';
 
 /// Dio error interceptor
 ///
@@ -77,31 +78,23 @@ class ApiErrorInterceptor extends Interceptor {
 
     // Fallback to status code based messages
     if (err.response?.statusCode != null) {
-      final statusCode = err.response!.statusCode!;
-      return switch (statusCode) {
-        400 => '请求参数错误',
-        401 => '认证已过期，请重新登录',
-        403 => '没有权限访问此资源',
-        404 => '请求的资源不存在',
-        >= 500 => '服务器错误，请稍后重试',
-        _ => '请求失败',
-      };
+      return ApiErrorMessages.fromStatusCode(err.response!.statusCode!);
     }
 
     // Fallback to DioException message
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
-        return '连接超时，请检查网络';
+        return NetworkErrorMessages.timeout;
       case DioExceptionType.sendTimeout:
-        return '发送请求超时';
+        return NetworkErrorMessages.timeout;
       case DioExceptionType.receiveTimeout:
-        return '接收响应超时';
+        return NetworkErrorMessages.timeout;
       case DioExceptionType.connectionError:
-        return '网络连接失败，请检查网络设置';
+        return NetworkErrorMessages.noConnection;
       case DioExceptionType.cancel:
         return '请求已取消';
       default:
-        return err.message ?? '请求失败';
+        return err.message ?? ApiErrorMessages.unknown;
     }
   }
 }

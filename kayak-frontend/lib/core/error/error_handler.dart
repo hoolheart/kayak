@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import 'error_models.dart';
+
+/// Logger for error module
+final _errorLogger = Logger(level: Level.warning);
 
 /// Error state containing current error and history
 class ErrorState {
@@ -153,7 +157,7 @@ class Toast {
                       message,
                       style: TextStyle(
                         fontSize: 12,
-                        color: color.withAlpha(200),
+                        color: color.withValues(alpha: 0.78),
                       ),
                     ),
                 ],
@@ -274,7 +278,9 @@ class ErrorHandler implements ErrorHandlerInterface {
     // In production, you would use a global key to get the context
     try {
       return navigatorKey.currentContext;
-    } catch (_) {
+    } catch (e) {
+      // Log the error for debugging but return null to gracefully degrade
+      _errorLogger.e('Error getting navigator context', error: e);
       return null;
     }
   }
