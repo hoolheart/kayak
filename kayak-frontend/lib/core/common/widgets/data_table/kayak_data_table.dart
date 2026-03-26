@@ -94,17 +94,8 @@ class _KayakDataTableState<T> extends State<KayakDataTable<T>> {
       final aValue = column.valueBuilder(a);
       final bValue = column.valueBuilder(b);
 
-      int result;
-      try {
-        if (aValue is Comparable && bValue is Comparable) {
-          result = aValue.compareTo(bValue);
-        } else {
-          result = aValue.toString().compareTo(bValue.toString());
-        }
-      } catch (_) {
-        result = aValue.toString().compareTo(bValue.toString());
-      }
-
+      // valueBuilder returns String, so use string comparison
+      final result = aValue.compareTo(bValue);
       return ascending ? result : -result;
     });
 
