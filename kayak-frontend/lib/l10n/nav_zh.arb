@@ -1,0 +1,14 @@
+{
+  "@@locale": "zh",
+  "navHome": "首页",
+  "navWorkbench": "工作台",
+  "navExperiments": "试验",
+  "navMethods": "方法",
+  "navDevices": "设备",
+  "navSettings": "设置",
+  "navProfile": "个人资料",
+  "navAbout": "关于",
+  "navLogout": "退出登录",
+  "navSearch": "搜索",
+  "navNotifications": "通知"
+}

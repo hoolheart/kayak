@@ -23,5 +23,123 @@
   "toggleTheme": "切换主题",
   "@toggleTheme": {
     "description": "主题切换按钮提示"
-  }
+  },
+  "language": "语言",
+  "@language": {
+    "description": "语言设置标签"
+  },
+  "languageSettings": "语言设置",
+  "@languageSettings": {
+    "description": "语言设置页面标题"
+  },
+  "currentLanguage": "当前语言",
+  "@currentLanguage": {
+    "description": "当前语言标签"
+  },
+  "availableLanguages": "可选语言",
+  "@availableLanguages": {
+    "description": "可选语言部分标题"
+  },
+  "selectLanguage": "选择语言",
+  "@selectLanguage": {
+    "description": "选择语言对话框标题"
+  },
+  "ok": "确定",
+  "@ok": {
+    "description": "确定按钮文本"
+  },
+  "cancel": "取消",
+  "@cancel": {
+    "description": "取消按钮文本"
+  },
+  "save": "保存",
+  "@save": {
+    "description": "保存按钮文本"
+  },
+  "delete": "删除",
+  "@delete": {
+    "description": "删除按钮文本"
+  },
+  "edit": "编辑",
+  "@edit": {
+    "description": "编辑按钮文本"
+  },
+  "close": "关闭",
+  "@close": {
+    "description": "关闭按钮文本"
+  },
+  "confirm": "确认",
+  "@confirm": {
+    "description": "确认按钮文本"
+  },
+  "back": "返回",
+  "@back": {
+    "description": "返回按钮文本"
+  },
+  "next": "下一步",
+  "@next": {
+    "description": "下一步按钮文本"
+  },
+  "done": "完成",
+  "@done": {
+    "description": "完成按钮文本"
+  },
+  "loading": "加载中...",
+  "@loading": {
+    "description": "加载指示器文本"
+  },
+  "error": "错误",
+  "@error": {
+    "description": "错误标签"
+  },
+  "success": "成功",
+  "@success": {
+    "description": "成功标签"
+  },
+  "warning": "警告",
+  "@warning": {
+    "description": "警告标签"
+  },
+  "info": "提示",
+  "@info": {
+    "description": "提示标签"
+  },
+  "loginTitle": "登录",
+  "loginSubtitle": "欢迎回来！请登录您的账户",
+  "emailLabel": "邮箱",
+  "emailPlaceholder": "请输入邮箱",
+  "passwordLabel": "密码",
+  "passwordPlaceholder": "请输入密码",
+  "rememberMe": "记住我",
+  "forgotPassword": "忘记密码？",
+  "loginButton": "登录",
+  "loginButtonLoading": "登录中...",
+  "noAccount": "还没有账户？",
+  "signUp": "注册",
+  "invalidEmail": "请输入有效的邮箱地址",
+  "passwordTooShort": "密码至少8个字符",
+  "loginFailed": "登录失败，请检查您的凭据",
+  "navHome": "首页",
+  "navWorkbench": "工作台",
+  "navExperiments": "试验",
+  "navMethods": "方法",
+  "navDevices": "设备",
+  "navSettings": "设置",
+  "navProfile": "个人资料",
+  "navAbout": "关于",
+  "navLogout": "退出登录",
+  "navSearch": "搜索",
+  "navNotifications": "通知",
+  "commonSave": "保存",
+  "commonCancel": "取消",
+  "commonConfirm": "确认",
+  "commonDelete": "删除",
+  "commonEdit": "编辑",
+  "commonAdd": "添加",
+  "commonSearch": "搜索",
+  "commonNoData": "暂无数据",
+  "commonRetry": "重试",
+  "commonRefresh": "刷新",
+  "commonSubmit": "提交",
+  "commonRequired": "此项为必填项"
 }
