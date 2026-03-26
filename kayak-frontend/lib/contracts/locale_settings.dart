@@ -53,13 +53,13 @@ class _LocaleSettingsImpl extends AppLocaleSettings {
   _LocaleSettingsImpl() : super._();
 
   @override
-  Locale get currentLocale => const Locale('zh');
+  Locale get currentLocale => LocaleSettings.defaultLocale;
 
   @override
   List<Locale> get supportedLocales => LocaleNotifier.supportedLocales;
 
   @override
-  Locale get defaultLocale => LocaleNotifier.defaultLocale;
+  Locale get defaultLocale => LocaleSettings.defaultLocale;
 
   @override
   Future<void> persistLocale(Locale locale) async {
@@ -68,7 +68,7 @@ class _LocaleSettingsImpl extends AppLocaleSettings {
 
   @override
   Future<Locale> loadSavedLocale() async {
-    return const Locale('zh');
+    return LocaleSettings.defaultLocale;
   }
 
   @override
@@ -80,45 +80,5 @@ class _LocaleSettingsImpl extends AppLocaleSettings {
   String getLocaleDisplayName(Locale locale) {
     final settings = LocaleSettings.fromLocale(locale);
     return settings?.nativeDisplayName ?? locale.languageCode;
-  }
-}
-
-/// Supported locale configuration
-class LocaleSettings {
-  final Locale locale;
-  final String displayName;
-  final String nativeDisplayName;
-  final bool isRightToLeft;
-
-  const LocaleSettings({
-    required this.locale,
-    required this.displayName,
-    required this.nativeDisplayName,
-    this.isRightToLeft = false,
-  });
-
-  /// Predefined locale settings
-  static const List<LocaleSettings> supportedSettings = [
-    LocaleSettings(
-      locale: Locale('en', 'US'),
-      displayName: 'English (US)',
-      nativeDisplayName: 'English',
-    ),
-    LocaleSettings(
-      locale: Locale('zh', 'CN'),
-      displayName: 'Chinese (Simplified)',
-      nativeDisplayName: '简体中文',
-    ),
-  ];
-
-  /// Gets configuration from Locale
-  static LocaleSettings? fromLocale(Locale locale) {
-    try {
-      return supportedSettings.firstWhere(
-        (s) => s.locale.languageCode == locale.languageCode,
-      );
-    } catch (_) {
-      return null;
-    }
   }
 }

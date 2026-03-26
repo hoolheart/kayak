@@ -37,6 +37,9 @@ class LocaleSettings {
     ),
   ];
 
+  /// 默认语言 - 英文
+  static Locale get defaultLocale => const Locale('en', 'US');
+
   /// 根据Locale获取配置
   static LocaleSettings? fromLocale(Locale locale) {
     try {
@@ -59,10 +62,13 @@ class LocaleNotifier extends StateNotifier<Locale> {
   /// SharedPreferences实例
   SharedPreferences? _prefs;
 
+  /// 是否已初始化
+  bool _initialized = false;
+
   /// 构造函数
   ///
-  /// 初始化时加载保存的语言设置，默认为中文
-  LocaleNotifier() : super(const Locale('zh')) {
+  /// 初始化时加载保存的语言设置，默认为英文
+  LocaleNotifier() : super(LocaleSettings.defaultLocale) {
     _loadLocale();
   }
 
@@ -72,14 +78,22 @@ class LocaleNotifier extends StateNotifier<Locale> {
   }
 
   /// 默认语言
-  static Locale get defaultLocale => const Locale('zh', 'CN');
+  static Locale get defaultLocale => LocaleSettings.defaultLocale;
 
   /// 从SharedPreferences加载语言设置
   Future<void> _loadLocale() async {
     _prefs = await SharedPreferences.getInstance();
+    _initialized = true;
     final savedLocale = _prefs?.getString(_localeKey);
     if (savedLocale != null) {
       state = Locale(savedLocale);
+    }
+  }
+
+  /// 确保SharedPreferences已初始化
+  Future<void> _ensureInitialized() async {
+    if (!_initialized) {
+      await _loadLocale();
     }
   }
 
@@ -87,16 +101,17 @@ class LocaleNotifier extends StateNotifier<Locale> {
   ///
   /// [locale] 要设置的语言
   /// 同时保存到SharedPreferences
-  void setLocale(Locale locale) {
+  Future<void> setLocale(Locale locale) async {
+    await _ensureInitialized();
     state = locale;
-    _prefs?.setString(_localeKey, locale.languageCode);
+    await _prefs?.setString(_localeKey, locale.languageCode);
   }
 
   /// 根据语言代码设置语言
   ///
   /// [languageCode] 语言代码（如 'en', 'zh'）
-  void setLocaleByCode(String languageCode) {
-    setLocale(Locale(languageCode));
+  Future<void> setLocaleByCode(String languageCode) async {
+    await setLocale(Locale(languageCode));
   }
 
   /// 获取语言显示名称
