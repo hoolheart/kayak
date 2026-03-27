@@ -146,8 +146,6 @@ impl TimeSeriesBufferServiceImpl {
             let timestamps: Vec<i64> = points.iter().map(|p| p.timestamp).collect();
             let values: Vec<f64> = points.iter().map(|p| p.value).collect();
 
-            total_points_flushed += points.len();
-
             // Create or get the channel group using path within file
             let group = match self.hdf5_service.get_group(&file, &channel_name).await {
                 Ok(g) => g,
@@ -173,13 +171,18 @@ impl TimeSeriesBufferServiceImpl {
             };
 
             // Write timeseries data
-            if let Err(e) = self
+            match self
                 .hdf5_service
                 .write_timeseries(&group, "values", &timestamps, &values)
                 .await
             {
-                tracing::error!("Failed to write timeseries for {}: {}", channel_name, e);
-                // Continue with other channels
+                Ok(()) => {
+                    total_points_flushed += points.len();
+                }
+                Err(e) => {
+                    tracing::error!("Failed to write timeseries for {}: {}", channel_name, e);
+                    // Continue with other channels
+                }
             }
         }
 
@@ -444,7 +447,8 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
+    use crate::services::hdf5::{Hdf5File, Hdf5Group};
+    use chrono::Utc;
 
     // Mock Hdf5Service for testing
     struct MockHdf5Service;
