@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'generated/app_localizations.dart';
 import 'providers/core/locale_provider.dart';
 import 'providers/core/theme_provider.dart';
 
@@ -37,6 +38,7 @@ class KayakApp extends ConsumerWidget {
         Locale('fr'), // 法文
       ],
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

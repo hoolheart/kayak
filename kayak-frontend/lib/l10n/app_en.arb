@@ -23,5 +23,213 @@
   "toggleTheme": "Toggle Theme",
   "@toggleTheme": {
     "description": "Theme toggle button tooltip"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting label"
+  },
+  "languageSettings": "Language Settings",
+  "@languageSettings": {
+    "description": "Language settings page title"
+  },
+  "currentLanguage": "Current Language",
+  "@currentLanguage": {
+    "description": "Current language label"
+  },
+  "availableLanguages": "Available Languages",
+  "@availableLanguages": {
+    "description": "Available languages section title"
+  },
+  "selectLanguage": "Select Language",
+  "@selectLanguage": {
+    "description": "Select language dialog title"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Back button text"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button text"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error label"
+  },
+  "success": "Success",
+  "@success": {
+    "description": "Success label"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning label"
+  },
+  "info": "Information",
+  "@info": {
+    "description": "Information label"
+  },
+  "loginTitle": "Sign In",
+  "@loginTitle": {
+    "description": "Login page title"
+  },
+  "loginSubtitle": "Welcome back! Please sign in to your account",
+  "@loginSubtitle": {
+    "description": "Login page subtitle"
+  },
+  "emailLabel": "Email",
+  "@emailLabel": {
+    "description": "Email input label"
+  },
+  "emailPlaceholder": "Enter your email",
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Password input label"
+  },
+  "passwordPlaceholder": "Enter your password",
+  "rememberMe": "Remember me",
+  "@rememberMe": {
+    "description": "Remember me checkbox label"
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+  "loginButton": "Sign In",
+  "@loginButton": {
+    "description": "Login button text"
+  },
+  "loginButtonLoading": "Signing in...",
+  "noAccount": "Don't have an account?",
+  "signUp": "Sign Up",
+  "invalidEmail": "Please enter a valid email address",
+  "passwordTooShort": "Password must be at least 8 characters",
+  "loginFailed": "Login failed. Please check your credentials",
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Home navigation item"
+  },
+  "navWorkbench": "Workbench",
+  "@navWorkbench": {
+    "description": "Workbench navigation item"
+  },
+  "navExperiments": "Experiments",
+  "@navExperiments": {
+    "description": "Experiments navigation item"
+  },
+  "navMethods": "Methods",
+  "@navMethods": {
+    "description": "Methods navigation item"
+  },
+  "navDevices": "Devices",
+  "@navDevices": {
+    "description": "Devices navigation item"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Settings navigation item"
+  },
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Profile navigation item"
+  },
+  "navAbout": "About",
+  "@navAbout": {
+    "description": "About navigation item"
+  },
+  "navLogout": "Logout",
+  "@navLogout": {
+    "description": "Logout navigation item"
+  },
+  "navSearch": "Search",
+  "@navSearch": {
+    "description": "Search navigation item"
+  },
+  "navNotifications": "Notifications",
+  "@navNotifications": {
+    "description": "Notifications navigation item"
+  },
+  "commonSave": "Save",
+  "@commonSave": {
+    "description": "Save button text"
+  },
+  "commonCancel": "Cancel",
+  "@commonCancel": {
+    "description": "Cancel button text"
+  },
+  "commonConfirm": "Confirm",
+  "@commonConfirm": {
+    "description": "Confirm button text"
+  },
+  "commonDelete": "Delete",
+  "@commonDelete": {
+    "description": "Delete button text"
+  },
+  "commonEdit": "Edit",
+  "@commonEdit": {
+    "description": "Edit button text"
+  },
+  "commonAdd": "Add",
+  "@commonAdd": {
+    "description": "Add button text"
+  },
+  "commonSearch": "Search",
+  "@commonSearch": {
+    "description": "Search placeholder"
+  },
+  "commonNoData": "No data available",
+  "@commonNoData": {
+    "description": "No data message"
+  },
+  "commonRetry": "Retry",
+  "@commonRetry": {
+    "description": "Retry button text"
+  },
+  "commonRefresh": "Refresh",
+  "@commonRefresh": {
+    "description": "Refresh button text"
+  },
+  "commonSubmit": "Submit",
+  "@commonSubmit": {
+    "description": "Submit button text"
+  },
+  "commonRequired": "This field is required",
+  "@commonRequired": {
+    "description": "Required field validation message"
   }
 }
