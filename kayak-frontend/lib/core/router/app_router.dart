@@ -12,7 +12,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
-import '../../screens/home/home_screen.dart';
+import '../../features/experiments/screens/experiment_list_page.dart';
+import '../../features/methods/screens/method_list_page.dart';
+import '../../screens/dashboard/dashboard_screen.dart';
+import '../../screens/settings/settings_page.dart';
+import '../navigation/app_shell.dart';
 import '../auth/providers.dart';
 
 /// 简单的启动页，后续可以替换为真正的SplashScreen
@@ -66,7 +70,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (authState.isAuthenticated) {
         debugPrint('SplashScreen: Navigating to home');
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go(AppRoutes.home);
+          context.go(AppRoutes.dashboard);
         });
       } else {
         debugPrint('SplashScreen: Navigating to login');
@@ -101,8 +105,8 @@ class AppRoutes {
   /// 登录页
   static const String login = '/login';
 
-  /// 首页
-  static const String home = '/home';
+  /// 仪表盘（首页）
+  static const String dashboard = '/dashboard';
 }
 
 /// Auth State Change Notifier
@@ -142,7 +146,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // 已登录访问登录页 -> 重定向到首页
       if (isLoggedIn && path == '/login') {
-        return '/home';
+        return AppRoutes.dashboard;
+      }
+
+      // /home 旧路由重定向到 /dashboard
+      if (path == '/home') {
+        return AppRoutes.dashboard;
       }
 
       return null;
@@ -173,10 +182,45 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterScreen(),
       ),
 
-      // 首页
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+      // 首页 - 使用 AppShell 包装
+      ShellRoute(
+        builder: (context, state, child) {
+          return AppShell(
+            selectedRoute: state.uri.path,
+            child: child,
+          );
+        },
+        routes: [
+          // 仪表盘
+          GoRoute(
+            path: '/dashboard',
+            builder: (context, state) => const DashboardScreen(),
+          ),
+          // 工作台
+          GoRoute(
+            path: '/workbenches',
+            builder: (context, state) => const Scaffold(
+              body: Center(
+                child: Text('工作台页面 - 开发中'),
+              ),
+            ),
+          ),
+          // 试验
+          GoRoute(
+            path: '/experiments',
+            builder: (context, state) => const ExperimentListPage(),
+          ),
+          // 方法
+          GoRoute(
+            path: '/methods',
+            builder: (context, state) => const MethodListPage(),
+          ),
+          // 设置
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
       ),
     ],
 
