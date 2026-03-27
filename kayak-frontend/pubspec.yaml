@@ -36,6 +36,8 @@ dependencies:
   dio: ^5.4.1
   # WebSocket客户端
   web_socket_channel: ^2.4.4
+  # 网络连接状态监听
+  connectivity_plus: ^6.0.0
 
   # ==================== 本地存储 ====================
   # 轻量级键值存储（用于主题、语言等偏好设置）
