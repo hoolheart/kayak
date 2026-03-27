@@ -18,7 +18,7 @@ pub use device::{
 };
 pub use experiment_query::{
     DataFileError, DataFileInfo, ExperimentFilter, ExperimentQueryError, ExperimentQueryService,
-    PointHistoryError, TimeRange,
+    PointHistoryError,
 };
 pub use hdf5::{
     CompressionInfo,
@@ -38,7 +38,7 @@ pub use point::{
     CreatePointEntity, PagedPointDto, PointDto, PointError, PointService, PointServiceImpl,
     PointValueDto, UpdatePointEntity,
 };
-pub use point_history::{Hdf5PointHistoryRepository, PointHistoryRepository};
+pub use point_history::{Hdf5PointHistoryRepository, PointHistoryRepository, TimeRange};
 pub use user::{
     ChangePasswordRequest, UpdateUserEntity, UpdateUserRequest, UserDto, UserError, UserService,
     UserServiceImpl,

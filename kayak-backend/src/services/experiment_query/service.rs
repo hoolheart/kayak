@@ -7,15 +7,9 @@ use uuid::Uuid;
 
 use super::error::{DataFileError, ExperimentQueryError, PointHistoryError};
 use super::types::ExperimentFilter;
-use crate::models::dto::experiment_query::{PointHistoryResponse, TimeSeriesDataPoint};
+use crate::models::dto::experiment_query::PointHistoryResponse;
 use crate::models::entities::experiment::Experiment;
-
-/// Time range for queries
-#[derive(Debug, Clone)]
-pub struct TimeRange {
-    pub start: DateTime<Utc>,
-    pub end: DateTime<Utc>,
-}
+use crate::services::point_history::TimeRange;
 
 /// Data file information
 #[derive(Debug)]
