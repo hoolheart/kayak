@@ -5,6 +5,7 @@
 pub mod device;
 pub mod hdf5;
 pub mod point;
+pub mod timeseries_buffer;
 pub mod user;
 pub mod user_repo_adapter;
 pub mod workbench;

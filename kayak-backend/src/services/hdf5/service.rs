@@ -62,7 +62,7 @@ pub trait Hdf5Service: Send + Sync {
     async fn create_file_with_directories(&self, path: &PathBuf) -> Result<Hdf5File, Hdf5Error>;
 
     /// Check if path is safe (no path traversal)
-    fn is_path_safe(path: &PathBuf) -> bool;
+    fn is_path_safe(&self, path: &PathBuf) -> bool;
 }
 
 /// HDF5 service implementation
@@ -82,7 +82,7 @@ impl Hdf5ServiceImpl {
 
     /// Validate path safety
     fn validate_path(&self, path: &PathBuf) -> Result<(), Hdf5Error> {
-        if !Self::is_path_safe(path) {
+        if !self.is_path_safe(path) {
             return Err(Hdf5Error::PathTraversalAttempted);
         }
         let path_str = path.to_string_lossy();
@@ -320,7 +320,7 @@ impl Hdf5Service for Hdf5ServiceImpl {
         self.create_file(path_clone).await
     }
 
-    fn is_path_safe(path: &PathBuf) -> bool {
+    fn is_path_safe(&self, path: &PathBuf) -> bool {
         let path_str = path.to_string_lossy();
         if path_str.contains("..") {
             return false;
