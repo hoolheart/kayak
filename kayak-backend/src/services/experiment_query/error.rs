@@ -67,4 +67,7 @@ pub enum DataFileError {
 
     #[error("文件过大，无法流式传输: {0} bytes")]
     FileTooLarge(i64),
+
+    #[error("功能未实现: {0}")]
+    NotImplemented(String),
 }

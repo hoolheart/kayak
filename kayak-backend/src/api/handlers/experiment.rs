@@ -18,7 +18,7 @@ use crate::models::dto::experiment_query::{
     ListExperimentsRequest, PagedResponse, PointHistoryRequest, PointHistoryResponse,
 };
 use crate::models::entities::experiment::Experiment;
-use crate::services::experiment_query::PointHistoryError;
+use crate::services::experiment_query::{DataFileError, PointHistoryError};
 use crate::services::point_history::{Hdf5PointHistoryRepository, PointHistoryRepository, TimeRange};
 
 /// Application state for experiment handlers
@@ -116,7 +116,7 @@ pub async fn get_point_history(
 pub async fn download_data_file(
     State(state): State<Arc<AppState>>,
     Path(experiment_id): Path<Uuid>,
-) -> Result<axum::response::Response, PointHistoryError> {
+) -> Result<axum::response::Response, DataFileError> {
     // Build HDF5 file path
     let file_path = state
         .data_root
@@ -124,17 +124,11 @@ pub async fn download_data_file(
         .join(format!("{}.h5", experiment_id));
 
     if !file_path.exists() {
-        return Err(PointHistoryError::Hdf5FileNotFound(
-            file_path.to_string_lossy().to_string(),
-        ));
+        return Err(DataFileError::DataFileNotFound);
     }
 
-    let metadata = std::fs::metadata(&file_path)
-        .map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
-    let file_size = metadata.len() as i64;
-
-    // For simplicity, return 404 - full streaming implementation requires more setup
-    Err(PointHistoryError::Hdf5FileNotFound(
-        "Streaming download not implemented".to_string(),
+    // Streaming download not yet implemented
+    Err(DataFileError::NotImplemented(
+        "Streaming download not yet implemented".to_string(),
     ))
 }
