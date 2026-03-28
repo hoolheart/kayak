@@ -4,6 +4,7 @@
 
 pub mod common;
 pub mod device;
+pub mod experiment;
 pub mod health;
 pub mod point;
 pub mod user;
