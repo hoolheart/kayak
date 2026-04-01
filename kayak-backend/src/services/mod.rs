@@ -17,8 +17,8 @@ pub use device::{
     UpdateDeviceEntity,
 };
 pub use experiment_query::{
-    DataFileError, DataFileInfo, ExperimentFilter, ExperimentQueryError, ExperimentQueryService,
-    PointHistoryError,
+    DataFileError, DataFileInfo, ExperimentQueryError, ExperimentQueryService,
+    ExperimentQueryServiceImpl, PointHistoryError,
 };
 pub use hdf5::{
     CompressionInfo,
