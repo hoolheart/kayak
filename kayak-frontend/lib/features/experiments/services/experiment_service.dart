@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/auth/authenticated_api_client.dart';
 import '../../../core/auth/providers.dart';
 import '../models/experiment.dart';
+import '../providers/experiment_detail_provider.dart';
 
 /// 试验服务接口
 abstract class ExperimentServiceInterface {
@@ -18,6 +19,13 @@ abstract class ExperimentServiceInterface {
     DateTime? startedBefore,
   });
   Future<Experiment> getExperiment(String id);
+  Future<PointHistoryResponse> getPointHistory(
+    String experimentId,
+    String channel, {
+    DateTime? startTime,
+    DateTime? endTime,
+    int limit = 1000,
+  });
 }
 
 /// 试验服务实现
@@ -63,6 +71,33 @@ class ExperimentService implements ExperimentServiceInterface {
     final response = await _apiClient.get('/api/v1/experiments/$id');
     return Experiment.fromJson(
         (response as Map)['data'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<PointHistoryResponse> getPointHistory(
+    String experimentId,
+    String channel, {
+    DateTime? startTime,
+    DateTime? endTime,
+    int limit = 1000,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'limit': limit,
+    };
+
+    if (startTime != null) {
+      queryParams['start_time'] = startTime.toIso8601String();
+    }
+    if (endTime != null) {
+      queryParams['end_time'] = endTime.toIso8601String();
+    }
+
+    final response = await _apiClient.get(
+      '/api/v1/experiments/$experimentId/points/$channel/history',
+      queryParameters: queryParams,
+    );
+
+    return PointHistoryResponse.fromJson(response as Map<String, dynamic>);
   }
 }
 
