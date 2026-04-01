@@ -28,6 +28,7 @@ class ExperimentDetailPage extends ConsumerStatefulWidget {
 
 class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
   String _selectedChannel = 'default';
+  bool _historyAutoLoaded = false;
 
   @override
   void initState() {
@@ -43,6 +44,16 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(experimentDetailProvider);
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Auto-load history after experiment is loaded
+    if (state.experiment != null && !_historyAutoLoaded) {
+      _historyAutoLoaded = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(experimentDetailProvider.notifier).loadPointHistory(
+            widget.experimentId, _selectedChannel,
+            reset: true);
+      });
+    }
 
     return Scaffold(
       body: state.isLoading
@@ -81,6 +92,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
+            key: const Key('retry_button'),
             onPressed: () {
               ref
                   .read(experimentDetailProvider.notifier)
@@ -197,6 +209,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
               const Spacer(),
               // 通道选择下拉框
               DropdownButton<String>(
+                key: const Key('channel_selector'),
                 value: _selectedChannel,
                 items: const [
                   DropdownMenuItem(value: 'default', child: Text('default')),
@@ -218,6 +231,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
               ),
               const SizedBox(width: 16),
               FilledButton.icon(
+                key: const Key('export_csv_button'),
                 onPressed: state.pointHistory.isEmpty
                     ? null
                     : () => _exportCsv(context),
@@ -277,29 +291,31 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
   }
 
   Widget _buildStatusChip(ExperimentStatus status) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     Color backgroundColor;
     Color textColor;
 
     switch (status) {
       case ExperimentStatus.idle:
-        backgroundColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade700;
+        backgroundColor = colorScheme.surfaceContainerHighest;
+        textColor = colorScheme.onSurfaceVariant;
         break;
       case ExperimentStatus.running:
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green.shade700;
+        backgroundColor = colorScheme.primaryContainer;
+        textColor = colorScheme.onPrimaryContainer;
         break;
       case ExperimentStatus.paused:
-        backgroundColor = Colors.orange.shade100;
-        textColor = Colors.orange.shade700;
+        backgroundColor = colorScheme.tertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
         break;
       case ExperimentStatus.completed:
-        backgroundColor = Colors.blue.shade100;
-        textColor = Colors.blue.shade700;
+        backgroundColor = colorScheme.secondaryContainer;
+        textColor = colorScheme.onSecondaryContainer;
         break;
       case ExperimentStatus.aborted:
-        backgroundColor = Colors.red.shade100;
-        textColor = Colors.red.shade700;
+        backgroundColor = colorScheme.errorContainer;
+        textColor = colorScheme.onErrorContainer;
         break;
     }
 
@@ -365,7 +381,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
           ),
           child: Row(
             children: [
-              Expanded(child: _buildHeaderCell(context, '时间戳', flex: 2)),
+              Expanded(child: _buildHeaderCell(context, '时间', flex: 2)),
               Expanded(child: _buildHeaderCell(context, '数值', flex: 1)),
             ],
           ),

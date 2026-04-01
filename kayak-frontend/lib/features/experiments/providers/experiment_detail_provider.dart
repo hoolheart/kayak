@@ -71,11 +71,15 @@ class ExperimentDetailNotifier extends StateNotifier<ExperimentDetailState> {
         experimentId,
         channel,
         limit: 100,
+        endTime: queryParams['end_time'] != null
+            ? DateTime.parse(queryParams['end_time'] as String)
+            : null,
       );
 
       final newData = response.data.map((point) {
         return PointHistoryData(
-          timestamp: point.timestamp,
+          timestamp:
+              DateTime.fromMillisecondsSinceEpoch(point.timestamp ~/ 1000000),
           value: point.value,
         );
       }).toList();
