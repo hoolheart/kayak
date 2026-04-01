@@ -67,12 +67,26 @@ class LoginResponse {
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
+    // Backend sends nested user object: { user: { id, email, username } }
+    // Frontend expects flat structure with user_id at top level
+    final userJson = json['user'] as Map<String, dynamic>?;
+
+    // Extract user_id from nested user object or top-level field
+    String userId;
+    if (userJson != null && userJson['id'] != null) {
+      userId = userJson['id'].toString();
+    } else if (json['user_id'] != null) {
+      userId = json['user_id'].toString();
+    } else {
+      throw FormatException('Login response missing user_id field: $json');
+    }
+
     return LoginResponse(
       accessToken: json['access_token'] as String,
       refreshToken: json['refresh_token'] as String,
       expiresIn: json['expires_in'] as int,
-      userId: json['user_id'] as String,
-      username: json['username'] as String?,
+      userId: userId,
+      username: userJson?['username'] as String? ?? json['username'] as String?,
     );
   }
 }
