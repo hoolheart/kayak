@@ -18,18 +18,18 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
   Future<void> loadExperiments({bool reset = false}) async {
     if (state.isLoading) return;
 
-    final targetPage = reset ? 1 : state.page;
+    final targetPage = reset ? 1 : state.currentPage;
 
     state = state.copyWith(
       isLoading: true,
       error: null,
-      page: reset ? 1 : null,
+      currentPage: reset ? 1 : null,
     );
 
     try {
       final response = await _service.getExperiments(
         page: targetPage,
-        size: state.size,
+        size: state.pageSize,
         status: state.statusFilter,
         startedAfter: state.startDateFilter,
         startedBefore: state.endDateFilter,
@@ -38,10 +38,9 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
       state = state.copyWith(
         experiments:
             reset ? response.items : [...state.experiments, ...response.items],
-        page: response.page,
+        currentPage: response.page,
         total: response.total,
-        hasNext: response.hasNext,
-        hasPrev: response.hasPrev,
+        hasMore: response.hasNext,
         isLoading: false,
       );
     } catch (e) {
@@ -61,7 +60,7 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
     try {
       final response = await _service.getExperiments(
         page: 1,
-        size: state.size,
+        size: state.pageSize,
         status: state.statusFilter,
         startedAfter: state.startDateFilter,
         startedBefore: state.endDateFilter,
@@ -69,10 +68,9 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
 
       state = state.copyWith(
         experiments: response.items,
-        page: response.page,
+        currentPage: response.page,
         total: response.total,
-        hasNext: response.hasNext,
-        hasPrev: response.hasPrev,
+        hasMore: response.hasNext,
         isRefreshing: false,
       );
     } catch (e) {
@@ -85,9 +83,9 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
 
   /// 加载更多
   Future<void> loadMore() async {
-    if (state.isLoading || !state.hasNext) return;
+    if (state.isLoading || !state.hasMore) return;
 
-    state = state.copyWith(page: state.page + 1);
+    state = state.copyWith(currentPage: state.currentPage + 1);
     await loadExperiments();
   }
 
@@ -99,7 +97,12 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
     );
   }
 
-  /// 设置日期范围筛选
+  /// 清除状态筛选
+  void clearStatusFilter() {
+    state = state.copyWith(clearStatusFilter: true);
+  }
+
+  /// 设置日期范围筛选 (别名: setDateRangeFilter)
   void setDateRange(DateTime? start, DateTime? end) {
     state = state.copyWith(
       startDateFilter: start,
@@ -107,6 +110,16 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
       clearStartDate: start == null,
       clearEndDate: end == null,
     );
+  }
+
+  /// 设置日期范围筛选 (API兼容名称)
+  void setDateRangeFilter(DateTime? start, DateTime? end) {
+    setDateRange(start, end);
+  }
+
+  /// 清除日期范围筛选
+  void clearDateRangeFilter() {
+    setDateRange(null, null);
   }
 
   /// 清除所有筛选
@@ -118,9 +131,14 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
     );
   }
 
+  /// 清除所有筛选 (别名)
+  void clearAllFilters() {
+    clearFilters();
+  }
+
   /// 重置分页
   void resetPagination() {
-    state = state.copyWith(page: 1);
+    state = state.copyWith(currentPage: 1);
   }
 }
 

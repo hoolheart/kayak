@@ -114,29 +114,31 @@ class ExperimentFilterBar extends StatelessWidget {
   }
 
   Widget _buildStatusChip(BuildContext context, ExperimentStatus status) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     Color backgroundColor;
     Color textColor;
 
     switch (status) {
       case ExperimentStatus.idle:
-        backgroundColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade700;
+        backgroundColor = colorScheme.surfaceContainerHighest;
+        textColor = colorScheme.onSurfaceVariant;
         break;
       case ExperimentStatus.running:
-        backgroundColor = Colors.green.shade100;
-        textColor = Colors.green.shade700;
+        backgroundColor = colorScheme.primaryContainer;
+        textColor = colorScheme.onPrimaryContainer;
         break;
       case ExperimentStatus.paused:
-        backgroundColor = Colors.orange.shade100;
-        textColor = Colors.orange.shade700;
+        backgroundColor = colorScheme.tertiaryContainer;
+        textColor = colorScheme.onTertiaryContainer;
         break;
       case ExperimentStatus.completed:
-        backgroundColor = Colors.blue.shade100;
-        textColor = Colors.blue.shade700;
+        backgroundColor = colorScheme.secondaryContainer;
+        textColor = colorScheme.onSecondaryContainer;
         break;
       case ExperimentStatus.aborted:
-        backgroundColor = Colors.red.shade100;
-        textColor = Colors.red.shade700;
+        backgroundColor = colorScheme.errorContainer;
+        textColor = colorScheme.onErrorContainer;
         break;
     }
 

@@ -8,13 +8,12 @@ import '../models/experiment.dart';
 /// 试验列表状态
 class ExperimentListState {
   final List<Experiment> experiments;
-  final int page;
-  final int size;
+  final int currentPage;
+  final int pageSize;
   final int total;
   final bool isLoading;
   final bool isRefreshing;
-  final bool hasNext;
-  final bool hasPrev;
+  final bool hasMore;
   final ExperimentStatus? statusFilter;
   final DateTime? startDateFilter;
   final DateTime? endDateFilter;
@@ -22,13 +21,12 @@ class ExperimentListState {
 
   const ExperimentListState({
     this.experiments = const [],
-    this.page = 1,
-    this.size = 10,
+    this.currentPage = 1,
+    this.pageSize = 20,
     this.total = 0,
     this.isLoading = false,
     this.isRefreshing = false,
-    this.hasNext = false,
-    this.hasPrev = false,
+    this.hasMore = true,
     this.statusFilter,
     this.startDateFilter,
     this.endDateFilter,
@@ -37,13 +35,12 @@ class ExperimentListState {
 
   ExperimentListState copyWith({
     List<Experiment>? experiments,
-    int? page,
-    int? size,
+    int? currentPage,
+    int? pageSize,
     int? total,
     bool? isLoading,
     bool? isRefreshing,
-    bool? hasNext,
-    bool? hasPrev,
+    bool? hasMore,
     ExperimentStatus? statusFilter,
     DateTime? startDateFilter,
     DateTime? endDateFilter,
@@ -55,13 +52,12 @@ class ExperimentListState {
   }) {
     return ExperimentListState(
       experiments: experiments ?? this.experiments,
-      page: page ?? this.page,
-      size: size ?? this.size,
+      currentPage: currentPage ?? this.currentPage,
+      pageSize: pageSize ?? this.pageSize,
       total: total ?? this.total,
       isLoading: isLoading ?? this.isLoading,
       isRefreshing: isRefreshing ?? this.isRefreshing,
-      hasNext: hasNext ?? this.hasNext,
-      hasPrev: hasPrev ?? this.hasPrev,
+      hasMore: hasMore ?? this.hasMore,
       statusFilter:
           clearStatusFilter ? null : (statusFilter ?? this.statusFilter),
       startDateFilter:

@@ -146,7 +146,7 @@ class _ExperimentListPageState extends ConsumerState<ExperimentListPage> {
                           ref.read(experimentListProvider.notifier).loadMore();
                         },
                         isLoadingMore: state.isLoading,
-                        hasMore: state.hasNext,
+                        hasMore: state.hasMore,
                       ),
           ),
 
@@ -158,11 +158,11 @@ class _ExperimentListPageState extends ConsumerState<ExperimentListPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '第 ${state.page} 页',
+                    '显示 ${((state.currentPage - 1) * state.pageSize) + 1}-${(state.currentPage * state.pageSize).clamp(0, state.total)} / 共 ${state.total} 条',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   const SizedBox(width: 16),
-                  if (state.hasNext)
+                  if (state.hasMore)
                     TextButton(
                       onPressed: () {
                         ref.read(experimentListProvider.notifier).loadMore();
