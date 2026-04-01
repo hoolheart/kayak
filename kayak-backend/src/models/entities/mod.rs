@@ -5,6 +5,7 @@
 pub mod data_file;
 pub mod device;
 pub mod experiment;
+pub mod method;
 pub mod point;
 pub mod user;
 pub mod workbench;
@@ -16,6 +17,7 @@ pub use experiment::{
     CreateExperimentRequest, Experiment, ExperimentResponse, ExperimentStatus,
     ListExperimentsRequest, PagedResponse, UpdateExperimentRequest, UpdateStatusRequest,
 };
+pub use method::Method;
 pub use point::{AccessType, DataType, Point, PointStatus};
 pub use user::{CreateUserRequest, UpdateUserRequest, User, UserStatus};
 pub use workbench::{

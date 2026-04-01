@@ -5,6 +5,7 @@
 pub mod device;
 pub mod experiment_query;
 pub mod hdf5;
+pub mod method_service;
 pub mod point;
 pub mod point_history;
 pub mod timeseries_buffer;

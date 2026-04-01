@@ -4,6 +4,8 @@
 
 pub mod device_repo;
 pub mod experiment_repo;
+pub mod method_error;
+pub mod method_repo;
 pub mod point_repo;
 pub mod user_repo;
 pub mod workbench_repo;
@@ -11,6 +13,8 @@ pub mod workbench_repo;
 // Re-exports for convenience
 pub use device_repo::{DeviceRepository, DeviceRepositoryError, SqlxDeviceRepository};
 pub use experiment_repo::{ExperimentRepository, ExperimentRepositoryError, SqlxExperimentRepository};
+pub use method_error::MethodRepositoryError;
+pub use method_repo::{MethodRepository, SqlxMethodRepository};
 pub use point_repo::{PointRepository, PointRepositoryError, SqlxPointRepository};
 
 // 基础Repository trait
