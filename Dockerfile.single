@@ -1,0 +1,70 @@
+# Kayak Single Container Dockerfile
+# This Dockerfile builds a single container with both frontend (web) and backend
+
+FROM rust:1.75-slim as backend-builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build backend
+WORKDIR /app
+COPY kayak-backend .
+RUN cargo build --release
+
+# Flutter build stage
+FROM flutter:3.16-slim as frontend-builder
+
+# Install build dependencies for web
+RUN apt-get update && apt-get install -y \
+    curl \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build frontend web
+WORKDIR /app
+COPY kayak-frontend .
+RUN flutter pub get
+RUN flutter build web --release
+
+# Final stage - single container with both frontend and backend
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy backend binary from builder
+COPY --from=backend-builder /app/target/release/kayak-backend /app/
+
+# Copy frontend build from builder
+COPY --from=frontend-builder /app/build/web /app/web
+
+# Create data directory
+RUN mkdir -p /app/data
+
+# Environment variables
+ENV KAYAK_DATA_DIR=/app/data
+ENV DATABASE_URL=sqlite:///app/data/kayak.db
+ENV KAYAK_LOG_LEVEL=info
+ENV KAYAK_SERVE_STATIC=/app/web
+ENV RUST_BACKTRACE=1
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Start command
+CMD ["/app/kayak-backend"]
