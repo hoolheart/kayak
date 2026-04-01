@@ -380,6 +380,17 @@ pub struct ApiResponse<T> {
     pub timestamp: String,
 }
 
+/// 分页响应结构
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PagedResponse<T> {
+    pub items: Vec<T>,
+    pub page: i32,
+    pub size: i32,
+    pub total: i64,
+    pub has_next: bool,
+    pub has_prev: bool,
+}
+
 /// 创建方法请求DTO
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateMethodRequest {
@@ -439,6 +450,22 @@ pub async fn create_method_via_api(
     let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
     let api_response: ApiResponse<MethodDto> = serde_json::from_slice(&body).unwrap();
     api_response.data
+}
+
+/// 简化版创建方法辅助函数（使用默认值）
+pub async fn create_method_via_api_simple(
+    app: &TestApp,
+    token: &str,
+    name: &str,
+) -> MethodDto {
+    create_method_via_api(
+        app,
+        token,
+        name,
+        None,
+        serde_json::json!({"steps": [{"type": "Start"}]}),
+        serde_json::json!({"type": "object", "properties": {}}),
+    ).await
 }
 
 /// 验证方法请求的辅助函数
@@ -1439,7 +1466,7 @@ async fn test_api_create_method() {
     assert_eq!(response.status(), StatusCode::CREATED);
     
     let body_bytes = hyper::body::to_bytes(response.into_body()).await.unwrap();
-    let api_response: SuccessResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
+    let api_response: ApiResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
     
     assert_eq!(api_response.data.name, "API测试方法");
     assert_eq!(api_response.data.version, 1);
@@ -1497,7 +1524,7 @@ async fn test_api_list_methods() {
     
     // 创建多个方法
     for i in 0..5 {
-        create_method_via_api(&app, &token, format!("方法{}", i)).await;
+        create_method_via_api_simple(&app, &token, &format!("方法{}", i)).await;
     }
     
     let response = app.get("/api/v1/methods?page=1&size=10", &token).await;
@@ -1505,7 +1532,7 @@ async fn test_api_list_methods() {
     assert_eq!(response.status(), StatusCode::OK);
     
     let body_bytes = hyper::body::to_bytes(response.into_body()).await.unwrap();
-    let api_response: SuccessResponse<PagedResponse<MethodDto>> = serde_json::from_slice(&body_bytes).unwrap();
+    let api_response: ApiResponse<PagedResponse<MethodDto>> = serde_json::from_slice(&body_bytes).unwrap();
     
     assert!(api_response.data.items.len() >= 5);
     assert_eq!(api_response.code, 200);
@@ -1519,7 +1546,7 @@ async fn test_api_get_method() {
     let app = create_test_app().await;
     let token = create_test_user_and_get_token().await;
     
-    let created = create_method_via_api(&app, &token, "待获取方法".to_string()).await;
+    let created = create_method_via_api_simple(&app, &token, "待获取方法").await;
     
     let path = format!("/api/v1/methods/{}", created.id);
     let response = app.get(&path, &token).await;
@@ -1527,7 +1554,7 @@ async fn test_api_get_method() {
     assert_eq!(response.status(), StatusCode::OK);
     
     let body_bytes = hyper::body::to_bytes(response.into_body()).await.unwrap();
-    let api_response: SuccessResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
+    let api_response: ApiResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
     
     assert_eq!(api_response.data.id, created.id);
     assert_eq!(api_response.data.name, "待获取方法");
@@ -1572,7 +1599,7 @@ async fn test_api_update_method() {
     assert_eq!(response.status(), StatusCode::OK);
     
     let body_bytes = hyper::body::to_bytes(response.into_body()).await.unwrap();
-    let api_response: SuccessResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
+    let api_response: ApiResponse<MethodDto> = serde_json::from_slice(&body_bytes).unwrap();
     
     assert_eq!(api_response.data.name, "更新后名称");
     assert_eq!(api_response.code, 200);
@@ -1607,7 +1634,7 @@ async fn test_api_delete_method_no_permission() {
     let token1 = create_test_user_and_get_token().await;
     let token2 = create_test_user_and_get_token().await;
     
-    let created = create_method_via_api(&app, &token1, "用户1的方法".to_string()).await;
+    let created = create_method_via_api_simple(&app, &token1, "用户1的方法").await;
     
     // 用户2尝试删除用户1的方法
     let path = format!("/api/v1/methods/{}", created.id);
@@ -1628,7 +1655,7 @@ async fn test_invalid_json_process_definition() {
     // 无效JSON应该在API层被拒绝，不会到达验证函数
     // 这个测试验证API层正确处理无效JSON
     let app = create_test_app().await;
-    let token = create_test_user_and_get_token(&app).await;
+    let token = create_test_user_and_get_token().await;
     
     // 直接发送无效JSON字符串到API
     let response = app.post("/api/v1/methods", &token, "invalid json".to_string()).await;
