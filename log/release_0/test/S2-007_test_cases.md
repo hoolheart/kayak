@@ -1583,7 +1583,7 @@ async fn test_api_update_method() {
     let app = create_test_app().await;
     let token = create_test_user_and_get_token().await;
     
-    let created = create_method_via_api(&app, &token, "原名称".to_string()).await;
+    let created = create_method_via_api_simple(&app, &token, "原名称").await;
     
     let update_request = UpdateMethodRequest {
         name: Some("更新后名称".to_string()),
@@ -1613,7 +1613,7 @@ async fn test_api_delete_method() {
     let app = create_test_app().await;
     let token = create_test_user_and_get_token().await;
     
-    let created = create_method_via_api(&app, &token, "待删除".to_string()).await;
+    let created = create_method_via_api_simple(&app, &token, "待删除").await;
     
     let path = format!("/api/v1/methods/{}", created.id);
     let response = app.delete(&path, &token).await;
