@@ -35,6 +35,9 @@ pub enum ExperimentControlError {
 
     #[error("Concurrent modification conflict")]
     ConcurrentConflict,
+
+    #[error("Forbidden: {0}")]
+    Forbidden(String),
 }
 
 impl From<ExperimentRepositoryError> for ExperimentControlError {
@@ -166,6 +169,26 @@ where
         }
     }
 
+    /// Verify that the user owns the experiment or is an admin.
+    /// Returns the experiment if authorized, error otherwise.
+    async fn verify_ownership(
+        &self,
+        experiment_id: Uuid,
+        user_id: Uuid,
+    ) -> Result<crate::models::entities::experiment::Experiment, ExperimentControlError> {
+        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+
+        // TODO: Add admin role check when user roles are implemented
+        if exp.user_id != user_id {
+            return Err(ExperimentControlError::Forbidden(
+                "You do not have permission to control this experiment".to_string(),
+            ));
+        }
+
+        Ok(exp)
+    }
+
     /// Load a method into the experiment (Idle -> Loaded)
     pub async fn load(
         &self,
@@ -173,9 +196,8 @@ where
         method_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        // Find experiment
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
-            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+        // Verify ownership
+        let exp = self.verify_ownership(experiment_id, user_id).await?;
 
         // Validate transition
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Load)?;
@@ -213,8 +235,7 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
-            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+        let exp = self.verify_ownership(experiment_id, user_id).await?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Start)?;
 
@@ -252,8 +273,7 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
-            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+        let exp = self.verify_ownership(experiment_id, user_id).await?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Pause)?;
 
@@ -284,8 +304,7 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
-            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+        let exp = self.verify_ownership(experiment_id, user_id).await?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Resume)?;
 
@@ -316,8 +335,7 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
-            .ok_or(ExperimentControlError::NotFound(experiment_id))?;
+        let exp = self.verify_ownership(experiment_id, user_id).await?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Stop)?;
 

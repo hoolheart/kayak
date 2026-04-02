@@ -10,6 +10,7 @@ use axum::{
 };
 
 use crate::api::handlers::device;
+use crate::api::handlers::experiment_control;
 use crate::api::handlers::health;
 use crate::api::handlers::point;
 use crate::api::handlers::user;
@@ -22,11 +23,15 @@ use crate::auth::{
 };
 use crate::db::connection::DbPool;
 use crate::db::repository::device_repo::SqlxDeviceRepository;
+use crate::db::repository::experiment_repo::SqlxExperimentRepository;
+use crate::db::repository::method_repo::SqlxMethodRepository;
 use crate::db::repository::point_repo::SqlxPointRepository;
+use crate::db::repository::state_change_log_repo::SqlxStateChangeLogRepository;
 use crate::db::repository::user_repo::UserRepository;
 use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
+use crate::services::experiment_control::ExperimentControlService;
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
@@ -94,11 +99,19 @@ pub fn create_router(pool: DbPool) -> Router {
 
     // 创建测点服务
     let point_service: Arc<dyn PointService> = Arc::new(PointServiceImpl::new(
-        device_repo,
-        point_repo,
+        device_repo.clone(),
+        point_repo.clone(),
         Arc::new(workbench_repo_for_point),
-        device_manager,
+        device_manager.clone(),
     ));
+
+    // 创建试验控制服务
+    let experiment_repo = SqlxExperimentRepository::new(pool.clone());
+    let method_repo = SqlxMethodRepository::new(pool.clone());
+    let state_change_log_repo = SqlxStateChangeLogRepository::new(pool.clone());
+    let experiment_control_service: experiment_control::AppState = Arc::new(
+        ExperimentControlService::new(experiment_repo, method_repo, state_change_log_repo),
+    );
 
     Router::new()
         // 健康检查（最优先，无中间件限制）
@@ -109,6 +122,7 @@ pub fn create_router(pool: DbPool) -> Router {
         .merge(workbench_routes(workbench_service))
         .merge(device_routes(device_service))
         .merge(point_routes(point_service))
+        .merge(experiment_control_routes(experiment_control_service))
         // 404处理
         .fallback(not_found_handler)
 }
@@ -196,10 +210,30 @@ fn point_routes(point_service: Arc<dyn PointService>) -> Router {
 }
 
 // Re-export for use in tests or other modules
+pub use experiment_control::{
+    get_experiment_history, get_experiment_status, load_experiment, pause_experiment,
+    resume_experiment, start_experiment, stop_experiment,
+};
 pub use user::{change_password, get_current_user, update_current_user};
 pub use workbench::{
     create_workbench, delete_workbench, get_workbench, list_workbenches, update_workbench,
 };
+
+/// 试验控制路由组
+fn experiment_control_routes(experiment_control_service: experiment_control::AppState) -> Router {
+    Router::new().nest(
+        "/api/v1/experiments",
+        Router::new()
+            .route("/{id}/load", post(load_experiment))
+            .route("/{id}/start", post(start_experiment))
+            .route("/{id}/pause", post(pause_experiment))
+            .route("/{id}/resume", post(resume_experiment))
+            .route("/{id}/stop", post(stop_experiment))
+            .route("/{id}/status", get(get_experiment_status))
+            .route("/{id}/history", get(get_experiment_history))
+            .with_state(experiment_control_service),
+    )
+}
 
 /// 获取健康检查路由（用于测试）
 pub fn health_routes() -> Router {

@@ -5,6 +5,7 @@
 pub mod common;
 pub mod device;
 pub mod experiment;
+pub mod experiment_control;
 pub mod health;
 pub mod point;
 pub mod user;
