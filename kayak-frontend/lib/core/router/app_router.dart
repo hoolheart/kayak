@@ -14,6 +14,7 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/experiments/screens/experiment_list_page.dart';
 import '../../features/methods/screens/method_list_page.dart';
+import '../../features/methods/screens/method_edit_page.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
 import '../../screens/settings/settings_page.dart';
 import '../navigation/app_shell.dart';
@@ -214,6 +215,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/methods',
             builder: (context, state) => const MethodListPage(),
+          ),
+          GoRoute(
+            path: '/methods/create',
+            builder: (context, state) => const MethodEditPage(),
+          ),
+          GoRoute(
+            path: '/methods/:id/edit',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return MethodEditPage(methodId: id);
+            },
           ),
           // 设置
           GoRoute(

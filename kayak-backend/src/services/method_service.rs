@@ -127,4 +127,86 @@ impl<R: MethodRepository> MethodService<R> {
 
         Ok(())
     }
+
+    /// 验证过程定义
+    pub fn validate_process_definition(
+        &self,
+        process_definition: &serde_json::Value,
+    ) -> crate::api::handlers::method::ValidationResult {
+        let mut errors = Vec::new();
+
+        // 检查必须是对象
+        if !process_definition.is_object() {
+            return crate::api::handlers::method::ValidationResult {
+                valid: false,
+                errors: vec!["过程定义必须是JSON对象".to_string()],
+            };
+        }
+
+        // 检查nodes字段
+        let nodes = match process_definition.get("nodes") {
+            Some(serde_json::Value::Array(nodes)) => nodes,
+            Some(_) => {
+                errors.push("'nodes'字段必须是数组".to_string());
+                return crate::api::handlers::method::ValidationResult {
+                    valid: false,
+                    errors,
+                };
+            }
+            None => {
+                errors.push("缺少'nodes'字段".to_string());
+                return crate::api::handlers::method::ValidationResult {
+                    valid: false,
+                    errors,
+                };
+            }
+        };
+
+        // 有效节点类型
+        let valid_types = [
+            "Start", "Read", "Control", "Delay", "Decision",
+            "Branch", "Wait", "Record", "Config", "Subprocess", "End",
+        ];
+
+        let mut has_start = false;
+        let mut has_end = false;
+        let mut node_ids = std::collections::HashSet::new();
+
+        for node in nodes {
+            // 检查节点类型
+            if let Some(node_type) = node.get("type").and_then(|v| v.as_str()) {
+                if !valid_types.contains(&node_type) {
+                    let node_id = node.get("id").and_then(|v| v.as_str()).unwrap_or("unknown");
+                    errors.push(format!("节点'{}'的类型'{}'无效", node_id, node_type));
+                }
+                if node_type == "Start" {
+                    has_start = true;
+                }
+                if node_type == "End" {
+                    has_end = true;
+                }
+            } else {
+                errors.push("节点缺少'type'字段".to_string());
+            }
+
+            // 检查节点ID唯一性
+            if let Some(node_id) = node.get("id").and_then(|v| v.as_str()) {
+                if !node_ids.insert(node_id.to_string()) {
+                    errors.push(format!("节点ID'{}'重复", node_id));
+                }
+            }
+        }
+
+        if !has_start {
+            errors.push("缺少Start节点".to_string());
+        }
+        if !has_end {
+            errors.push("缺少End节点".to_string());
+        }
+
+        crate::api::handlers::method::ValidationResult {
+            valid: errors.is_empty(),
+            errors,
+        }
+    }
 }

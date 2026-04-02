@@ -13,6 +13,8 @@ use crate::api::handlers::device;
 use crate::api::handlers::experiment_control;
 use crate::api::handlers::experiment_ws;
 use crate::api::handlers::health;
+use crate::api::handlers::method;
+use crate::api::handlers::method::MethodServiceAdapter;
 use crate::api::handlers::point;
 use crate::api::handlers::user;
 use crate::api::handlers::workbench;
@@ -34,6 +36,7 @@ use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
 use crate::services::experiment_control::ws_manager::ExperimentWsManager;
 use crate::services::experiment_control::ExperimentControlService;
+use crate::services::method_service::MethodService;
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
@@ -131,6 +134,12 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     // 创建WebSocket状态（使用同一个ws_manager）
     let ws_state = experiment_ws::AppState::with_ws_manager(ws_manager);
 
+    // 创建方法服务
+    let method_repo_for_service = SqlxMethodRepository::new(pool.clone());
+    let method_service_impl = MethodService::new(method_repo_for_service);
+    let method_service: Arc<dyn method::MethodServiceTrait> =
+        Arc::new(MethodServiceAdapter::new(method_service_impl));
+
     Router::new()
         // 健康检查（最优先，无中间件限制）
         .merge(health_routes())
@@ -142,6 +151,7 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(workbench_routes(workbench_service))
         .merge(device_routes(device_service))
         .merge(point_routes(point_service))
+        .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
         // 404处理
         .fallback(not_found_handler)
@@ -238,6 +248,21 @@ pub use user::{change_password, get_current_user, update_current_user};
 pub use workbench::{
     create_workbench, delete_workbench, get_workbench, list_workbenches, update_workbench,
 };
+
+/// 方法路由组
+fn method_routes(method_service: Arc<dyn method::MethodServiceTrait>) -> Router<()> {
+    Router::new().nest(
+        "/api/v1/methods",
+        Router::new()
+            .route("/", post(method::create_method))
+            .route("/", get(method::list_methods))
+            .route("/{id}", get(method::get_method))
+            .route("/{id}", put(method::update_method))
+            .route("/{id}", delete(method::delete_method))
+            .route("/validate", post(method::validate_method))
+            .with_state(method_service),
+    )
+}
 
 /// 试验控制路由组
 fn experiment_control_routes(
