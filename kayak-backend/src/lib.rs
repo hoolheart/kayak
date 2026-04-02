@@ -18,6 +18,7 @@ pub mod core {
 pub mod auth;
 pub mod db;
 pub mod drivers;
+pub mod engine;
 pub mod models;
 pub mod services;
 pub mod state_machine;
