@@ -250,16 +250,43 @@ impl UserRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::db::connection::init_db;
+    use crate::db::connection::init_db_without_migrations;
     use crate::services::user::UpdateUserEntity;
+
+    /// 手动创建测试数据库schema
+    async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            r#"
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                username TEXT,
+                avatar_url TEXT,
+                status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'banned')),
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+            "#
+        )
+        .execute(pool)
+        .await?;
+        Ok(())
+    }
 
     #[tokio::test]
     async fn test_user_repository() {
-        // 使用唯一的数据库URL避免测试冲突
-        let db_id = uuid::Uuid::new_v4().to_string();
-        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id))
+        // 使用临时文件数据库，避免迁移问题
+        let temp_dir = std::env::temp_dir();
+        let db_path = temp_dir.join(format!("test_user_repo_{}.db", uuid::Uuid::new_v4()));
+        let pool = init_db_without_migrations(&format!("sqlite:{}", db_path.display()))
             .await
             .unwrap();
+        
+        // 手动创建schema
+        create_test_schema(&pool).await.unwrap();
+        
         let repo = UserRepository::new(pool);
 
         // 创建用户
@@ -295,10 +322,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_exists_by_username() {
-        let db_id = uuid::Uuid::new_v4().to_string();
-        let pool = init_db(&format!("sqlite:file:{}?mode=memory&cache=shared", db_id))
+        // 使用临时文件数据库，避免迁移问题
+        let temp_dir = std::env::temp_dir();
+        let db_path = temp_dir.join(format!("test_exists_{}.db", uuid::Uuid::new_v4()));
+        let pool = init_db_without_migrations(&format!("sqlite:{}", db_path.display()))
             .await
             .unwrap();
+        
+        // 手动创建schema
+        create_test_schema(&pool).await.unwrap();
+        
         let repo = UserRepository::new(pool);
 
         // 创建用户
