@@ -13,14 +13,26 @@ pub enum ExperimentStatus {
     /// 初始状态，试验未开始
     #[default]
     Idle,
+    /// 方法已载入，准备开始
+    Loaded,
     /// 试验正在运行
     Running,
     /// 试验暂停
     Paused,
-    /// 试验正常结束
+    /// 试验正常结束（终态）
     Completed,
-    /// 试验被中止
+    /// 试验被中止（终态）
     Aborted,
+}
+
+impl ExperimentStatus {
+    /// Check if this state is terminal (no further transitions allowed)
+    pub fn is_terminal(self) -> bool {
+        matches!(
+            self,
+            ExperimentStatus::Completed | ExperimentStatus::Aborted
+        )
+    }
 }
 
 /// 试验实体
@@ -67,23 +79,21 @@ impl Experiment {
     }
 
     /// 检查状态转换是否有效
+    ///
+    /// DEPRECATED: Use `StateMachine::is_allowed()` instead.
+    /// This method is kept for backward compatibility but delegates to the state machine.
+    #[deprecated(since = "0.2.0", note = "Use StateMachine::is_allowed() instead")]
     pub fn can_transition_to(&self, new_status: ExperimentStatus) -> bool {
-        match (self.status, new_status) {
-            // Idle 可以转到 Running
-            (ExperimentStatus::Idle, ExperimentStatus::Running) => true,
-            // Running 可以转到 Paused, Completed, Aborted
-            (ExperimentStatus::Running, ExperimentStatus::Paused) => true,
-            (ExperimentStatus::Running, ExperimentStatus::Completed) => true,
-            (ExperimentStatus::Running, ExperimentStatus::Aborted) => true,
-            // Paused 可以转到 Running, Aborted
-            (ExperimentStatus::Paused, ExperimentStatus::Running) => true,
-            (ExperimentStatus::Paused, ExperimentStatus::Aborted) => true,
-            // 终态不能转换
-            (ExperimentStatus::Completed, _) => false,
-            (ExperimentStatus::Aborted, _) => false,
-            // 其他情况无效
-            _ => false,
-        }
+        // Map target status to operation for backward compatibility
+        let operation = match new_status {
+            ExperimentStatus::Loaded => crate::state_machine::StateMachineOperation::Load,
+            ExperimentStatus::Running => crate::state_machine::StateMachineOperation::Start,
+            ExperimentStatus::Paused => crate::state_machine::StateMachineOperation::Pause,
+            ExperimentStatus::Completed => crate::state_machine::StateMachineOperation::Complete,
+            ExperimentStatus::Aborted => crate::state_machine::StateMachineOperation::Abort,
+            ExperimentStatus::Idle => crate::state_machine::StateMachineOperation::Reset,
+        };
+        crate::state_machine::StateMachine::is_allowed(self.status, operation)
     }
 }
 

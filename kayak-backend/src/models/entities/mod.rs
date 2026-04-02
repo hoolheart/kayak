@@ -7,6 +7,7 @@ pub mod device;
 pub mod experiment;
 pub mod method;
 pub mod point;
+pub mod state_change_log;
 pub mod user;
 pub mod workbench;
 
@@ -19,6 +20,7 @@ pub use experiment::{
 };
 pub use method::Method;
 pub use point::{AccessType, DataType, Point, PointStatus};
+pub use state_change_log::StateChangeLog;
 pub use user::{CreateUserRequest, UpdateUserRequest, User, UserStatus};
 pub use workbench::{
     CreateWorkbenchRequest, OwnerType, UpdateWorkbenchRequest, Workbench, WorkbenchStatus,

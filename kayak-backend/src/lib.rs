@@ -20,6 +20,7 @@ pub mod db;
 pub mod drivers;
 pub mod models;
 pub mod services;
+pub mod state_machine;
 
 #[cfg(test)]
 pub mod test_utils;

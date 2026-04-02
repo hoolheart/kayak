@@ -10,6 +10,17 @@ use uuid::Uuid;
 use crate::db::connection::DbPool;
 use crate::models::entities::experiment::{Experiment, ExperimentStatus};
 
+/// Controls how method_id should be updated during a state transition.
+#[derive(Debug, Clone, Copy)]
+pub enum MethodIdUpdate {
+    /// Set method_id to a specific value (used by Load operation)
+    Set(Uuid),
+    /// Clear method_id (used by Reset operation)
+    Clear,
+    /// Do not change method_id (used by Start, Pause, Resume, Stop, etc.)
+    Preserve,
+}
+
 /// Repository错误类型
 #[derive(Debug, thiserror::Error)]
 pub enum ExperimentRepositoryError {
@@ -39,6 +50,7 @@ impl ExperimentRow {
     fn to_experiment(&self) -> Experiment {
         let status = match self.status.as_str() {
             "IDLE" => ExperimentStatus::Idle,
+            "LOADED" => ExperimentStatus::Loaded,
             "RUNNING" => ExperimentStatus::Running,
             "PAUSED" => ExperimentStatus::Paused,
             "COMPLETED" => ExperimentStatus::Completed,
@@ -96,10 +108,26 @@ pub trait ExperimentRepository: Send + Sync {
     async fn delete(&self, id: Uuid) -> Result<u64, ExperimentRepositoryError>;
 
     /// 更新试验状态
+    #[deprecated(since = "0.2.0", note = "Use update_state() instead")]
     async fn update_status(
         &self,
         id: Uuid,
         status: ExperimentStatus,
+    ) -> Result<Experiment, ExperimentRepositoryError>;
+
+    /// Update experiment state with explicit control over method_id and timestamps.
+    /// This is the primary method used by the state machine service.
+    ///
+    /// - `method_id`: Controls how method_id is updated (Set/Clear/Preserve)
+    /// - `started_at`: If Some, sets the started_at timestamp
+    /// - `ended_at`: If Some, sets the ended_at timestamp
+    async fn update_state(
+        &self,
+        id: Uuid,
+        status: ExperimentStatus,
+        method_id: MethodIdUpdate,
+        started_at: Option<DateTime<Utc>>,
+        ended_at: Option<DateTime<Utc>>,
     ) -> Result<Experiment, ExperimentRepositoryError>;
 }
 
@@ -335,6 +363,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
         Ok(result.rows_affected())
     }
 
+    #[allow(deprecated)]
     async fn update_status(
         &self,
         id: Uuid,
@@ -351,6 +380,60 @@ impl ExperimentRepository for SqlxExperimentRepository {
             "#,
         )
         .bind(&status_str)
+        .bind(now)
+        .bind(id.to_string())
+        .execute(&self.pool)
+        .await?;
+
+        self.find_by_id(id)
+            .await?
+            .ok_or(ExperimentRepositoryError::NotFound(id))
+    }
+
+    async fn update_state(
+        &self,
+        id: Uuid,
+        status: ExperimentStatus,
+        method_id: MethodIdUpdate,
+        started_at: Option<DateTime<Utc>>,
+        ended_at: Option<DateTime<Utc>>,
+    ) -> Result<Experiment, ExperimentRepositoryError> {
+        let status_str = format!("{:?}", status).to_uppercase();
+        let now = Utc::now();
+
+        // First, get the current experiment to determine method_id handling
+        let current = self.find_by_id(id).await?
+            .ok_or(ExperimentRepositoryError::NotFound(id))?;
+
+        // Determine the new method_id based on the update type
+        let new_method_id = match method_id {
+            MethodIdUpdate::Set(uuid) => Some(uuid),
+            MethodIdUpdate::Clear => None,
+            MethodIdUpdate::Preserve => current.method_id,
+        };
+
+        // Determine started_at and ended_at
+        // If the caller provides a value, use it; otherwise preserve existing
+        let final_started_at = match started_at {
+            Some(dt) => Some(dt),
+            None => current.started_at,
+        };
+        let final_ended_at = match ended_at {
+            Some(dt) => Some(dt),
+            None => current.ended_at,
+        };
+
+        sqlx::query(
+            r#"
+            UPDATE experiments
+            SET status = ?, method_id = ?, started_at = ?, ended_at = ?, updated_at = ?
+            WHERE id = ?
+            "#,
+        )
+        .bind(&status_str)
+        .bind(new_method_id.map(|u| u.to_string()))
+        .bind(final_started_at)
+        .bind(final_ended_at)
         .bind(now)
         .bind(id.to_string())
         .execute(&self.pool)

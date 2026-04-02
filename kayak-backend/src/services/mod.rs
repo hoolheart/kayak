@@ -3,6 +3,7 @@
 //! 包含业务逻辑服务
 
 pub mod device;
+pub mod experiment_control;
 pub mod experiment_query;
 pub mod hdf5;
 pub mod method_service;
@@ -12,6 +13,11 @@ pub mod timeseries_buffer;
 pub mod user;
 pub mod user_repo_adapter;
 pub mod workbench;
+
+pub use experiment_control::{
+    ExperimentControlDto, ExperimentControlError, ExperimentControlService, ExperimentStatusDto,
+    StateChangeLogDto,
+};
 
 pub use device::{
     CreateDeviceEntity, DeviceDto, DeviceError, DeviceService, DeviceServiceImpl, PagedDeviceDto,
