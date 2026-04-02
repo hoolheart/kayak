@@ -6,6 +6,7 @@ library;
 /// 实验状态
 enum ExperimentStatus {
   idle('IDLE'),
+  loaded('LOADED'),
   running('RUNNING'),
   paused('PAUSED'),
   completed('COMPLETED'),
@@ -80,6 +81,32 @@ class Experiment {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  Experiment copyWith({
+    String? id,
+    String? userId,
+    String? methodId,
+    String? name,
+    String? description,
+    ExperimentStatus? status,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Experiment(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      methodId: methodId ?? this.methodId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }
 

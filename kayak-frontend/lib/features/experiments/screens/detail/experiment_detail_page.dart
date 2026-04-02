@@ -301,6 +301,10 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
         backgroundColor = colorScheme.surfaceContainerHighest;
         textColor = colorScheme.onSurfaceVariant;
         break;
+      case ExperimentStatus.loaded:
+        backgroundColor = colorScheme.secondaryContainer;
+        textColor = colorScheme.onSecondaryContainer;
+        break;
       case ExperimentStatus.running:
         backgroundColor = colorScheme.primaryContainer;
         textColor = colorScheme.onPrimaryContainer;
@@ -510,6 +514,8 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
     switch (status) {
       case ExperimentStatus.idle:
         return '空闲';
+      case ExperimentStatus.loaded:
+        return '已载入';
       case ExperimentStatus.running:
         return '运行中';
       case ExperimentStatus.paused:
