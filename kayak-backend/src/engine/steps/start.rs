@@ -42,6 +42,8 @@ impl StepExecutor for StartStepExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use uuid::Uuid;
+    use crate::drivers::core::PointValue;
 
     #[tokio::test]
     async fn test_start_sets_running_status() {
@@ -81,12 +83,11 @@ mod tests {
 
     struct MockDriver;
     impl DriverAccess for MockDriver {
-        fn read_point(&self, _point_id: Uuid) -> Result<crate::drivers::core::PointValue, ExecutionError> {
-            unimplemented!()
+        fn read_point(&self, _point_id: Uuid) -> Result<PointValue, ExecutionError> {
+            unreachable!("read_point should not be called in Start tests")
         }
-        fn write_point(&self, _point_id: Uuid, _value: crate::drivers::core::PointValue) -> Result<(), ExecutionError> {
-            unimplemented!()
+        fn write_point(&self, _point_id: Uuid, _value: PointValue) -> Result<(), ExecutionError> {
+            unreachable!("write_point should not be called in Start tests")
         }
     }
-    use uuid::Uuid;
 }

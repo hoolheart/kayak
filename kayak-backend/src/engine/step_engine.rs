@@ -79,12 +79,13 @@ impl StepEngine {
             let start_time = Utc::now();
 
             // 获取驱动的只读引用（读锁）
-            // 注意：锁在此作用域内持有，步骤执行完毕后自动释放
+            // 注意：DeviceDriver::read_point/write_point 使用 &self（非 &mut self），
+            // 因此读锁足够。锁在此作用域内持有，步骤执行完毕后自动释放。
             let driver = driver_lock.read().map_err(|_| {
                 EngineError::LockError("Failed to acquire driver lock".to_string())
             })?;
 
-            // 构建 DriverAccess 适配器
+            // 构建 DriverAccess 适配器（泛型版本，支持任何 DeviceDriver 实现）
             let driver_access = DriverAccessAdapter::new(&*driver);
 
             // 执行环节
@@ -344,5 +345,89 @@ mod tests {
         assert!(result.is_ok());
         assert_eq!(listener.started.load(Ordering::SeqCst), 2);
         assert_eq!(listener.completed.load(Ordering::SeqCst), 2);
+    }
+
+    #[tokio::test]
+    async fn test_execute_fail_fast_on_read_error() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+
+        // Register a VirtualDriver but DON'T connect it — read_point will fail
+        let manager = Arc::new(DeviceManager::new());
+        let device_id = uuid::Uuid::new_v4();
+        let driver = VirtualDriver::new();
+        manager
+            .register_device(device_id, driver)
+            .expect("Failed to register device");
+
+        struct FailListener {
+            step_failed: AtomicUsize,
+            process_completed: AtomicUsize,
+        }
+
+        impl ExecutionListener for FailListener {
+            fn step_failed(&self, _step: &StepDefinition, _error: &ExecutionError) {
+                self.step_failed.fetch_add(1, Ordering::SeqCst);
+            }
+            fn process_completed(&self, _result: &ProcessResult) {
+                self.process_completed.fetch_add(1, Ordering::SeqCst);
+            }
+        }
+
+        let listener = Arc::new(FailListener {
+            step_failed: AtomicUsize::new(0),
+            process_completed: AtomicUsize::new(0),
+        });
+        let engine = StepEngine::new(manager, Some(listener.clone()));
+
+        // Process: Start -> Read -> Control -> End
+        // Read should fail (driver not connected), Control and End should NOT execute
+        let process_def = ProcessDefinition {
+            version: "1.0".to_string(),
+            steps: vec![
+                StepDefinition::Start {
+                    id: "s1".to_string(),
+                    name: "Start".to_string(),
+                },
+                StepDefinition::Read {
+                    id: "r1".to_string(),
+                    name: "Read Temp".to_string(),
+                    point_id: "00000000-0000-0000-0000-000000000001".to_string(),
+                    target_var: "temperature".to_string(),
+                },
+                StepDefinition::Control {
+                    id: "c1".to_string(),
+                    name: "Control".to_string(),
+                    point_id: "00000000-0000-0000-0000-000000000001".to_string(),
+                    value: crate::drivers::core::PointValue::Number(50.0),
+                },
+                StepDefinition::End {
+                    id: "e1".to_string(),
+                    name: "End".to_string(),
+                },
+            ],
+        };
+
+        let result = engine.execute(&process_def, device_id).await;
+        assert!(result.is_err());
+
+        match result.unwrap_err() {
+            EngineError::ExecutionFailed { context, source_error } => {
+                // Status should be Failed
+                assert_eq!(context.status, ExecutionStatus::Failed);
+                // Only Start and Read should have logs (Read failed)
+                assert_eq!(context.logs.len(), 2);
+                assert_eq!(context.logs[0].step_type, StepType::Start);
+                assert_eq!(context.logs[0].status, StepStatus::Success);
+                assert_eq!(context.logs[1].step_type, StepType::Read);
+                assert_eq!(context.logs[1].status, StepStatus::Failed);
+                // Error should be a driver error
+                assert!(matches!(source_error, ExecutionError::DriverError(_)));
+            }
+            _ => panic!("Expected ExecutionFailed error"),
+        }
+
+        // Listener callbacks should have fired
+        assert_eq!(listener.step_failed.load(Ordering::SeqCst), 1);
+        assert_eq!(listener.process_completed.load(Ordering::SeqCst), 1);
     }
 }

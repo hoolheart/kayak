@@ -36,8 +36,8 @@ impl StepExecutor for EndStepExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::core::PointValue;
     use uuid::Uuid;
+    use crate::drivers::core::PointValue;
 
     #[tokio::test]
     async fn test_end_sets_completed_status() {
@@ -57,10 +57,10 @@ mod tests {
     struct MockDriver;
     impl DriverAccess for MockDriver {
         fn read_point(&self, _point_id: Uuid) -> Result<PointValue, ExecutionError> {
-            unimplemented!()
+            unreachable!("read_point should not be called in End tests")
         }
         fn write_point(&self, _point_id: Uuid, _value: PointValue) -> Result<(), ExecutionError> {
-            unimplemented!()
+            unreachable!("write_point should not be called in End tests")
         }
     }
 }
