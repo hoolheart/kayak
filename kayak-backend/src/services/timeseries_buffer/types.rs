@@ -217,8 +217,9 @@ impl ExperimentBuffer {
                 .num_milliseconds() as u64;
             elapsed >= self.config.flush_interval_ms && self.total_points() > 0
         } else {
-            // Never flushed but has data - should flush
-            self.total_points() > 0
+            // Never flushed - don't auto-flush by time until first manual flush
+            // This prevents immediate auto-flush when first points are written
+            false
         }
     }
 

@@ -95,8 +95,10 @@ impl TimeSeriesBufferServiceImpl {
         buffer: &mut ExperimentBuffer,
         manual: bool,
     ) -> Result<FlushResult, TimeSeriesBufferError> {
+        eprintln!("[flush_internal] Entering flush_internal, manual={}", manual);
         // Check if flush is already in progress
         if buffer.is_flush_in_progress() {
+            eprintln!("[flush_internal] Flush already in progress, returning error");
             return Err(TimeSeriesBufferError::FlushInProgress);
         }
 
@@ -108,8 +110,11 @@ impl TimeSeriesBufferServiceImpl {
 
         // Take all points from all channels
         let all_points = buffer.take_all_points();
+        let points_count: usize = all_points.values().map(|v| v.len()).sum();
+        eprintln!("[flush_internal] Taking {} points from {} channels", points_count, all_points.len());
 
         if all_points.is_empty() || all_points.values().all(|v| v.is_empty()) {
+            eprintln!("[flush_internal] No points to flush, returning early");
             buffer.set_flushing(false);
             return Ok(FlushResult {
                 points_flushed: 0,
@@ -197,6 +202,7 @@ impl TimeSeriesBufferServiceImpl {
         // Mark as not flushing
         buffer.set_flushing(false);
 
+        eprintln!("[flush_internal] Flush complete, flushed {} points", total_points_flushed);
         Ok(FlushResult {
             points_flushed: total_points_flushed,
             flush_duration_ms: start.elapsed().as_millis() as u64,
@@ -209,15 +215,21 @@ impl TimeSeriesBufferServiceImpl {
         &self,
         buffer: &mut ExperimentBuffer,
     ) -> Result<(), TimeSeriesBufferError> {
+        let is_full = buffer.is_any_channel_full();
+        let should_flush_by_time = buffer.should_flush_by_time();
+        eprintln!("[check_and_auto_flush] Checking triggers - is_any_channel_full={}, should_flush_by_time={}", is_full, should_flush_by_time);
+
         // Check capacity trigger - any channel full triggers flush
-        if buffer.is_any_channel_full() {
+        if is_full {
+            eprintln!("[check_and_auto_flush] Capacity trigger activated!");
             tracing::debug!("Capacity trigger flush for buffer");
             self.flush_internal(buffer, false).await?;
             return Ok(());
         }
 
         // Check time trigger
-        if buffer.should_flush_by_time() {
+        if should_flush_by_time {
+            eprintln!("[check_and_auto_flush] Time trigger activated!");
             tracing::debug!("Time trigger flush for buffer");
             self.flush_internal(buffer, false).await?;
         }
@@ -263,6 +275,8 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         point: TimeSeriesPoint,
     ) -> Result<(), TimeSeriesBufferError> {
         self.validate_point(&point)?;
+        eprintln!("[write_point] Adding point to channel '{}' with timestamp {} and value {}", 
+            point.channel, point.timestamp, point.value);
 
         let buffers = self.buffers.read().await;
         
@@ -455,8 +469,8 @@ mod tests {
 
     #[async_trait]
     impl Hdf5Service for MockHdf5Service {
-        async fn create_file(&self, _path: PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
-            Ok(Hdf5File { path: PathBuf::from("/tmp/test.h5") })
+        async fn create_file(&self, path: PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
+            Ok(Hdf5File { path })
         }
 
         async fn open_file(&self, path: &PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
@@ -468,18 +482,33 @@ mod tests {
         }
 
         async fn create_group(&self, parent: &Hdf5Group, name: &str) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
+            let full_path = if parent.path == "/" {
+                format!("/{}", name)
+            } else {
+                format!("{}/{}", parent.path, name)
+            };
+
             Ok(Hdf5Group {
                 file_path: parent.file_path.clone(),
                 name: name.to_string(),
-                path: format!("{}/{}", parent.path, name),
+                path: full_path,
             })
         }
 
         async fn get_group(&self, file: &Hdf5File, path: &str) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
+            // Always succeed for any path - simulates that all groups exist
+            let normalized = if path.starts_with("/") {
+                path.to_string()
+            } else {
+                format!("/{}", path)
+            };
+            
+            let name = normalized.split('/').filter(|s| !s.is_empty()).last().unwrap_or("").to_string();
+            
             Ok(Hdf5Group {
                 file_path: file.path.clone(),
-                name: path.to_string(),
-                path: path.to_string(),
+                name,
+                path: normalized,
             })
         }
 
