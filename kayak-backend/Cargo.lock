@@ -626,6 +626,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "evalexpr"
+version = "10.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6cffb2e9992a43637801ac84ca58bdb5acb2a426ab88a1e3d343b96cfaa845c"
+
+[[package]]
 name = "event-listener"
 version = "2.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1437,6 +1443,7 @@ dependencies = [
  "chrono",
  "config",
  "dotenvy",
+ "evalexpr",
  "futures",
  "hdf5",
  "jsonwebtoken",

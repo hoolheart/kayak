@@ -19,6 +19,7 @@
 
 mod adapter;
 mod executor;
+mod expression;
 mod listener;
 mod step_engine;
 mod steps;
