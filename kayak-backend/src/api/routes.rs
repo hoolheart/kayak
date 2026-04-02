@@ -11,6 +11,7 @@ use axum::{
 
 use crate::api::handlers::device;
 use crate::api::handlers::experiment_control;
+use crate::api::handlers::experiment_ws;
 use crate::api::handlers::health;
 use crate::api::handlers::point;
 use crate::api::handlers::user;
@@ -31,6 +32,7 @@ use crate::db::repository::user_repo::UserRepository;
 use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
+use crate::services::experiment_control::ws_manager::ExperimentWsManager;
 use crate::services::experiment_control::ExperimentControlService;
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
@@ -43,7 +45,7 @@ fn create_device_manager() -> Arc<DeviceManager> {
 }
 
 /// 创建应用路由
-pub fn create_router(pool: DbPool) -> Router {
+pub fn create_router(pool: DbPool) -> Router<()> {
     // 创建基础组件
     let user_repo = UserRepository::new(pool.clone());
     let user_service_repo_adapter = Arc::new(UserServiceRepositoryAdapter::new(user_repo));
@@ -105,17 +107,35 @@ pub fn create_router(pool: DbPool) -> Router {
         device_manager.clone(),
     ));
 
+    // 创建WebSocket管理器（共享实例）
+    let ws_manager =
+        std::sync::Arc::new(crate::services::experiment_control::ExperimentWsManager::new());
+
     // 创建试验控制服务
     let experiment_repo = SqlxExperimentRepository::new(pool.clone());
     let method_repo = SqlxMethodRepository::new(pool.clone());
     let state_change_log_repo = SqlxStateChangeLogRepository::new(pool.clone());
-    let experiment_control_service: experiment_control::AppState = Arc::new(
-        ExperimentControlService::new(experiment_repo, method_repo, state_change_log_repo),
-    );
+    let experiment_control_service: Arc<
+        ExperimentControlService<
+            SqlxExperimentRepository,
+            SqlxMethodRepository,
+            SqlxStateChangeLogRepository,
+        >,
+    > = Arc::new(ExperimentControlService::with_ws_manager(
+        experiment_repo,
+        method_repo,
+        state_change_log_repo,
+        ws_manager.clone(),
+    ));
+
+    // 创建WebSocket状态（使用同一个ws_manager）
+    let ws_state = experiment_ws::AppState::with_ws_manager(ws_manager);
 
     Router::new()
         // 健康检查（最优先，无中间件限制）
-        .route("/health", get(health::health_check))
+        .merge(health_routes())
+        // WebSocket路由（使用自己的状态）
+        .merge(ws_routes(ws_state))
         // API路由
         .merge(auth_routes(auth_service))
         .merge(user_routes(user_service))
@@ -128,7 +148,7 @@ pub fn create_router(pool: DbPool) -> Router {
 }
 
 /// 认证路由组
-fn auth_routes<S>(auth_service: Arc<S>) -> Router
+fn auth_routes<S>(auth_service: Arc<S>) -> Router<()>
 where
     S: crate::auth::traits::AuthService + 'static,
 {
@@ -143,7 +163,7 @@ where
 }
 
 /// 用户路由组
-fn user_routes(user_service: Arc<dyn UserService>) -> Router {
+fn user_routes(user_service: Arc<dyn UserService>) -> Router<()> {
     Router::new().nest(
         "/api/v1/users",
         Router::new()
@@ -155,7 +175,7 @@ fn user_routes(user_service: Arc<dyn UserService>) -> Router {
 }
 
 /// 工作台路由组
-fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router {
+fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router<()> {
     Router::new().nest(
         "/api/v1/workbenches",
         Router::new()
@@ -169,7 +189,7 @@ fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router {
 }
 
 /// 设备路由组
-fn device_routes(device_service: Arc<dyn DeviceService>) -> Router {
+fn device_routes(device_service: Arc<dyn DeviceService>) -> Router<()> {
     Router::new().nest(
         "/api/v1",
         Router::new()
@@ -191,7 +211,7 @@ fn device_routes(device_service: Arc<dyn DeviceService>) -> Router {
 }
 
 /// 测点路由组
-fn point_routes(point_service: Arc<dyn PointService>) -> Router {
+fn point_routes(point_service: Arc<dyn PointService>) -> Router<()> {
     Router::new().nest(
         "/api/v1",
         Router::new()
@@ -220,7 +240,15 @@ pub use workbench::{
 };
 
 /// 试验控制路由组
-fn experiment_control_routes(experiment_control_service: experiment_control::AppState) -> Router {
+fn experiment_control_routes(
+    experiment_control_service: Arc<
+        ExperimentControlService<
+            SqlxExperimentRepository,
+            SqlxMethodRepository,
+            SqlxStateChangeLogRepository,
+        >,
+    >,
+) -> Router<()> {
     Router::new().nest(
         "/api/v1/experiments",
         Router::new()
@@ -235,7 +263,14 @@ fn experiment_control_routes(experiment_control_service: experiment_control::App
     )
 }
 
+/// WebSocket路由组
+fn ws_routes(ws_state: experiment_ws::AppState) -> Router<()> {
+    Router::new()
+        .route("/ws/experiments/{id}", get(experiment_ws::ws_handler))
+        .with_state(ws_state)
+}
+
 /// 获取健康检查路由（用于测试）
-pub fn health_routes() -> Router {
+pub fn health_routes() -> Router<()> {
     Router::new().route("/health", get(health::health_check))
 }

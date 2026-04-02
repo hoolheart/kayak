@@ -8,12 +8,17 @@
 
 use chrono::Utc;
 use serde::Serialize;
+use std::sync::Arc;
 use uuid::Uuid;
 
 use crate::db::repository::experiment_repo::{ExperimentRepository, ExperimentRepositoryError, MethodIdUpdate};
 use crate::db::repository::method_repo::MethodRepository;
 use crate::db::repository::state_change_log_repo::StateChangeLogRepository;
 use crate::state_machine::{StateMachine, StateMachineError, StateMachineOperation};
+
+pub mod ws_manager;
+
+pub use ws_manager::{ExperimentWsManager, WsMessage, broadcast_error, broadcast_status_change};
 
 /// Experiment control service error
 #[derive(Debug, thiserror::Error)]
@@ -153,6 +158,7 @@ where
     experiment_repo: ER,
     method_repo: MR,
     log_repo: LR,
+    ws_manager: Option<std::sync::Arc<ExperimentWsManager>>,
 }
 
 impl<ER, MR, LR> ExperimentControlService<ER, MR, LR>
@@ -166,6 +172,22 @@ where
             experiment_repo,
             method_repo,
             log_repo,
+            ws_manager: None,
+        }
+    }
+
+    /// Create a new service with WebSocket manager
+    pub fn with_ws_manager(
+        experiment_repo: ER,
+        method_repo: MR,
+        log_repo: LR,
+        ws_manager: std::sync::Arc<ExperimentWsManager>,
+    ) -> Self {
+        Self {
+            experiment_repo,
+            method_repo,
+            log_repo,
+            ws_manager: Some(ws_manager),
         }
     }
 
@@ -187,6 +209,27 @@ where
         }
 
         Ok(exp)
+    }
+
+    /// Broadcast status change if WebSocket manager is configured
+    fn broadcast_status_change(
+        &self,
+        experiment_id: Uuid,
+        old_status: &str,
+        new_status: &str,
+        operation: &str,
+        user_id: Uuid,
+    ) {
+        if let Some(ref manager) = self.ws_manager {
+            broadcast_status_change(Arc::clone(manager), experiment_id, old_status, new_status, operation, user_id);
+        }
+    }
+
+    /// Broadcast error if WebSocket manager is configured
+    fn broadcast_error(&self, experiment_id: Uuid, error: &str, code: u16) {
+        if let Some(ref manager) = self.ws_manager {
+            broadcast_error(Arc::clone(manager), experiment_id, error, code);
+        }
     }
 
     /// Load a method into the experiment (Idle -> Loaded)
@@ -226,6 +269,15 @@ where
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "load",
+            user_id,
+        );
+
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
 
@@ -264,6 +316,15 @@ where
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "start",
+            user_id,
+        );
+
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
 
@@ -294,6 +355,15 @@ where
         );
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
+
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "pause",
+            user_id,
+        );
 
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
@@ -326,6 +396,15 @@ where
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "resume",
+            user_id,
+        );
+
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
 
@@ -356,6 +435,15 @@ where
         );
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
+
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "stop",
+            user_id,
+        );
 
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
@@ -389,6 +477,15 @@ where
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "reset",
+            user_id,
+        );
+
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
 
@@ -421,6 +518,15 @@ where
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "complete",
+            user_id,
+        );
+
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
 
@@ -452,6 +558,15 @@ where
         );
         self.log_repo.record(&log).await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
+
+        // Broadcast status change via WebSocket
+        self.broadcast_status_change(
+            experiment_id,
+            &format!("{:?}", exp.status),
+            &format!("{:?}", new_status),
+            "abort",
+            user_id,
+        );
 
         Ok(ExperimentControlDto::from_experiment(&updated))
     }
