@@ -36,7 +36,7 @@ use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
 use crate::services::experiment_control::ws_manager::ExperimentWsManager;
 use crate::services::experiment_control::ExperimentControlService;
-use crate::services::method_service::MethodService;
+use crate::services::method_service::{MethodService, MethodServiceTrait};
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
@@ -135,9 +135,8 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     let ws_state = experiment_ws::AppState::with_ws_manager(ws_manager);
 
     // 创建方法服务
-    let method_repo_for_service = SqlxMethodRepository::new(pool.clone());
-    let method_service_impl = MethodService::new(method_repo_for_service);
-    let method_service: Arc<dyn method::MethodServiceTrait> =
+    let method_service_impl = MethodService::new(method_repo);
+    let method_service: Arc<dyn MethodServiceTrait> =
         Arc::new(MethodServiceAdapter::new(method_service_impl));
 
     Router::new()
@@ -250,16 +249,17 @@ pub use workbench::{
 };
 
 /// 方法路由组
-fn method_routes(method_service: Arc<dyn method::MethodServiceTrait>) -> Router<()> {
+fn method_routes(method_service: Arc<dyn MethodServiceTrait>) -> Router<()> {
     Router::new().nest(
         "/api/v1/methods",
         Router::new()
             .route("/", post(method::create_method))
             .route("/", get(method::list_methods))
+            // C1 fix: /validate must come before /{id} to avoid route matching conflict
+            .route("/validate", post(method::validate_method))
             .route("/{id}", get(method::get_method))
             .route("/{id}", put(method::update_method))
             .route("/{id}", delete(method::delete_method))
-            .route("/validate", post(method::validate_method))
             .with_state(method_service),
     )
 }

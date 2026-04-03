@@ -5,12 +5,14 @@
 use crate::db::repository::method_repo::MethodRepository;
 use crate::db::repository::method_error::MethodRepositoryError;
 use crate::models::dto::method_dto::{CreateMethodRequest, MethodDto, MethodListResponse, UpdateMethodRequest};
+use serde::Serialize;
 use uuid::Uuid;
 
 #[derive(Debug)]
 pub enum MethodServiceError {
     Validation(String),
     NotFound,
+    Forbidden,
     Repository(MethodRepositoryError),
 }
 
@@ -18,6 +20,41 @@ impl From<MethodRepositoryError> for MethodServiceError {
     fn from(err: MethodRepositoryError) -> Self {
         MethodServiceError::Repository(err)
     }
+}
+
+/// Validation result for method process definitions (M3 fix: defined in service layer)
+#[derive(Debug, Serialize)]
+pub struct ValidationResult {
+    pub valid: bool,
+    pub errors: Vec<String>,
+}
+
+/// Method service trait (for dependency injection)
+#[axum::async_trait]
+pub trait MethodServiceTrait: Send + Sync {
+    async fn create_method(
+        &self,
+        request: CreateMethodRequest,
+        user_id: Uuid,
+    ) -> Result<MethodDto, MethodServiceError>;
+    async fn get_method(&self, id: Uuid, user_id: Uuid) -> Result<MethodDto, MethodServiceError>;
+    async fn update_method(
+        &self,
+        id: Uuid,
+        request: UpdateMethodRequest,
+        user_id: Uuid,
+    ) -> Result<MethodDto, MethodServiceError>;
+    async fn delete_method(&self, id: Uuid, user_id: Uuid) -> Result<(), MethodServiceError>;
+    async fn list_methods(
+        &self,
+        user_id: Uuid,
+        page: i64,
+        size: i64,
+    ) -> Result<MethodListResponse, MethodServiceError>;
+    async fn validate_method(
+        &self,
+        process_definition: serde_json::Value,
+    ) -> Result<ValidationResult, MethodServiceError>;
 }
 
 pub struct MethodService<R: MethodRepository> {
@@ -53,26 +90,42 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(created.into())
     }
 
-    /// 获取方法
-    pub async fn get_method(&self, id: Uuid) -> Result<MethodDto, MethodServiceError> {
+    /// 获取方法 (C2 fix: with ownership check)
+    pub async fn get_method(&self, id: Uuid, user_id: Uuid) -> Result<MethodDto, MethodServiceError> {
         let method = self.repository.get_by_id(id).await?;
         match method {
-            Some(m) => Ok(m.into()),
+            Some(m) => {
+                if m.created_by != user_id {
+                    return Err(MethodServiceError::Forbidden);
+                }
+                Ok(m.into())
+            }
             None => Err(MethodServiceError::NotFound),
         }
     }
 
-    /// 更新方法
+    /// 更新方法 (C2 fix: with ownership check)
     pub async fn update_method(
         &self,
         id: Uuid,
         request: UpdateMethodRequest,
+        user_id: Uuid,
     ) -> Result<MethodDto, MethodServiceError> {
         // 验证请求
         if let Some(ref name) = request.name {
             if name.is_empty() || name.len() > 255 {
                 return Err(MethodServiceError::Validation("名称长度必须在1-255之间".to_string()));
             }
+        }
+
+        // Ownership check
+        let existing = self.repository.get_by_id(id).await?;
+        match existing {
+            Some(m) if m.created_by != user_id => {
+                return Err(MethodServiceError::Forbidden);
+            }
+            None => return Err(MethodServiceError::NotFound),
+            _ => {}
         }
 
         let updated = self.repository.update(
@@ -86,8 +139,18 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(updated.into())
     }
 
-    /// 删除方法
-    pub async fn delete_method(&self, id: Uuid) -> Result<(), MethodServiceError> {
+    /// 删除方法 (C2 fix: with ownership check)
+    pub async fn delete_method(&self, id: Uuid, user_id: Uuid) -> Result<(), MethodServiceError> {
+        // Ownership check
+        let existing = self.repository.get_by_id(id).await?;
+        match existing {
+            Some(m) if m.created_by != user_id => {
+                return Err(MethodServiceError::Forbidden);
+            }
+            None => return Err(MethodServiceError::NotFound),
+            _ => {}
+        }
+
         self.repository.delete(id).await?;
         Ok(())
     }
@@ -128,16 +191,16 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(())
     }
 
-    /// 验证过程定义
+    /// 验证过程定义 (M3 fix: returns service-layer ValidationResult)
     pub fn validate_process_definition(
         &self,
         process_definition: &serde_json::Value,
-    ) -> crate::api::handlers::method::ValidationResult {
+    ) -> ValidationResult {
         let mut errors = Vec::new();
 
         // 检查必须是对象
         if !process_definition.is_object() {
-            return crate::api::handlers::method::ValidationResult {
+            return ValidationResult {
                 valid: false,
                 errors: vec!["过程定义必须是JSON对象".to_string()],
             };
@@ -148,14 +211,14 @@ impl<R: MethodRepository> MethodService<R> {
             Some(serde_json::Value::Array(nodes)) => nodes,
             Some(_) => {
                 errors.push("'nodes'字段必须是数组".to_string());
-                return crate::api::handlers::method::ValidationResult {
+                return ValidationResult {
                     valid: false,
                     errors,
                 };
             }
             None => {
                 errors.push("缺少'nodes'字段".to_string());
-                return crate::api::handlers::method::ValidationResult {
+                return ValidationResult {
                     valid: false,
                     errors,
                 };
@@ -204,7 +267,7 @@ impl<R: MethodRepository> MethodService<R> {
             errors.push("缺少End节点".to_string());
         }
 
-        crate::api::handlers::method::ValidationResult {
+        ValidationResult {
             valid: errors.is_empty(),
             errors,
         }

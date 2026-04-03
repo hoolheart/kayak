@@ -29,6 +29,7 @@ pub trait MethodRepository: Send + Sync {
     ) -> Result<(Vec<Method>, i64), MethodRepositoryError>;
 }
 
+#[derive(Clone)]
 pub struct SqlxMethodRepository {
     pool: Pool<Sqlite>,
 }
