@@ -365,6 +365,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-012, S2-007 |
 | **验收标准** | 1. JSON编辑器可编辑过程定义<br>2. 参数表配置表单可用<br>3. 方法语法基础验证 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-03 |
+| **分支** | `feature/s2-012-method-management-page` |
+| **代码审查** | `log/release_0/review/S2-012_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-012_test_execution_report.md` |
 
 #### S2-013: 试验执行控制台页面
 | 字段 | 内容 |
@@ -374,6 +379,11 @@
 | **预估工时** | 12h |
 | **依赖任务** | S2-011, S2-012 |
 | **验收标准** | 1. 控制按钮根据状态启用/禁用<br>2. 实时日志显示执行过程<br>3. 参数配置可修改 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-03 |
+| **分支** | `feature/s2-013-experiment-console-page` |
+| **代码审查** | `log/release_0/review/S2-013_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-013_test_execution_report.md` |
 
 ---
 
