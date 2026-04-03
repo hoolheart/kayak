@@ -8,6 +8,15 @@ import 'dart:convert';
 
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+/// WebSocket connection states (C-04 fix)
+enum WsConnectionState {
+  disconnected,
+  connecting,
+  connected,
+  reconnecting,
+  failed,
+}
+
 /// WebSocket message types
 enum WsMessageType {
   statusChange,
@@ -77,10 +86,21 @@ class ExperimentWebSocketClient {
   final _errorController = StreamController<String>.broadcast();
   final _connectionController = StreamController<bool>.broadcast();
 
-  bool _isConnected = false;
+  // C-04 fix: Use WsConnectionState enum with exponential backoff and max retries
+  WsConnectionState _connectionState = WsConnectionState.disconnected;
+  int _reconnectAttempts = 0;
+  static const int _maxReconnectAttempts = 10;
+  static const int _baseDelaySeconds = 1;
+  static const int _maxDelaySeconds = 30;
+
   Timer? _reconnectTimer;
+  Timer? _heartbeatTimer;
   String? _wsUrl;
   String? _experimentId;
+
+  static const Duration _heartbeatInterval = Duration(seconds: 30);
+  static const Duration _heartbeatTimeout = Duration(seconds: 60);
+  DateTime? _lastPongReceived;
 
   /// Stream of raw messages
   Stream<Map<String, dynamic>> get messages => _messageController.stream;
@@ -94,48 +114,57 @@ class ExperimentWebSocketClient {
   /// Stream of errors
   Stream<String> get errors => _errorController.stream;
 
-  /// Stream of connection status
+  /// Stream of connection status (keeps backward compatibility - true if connected)
   Stream<bool> get connectionStatus => _connectionController.stream;
 
-  /// Whether the client is currently connected
-  bool get isConnected => _isConnected;
+  /// Current connection state (C-04 fix)
+  WsConnectionState get connectionState => _connectionState;
+
+  /// Whether the client is currently connected (backward compatibility)
+  bool get isConnected => _connectionState == WsConnectionState.connected;
 
   /// Connect to WebSocket server
   Future<void> connect(String url, {String? experimentId}) async {
     _wsUrl = url;
     _experimentId = experimentId;
+    _reconnectAttempts = 0;
     await _doConnect();
   }
 
   Future<void> _doConnect() async {
     if (_wsUrl == null) return;
 
+    _connectionState = WsConnectionState.connecting;
+    _notifyConnectionStatus();
+
     try {
       await _channel?.sink.close();
       _channel = WebSocketChannel.connect(Uri.parse(_wsUrl!));
-      _isConnected = true;
-      _connectionController.add(true);
+      _connectionState = WsConnectionState.connected;
+      _reconnectAttempts = 0; // Reset on successful connection
+      _notifyConnectionStatus();
+      _startHeartbeat();
 
       _channel!.stream.listen(
         (data) {
           _handleMessage(data);
         },
         onError: (error) {
-          _isConnected = false;
-          _connectionController.add(false);
+          _connectionState = WsConnectionState.reconnecting;
+          _notifyConnectionStatus();
           _errorController.add(error.toString());
           _scheduleReconnect();
         },
         onDone: () {
-          _isConnected = false;
-          _connectionController.add(false);
+          _connectionState = WsConnectionState.reconnecting;
+          _notifyConnectionStatus();
           _scheduleReconnect();
         },
         cancelOnError: false,
       );
     } catch (e) {
-      _isConnected = false;
-      _connectionController.add(false);
+      _connectionState = WsConnectionState.reconnecting;
+      _notifyConnectionStatus();
       _errorController.add(e.toString());
       _scheduleReconnect();
     }
@@ -152,9 +181,15 @@ class ExperimentWebSocketClient {
         return;
       }
 
+      // Handle pong response for heartbeat
+      final type = json['type'] as String? ?? '';
+      if (type == 'pong') {
+        _lastPongReceived = DateTime.now();
+        return;
+      }
+
       _messageController.add(json);
 
-      final type = json['type'] as String? ?? '';
       switch (type) {
         case 'status_change':
           _statusController.add(WsStatusChange.fromJson(json));
@@ -171,23 +206,81 @@ class ExperimentWebSocketClient {
     }
   }
 
+  /// C-04 fix: Exponential backoff reconnect with max attempts
   void _scheduleReconnect() {
+    // Check if max attempts reached
+    if (_reconnectAttempts >= _maxReconnectAttempts) {
+      _connectionState = WsConnectionState.failed;
+      _notifyConnectionStatus();
+      _errorController.add(
+          'WebSocket connection failed after $_maxReconnectAttempts attempts');
+      return;
+    }
+
     _reconnectTimer?.cancel();
-    _reconnectTimer = Timer(const Duration(seconds: 3), () {
-      if (_wsUrl != null) {
+
+    // Calculate delay with exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s (capped)
+    final delaySeconds = (_baseDelaySeconds * (1 << _reconnectAttempts))
+        .clamp(1, _maxDelaySeconds);
+    _reconnectAttempts++;
+
+    _connectionState = WsConnectionState.reconnecting;
+    _notifyConnectionStatus();
+
+    _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
+      if (_wsUrl != null && _connectionState != WsConnectionState.failed) {
         _doConnect();
       }
     });
+  }
+
+  /// C-04 fix: Heartbeat mechanism
+  void _startHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _lastPongReceived = DateTime.now();
+
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (timer) {
+      if (_connectionState != WsConnectionState.connected) {
+        timer.cancel();
+        return;
+      }
+
+      // Check if we received pong within timeout
+      if (_lastPongReceived != null) {
+        final elapsed = DateTime.now().difference(_lastPongReceived!);
+        if (elapsed > _heartbeatTimeout) {
+          // Connection is stale, force reconnect
+          _connectionState = WsConnectionState.reconnecting;
+          _notifyConnectionStatus();
+          _scheduleReconnect();
+          timer.cancel();
+          return;
+        }
+      }
+
+      // Send ping
+      try {
+        _channel?.sink.add(jsonEncode({'type': 'ping'}));
+      } catch (e) {
+        // Ignore send errors
+      }
+    });
+  }
+
+  void _notifyConnectionStatus() {
+    _connectionController.add(_connectionState == WsConnectionState.connected);
   }
 
   /// Disconnect from WebSocket server
   Future<void> disconnect() async {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     await _channel?.sink.close();
-    _isConnected = false;
+    _connectionState = WsConnectionState.disconnected;
     _channel = null;
-    _connectionController.add(false);
+    _notifyConnectionStatus();
   }
 
   /// Dispose all resources

@@ -78,17 +78,17 @@ class ExperimentConsoleState {
     );
   }
 
-  /// Whether the load button should be enabled
+  /// Whether the load button should be enabled (C-02 fix: allow idle, completed, aborted)
   bool get canLoad =>
       experiment != null &&
       selectedMethodId != null &&
-      (experiment!.status == ExperimentStatus.idle);
+      (experiment!.status == ExperimentStatus.idle ||
+          experiment!.status == ExperimentStatus.completed ||
+          experiment!.status == ExperimentStatus.aborted);
 
-  /// Whether the start button should be enabled
+  /// Whether the start button should be enabled (C-02 fix: only loaded, not paused)
   bool get canStart =>
-      experiment != null &&
-      (experiment!.status == ExperimentStatus.loaded ||
-          experiment!.status == ExperimentStatus.paused);
+      experiment != null && experiment!.status == ExperimentStatus.loaded;
 
   /// Whether the pause button should be enabled
   bool get canPause =>
@@ -135,8 +135,9 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     this._methodService,
   ) : super(const ExperimentConsoleState());
 
-  /// Initialize the console - load methods and create experiment
-  Future<void> initialize() async {
+  /// Initialize the console - load methods and optionally load/create experiment
+  /// C-05 fix: Accept optional experimentId to load existing experiment
+  Future<void> initialize({String? experimentId}) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
@@ -145,8 +146,15 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
           await _methodService.getMethods(page: 1, size: 100);
       final methods = methodsResponse.items;
 
-      // Create new experiment
-      final experiment = await _controlService.createExperiment();
+      // Load existing experiment or create new one
+      Experiment experiment;
+      if (experimentId != null) {
+        experiment = await _controlService.getExperimentStatus(experimentId);
+        _addLog('info', '已加载试验: ${experiment.name}');
+      } else {
+        experiment = await _controlService.createExperiment();
+        _addLog('info', '试验已创建: ${experiment.name}');
+      }
 
       state = state.copyWith(
         experiment: experiment,
@@ -154,9 +162,6 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         isLoading: false,
         error: null,
       );
-
-      // Add initial log
-      _addLog('info', '试验已创建: ${experiment.name}');
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -187,16 +192,18 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     state = state.copyWith(parameterValues: params);
   }
 
-  /// Load method into experiment
+  /// Load method into experiment (C-01 fix: now passes parameters)
   Future<void> loadExperiment() async {
     if (state.selectedMethodId == null || state.experiment == null) return;
 
     state = state.copyWith(isControlling: true, error: null);
 
     try {
+      // C-01 fix: pass parameter values to backend
       final experiment = await _controlService.loadExperiment(
         state.experiment!.id,
         state.selectedMethodId!,
+        state.parameterValues,
       );
 
       state = state.copyWith(experiment: experiment, isControlling: false);
@@ -305,8 +312,9 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
       ),
     );
 
+    // M-11 fix: Correct string interpolation syntax
     _addLog(
-        'info', '状态变更: ${_statusLabel(oldStatus)} -> $_statusLabel(status)');
+        'info', '状态变更: ${_statusLabel(oldStatus)} -> ${_statusLabel(status)}');
   }
 
   /// Handle WebSocket log entry

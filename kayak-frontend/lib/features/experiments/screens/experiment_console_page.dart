@@ -25,12 +25,17 @@ class ExperimentConsolePage extends ConsumerStatefulWidget {
 class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
   ExperimentWebSocketClient? _wsClient;
   final ScrollController _logScrollController = ScrollController();
+  // C-03 fix: Store TextEditingControllers in a map to manage lifecycle
+  final Map<String, TextEditingController> _parameterControllers = {};
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(experimentConsoleProvider.notifier).initialize();
+      // C-05 fix: Pass experimentId to initialize if provided
+      ref.read(experimentConsoleProvider.notifier).initialize(
+            experimentId: widget.experimentId,
+          );
       _setupWebSocket();
     });
   }
@@ -61,12 +66,21 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
         ref.read(experimentConsoleProvider.notifier).setWsConnected(connected);
       }
     });
+
+    // C-05 fix: Connect WebSocket with experiment ID if provided
+    // Note: WebSocket URL should include experiment ID for proper routing
+    // The actual connection is initiated by the provider when experiment is loaded
   }
 
   @override
   void dispose() {
     _wsClient?.dispose();
     _logScrollController.dispose();
+    // C-03 fix: Dispose all parameter controllers
+    for (final controller in _parameterControllers.values) {
+      controller.dispose();
+    }
+    _parameterControllers.clear();
     super.dispose();
   }
 
@@ -449,6 +463,24 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
     );
   }
 
+  // C-03 fix: Get or create controller for parameter
+  TextEditingController _getParameterController(
+      String name, dynamic currentValue) {
+    if (!_parameterControllers.containsKey(name)) {
+      _parameterControllers[name] = TextEditingController(
+        text: currentValue?.toString() ?? '',
+      );
+    } else {
+      // Update text if value changed externally
+      final controller = _parameterControllers[name]!;
+      final currentText = currentValue?.toString() ?? '';
+      if (controller.text != currentText) {
+        controller.text = currentText;
+      }
+    }
+    return _parameterControllers[name]!;
+  }
+
   Widget _buildParameterInput(
     BuildContext context,
     String name,
@@ -457,6 +489,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
     ExperimentConsoleState state,
   ) {
     final notifier = ref.read(experimentConsoleProvider.notifier);
+    final controller = _getParameterController(name, currentValue);
 
     switch (type) {
       case 'number':
@@ -468,9 +501,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           ),
-          controller: TextEditingController(
-            text: currentValue?.toString() ?? '',
-          ),
+          controller: controller,
           onChanged: (value) {
             final num = double.tryParse(value);
             if (num != null) {
@@ -487,9 +518,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           ),
-          controller: TextEditingController(
-            text: currentValue?.toString() ?? '',
-          ),
+          controller: controller,
           onChanged: (value) {
             final num = int.tryParse(value);
             if (num != null) {
@@ -513,9 +542,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
             border: OutlineInputBorder(),
             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           ),
-          controller: TextEditingController(
-            text: currentValue?.toString() ?? '',
-          ),
+          controller: controller,
           onChanged: (value) {
             notifier.updateParameter(name, value);
           },

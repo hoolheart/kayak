@@ -11,7 +11,9 @@ import '../models/experiment.dart';
 /// Experiment control service interface
 abstract class ExperimentControlServiceInterface {
   Future<Experiment> createExperiment();
-  Future<Experiment> loadExperiment(String experimentId, String methodId);
+  // C-01 fix: loadExperiment now accepts parameters map
+  Future<Experiment> loadExperiment(
+      String experimentId, String methodId, Map<String, dynamic> parameters);
   Future<Experiment> startExperiment(String experimentId);
   Future<Experiment> pauseExperiment(String experimentId);
   Future<Experiment> resumeExperiment(String experimentId);
@@ -33,12 +35,13 @@ class ExperimentControlService implements ExperimentControlServiceInterface {
     return Experiment.fromJson(data['data'] as Map<String, dynamic>);
   }
 
+  // C-01 fix: loadExperiment now passes parameters to backend
   @override
-  Future<Experiment> loadExperiment(
-      String experimentId, String methodId) async {
+  Future<Experiment> loadExperiment(String experimentId, String methodId,
+      Map<String, dynamic> parameters) async {
     final response = await _apiClient.post(
       '/api/v1/experiments/$experimentId/load',
-      data: {'method_id': methodId},
+      data: {'method_id': methodId, 'parameters': parameters},
     );
     final data = response as Map<String, dynamic>;
     return Experiment.fromJson(data['data'] as Map<String, dynamic>);

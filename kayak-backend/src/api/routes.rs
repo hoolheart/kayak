@@ -249,17 +249,17 @@ pub use workbench::{
     create_workbench, delete_workbench, get_workbench, list_workbenches, update_workbench,
 };
 
-/// 方法路由组
+/// 方法路由组 (C2 fix: /validate路由放在/{id}路由之前，避免路径匹配冲突)
 fn method_routes(method_service: Arc<dyn MethodServiceTrait>) -> Router<()> {
     Router::new().nest(
         "/api/v1/methods",
         Router::new()
             .route("/", post(method::create_method))
             .route("/", get(method::list_methods))
+            .route("/validate", post(method::validate_method))
             .route("/{id}", get(method::get_method))
             .route("/{id}", put(method::update_method))
             .route("/{id}", delete(method::delete_method))
-            .route("/validate", post(method::validate_method))
             .with_state(method_service),
     )
 }
