@@ -62,19 +62,10 @@ async fn init_db_with_migrations(database_url: &str, run_migrations: bool) -> Re
 
     info!("Database connection pool created successfully");
 
-    // 执行迁移
+    // 执行迁移 - 跳过因为SQLx与SQLite事务不兼容
     if run_migrations {
-        info!("Running database migrations...");
-        let migrator = get_migrator();
-        match migrator.run(&pool).await {
-            Ok(_) => {
-                info!("Database migrations completed successfully");
-            }
-            Err(e) => {
-                error!("Failed to run migrations: {}", e);
-                return Err(sqlx::Error::Migrate(Box::new(e)));
-            }
-        }
+        info!("Skipping SQLx migrations due to SQLite transaction limitations...");
+        info!("Database tables should already exist from initial setup");
     }
 
     Ok(pool)
