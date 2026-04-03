@@ -211,6 +211,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-013, S1-017 |
 | **验收标准** | 1. 实现PRD 2.1.4中的设备、测点相关API<br>2. 读取虚拟设备测点返回模拟数据<br>3. 设备支持嵌套创建 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-23 |
+| **分支** | `feature/S1-018-device-point-crud` |
+| **代码审查** | `log/release_0/review/S1-018_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-018_test_execution_report.md` |
 
 #### S1-019: 设备与测点管理UI
 | 字段 | 内容 |
@@ -220,9 +225,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-015, S1-018 |
 | **验收标准** | 1. 树形结构展示设备层级<br>2. 创建设备时协议选择"Virtual"<br>3. 测点值实时显示(定时刷新) |
-| **状态** | 🔄 进行中 |
-| **当前阶段** | 实现完成，待代码审查 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-24 |
 | **分支** | `feature/S1-019-device-point-management-ui` |
+| **代码审查** | `log/release_0/review/S1-019_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-019_test_execution_report.md` |
 
 #### S1-020: Sprint 1集成测试与Bug修复
 | 字段 | 内容 |
@@ -446,6 +453,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-007, S2-014 |
 | **验收标准** | 1. 桌面应用可打包运行<br>2. Docker镜像可构建和运行<br>3. 提供docker-compose.yml |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-04 |
+| **分支** | `feature/S2-019-deployment-config` |
+| **代码审查** | `log/release_0/review/S2-019_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-019_test_execution_report.md` |
 
 #### S2-020: 项目文档与Release 0交付
 | 字段 | 内容 |
@@ -455,6 +467,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S2-001 ~ S2-019 |
 | **验收标准** | 1. API文档完整准确<br>2. 用户手册包含截图<br>3. 项目可编译无错误 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-04 |
+| **分支** | `feature/S2-020-documentation` |
+| **代码审查** | `log/release_0/review/S2-020_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-020_test_execution_report.md` |
 
 ---
 
