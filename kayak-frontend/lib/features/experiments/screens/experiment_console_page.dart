@@ -38,6 +38,10 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   // m-02 fix: Animation controller for RUNNING state pulse effect
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+  // BUG-006/007 fix: Track scroll position for auto-scroll and new logs indicator
+  bool _userScrolledAwayFromBottom = false;
+  bool _newLogsAvailable = false;
+  int _lastLogCount = 0;
 
   @override
   void initState() {
@@ -52,6 +56,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
     );
     _pulseController.repeat(reverse: true);
 
+    // BUG-006/007 fix: Add scroll listener to detect user scrolling
+    _logScrollController.addListener(_onLogScroll);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // C-05 fix: Pass experimentId to initialize if provided
       ref.read(experimentConsoleProvider.notifier).initialize(
@@ -59,6 +66,42 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
           );
       _setupWebSocket();
     });
+  }
+
+  // BUG-006/007 fix: Handle scroll to detect if user scrolled away from bottom
+  void _onLogScroll() {
+    if (!_logScrollController.hasClients) return;
+
+    final maxScroll = _logScrollController.position.maxScrollExtent;
+    final currentScroll = _logScrollController.position.pixels;
+    final isAtBottom = (maxScroll - currentScroll) < 50; // 50px threshold
+
+    if (isAtBottom && _userScrolledAwayFromBottom) {
+      // User scrolled back to bottom - clear indicator and auto-scroll
+      setState(() {
+        _userScrolledAwayFromBottom = false;
+        _newLogsAvailable = false;
+      });
+    } else if (!isAtBottom && !_userScrolledAwayFromBottom) {
+      setState(() {
+        _userScrolledAwayFromBottom = true;
+      });
+    }
+  }
+
+  // BUG-006/007 fix: Scroll to bottom and clear indicator
+  void _scrollToBottom() {
+    if (_logScrollController.hasClients) {
+      _logScrollController.animateTo(
+        _logScrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+      setState(() {
+        _userScrolledAwayFromBottom = false;
+        _newLogsAvailable = false;
+      });
+    }
   }
 
   void _setupWebSocket() {
@@ -784,6 +827,22 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   Widget _buildLogOutput(BuildContext context, ExperimentConsoleState state) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    // BUG-006/007 fix: Auto-scroll when new logs arrive if user is at bottom
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (state.logs.length > _lastLogCount) {
+        _lastLogCount = state.logs.length;
+        if (!_userScrolledAwayFromBottom) {
+          // User is at bottom - auto-scroll to new log
+          _scrollToBottom();
+        } else {
+          // User scrolled away - show indicator
+          setState(() {
+            _newLogsAvailable = true;
+          });
+        }
+      }
+    });
+
     return Column(
       children: [
         // Log header
@@ -815,18 +874,42 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
         ),
         // Log content
         Expanded(
-          child: Container(
-            color: colorScheme.surfaceContainerLowest,
-            child: ListView.builder(
-              key: const Key('log_list'),
-              controller: _logScrollController,
-              padding: const EdgeInsets.all(8),
-              itemCount: state.logs.length,
-              itemBuilder: (context, index) {
-                final log = state.logs[index];
-                return _buildLogEntry(context, log);
-              },
-            ),
+          child: Stack(
+            children: [
+              Container(
+                color: colorScheme.surfaceContainerLowest,
+                child: ListView.builder(
+                  key: const Key('log_list'),
+                  controller: _logScrollController,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: state.logs.length,
+                  itemBuilder: (context, index) {
+                    final log = state.logs[index];
+                    return _buildLogEntry(context, log);
+                  },
+                ),
+              ),
+              // BUG-007 fix: Show "new logs available" indicator when user scrolled away
+              if (_newLogsAvailable)
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: FilledButton.tonal(
+                      onPressed: _scrollToBottom,
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.arrow_downward, size: 16),
+                          SizedBox(width: 4),
+                          Text('新日志'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ],

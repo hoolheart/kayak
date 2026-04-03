@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment.dart';
-import 'package:kayak_frontend/features/experiments/models/experiment_list_state.dart';
 import 'package:kayak_frontend/features/experiments/providers/experiment_list_provider.dart';
 import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
 
@@ -53,11 +52,9 @@ PagedExperimentResponse createPagedResponse({
 
 void main() {
   group('ExperimentListNotifier', () {
-    late MockExperimentService mockService;
     late ProviderContainer container;
 
     setUp(() {
-      mockService = MockExperimentService();
       container = ProviderContainer();
     });
 
@@ -315,7 +312,6 @@ void main() {
     group('刷新功能', () {
       test('refresh重新加载第一页', () async {
         final mockService = MockExperimentService();
-        var callCount = 0;
         when(() => mockService.getExperiments(
               page: any(named: 'page'),
               size: any(named: 'size'),
@@ -323,7 +319,6 @@ void main() {
               startedAfter: any(named: 'startedAfter'),
               startedBefore: any(named: 'startedBefore'),
             )).thenAnswer((invocation) async {
-          callCount++;
           final page = invocation.namedArguments[const Symbol('page')] as int;
           return createPagedResponse(
             items: [createTestExperiment(name: 'Page $page')],

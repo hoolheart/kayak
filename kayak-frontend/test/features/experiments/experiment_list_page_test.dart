@@ -9,7 +9,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment.dart';
 import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
 import 'package:kayak_frontend/features/experiments/screens/experiment_list_page.dart';
-import 'package:kayak_frontend/features/experiments/providers/experiment_list_provider.dart';
 
 class MockExperimentService extends Mock
     implements ExperimentServiceInterface {}
