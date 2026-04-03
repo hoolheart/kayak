@@ -126,7 +126,7 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         >,
     > = Arc::new(ExperimentControlService::with_ws_manager(
         experiment_repo,
-        method_repo,
+        method_repo.clone(),
         state_change_log_repo,
         ws_manager.clone(),
     ));

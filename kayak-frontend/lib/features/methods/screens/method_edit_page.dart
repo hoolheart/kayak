@@ -30,10 +30,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   final _paramUnitController = TextEditingController();
   final _paramDescController = TextEditingController();
 
-  // ignore: unused_field
-  bool _isEditingParameter = false;
-  // ignore: unused_field
-  String? _editingParamName; // Reserved for future use
+  // C4 fix: Track if controllers have been initialized
+  bool _controllersInitialized = false;
 
   @override
   void initState() {
@@ -63,17 +61,11 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     final state = ref.watch(methodEditProvider);
     final isCreateMode = widget.methodId == null;
 
-    // Sync controllers with state
-    if (_nameController.text != state.name) {
+    // C4 fix: Only sync controllers once when data is loaded, not on every build
+    if (!_controllersInitialized && state.isLoaded) {
+      _controllersInitialized = true;
       _nameController.text = state.name;
-      _nameController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _nameController.text.length),
-      );
-    }
-    if (_descriptionController.text != (state.description ?? '')) {
       _descriptionController.text = state.description ?? '';
-    }
-    if (_jsonController.text != state.processDefinitionJson) {
       _jsonController.text = state.processDefinitionJson;
     }
 
@@ -276,7 +268,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
             const Spacer(),
             FilledButton.icon(
               onPressed: () {
-                ref.read(methodEditProvider.notifier).addParameter();
+                // C3 fix: Don't pre-create a placeholder, just show dialog
+                // The parameter will be added via addParameterWithConfig when dialog confirms
                 _showParameterDialog(context, null, null);
               },
               icon: const Icon(Icons.add, size: 18),
@@ -559,11 +552,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                 if (existingName != null) {
                   notifier.updateParameter(existingName, param);
                 } else {
-                  // For new params, we need to add it manually since addParameter already created one
-                  final params =
-                      Map<String, ParameterConfig>.from(state.parameters);
-                  params[name] = param;
-                  // Use the notifier's internal state update
+                  // C3 fix: Actually add the new parameter via notifier
+                  notifier.addParameterWithConfig(param);
                 }
 
                 Navigator.of(context).pop();

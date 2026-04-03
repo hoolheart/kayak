@@ -97,14 +97,14 @@ class MethodListResponse {
   });
 
   factory MethodListResponse.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
+    // C1 fix: Accept unwrapped data (service extracts ['data'] before calling)
     return MethodListResponse(
-      items: (data['items'] as List<dynamic>)
+      items: (json['items'] as List<dynamic>)
           .map((e) => Method.fromJson(e as Map<String, dynamic>))
           .toList(),
-      total: data['total'] as int,
-      page: data['page'] as int,
-      size: data['size'] as int,
+      total: json['total'] as int,
+      page: json['page'] as int,
+      size: json['size'] as int,
     );
   }
 }
@@ -120,11 +120,11 @@ class ValidationResult {
   });
 
   factory ValidationResult.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
+    // C2 fix: Accept unwrapped data (service extracts ['data'] before calling)
     return ValidationResult(
-      valid: data['valid'] as bool,
+      valid: json['valid'] as bool,
       errors:
-          (data['errors'] as List<dynamic>).map((e) => e as String).toList(),
+          (json['errors'] as List<dynamic>).map((e) => e as String).toList(),
     );
   }
 }

@@ -42,7 +42,9 @@ class MethodService implements MethodServiceInterface {
       '/api/v1/methods',
       queryParameters: {'page': page, 'size': size},
     );
-    return MethodListResponse.fromJson(response as Map<String, dynamic>);
+    final data = response as Map<String, dynamic>;
+    // C1 fix: Extract data key consistently with other methods
+    return MethodListResponse.fromJson(data['data'] as Map<String, dynamic>);
   }
 
   @override
