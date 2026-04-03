@@ -4,7 +4,6 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/experiment.dart';
 import '../models/experiment_detail_state.dart';
 import '../services/experiment_service.dart';
 

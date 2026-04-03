@@ -6,8 +6,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/router/app_router.dart';
-import '../models/experiment.dart';
 import '../providers/experiment_list_provider.dart';
 import '../widgets/experiment_filter_bar.dart';
 import '../widgets/experiment_data_table.dart';
@@ -187,7 +185,7 @@ class _ExperimentListPageState extends ConsumerState<ExperimentListPage> {
           Icon(
             Icons.science_outlined,
             size: 64,
-            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -200,7 +198,7 @@ class _ExperimentListPageState extends ConsumerState<ExperimentListPage> {
           Text(
             '开始一个新试验来查看数据',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                 ),
           ),
         ],

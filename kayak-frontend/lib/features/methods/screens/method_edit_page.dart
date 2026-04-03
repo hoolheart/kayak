@@ -325,7 +325,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
           ...state.parameters.entries.map((entry) {
             final param = entry.value;
             return _buildParameterCard(context, entry.key, param, state);
-          }).toList(),
+          }),
       ],
     );
   }
@@ -450,7 +450,6 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   void _showParameterDialog(BuildContext context, String? existingName,
       ParameterConfig? existingParam) {
     final notifier = ref.read(methodEditProvider.notifier);
-    final state = ref.read(methodEditProvider);
 
     _paramNameController.text = existingName ?? '';
     _paramTypeController.text = existingParam?.type ?? 'number';

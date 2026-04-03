@@ -7,7 +7,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/router/app_router.dart';
 import '../../models/experiment.dart';
 import '../../models/experiment_detail_state.dart';
 import '../../providers/experiment_detail_provider.dart';
@@ -43,7 +42,6 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(experimentDetailProvider);
-    final colorScheme = Theme.of(context).colorScheme;
 
     // Auto-load history after experiment is loaded
     if (state.experiment != null && !_historyAutoLoaded) {
@@ -347,8 +345,10 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
           Icon(
             Icons.show_chart,
             size: 64,
-            color:
-                Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurfaceVariant
+                .withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -364,7 +364,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
                   color: Theme.of(context)
                       .colorScheme
                       .onSurfaceVariant
-                      .withOpacity(0.7),
+                      .withValues(alpha: 0.7),
                 ),
           ),
         ],

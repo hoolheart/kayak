@@ -243,13 +243,13 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         // Check min/max constraints
         if (schema.containsKey('min')) {
           final min = (schema['min'] as num).toDouble();
-          if ((value as num).toDouble() < min) {
+          if (value.toDouble() < min) {
             return '最小值为$min';
           }
         }
         if (schema.containsKey('max')) {
           final max = (schema['max'] as num).toDouble();
-          if ((value as num).toDouble() > max) {
+          if (value.toDouble() > max) {
             return '最大值为$max';
           }
         }

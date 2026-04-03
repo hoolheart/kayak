@@ -96,7 +96,6 @@ class ExperimentWebSocketClient {
   Timer? _reconnectTimer;
   Timer? _heartbeatTimer;
   String? _wsUrl;
-  String? _experimentId;
 
   static const Duration _heartbeatInterval = Duration(seconds: 30);
   static const Duration _heartbeatTimeout = Duration(seconds: 60);
@@ -126,7 +125,6 @@ class ExperimentWebSocketClient {
   /// Connect to WebSocket server
   Future<void> connect(String url, {String? experimentId}) async {
     _wsUrl = url;
-    _experimentId = experimentId;
     _reconnectAttempts = 0;
     await _doConnect();
   }
