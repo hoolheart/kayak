@@ -115,6 +115,7 @@ pub async fn create_method(
         .await
         .map_err(method_error_to_app_error)?;
 
+    // C1 fix: Return 201 for creation
     Ok(Json(ApiResponse::created(result)))
 }
 
@@ -141,7 +142,7 @@ pub async fn list_methods(
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Get method detail handler (C2 fix: passes user_id for ownership check)
+/// Get method detail handler (M1/M2 fix: passes user_id for ownership check)
 ///
 /// GET /api/v1/methods/{id}
 pub async fn get_method(
@@ -157,7 +158,7 @@ pub async fn get_method(
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Update method handler (C2 fix: passes user_id for ownership check)
+/// Update method handler (M1 fix: passes user_id for ownership check)
 ///
 /// PUT /api/v1/methods/{id}
 pub async fn update_method(
@@ -174,7 +175,7 @@ pub async fn update_method(
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Delete method handler (C2 fix: passes user_id for ownership check)
+/// Delete method handler (M1 fix: passes user_id for ownership check)
 ///
 /// DELETE /api/v1/methods/{id}
 pub async fn delete_method(
@@ -213,7 +214,7 @@ fn method_error_to_app_error(err: MethodServiceError) -> AppError {
         MethodServiceError::Validation(msg) => AppError::BadRequest(msg),
         MethodServiceError::Forbidden => AppError::Forbidden("无权操作此方法".to_string()),
         MethodServiceError::Repository(repo_err) => {
-            tracing::error!("Method repository error: {:?}", repo_err);
+            tracing::error!("Method repository error: {}", repo_err);
             AppError::InternalError("数据库操作失败".to_string())
         }
     }
@@ -281,7 +282,6 @@ mod tests {
     #[test]
     fn test_list_methods_query_negative_page() {
         let query = ListMethodsQuery { page: -1, size: 10 };
-        // Handler logic should clamp to 1
         let page = if query.page < 1 { 1 } else { query.page };
         assert_eq!(page, 1);
     }

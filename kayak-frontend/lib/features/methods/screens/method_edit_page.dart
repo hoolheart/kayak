@@ -30,8 +30,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   final _paramUnitController = TextEditingController();
   final _paramDescController = TextEditingController();
 
-  // C4 fix: Track if controllers have been initialized
-  bool _controllersInitialized = false;
+  // C5 fix: Track last shown error to prevent snackbar loop
+  String? _lastShownError;
 
   @override
   void initState() {
@@ -61,11 +61,17 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     final state = ref.watch(methodEditProvider);
     final isCreateMode = widget.methodId == null;
 
-    // C4 fix: Only sync controllers once when data is loaded, not on every build
-    if (!_controllersInitialized && state.isLoaded) {
-      _controllersInitialized = true;
+    // Sync controllers with state
+    if (_nameController.text != state.name) {
       _nameController.text = state.name;
+      _nameController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _nameController.text.length),
+      );
+    }
+    if (_descriptionController.text != (state.description ?? '')) {
       _descriptionController.text = state.description ?? '';
+    }
+    if (_jsonController.text != state.processDefinitionJson) {
       _jsonController.text = state.processDefinitionJson;
     }
 
@@ -115,25 +121,28 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   }
 
   Widget _buildErrorBanner(BuildContext context, String error) {
-    // Show error as a snackbar
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            action: SnackBarAction(
-              label: '关闭',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                ref.read(methodEditProvider.notifier).clearError();
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
+    // C5 fix: Only show snackbar once per error (not on every rebuild)
+    if (error != _lastShownError) {
+      _lastShownError = error;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              action: SnackBarAction(
+                label: '关闭',
+                textColor: Theme.of(context).colorScheme.onErrorContainer,
+                onPressed: () {
+                  ref.read(methodEditProvider.notifier).clearError();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+              ),
             ),
-          ),
-        );
-      }
-    });
+          );
+        }
+      });
+    }
     return _buildContent(context, ref.watch(methodEditProvider));
   }
 
@@ -268,8 +277,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
             const Spacer(),
             FilledButton.icon(
               onPressed: () {
-                // C3 fix: Don't pre-create a placeholder, just show dialog
-                // The parameter will be added via addParameterWithConfig when dialog confirms
+                // C4 fix: Don't pre-create placeholder, just show dialog
+                // Parameter will be added via addParameterWithConfig when dialog confirms
                 _showParameterDialog(context, null, null);
               },
               icon: const Icon(Icons.add, size: 18),
@@ -552,7 +561,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                 if (existingName != null) {
                   notifier.updateParameter(existingName, param);
                 } else {
-                  // C3 fix: Actually add the new parameter via notifier
+                  // C4 fix: Actually save the new parameter via notifier
                   notifier.addParameterWithConfig(param);
                 }
 

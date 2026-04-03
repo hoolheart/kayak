@@ -22,14 +22,14 @@ impl From<MethodRepositoryError> for MethodServiceError {
     }
 }
 
-/// Validation result for method process definitions (M3 fix: defined in service layer)
+/// Validation result for method process definitions (C3 fix: defined in service layer, not handler)
 #[derive(Debug, Serialize)]
 pub struct ValidationResult {
     pub valid: bool,
     pub errors: Vec<String>,
 }
 
-/// Method service trait (for dependency injection)
+/// Method service trait (M4 fix: defined in service layer, not handler)
 #[axum::async_trait]
 pub trait MethodServiceTrait: Send + Sync {
     async fn create_method(
@@ -90,7 +90,7 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(created.into())
     }
 
-    /// 获取方法 (C2 fix: with ownership check)
+    /// 获取方法 (M1/M2 fix: with ownership check)
     pub async fn get_method(&self, id: Uuid, user_id: Uuid) -> Result<MethodDto, MethodServiceError> {
         let method = self.repository.get_by_id(id).await?;
         match method {
@@ -104,7 +104,7 @@ impl<R: MethodRepository> MethodService<R> {
         }
     }
 
-    /// 更新方法 (C2 fix: with ownership check)
+    /// 更新方法 (M1 fix: with ownership check)
     pub async fn update_method(
         &self,
         id: Uuid,
@@ -139,7 +139,7 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(updated.into())
     }
 
-    /// 删除方法 (C2 fix: with ownership check)
+    /// 删除方法 (M1 fix: with ownership check)
     pub async fn delete_method(&self, id: Uuid, user_id: Uuid) -> Result<(), MethodServiceError> {
         // Ownership check
         let existing = self.repository.get_by_id(id).await?;
@@ -191,7 +191,7 @@ impl<R: MethodRepository> MethodService<R> {
         Ok(())
     }
 
-    /// 验证过程定义 (M3 fix: returns service-layer ValidationResult)
+    /// 验证过程定义 (C3 fix: returns service-layer ValidationResult)
     pub fn validate_process_definition(
         &self,
         process_definition: &serde_json::Value,

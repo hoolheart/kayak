@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/experiments/screens/experiment_list_page.dart';
+import '../../features/experiments/screens/experiment_console_page.dart';
 import '../../features/methods/screens/method_list_page.dart';
 import '../../features/methods/screens/method_edit_page.dart';
 import '../../screens/dashboard/dashboard_screen.dart';
@@ -210,6 +211,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/experiments',
             builder: (context, state) => const ExperimentListPage(),
+          ),
+          GoRoute(
+            path: '/experiments/console',
+            builder: (context, state) => const ExperimentConsolePage(),
+          ),
+          GoRoute(
+            path: '/experiments/:id/console',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return ExperimentConsolePage(experimentId: id);
+            },
           ),
           // 方法
           GoRoute(

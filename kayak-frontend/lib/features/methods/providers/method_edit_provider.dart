@@ -155,7 +155,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
     state = state.copyWith(parameters: params, isDirty: true);
   }
 
-  /// C3 fix: Add parameter with user-specified config (from dialog)
+  /// C4 fix: Add parameter with user-specified config (from dialog)
   void addParameterWithConfig(ParameterConfig param) {
     final params = Map<String, ParameterConfig>.from(state.parameters);
     params[param.name] = param;

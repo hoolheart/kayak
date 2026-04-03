@@ -166,6 +166,10 @@ class ExperimentDataTable extends StatelessWidget {
         backgroundColor = Colors.grey.shade200;
         textColor = Colors.grey.shade700;
         break;
+      case ExperimentStatus.loaded:
+        backgroundColor = Colors.blue.shade100;
+        textColor = Colors.blue.shade700;
+        break;
       case ExperimentStatus.running:
         backgroundColor = Colors.green.shade100;
         textColor = Colors.green.shade700;
@@ -175,8 +179,8 @@ class ExperimentDataTable extends StatelessWidget {
         textColor = Colors.orange.shade700;
         break;
       case ExperimentStatus.completed:
-        backgroundColor = Colors.blue.shade100;
-        textColor = Colors.blue.shade700;
+        backgroundColor = Colors.teal.shade100;
+        textColor = Colors.teal.shade700;
         break;
       case ExperimentStatus.aborted:
         backgroundColor = Colors.red.shade100;
@@ -226,6 +230,8 @@ class ExperimentDataTable extends StatelessWidget {
     switch (status) {
       case ExperimentStatus.idle:
         return '空闲';
+      case ExperimentStatus.loaded:
+        return '已载入';
       case ExperimentStatus.running:
         return '运行中';
       case ExperimentStatus.paused:
