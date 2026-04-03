@@ -28,6 +28,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | 无 |
 | **验收标准** | 1. 项目可编译通过 `cargo build` 无错误<br>2. 启动后能响应健康检查接口 `GET /health`<br>3. 日志输出格式规范，包含时间戳和级别 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-001-rust-backend-init` |
+| **代码审查** | `log/release_0/review/S1-001_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-001_execution_report.md` |
 
 #### S1-002: Flutter前端工程初始化
 | 字段 | 内容 |
@@ -37,6 +42,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | 无 |
 | **验收标准** | 1. `flutter run` 在桌面端正常启动<br>2. 显示Material Design 3风格的默认界面<br>3. 浅色/深色主题切换功能可用 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-002-flutter-frontend-init` |
+| **代码审查** | `log/release_0/review/S1-002_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-002_execution_report.md` |
 
 #### S1-003: SQLite数据库Schema设计
 | 字段 | 内容 |
@@ -46,6 +56,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S1-001 |
 | **验收标准** | 1. 所有表结构通过sqlx migrate创建成功<br>2. 提供完整的ER图文档<br>3. 每个表包含创建时间、更新时间字段 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-003-sqlite-schema` |
+| **代码审查** | `log/release_0/review/S1-003_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-003_execution_report.md` |
 
 #### S1-004: API路由与错误处理框架
 | 字段 | 内容 |
@@ -55,6 +70,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S1-001 |
 | **验收标准** | 1. 所有API返回统一JSON格式 `{code, message, data}`<br>2. 错误响应包含标准错误码<br>3. 请求参数验证失败返回400错误 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-004-api-routing` |
+| **代码审查** | `log/release_0/review/S1-004_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-004_execution_report.md` |
 
 #### S1-005: 后端单元测试框架搭建
 | 字段 | 内容 |
@@ -64,6 +84,11 @@
 | **预估工时** | 4h |
 | **依赖任务** | S1-001, S1-003 |
 | **验收标准** | 1. `cargo test` 执行所有测试<br>2. 提供测试覆盖率报告<br>3. 包含至少一个示例API测试用例 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-005-backend-testing` |
+| **代码审查** | `log/release_0/review/S1-005_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-005_execution_report.md` |
 
 #### S1-006: Flutter Widget测试框架搭建
 | 字段 | 内容 |
@@ -73,6 +98,11 @@
 | **预估工时** | 4h |
 | **依赖任务** | S1-002 |
 | **验收标准** | 1. `flutter test` 执行通过<br>2. 包含至少一个Widget测试示例<br>3. Golden测试配置完成 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-006-flutter-widget-testing` |
+| **代码审查** | `log/release_0/review/S1-006_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-006_execution_report.md` |
 
 #### S1-007: CI/CD流水线配置
 | 字段 | 内容 |
@@ -82,6 +112,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-001, S1-002, S1-005, S1-006 |
 | **验收标准** | 1. PR提交自动触发CI检查<br>2. CI失败阻止合并<br>3. 构建产物可下载 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-18 |
+| **分支** | `feature/S1-007-ci-cd-pipeline` |
+| **代码审查** | `log/release_0/review/S1-007_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-007_execution_report.md` |
 
 ---
 
@@ -95,6 +130,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-003, S1-004 |
 | **验收标准** | 1. POST /api/v1/auth/register 成功创建用户<br>2. POST /api/v1/auth/login 返回JWT Token<br>3. 密码不以明文存储 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-19 |
+| **分支** | `feature/S1-008-user-auth-api` |
+| **代码审查** | `log/release_0/review/S1-008_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-008_execution_report.md` |
 
 #### S1-009: JWT认证中间件
 | 字段 | 内容 |
@@ -104,6 +144,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S1-008 |
 | **验收标准** | 1. 受保护API需要有效Token才能访问<br>2. Token过期返回401错误<br>3. 无效Token返回401错误 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-19 |
+| **分支** | `feature/S1-009-jwt-auth-middleware` |
+| **代码审查** | `log/release_0/review/S1-009_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-009_execution_report.md` |
 
 #### S1-010: 用户个人信息管理API
 | 字段 | 内容 |
@@ -113,6 +158,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S1-009 |
 | **验收标准** | 1. GET /api/v1/users/me 返回当前用户信息<br>2. PUT /api/v1/users/me 更新用户信息<br>3. POST /api/v1/users/me/password 修改密码需要验证旧密码 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-19 |
+| **分支** | `feature/S1-010-user-profile-api` |
+| **代码审查** | `log/release_0/review/S1-010_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-010_execution_report.md` |
 
 #### S1-011: 登录页面UI实现
 | 字段 | 内容 |
@@ -122,6 +172,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-002, S1-008 |
 | **验收标准** | 1. 界面符合Material Design 3规范<br>2. 表单验证即时反馈<br>3. 登录成功跳转首页 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-20 |
+| **分支** | `feature/S1-011-login-page-ui` |
+| **代码审查** | `log/release_0/review/S1-011_code_review.md` |
+| **测试报告** | `log/release_0/test/S1-011_execution_report.md` |
 
 #### S1-012: 认证状态管理与路由守卫
 | 字段 | 内容 |
@@ -257,6 +312,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-001 |
 | **验收标准** | 1. 可创建HDF5文件<br>2. 支持写入时序数据集<br>3. 支持读取数据集元信息 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-26 |
+| **分支** | `feature/S2-001-hdf5-implementation` |
+| **代码审查** | `log/release_0/review/S2-001_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-001_execution_report.md` |
 
 #### S2-002: 试验数据模型与元信息管理
 | 字段 | 内容 |
@@ -266,6 +326,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S1-003 |
 | **验收标准** | 1. 试验记录包含完整元信息<br>2. 试验状态流转正确<br>3. 数据文件元信息表记录HDF5文件路径 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-26 |
+| **分支** | `feature/S2-002-experiment-model` |
+| **代码审查** | `log/release_0/review/S2-002_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-002_execution_report.md` |
 
 #### S2-003: 时序数据写入服务
 | 字段 | 内容 |
@@ -275,6 +340,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S2-001, S2-002 |
 | **验收标准** | 1. 数据批量写入性能>10k samples/sec<br>2. 支持gzip压缩<br>3. 服务异常不丢失数据 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-28 |
+| **分支** | `feature/S2-003-timeseries-buffer` |
+| **代码审查** | `log/release_0/review/S2-003_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-003_execution_report.md` |
 
 #### S2-004: 试验数据查询API
 | 字段 | 内容 |
@@ -284,6 +354,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S2-002, S2-003 |
 | **验收标准** | 1. GET /api/v1/points/{id}/history 支持时间过滤<br>2. 试验列表支持分页<br>3. 数据文件可下载 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-28 |
+| **分支** | `feature/S2-004-experiment-query-api` |
+| **代码审查** | `log/release_0/review/S2-004_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-004_execution_report.md` |
 
 #### S2-005: 数据管理页面 - 试验列表
 | 字段 | 内容 |
@@ -293,6 +368,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-012, S2-004 |
 | **验收标准** | 1. 列表展示所有试验记录<br>2. 筛选功能可用<br>3. 点击进入试验详情页 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-30 |
+| **分支** | `feature/S2-005-experiment-list-page` |
+| **代码审查** | `log/release_0/review/S2-005_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-005_execution_report.md` |
 
 #### S2-006: 数据管理页面 - 试验详情与数据查看
 | 字段 | 内容 |
@@ -302,6 +382,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S2-005 |
 | **验收标准** | 1. 展示试验完整元信息<br>2. 测点数据表格展示<br>3. 导出CSV功能可用 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-03-30 |
+| **分支** | `feature/S2-006-experiment-detail-page` |
+| **代码审查** | `log/release_0/review/S2-006_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-006_execution_report.md` |
 
 ---
 
@@ -315,6 +400,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-003 |
 | **验收标准** | 1. 方法定义存储为JSON<br>2. 支持配置参数表<br>3. 方法版本管理预留扩展点 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-007-method-model` |
+| **代码审查** | `log/release_0/review/S2-007_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-007_execution_report.md` |
 
 #### S2-008: 试验过程状态机实现
 | 字段 | 内容 |
@@ -404,6 +494,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-012 |
 | **验收标准** | 1. 侧边栏导航可用<br>2. 路由切换正常<br>3. 窗口大小变化自适应 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-014-app-navigation-framework` |
+| **代码审查** | `log/release_0/review/S2-014_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-014_execution_report.md` |
 
 #### S2-015: Dashboard首页
 | 字段 | 内容 |
@@ -413,6 +508,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S2-014 |
 | **验收标准** | 1. 快捷入口可点击跳转<br>2. 最近列表展示正确<br>3. 空状态提示友好 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-015-dashboard-homepage` |
+| **代码审查** | `log/release_0/review/S2-015_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-015_execution_report.md` |
 
 #### S2-016: 全局UI组件库
 | 字段 | 内容 |
@@ -422,6 +522,11 @@
 | **预估工时** | 10h |
 | **依赖任务** | S1-002 |
 | **验收标准** | 1. 组件符合Material Design 3<br>2. 支持浅色/深色主题<br>3. 组件文档和示例可用 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-016-global-ui-components` |
+| **代码审查** | `log/release_0/review/S2-016_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-016_execution_report.md` |
 
 #### S2-017: 错误处理与反馈
 | 字段 | 内容 |
@@ -431,6 +536,11 @@
 | **预估工时** | 6h |
 | **依赖任务** | S2-016 |
 | **验收标准** | 1. API错误显示Toast提示<br>2. 网络断开有友好提示<br>3. 错误边界捕获渲染错误 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-017-error-handling` |
+| **代码审查** | `log/release_0/review/S2-017_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-017_execution_report.md` |
 
 #### S2-018: 国际化(i18n)基础框架
 | 字段 | 内容 |
@@ -440,6 +550,11 @@
 | **预估工时** | 8h |
 | **依赖任务** | S1-002 |
 | **验收标准** | 1. 支持中英文切换<br>2. 翻译内容覆盖主要界面<br>3. 翻译文件按模块组织 |
+| **状态** | ✅ 已完成 |
+| **完成日期** | 2026-04-01 |
+| **分支** | `feature/S2-018-i18n-framework` |
+| **代码审查** | `log/release_0/review/S2-018_code_review.md` |
+| **测试报告** | `log/release_0/test/S2-018_execution_report.md` |
 
 ---
 
