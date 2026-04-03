@@ -13,6 +13,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/experiment.dart';
 import '../providers/experiment_console_provider.dart';
 import '../services/experiment_ws_client.dart';
@@ -225,42 +226,92 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
           ),
           const SizedBox(height: 12),
 
-          // Method selector
+          // Method selector (M-07, M-08 fix: handle loading, error, and empty states)
           Row(
             children: [
               const Text('方法: ', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  key: const Key('method_selector'),
-                  // Note: value is correct here since this is a controlled dropdown
-                  value: state.selectedMethodId,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    hintText: '选择试验方法',
-                  ),
-                  items: state.availableMethods
-                      .map((method) => DropdownMenuItem(
-                            value: method.id,
-                            child: Text(method.name),
-                          ))
-                      .toList(),
-                  onChanged: state.experiment?.status == ExperimentStatus.idle
-                      ? (value) {
-                          if (value != null) {
-                            ref
-                                .read(experimentConsoleProvider.notifier)
-                                .selectMethod(value);
-                          }
-                        }
-                      : null,
-                ),
+                child: _buildMethodSelector(context, state),
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  // M-07/M-08 fix: Build method selector with error and empty state handling
+  Widget _buildMethodSelector(
+      BuildContext context, ExperimentConsoleState state) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Handle loading state
+    if (state.isLoading && state.availableMethods.isEmpty) {
+      return const LinearProgressIndicator();
+    }
+
+    // Handle empty methods list
+    if (state.availableMethods.isEmpty) {
+      return Row(
+        children: [
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: colorScheme.outline),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline,
+                      size: 18, color: colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '暂无可用方法',
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to create method page
+                      context.push('/methods/create');
+                    },
+                    child: const Text('创建方法'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Normal dropdown
+    return DropdownButtonFormField<String>(
+      key: const Key('method_selector'),
+      value: state.selectedMethodId,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        isDense: true,
+        hintText: '选择试验方法',
+      ),
+      items: state.availableMethods
+          .map((method) => DropdownMenuItem(
+                value: method.id,
+                child: Text(method.name),
+              ))
+          .toList(),
+      onChanged: state.experiment?.status == ExperimentStatus.idle
+          ? (value) {
+              if (value != null) {
+                ref
+                    .read(experimentConsoleProvider.notifier)
+                    .selectMethod(value);
+              }
+            }
+          : null,
     );
   }
 
@@ -557,51 +608,72 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
             final description = schema['description'] as String?;
             final currentValue = state.parameterValues[entry.key];
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 160,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          entry.key,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        // M-10 fix: Show description as hint text
-                        if (description != null && description.isNotEmpty)
-                          Text(
-                            description,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
+            // M-01 fix: Get validation error for this parameter
+            final error = state.parameterErrors[entry.key];
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 160,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.key,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                            // M-10 fix: Show description as hint text
+                            if (description != null && description.isNotEmpty)
+                              Text(
+                                description,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurfaceVariant,
                                     ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildParameterInput(
+                          context,
+                          entry.key,
+                          type,
+                          currentValue,
+                          state,
+                        ),
+                      ),
+                      if (unit != null)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text(unit,
+                              style: Theme.of(context).textTheme.bodySmall),
+                        ),
+                    ],
+                  ),
+                ),
+                // M-01 fix: Show validation error below parameter
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 168, bottom: 4),
+                    child: Text(
+                      error,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
                           ),
-                      ],
                     ),
                   ),
-                  Expanded(
-                    child: _buildParameterInput(
-                      context,
-                      entry.key,
-                      type,
-                      currentValue,
-                      state,
-                    ),
-                  ),
-                  if (unit != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Text(unit,
-                          style: Theme.of(context).textTheme.bodySmall),
-                    ),
-                ],
-              ),
+              ],
             );
           }).toList(),
         ],

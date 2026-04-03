@@ -55,6 +55,8 @@ class ExperimentConsoleState {
   // M-04 fix: Auto-scroll state and new logs indicator
   final bool autoScrollEnabled;
   final bool newLogsAvailable;
+  // M-01 fix: Parameter validation errors
+  final Map<String, String?> parameterErrors;
 
   const ExperimentConsoleState({
     this.experiment,
@@ -69,6 +71,7 @@ class ExperimentConsoleState {
     this.wsConnected = false,
     this.autoScrollEnabled = true,
     this.newLogsAvailable = false,
+    this.parameterErrors = const {},
   });
 
   ExperimentConsoleState copyWith({
@@ -85,6 +88,7 @@ class ExperimentConsoleState {
     bool? wsConnected,
     bool? autoScrollEnabled,
     bool? newLogsAvailable,
+    Map<String, String?>? parameterErrors,
   }) {
     return ExperimentConsoleState(
       experiment: experiment ?? this.experiment,
@@ -101,6 +105,7 @@ class ExperimentConsoleState {
       wsConnected: wsConnected ?? this.wsConnected,
       autoScrollEnabled: autoScrollEnabled ?? this.autoScrollEnabled,
       newLogsAvailable: newLogsAvailable ?? this.newLogsAvailable,
+      parameterErrors: parameterErrors ?? this.parameterErrors,
     );
   }
 
@@ -193,8 +198,19 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     }
   }
 
-  /// Select a method
-  void selectMethod(String methodId) {
+  /// Select a method (M-05 fix: check experiment state before switching)
+  bool selectMethod(String methodId) {
+    // M-05 fix: Check if experiment is in a state that allows method switching
+    if (state.experiment != null) {
+      final status = state.experiment!.status;
+      if (status == ExperimentStatus.running ||
+          status == ExperimentStatus.paused) {
+        // Cannot switch method while experiment is running or paused
+        _addLog('warn', '请先停止当前试验再切换方法');
+        return false;
+      }
+    }
+
     state = state.copyWith(selectedMethodId: methodId);
 
     // Load parameter defaults from method
@@ -204,18 +220,104 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     );
 
     final params = <String, dynamic>{};
+    final errors = <String, String?>{};
     for (final entry in method.parameterSchema.entries) {
       final schema = entry.value as Map<String, dynamic>;
       params[entry.key] = schema['default'];
+      errors[entry.key] = null; // Clear errors for new method's params
     }
-    state = state.copyWith(parameterValues: params);
+    state = state.copyWith(parameterValues: params, parameterErrors: errors);
+    return true;
   }
 
-  /// Update a parameter value
+  /// M-01 fix: Validate a parameter value against its schema
+  String? validateParameterValue(
+      String name, dynamic value, Map<String, dynamic> schema) {
+    final type = schema['type'] as String? ?? 'string';
+
+    switch (type) {
+      case 'number':
+        if (value is! num) {
+          return '必须是有效数字';
+        }
+        // Check min/max constraints
+        if (schema.containsKey('min')) {
+          final min = (schema['min'] as num).toDouble();
+          if ((value as num).toDouble() < min) {
+            return '最小值为$min';
+          }
+        }
+        if (schema.containsKey('max')) {
+          final max = (schema['max'] as num).toDouble();
+          if ((value as num).toDouble() > max) {
+            return '最大值为$max';
+          }
+        }
+        break;
+      case 'integer':
+        if (value is! int) {
+          // Allow num to pass for integers since form returns num
+          if (value is num && value.toInt() != value.toDouble()) {
+            return '必须是整数';
+          }
+        }
+        if (schema.containsKey('min')) {
+          final min = (schema['min'] as num).toInt();
+          if ((value as num).toInt() < min) {
+            return '最小值为$min';
+          }
+        }
+        if (schema.containsKey('max')) {
+          final max = (schema['max'] as num).toInt();
+          if ((value as num).toInt() > max) {
+            return '最大值为$max';
+          }
+        }
+        break;
+      case 'string':
+        if (schema['required'] == true &&
+            (value == null || value.toString().isEmpty)) {
+          return '不能为空';
+        }
+        if (schema.containsKey('minLength')) {
+          final minLen = schema['minLength'] as int;
+          if (value.toString().length < minLen) {
+            return '最短${minLen}个字符';
+          }
+        }
+        if (schema.containsKey('maxLength')) {
+          final maxLen = schema['maxLength'] as int;
+          if (value.toString().length > maxLen) {
+            return '最长${maxLen}个字符';
+          }
+        }
+        break;
+    }
+    return null;
+  }
+
+  /// Update a parameter value with validation
   void updateParameter(String name, dynamic value) {
+    // Get the schema for this parameter
+    final method = state.availableMethods.firstWhere(
+      (m) => m.id == state.selectedMethodId,
+      orElse: () => state.availableMethods.first,
+    );
+    final schema = method.parameterSchema[name] as Map<String, dynamic>?;
+
+    // Validate if schema exists
+    String? error;
+    if (schema != null) {
+      error = validateParameterValue(name, value, schema);
+    }
+
+    // Update value and clear error for this parameter
     final params = Map<String, dynamic>.from(state.parameterValues);
     params[name] = value;
-    state = state.copyWith(parameterValues: params);
+    final errors = Map<String, String?>.from(state.parameterErrors);
+    errors[name] = error;
+
+    state = state.copyWith(parameterValues: params, parameterErrors: errors);
   }
 
   // M-02 fix: Reset all parameters to their default values
@@ -228,11 +330,13 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     );
 
     final params = <String, dynamic>{};
+    final errors = <String, String?>{};
     for (final entry in method.parameterSchema.entries) {
       final schema = entry.value as Map<String, dynamic>;
       params[entry.key] = schema['default'];
+      errors[entry.key] = null; // Clear validation errors
     }
-    state = state.copyWith(parameterValues: params);
+    state = state.copyWith(parameterValues: params, parameterErrors: errors);
   }
 
   /// Load method into experiment (C-01 fix: now passes parameters)

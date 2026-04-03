@@ -33,6 +33,9 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   // C5 fix: Track last shown error to prevent snackbar loop
   String? _lastShownError;
 
+  // M7 fix: Track initial sync state to avoid wasteful rebuilds
+  bool _initialSyncDone = false;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +43,9 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(methodEditProvider.notifier).loadMethod(widget.methodId!);
       });
+    } else {
+      // For create mode, mark initial sync as done since there's no method to load
+      _initialSyncDone = true;
     }
   }
 
@@ -61,17 +67,11 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     final state = ref.watch(methodEditProvider);
     final isCreateMode = widget.methodId == null;
 
-    // Sync controllers with state
-    if (_nameController.text != state.name) {
+    // M7 fix: Only sync controllers on initial load, not every rebuild
+    if (!_initialSyncDone && (state.isLoaded || isCreateMode)) {
+      _initialSyncDone = true;
       _nameController.text = state.name;
-      _nameController.selection = TextSelection.fromPosition(
-        TextPosition(offset: _nameController.text.length),
-      );
-    }
-    if (_descriptionController.text != (state.description ?? '')) {
       _descriptionController.text = state.description ?? '';
-    }
-    if (_jsonController.text != state.processDefinitionJson) {
       _jsonController.text = state.processDefinitionJson;
     }
 

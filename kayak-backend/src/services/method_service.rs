@@ -270,6 +270,40 @@ impl<R: MethodRepository> MethodService<R> {
             errors.push("缺少End节点".to_string());
         }
 
+        // M8 fix: Validate connections/edges reference valid node IDs
+        if let Some(connections) = process_definition.get("connections") {
+            if let Some(conn_array) = connections.as_array() {
+                for (i, conn) in conn_array.iter().enumerate() {
+                    let from = conn.get("from").and_then(|v| v.as_str()).unwrap_or("");
+                    let to = conn.get("to").and_then(|v| v.as_str()).unwrap_or("");
+                    
+                    if !node_ids.contains(from) {
+                        errors.push(format!("连接{}: 源节点'{}'不存在", i, from));
+                    }
+                    if !node_ids.contains(to) {
+                        errors.push(format!("连接{}: 目标节点'{}'不存在", i, to));
+                    }
+                }
+            }
+        }
+
+        // Also check edges field (alternative format)
+        if let Some(edges) = process_definition.get("edges") {
+            if let Some(edges_array) = edges.as_array() {
+                for (i, edge) in edges_array.iter().enumerate() {
+                    let source = edge.get("source").and_then(|v| v.as_str()).unwrap_or("");
+                    let target = edge.get("target").and_then(|v| v.as_str()).unwrap_or("");
+                    
+                    if !node_ids.contains(source) {
+                        errors.push(format!("边{}: 源节点'{}'不存在", i, source));
+                    }
+                    if !node_ids.contains(target) {
+                        errors.push(format!("边{}: 目标节点'{}'不存在", i, target));
+                    }
+                }
+            }
+        }
+
         ValidationResult {
             valid: errors.is_empty(),
             errors,

@@ -127,12 +127,9 @@ pub async fn list_methods(
     RequireAuth(user_ctx): RequireAuth,
     Query(query): Query<ListMethodsQuery>,
 ) -> Result<Json<ApiResponse<MethodListResponse>>, AppError> {
-    let page = if query.page < 1 { 1 } else { query.page };
-    let size = if query.size < 1 || query.size > 100 {
-        10
-    } else {
-        query.size
-    };
+    // M10 fix: Use clamped values for pagination
+    let page = query.page.clamp(1, i64::MAX);
+    let size = query.size.clamp(1, 100);
 
     let result = handler
         .list_methods(user_ctx.user_id, page, size)
