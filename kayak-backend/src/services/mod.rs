@@ -54,3 +54,4 @@ pub use user_repo_adapter::UserServiceRepositoryAdapter;
 pub use workbench::{
     PagedWorkbenchDto, WorkbenchDto, WorkbenchError, WorkbenchService, WorkbenchServiceImpl,
 };
+pub use method_service::{MethodServiceTrait, ValidationResult};

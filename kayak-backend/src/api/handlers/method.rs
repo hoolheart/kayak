@@ -5,10 +5,10 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Query, State},
+    extract::{Path, Query, State},
     Json,
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::auth::middleware::require_auth::RequireAuth;
@@ -16,7 +16,9 @@ use crate::core::error::{ApiResponse, AppError};
 use crate::models::dto::method_dto::{
     CreateMethodRequest, MethodDto, MethodListResponse, UpdateMethodRequest,
 };
-use crate::services::method_service::{MethodService, MethodServiceError};
+use crate::services::method_service::{
+    MethodService, MethodServiceError, MethodServiceTrait, ValidationResult,
+};
 use crate::db::repository::method_repo::SqlxMethodRepository;
 
 /// Application state for method handlers
@@ -43,20 +45,21 @@ impl MethodServiceTrait for MethodServiceAdapter {
         self.service.create_method(request, user_id).await
     }
 
-    async fn get_method(&self, id: Uuid) -> Result<MethodDto, MethodServiceError> {
-        self.service.get_method(id).await
+    async fn get_method(&self, id: Uuid, user_id: Uuid) -> Result<MethodDto, MethodServiceError> {
+        self.service.get_method(id, user_id).await
     }
 
     async fn update_method(
         &self,
         id: Uuid,
         request: UpdateMethodRequest,
+        user_id: Uuid,
     ) -> Result<MethodDto, MethodServiceError> {
-        self.service.update_method(id, request).await
+        self.service.update_method(id, request, user_id).await
     }
 
-    async fn delete_method(&self, id: Uuid) -> Result<(), MethodServiceError> {
-        self.service.delete_method(id).await
+    async fn delete_method(&self, id: Uuid, user_id: Uuid) -> Result<(), MethodServiceError> {
+        self.service.delete_method(id, user_id).await
     }
 
     async fn list_methods(
@@ -74,33 +77,6 @@ impl MethodServiceTrait for MethodServiceAdapter {
     ) -> Result<ValidationResult, MethodServiceError> {
         Ok(self.service.validate_process_definition(&process_definition))
     }
-}
-
-/// Trait for method service (for dependency injection)
-#[axum::async_trait]
-pub trait MethodServiceTrait: Send + Sync {
-    async fn create_method(
-        &self,
-        request: CreateMethodRequest,
-        user_id: Uuid,
-    ) -> Result<MethodDto, MethodServiceError>;
-    async fn get_method(&self, id: Uuid) -> Result<MethodDto, MethodServiceError>;
-    async fn update_method(
-        &self,
-        id: Uuid,
-        request: UpdateMethodRequest,
-    ) -> Result<MethodDto, MethodServiceError>;
-    async fn delete_method(&self, id: Uuid) -> Result<(), MethodServiceError>;
-    async fn list_methods(
-        &self,
-        user_id: Uuid,
-        page: i64,
-        size: i64,
-    ) -> Result<MethodListResponse, MethodServiceError>;
-    async fn validate_method(
-        &self,
-        process_definition: serde_json::Value,
-    ) -> Result<ValidationResult, MethodServiceError>;
 }
 
 /// Query parameters for listing methods
@@ -126,13 +102,6 @@ pub struct ValidateMethodRequest {
     pub process_definition: serde_json::Value,
 }
 
-/// Validate method response
-#[derive(Debug, Serialize)]
-pub struct ValidationResult {
-    pub valid: bool,
-    pub errors: Vec<String>,
-}
-
 /// Create method handler
 ///
 /// POST /api/v1/methods
@@ -146,7 +115,8 @@ pub async fn create_method(
         .await
         .map_err(method_error_to_app_error)?;
 
-    Ok(Json(ApiResponse::success(result)))
+    // C1 fix: Return 201 for creation
+    Ok(Json(ApiResponse::created(result)))
 }
 
 /// List methods handler
@@ -172,49 +142,49 @@ pub async fn list_methods(
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Get method detail handler
+/// Get method detail handler (M1/M2 fix: passes user_id for ownership check)
 ///
 /// GET /api/v1/methods/{id}
 pub async fn get_method(
     State(handler): State<AppState>,
-    RequireAuth(_user_ctx): RequireAuth,
+    RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApiResponse<MethodDto>>, AppError> {
     let result = handler
-        .get_method(id)
+        .get_method(id, user_ctx.user_id)
         .await
         .map_err(method_error_to_app_error)?;
 
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Update method handler
+/// Update method handler (M1 fix: passes user_id for ownership check)
 ///
 /// PUT /api/v1/methods/{id}
 pub async fn update_method(
     State(handler): State<AppState>,
-    RequireAuth(_user_ctx): RequireAuth,
+    RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdateMethodRequest>,
 ) -> Result<Json<ApiResponse<MethodDto>>, AppError> {
     let result = handler
-        .update_method(id, payload)
+        .update_method(id, payload, user_ctx.user_id)
         .await
         .map_err(method_error_to_app_error)?;
 
     Ok(Json(ApiResponse::success(result)))
 }
 
-/// Delete method handler
+/// Delete method handler (M1 fix: passes user_id for ownership check)
 ///
 /// DELETE /api/v1/methods/{id}
 pub async fn delete_method(
     State(handler): State<AppState>,
-    RequireAuth(_user_ctx): RequireAuth,
+    RequireAuth(user_ctx): RequireAuth,
     Path(id): Path<Uuid>,
 ) -> Result<Json<ApiResponse<()>>, AppError> {
     handler
-        .delete_method(id)
+        .delete_method(id, user_ctx.user_id)
         .await
         .map_err(method_error_to_app_error)?;
 
@@ -242,14 +212,13 @@ fn method_error_to_app_error(err: MethodServiceError) -> AppError {
     match err {
         MethodServiceError::NotFound => AppError::NotFound("方法不存在".to_string()),
         MethodServiceError::Validation(msg) => AppError::BadRequest(msg),
+        MethodServiceError::Forbidden => AppError::Forbidden("无权操作此方法".to_string()),
         MethodServiceError::Repository(repo_err) => {
-            tracing::error!("Method repository error: {:?}", repo_err);
+            tracing::error!("Method repository error: {}", repo_err);
             AppError::InternalError("数据库操作失败".to_string())
         }
     }
 }
-
-use axum::extract::Path;
 
 #[cfg(test)]
 mod tests {
@@ -313,7 +282,6 @@ mod tests {
     #[test]
     fn test_list_methods_query_negative_page() {
         let query = ListMethodsQuery { page: -1, size: 10 };
-        // Handler logic should clamp to 1
         let page = if query.page < 1 { 1 } else { query.page };
         assert_eq!(page, 1);
     }
@@ -346,6 +314,16 @@ mod tests {
         match app_err {
             AppError::BadRequest(msg) => assert_eq!(msg, "名称不能为空"),
             _ => panic!("Expected BadRequest"),
+        }
+    }
+
+    #[test]
+    fn test_method_error_to_app_error_forbidden() {
+        let err = MethodServiceError::Forbidden;
+        let app_err = method_error_to_app_error(err);
+        match app_err {
+            AppError::Forbidden(msg) => assert_eq!(msg, "无权操作此方法"),
+            _ => panic!("Expected Forbidden"),
         }
     }
 }

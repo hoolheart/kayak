@@ -30,10 +30,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   final _paramUnitController = TextEditingController();
   final _paramDescController = TextEditingController();
 
-  // ignore: unused_field
-  bool _isEditingParameter = false;
-  // ignore: unused_field
-  String? _editingParamName; // Reserved for future use
+  // C5 fix: Track last shown error to prevent snackbar loop
+  String? _lastShownError;
 
   @override
   void initState() {
@@ -123,25 +121,28 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
   }
 
   Widget _buildErrorBanner(BuildContext context, String error) {
-    // Show error as a snackbar
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error),
-            backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            action: SnackBarAction(
-              label: '关闭',
-              textColor: Theme.of(context).colorScheme.onErrorContainer,
-              onPressed: () {
-                ref.read(methodEditProvider.notifier).clearError();
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
+    // C5 fix: Only show snackbar once per error (not on every rebuild)
+    if (error != _lastShownError) {
+      _lastShownError = error;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error),
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              action: SnackBarAction(
+                label: '关闭',
+                textColor: Theme.of(context).colorScheme.onErrorContainer,
+                onPressed: () {
+                  ref.read(methodEditProvider.notifier).clearError();
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                },
+              ),
             ),
-          ),
-        );
-      }
-    });
+          );
+        }
+      });
+    }
     return _buildContent(context, ref.watch(methodEditProvider));
   }
 
@@ -276,7 +277,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
             const Spacer(),
             FilledButton.icon(
               onPressed: () {
-                ref.read(methodEditProvider.notifier).addParameter();
+                // C4 fix: Don't pre-create placeholder, just show dialog
+                // Parameter will be added via addParameterWithConfig when dialog confirms
                 _showParameterDialog(context, null, null);
               },
               icon: const Icon(Icons.add, size: 18),
@@ -559,11 +561,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                 if (existingName != null) {
                   notifier.updateParameter(existingName, param);
                 } else {
-                  // For new params, we need to add it manually since addParameter already created one
-                  final params =
-                      Map<String, ParameterConfig>.from(state.parameters);
-                  params[name] = param;
-                  // Use the notifier's internal state update
+                  // C4 fix: Actually save the new parameter via notifier
+                  notifier.addParameterWithConfig(param);
                 }
 
                 Navigator.of(context).pop();
