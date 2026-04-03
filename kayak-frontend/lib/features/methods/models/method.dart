@@ -32,15 +32,24 @@ class Method {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      processDefinition:
-          (json['process_definition'] as Map<String, dynamic>?) ?? {},
-      parameterSchema:
-          (json['parameter_schema'] as Map<String, dynamic>?) ?? {},
+      // M5 fix: Use safer cast pattern to handle non-null but non-Map values
+      processDefinition: _safeCastMap(json['process_definition']),
+      parameterSchema: _safeCastMap(json['parameter_schema']),
       version: json['version'] as int,
       createdBy: json['created_by'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
+  }
+
+  /// M5 fix: Safe cast to Map<String, dynamic> that handles non-null but non-Map values
+  static Map<String, dynamic> _safeCastMap(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return value;
+    } else if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+    return {};
   }
 
   Map<String, dynamic> toJson() {

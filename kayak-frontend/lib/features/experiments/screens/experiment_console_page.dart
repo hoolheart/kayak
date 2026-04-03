@@ -485,7 +485,34 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
     );
 
     if (method.parameterSchema.isEmpty) {
-      return const SizedBox.shrink();
+      // M-03 fix: Show message when method has no parameters
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          border: Border(
+            bottom: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.info_outline,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '此方法无需配置参数',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
+        ),
+      );
     }
 
     return Container(
@@ -501,11 +528,26 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '参数配置',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+          Row(
+            children: [
+              Text(
+                '参数配置',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const Spacer(),
+              // M-02 fix: Add reset to defaults button
+              TextButton.icon(
+                onPressed: () {
+                  ref
+                      .read(experimentConsoleProvider.notifier)
+                      .resetParametersToDefaults();
+                },
+                icon: const Icon(Icons.restart_alt, size: 16),
+                label: const Text('重置默认值'),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           ...method.parameterSchema.entries.map((entry) {
@@ -518,12 +560,29 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: 160,
-                    child: Text(
-                      entry.key,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          entry.key,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        // M-10 fix: Show description as hint text
+                        if (description != null && description.isNotEmpty)
+                          Text(
+                            description,
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                          ),
+                      ],
                     ),
                   ),
                   Expanded(

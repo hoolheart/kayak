@@ -114,9 +114,20 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
           const SizedBox(width: 16),
         ],
       ),
-      body: state.error != null
-          ? _buildErrorBanner(context, state.error!)
-          : _buildContent(context, state),
+      // M9 fix: Warn user about unsaved changes when navigating away
+      body: PopScope(
+        canPop: !state.isDirty,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          final shouldPop = await _showDiscardDialog();
+          if (shouldPop && context.mounted) {
+            context.pop();
+          }
+        },
+        child: state.error != null
+            ? _buildErrorBanner(context, state.error!)
+            : _buildContent(context, state),
+      ),
     );
   }
 
@@ -590,5 +601,27 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
       );
       context.pop();
     }
+  }
+
+  // M9 fix: Show confirmation dialog when user has unsaved changes
+  Future<bool> _showDiscardDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('放弃更改?'),
+        content: const Text('您有未保存的更改，确定要放弃吗?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('放弃'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 }

@@ -52,6 +52,9 @@ class ExperimentConsoleState {
   final ControlOperation? currentOperation;
   final String? error;
   final bool wsConnected;
+  // M-04 fix: Auto-scroll state and new logs indicator
+  final bool autoScrollEnabled;
+  final bool newLogsAvailable;
 
   const ExperimentConsoleState({
     this.experiment,
@@ -64,6 +67,8 @@ class ExperimentConsoleState {
     this.currentOperation,
     this.error,
     this.wsConnected = false,
+    this.autoScrollEnabled = true,
+    this.newLogsAvailable = false,
   });
 
   ExperimentConsoleState copyWith({
@@ -78,6 +83,8 @@ class ExperimentConsoleState {
     bool clearCurrentOperation = false,
     String? error,
     bool? wsConnected,
+    bool? autoScrollEnabled,
+    bool? newLogsAvailable,
   }) {
     return ExperimentConsoleState(
       experiment: experiment ?? this.experiment,
@@ -92,6 +99,8 @@ class ExperimentConsoleState {
           : (currentOperation ?? this.currentOperation),
       error: error,
       wsConnected: wsConnected ?? this.wsConnected,
+      autoScrollEnabled: autoScrollEnabled ?? this.autoScrollEnabled,
+      newLogsAvailable: newLogsAvailable ?? this.newLogsAvailable,
     );
   }
 
@@ -206,6 +215,23 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   void updateParameter(String name, dynamic value) {
     final params = Map<String, dynamic>.from(state.parameterValues);
     params[name] = value;
+    state = state.copyWith(parameterValues: params);
+  }
+
+  // M-02 fix: Reset all parameters to their default values
+  void resetParametersToDefaults() {
+    if (state.selectedMethodId == null) return;
+
+    final method = state.availableMethods.firstWhere(
+      (m) => m.id == state.selectedMethodId,
+      orElse: () => state.availableMethods.first,
+    );
+
+    final params = <String, dynamic>{};
+    for (final entry in method.parameterSchema.entries) {
+      final schema = entry.value as Map<String, dynamic>;
+      params[entry.key] = schema['default'];
+    }
     state = state.copyWith(parameterValues: params);
   }
 
@@ -464,6 +490,26 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
   void clearError() {
     state = state.copyWith(error: null);
+  }
+
+  // M-04 fix: Toggle auto-scroll when user manually scrolls
+  void setAutoScroll(bool enabled) {
+    state = state.copyWith(autoScrollEnabled: enabled, newLogsAvailable: false);
+  }
+
+  // M-04 fix: Called when user scrolls to bottom manually
+  void onUserScrolledToBottom() {
+    state = state.copyWith(autoScrollEnabled: true, newLogsAvailable: false);
+  }
+
+  // M-04 fix: Scroll to bottom (called from UI after new log if autoScroll enabled)
+  void scrollToBottom() {
+    // This is handled by the UI listening to state changes
+    if (state.autoScrollEnabled) {
+      state = state.copyWith(newLogsAvailable: false);
+    } else {
+      state = state.copyWith(newLogsAvailable: true);
+    }
   }
 
   // m-07 fix: Expose reconnectWebSocket method for manual reconnect
