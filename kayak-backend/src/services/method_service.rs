@@ -128,10 +128,13 @@ impl<R: MethodRepository> MethodService<R> {
             _ => {}
         }
 
+        // m8 fix: Treat empty description string as None for consistency
+        let description = request.description.filter(|d| !d.is_empty());
+
         let updated = self.repository.update(
             id,
             request.name,
-            request.description,
+            description,
             request.process_definition,
             request.parameter_schema,
         ).await?;

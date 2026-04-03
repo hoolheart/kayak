@@ -6,7 +6,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../models/experiment.dart';
 import '../providers/experiment_console_provider.dart';
 import '../services/experiment_ws_client.dart';
@@ -211,6 +210,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
               Expanded(
                 child: DropdownButtonFormField<String>(
                   key: const Key('method_selector'),
+                  // Note: value is correct here since this is a controlled dropdown
                   value: state.selectedMethodId,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -612,6 +612,10 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
         break;
       case 'warn':
         levelColor = colorScheme.tertiary;
+        break;
+      case 'debug':
+        // m-01 fix: Add grey color for debug level
+        levelColor = colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
         break;
       default:
         levelColor = colorScheme.onSurfaceVariant;

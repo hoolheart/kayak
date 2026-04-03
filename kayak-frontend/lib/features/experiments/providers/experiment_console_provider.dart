@@ -287,6 +287,9 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
     state = state.copyWith(logs: []);
   }
 
+  // m-03 fix: Log entry limit to prevent memory issues
+  static const int _maxLogEntries = 5000;
+
   /// Add a log entry
   void _addLog(String level, String message) {
     final entry = ConsoleLogEntry(
@@ -294,7 +297,12 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
       level: level,
       message: message,
     );
-    state = state.copyWith(logs: [...state.logs, entry]);
+    // m-03 fix: Keep only the last 5000 entries to prevent memory issues
+    final updatedLogs = [...state.logs, entry];
+    final trimmedLogs = updatedLogs.length > _maxLogEntries
+        ? updatedLogs.sublist(updatedLogs.length - _maxLogEntries)
+        : updatedLogs;
+    state = state.copyWith(logs: trimmedLogs);
   }
 
   /// Handle WebSocket status change
@@ -351,6 +359,14 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
   void clearError() {
     state = state.copyWith(error: null);
+  }
+
+  // m-07 fix: Expose reconnectWebSocket method for manual reconnect
+  Future<void> reconnectWebSocket(String wsUrl) async {
+    if (_wsClient != null) {
+      _wsClient!.disconnect();
+      await _wsClient!.connect(wsUrl, experimentId: state.experiment?.id);
+    }
   }
 
   @override

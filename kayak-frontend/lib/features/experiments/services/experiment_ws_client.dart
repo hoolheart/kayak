@@ -188,17 +188,26 @@ class ExperimentWebSocketClient {
         return;
       }
 
-      _messageController.add(json);
+      // m-10 fix: Check if controllers are closed before adding
+      if (!_messageController.isClosed) {
+        _messageController.add(json);
+      }
 
       switch (type) {
         case 'status_change':
-          _statusController.add(WsStatusChange.fromJson(json));
+          if (!_statusController.isClosed) {
+            _statusController.add(WsStatusChange.fromJson(json));
+          }
           break;
         case 'log':
-          _logController.add(WsLogEntry.fromJson(json));
+          if (!_logController.isClosed) {
+            _logController.add(WsLogEntry.fromJson(json));
+          }
           break;
         case 'error':
-          _errorController.add(json['message'] as String? ?? 'Unknown error');
+          if (!_errorController.isClosed) {
+            _errorController.add(json['message'] as String? ?? 'Unknown error');
+          }
           break;
       }
     } catch (e) {
@@ -268,7 +277,11 @@ class ExperimentWebSocketClient {
   }
 
   void _notifyConnectionStatus() {
-    _connectionController.add(_connectionState == WsConnectionState.connected);
+    // m-10 fix: Check if controller is closed before adding
+    if (!_connectionController.isClosed) {
+      _connectionController
+          .add(_connectionState == WsConnectionState.connected);
+    }
   }
 
   /// Disconnect from WebSocket server

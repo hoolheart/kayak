@@ -148,7 +148,8 @@ class ParameterConfig {
   factory ParameterConfig.fromJson(String name, Map<String, dynamic> json) {
     return ParameterConfig(
       name: name,
-      type: json['type'] as String? ?? 'string',
+      // m7 fix: Use toString() for type to avoid cast exceptions
+      type: json['type']?.toString() ?? 'string',
       defaultValue: json['default'],
       unit: json['unit'] as String?,
       description: json['description'] as String?,

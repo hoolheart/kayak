@@ -65,7 +65,9 @@ class MethodListNotifier extends StateNotifier<MethodListState> {
       final response = await _service.getMethods(page: page);
       final newMethods =
           append ? [...state.methods, ...response.items] : response.items;
-      final hasMore = newMethods.length < response.total;
+      // m5 fix: Use response.items.length to determine hasMore, not newMethods.length
+      // which could exceed total after appending with stale data
+      final hasMore = response.items.length >= response.size;
 
       state = state.copyWith(
         methods: newMethods,
