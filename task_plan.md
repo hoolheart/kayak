@@ -4,7 +4,7 @@
 完成kayak软件的完整架构设计，确定前两个sprint的开发任务，并确保每个sprint都能交付可运行的程序和可视界面。
 
 ## Current Phase
-Phase 6: Sprint 2收尾 - S2-019/S2-020 TDD流程补全
+Phase 7: Release 0最终验收 - 所有开发任务完成
 
 ## Phases
 
@@ -74,15 +74,15 @@ Phase 6: Sprint 2收尾 - S2-019/S2-020 TDD流程补全
 - [x] S2-016: 全局UI组件库 - **已完成 ✅** (已合并到main)
 - [x] S2-017: 错误处理与反馈 - **已完成 ✅** (已合并到main)
 - [x] S2-018: 国际化(i18n)基础框架 - **已完成 ✅** (已合并到main)
-- [ ] S2-019: 桌面部署与容器部署配置 - **进行中 🔄** (代码已合并到main，TDD流程待补全)
-- [ ] S2-020: 项目文档与Release 0交付 - **进行中 🔄** (代码已合并到main，TDD流程待补全)
-- **Status:** in_progress
+- [x] S2-019: 桌面部署与容器部署配置 - **已完成 ✅** (已合并到main，TDD流程完成)
+- [x] S2-020: 项目文档与Release 0交付 - **已完成 ✅** (已合并到main，TDD流程完成)
+- **Status:** complete
 
 ### Phase 7: Release 0最终验收
-- [ ] 集成测试
-- [ ] 创建验收文档
-- [ ] 更新README和架构文档
-- **Status:** pending
+- [x] 集成测试 - **已完成 ✅** (后端17 tests + 前端232 tests = 249 tests all passing)
+- [x] 创建验收文档 - **已完成 ✅** (acceptance.md updated)
+- [x] 更新README和架构文档 - **已完成 ✅**
+- **Status:** complete
 
 ## Key Questions
 1. 是否需要分多个release进行？
