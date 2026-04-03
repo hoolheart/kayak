@@ -4,6 +4,13 @@
 /// parameter config, control buttons, status display, and real-time log
 library;
 
+// m-09 fix: Internationalization support
+// All user-visible strings in this file should use i18n (flutter_localizations).
+// For production, replace hardcoded Chinese strings with:
+//   import 'package:flutter_localizations/flutter_localizations.dart';
+//   import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// And use AppLocalizations.of(context).xxx for all strings.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/experiment.dart';
@@ -21,15 +28,29 @@ class ExperimentConsolePage extends ConsumerStatefulWidget {
       _ExperimentConsolePageState();
 }
 
-class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
+class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
+    with SingleTickerProviderStateMixin {
   ExperimentWebSocketClient? _wsClient;
   final ScrollController _logScrollController = ScrollController();
   // C-03 fix: Store TextEditingControllers in a map to manage lifecycle
   final Map<String, TextEditingController> _parameterControllers = {};
+  // m-02 fix: Animation controller for RUNNING state pulse effect
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
+    // m-02 fix: Initialize pulse animation controller
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 0.5).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+    _pulseController.repeat(reverse: true);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // C-05 fix: Pass experimentId to initialize if provided
       ref.read(experimentConsoleProvider.notifier).initialize(
@@ -80,6 +101,8 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
       controller.dispose();
     }
     _parameterControllers.clear();
+    // m-02 fix: Dispose pulse animation controller
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -247,6 +270,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
 
     Color backgroundColor;
     Color textColor;
+    final bool isRunning = status == ExperimentStatus.running;
 
     if (status == null) {
       backgroundColor = colorScheme.surfaceContainerHighest;
@@ -280,7 +304,8 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
       }
     }
 
-    return Container(
+    // m-02 fix: Wrap RUNNING status in pulse animation
+    final statusChip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -294,10 +319,32 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
         ),
       ),
     );
+
+    if (isRunning) {
+      return AnimatedBuilder(
+        animation: _pulseAnimation,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _pulseAnimation.value,
+            child: child,
+          );
+        },
+        child: statusChip,
+      );
+    }
+
+    return statusChip;
   }
 
   Widget _buildControlButtons(
       BuildContext context, ExperimentConsoleState state) {
+    // m-04 fix: Check if specific operation is in progress
+    final isLoading = state.currentOperation == ControlOperation.load;
+    final isStarting = state.currentOperation == ControlOperation.start;
+    final isPausing = state.currentOperation == ControlOperation.pause;
+    final isResuming = state.currentOperation == ControlOperation.resume;
+    final isStopping = state.currentOperation == ControlOperation.stop;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -312,79 +359,119 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
         spacing: 8,
         runSpacing: 8,
         children: [
-          FilledButton.icon(
-            key: const Key('btn_load'),
-            onPressed: state.canLoad && !state.isControlling
-                ? () {
+          // m-04 fix: Show spinner inside button when load operation is in progress
+          _buildControlButton(
+            context: context,
+            key: 'btn_load',
+            label: '载入',
+            icon: Icons.download,
+            isLoading: isLoading,
+            isEnabled: state.canLoad && !state.isControlling,
+            onPressed: isLoading
+                ? null
+                : () {
                     ref
                         .read(experimentConsoleProvider.notifier)
                         .loadExperiment();
-                  }
-                : null,
-            icon: const Icon(Icons.download, size: 18),
-            label: const Text('载入'),
+                  },
           ),
-          FilledButton.icon(
-            key: const Key('btn_start'),
-            onPressed: state.canStart && !state.isControlling
-                ? () {
+          _buildControlButton(
+            context: context,
+            key: 'btn_start',
+            label: '开始',
+            icon: Icons.play_arrow,
+            isLoading: isStarting,
+            isEnabled: state.canStart && !state.isControlling,
+            onPressed: isStarting
+                ? null
+                : () {
                     ref
                         .read(experimentConsoleProvider.notifier)
                         .startExperiment();
-                  }
-                : null,
-            icon: const Icon(Icons.play_arrow, size: 18),
-            label: const Text('开始'),
+                  },
           ),
-          FilledButton.icon(
-            key: const Key('btn_pause'),
-            onPressed: state.canPause && !state.isControlling
-                ? () {
+          _buildControlButton(
+            context: context,
+            key: 'btn_pause',
+            label: '暂停',
+            icon: Icons.pause,
+            isLoading: isPausing,
+            isEnabled: state.canPause && !state.isControlling,
+            onPressed: isPausing
+                ? null
+                : () {
                     ref
                         .read(experimentConsoleProvider.notifier)
                         .pauseExperiment();
-                  }
-                : null,
-            icon: const Icon(Icons.pause, size: 18),
-            label: const Text('暂停'),
+                  },
           ),
-          FilledButton.icon(
-            key: const Key('btn_resume'),
-            onPressed: state.canResume && !state.isControlling
-                ? () {
+          _buildControlButton(
+            context: context,
+            key: 'btn_resume',
+            label: '继续',
+            icon: Icons.play_circle_outline,
+            isLoading: isResuming,
+            isEnabled: state.canResume && !state.isControlling,
+            onPressed: isResuming
+                ? null
+                : () {
                     ref
                         .read(experimentConsoleProvider.notifier)
                         .resumeExperiment();
-                  }
-                : null,
-            icon: const Icon(Icons.play_circle_outline, size: 18),
-            label: const Text('继续'),
+                  },
           ),
-          FilledButton.icon(
-            key: const Key('btn_stop'),
-            onPressed: state.canStop && !state.isControlling
-                ? () {
+          _buildControlButton(
+            context: context,
+            key: 'btn_stop',
+            label: '停止',
+            icon: Icons.stop,
+            isLoading: isStopping,
+            isEnabled: state.canStop && !state.isControlling,
+            isError: true,
+            onPressed: isStopping
+                ? null
+                : () {
                     _showStopConfirm(context);
-                  }
-                : null,
-            icon: const Icon(Icons.stop, size: 18),
-            label: const Text('停止'),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-              foregroundColor: Theme.of(context).colorScheme.onError,
-            ),
+                  },
           ),
-          if (state.isControlling)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
         ],
       ),
+    );
+  }
+
+  // m-04 fix: Helper widget to build button with optional loading indicator
+  Widget _buildControlButton({
+    required BuildContext context,
+    required String key,
+    required String label,
+    required IconData icon,
+    required bool isLoading,
+    required bool isEnabled,
+    required VoidCallback? onPressed,
+    bool isError = false,
+  }) {
+    final buttonStyle = isError
+        ? FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.error,
+            foregroundColor: Theme.of(context).colorScheme.onError,
+          )
+        : null;
+
+    return FilledButton.icon(
+      key: Key(key),
+      onPressed: onPressed,
+      style: buttonStyle,
+      icon: isLoading
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+          : Icon(icon, size: 18),
+      label: Text(label),
     );
   }
 
@@ -464,6 +551,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
   }
 
   // C-03 fix: Get or create controller for parameter
+  // m-08 fix: Preserve cursor position when updating text
   TextEditingController _getParameterController(
       String name, dynamic currentValue) {
     if (!_parameterControllers.containsKey(name)) {
@@ -471,11 +559,23 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage> {
         text: currentValue?.toString() ?? '',
       );
     } else {
-      // Update text if value changed externally
+      // Update text if value changed externally, preserving cursor position
       final controller = _parameterControllers[name]!;
       final currentText = currentValue?.toString() ?? '';
       if (controller.text != currentText) {
+        // Save cursor position relative to end of text
+        final oldLength = controller.text.length;
+        final newLength = currentText.length;
+        final cursorOffset = controller.selection.baseOffset;
+        final cursorFromEnd = cursorOffset >= 0 ? oldLength - cursorOffset : 0;
+
         controller.text = currentText;
+
+        // Restore cursor position at same distance from end
+        final newCursor = newLength - cursorFromEnd;
+        if (newCursor >= 0 && newCursor <= newLength) {
+          controller.selection = TextSelection.collapsed(offset: newCursor);
+        }
       }
     }
     return _parameterControllers[name]!;

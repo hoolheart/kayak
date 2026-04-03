@@ -30,6 +30,15 @@ class ConsoleLogEntry {
   }
 }
 
+/// Current control operation type (m-04 fix)
+enum ControlOperation {
+  load,
+  start,
+  pause,
+  resume,
+  stop,
+}
+
 /// Experiment console state
 class ExperimentConsoleState {
   final Experiment? experiment;
@@ -39,6 +48,8 @@ class ExperimentConsoleState {
   final List<ConsoleLogEntry> logs;
   final bool isLoading;
   final bool isControlling;
+  // m-04 fix: Track which operation is currently in progress
+  final ControlOperation? currentOperation;
   final String? error;
   final bool wsConnected;
 
@@ -50,6 +61,7 @@ class ExperimentConsoleState {
     this.logs = const [],
     this.isLoading = false,
     this.isControlling = false,
+    this.currentOperation,
     this.error,
     this.wsConnected = false,
   });
@@ -62,6 +74,8 @@ class ExperimentConsoleState {
     List<ConsoleLogEntry>? logs,
     bool? isLoading,
     bool? isControlling,
+    ControlOperation? currentOperation,
+    bool clearCurrentOperation = false,
     String? error,
     bool? wsConnected,
   }) {
@@ -73,6 +87,9 @@ class ExperimentConsoleState {
       logs: logs ?? this.logs,
       isLoading: isLoading ?? this.isLoading,
       isControlling: isControlling ?? this.isControlling,
+      currentOperation: clearCurrentOperation
+          ? null
+          : (currentOperation ?? this.currentOperation),
       error: error,
       wsConnected: wsConnected ?? this.wsConnected,
     );
@@ -196,7 +213,11 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   Future<void> loadExperiment() async {
     if (state.selectedMethodId == null || state.experiment == null) return;
 
-    state = state.copyWith(isControlling: true, error: null);
+    // m-04 fix: Set currentOperation to track which operation is in progress
+    state = state.copyWith(
+        isControlling: true,
+        currentOperation: ControlOperation.load,
+        error: null);
 
     try {
       // C-01 fix: pass parameter values to backend
@@ -206,10 +227,21 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         state.parameterValues,
       );
 
-      state = state.copyWith(experiment: experiment, isControlling: false);
+      state = state.copyWith(
+          experiment: experiment,
+          isControlling: false,
+          clearCurrentOperation: true);
       _addLog('info', '方法已载入');
     } catch (e) {
-      state = state.copyWith(isControlling: false, error: e.toString());
+      // m-05 fix: Try to sync state on state conflict error
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('state') || errorStr.contains('invalid')) {
+        await _syncStateFromServer();
+      }
+      state = state.copyWith(
+          isControlling: false,
+          clearCurrentOperation: true,
+          error: e.toString());
       _addLog('error', '载入失败: $e');
     }
   }
@@ -218,15 +250,30 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   Future<void> startExperiment() async {
     if (state.experiment == null) return;
 
-    state = state.copyWith(isControlling: true, error: null);
+    // m-04 fix: Set currentOperation
+    state = state.copyWith(
+        isControlling: true,
+        currentOperation: ControlOperation.start,
+        error: null);
 
     try {
       final experiment =
           await _controlService.startExperiment(state.experiment!.id);
-      state = state.copyWith(experiment: experiment, isControlling: false);
+      state = state.copyWith(
+          experiment: experiment,
+          isControlling: false,
+          clearCurrentOperation: true);
       _addLog('info', '试验开始');
     } catch (e) {
-      state = state.copyWith(isControlling: false, error: e.toString());
+      // m-05 fix: Try to sync state on state conflict error
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('state') || errorStr.contains('invalid')) {
+        await _syncStateFromServer();
+      }
+      state = state.copyWith(
+          isControlling: false,
+          clearCurrentOperation: true,
+          error: e.toString());
       _addLog('error', '启动失败: $e');
     }
   }
@@ -235,15 +282,30 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   Future<void> pauseExperiment() async {
     if (state.experiment == null) return;
 
-    state = state.copyWith(isControlling: true, error: null);
+    // m-04 fix: Set currentOperation
+    state = state.copyWith(
+        isControlling: true,
+        currentOperation: ControlOperation.pause,
+        error: null);
 
     try {
       final experiment =
           await _controlService.pauseExperiment(state.experiment!.id);
-      state = state.copyWith(experiment: experiment, isControlling: false);
+      state = state.copyWith(
+          experiment: experiment,
+          isControlling: false,
+          clearCurrentOperation: true);
       _addLog('info', '试验已暂停');
     } catch (e) {
-      state = state.copyWith(isControlling: false, error: e.toString());
+      // m-05 fix: Try to sync state on state conflict error
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('state') || errorStr.contains('invalid')) {
+        await _syncStateFromServer();
+      }
+      state = state.copyWith(
+          isControlling: false,
+          clearCurrentOperation: true,
+          error: e.toString());
       _addLog('error', '暂停失败: $e');
     }
   }
@@ -252,15 +314,30 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   Future<void> resumeExperiment() async {
     if (state.experiment == null) return;
 
-    state = state.copyWith(isControlling: true, error: null);
+    // m-04 fix: Set currentOperation
+    state = state.copyWith(
+        isControlling: true,
+        currentOperation: ControlOperation.resume,
+        error: null);
 
     try {
       final experiment =
           await _controlService.resumeExperiment(state.experiment!.id);
-      state = state.copyWith(experiment: experiment, isControlling: false);
+      state = state.copyWith(
+          experiment: experiment,
+          isControlling: false,
+          clearCurrentOperation: true);
       _addLog('info', '试验继续');
     } catch (e) {
-      state = state.copyWith(isControlling: false, error: e.toString());
+      // m-05 fix: Try to sync state on state conflict error
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('state') || errorStr.contains('invalid')) {
+        await _syncStateFromServer();
+      }
+      state = state.copyWith(
+          isControlling: false,
+          clearCurrentOperation: true,
+          error: e.toString());
       _addLog('error', '继续失败: $e');
     }
   }
@@ -269,15 +346,30 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   Future<void> stopExperiment() async {
     if (state.experiment == null) return;
 
-    state = state.copyWith(isControlling: true, error: null);
+    // m-04 fix: Set currentOperation
+    state = state.copyWith(
+        isControlling: true,
+        currentOperation: ControlOperation.stop,
+        error: null);
 
     try {
       final experiment =
           await _controlService.stopExperiment(state.experiment!.id);
-      state = state.copyWith(experiment: experiment, isControlling: false);
+      state = state.copyWith(
+          experiment: experiment,
+          isControlling: false,
+          clearCurrentOperation: true);
       _addLog('info', '试验已停止');
     } catch (e) {
-      state = state.copyWith(isControlling: false, error: e.toString());
+      // m-05 fix: Try to sync state on state conflict error
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('state') || errorStr.contains('invalid')) {
+        await _syncStateFromServer();
+      }
+      state = state.copyWith(
+          isControlling: false,
+          clearCurrentOperation: true,
+          error: e.toString());
       _addLog('error', '停止失败: $e');
     }
   }
@@ -354,6 +446,19 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         return '已完成';
       case ExperimentStatus.aborted:
         return '已中止';
+    }
+  }
+
+  // m-05 fix: Sync state from server when state conflict occurs
+  Future<void> _syncStateFromServer() async {
+    if (state.experiment == null) return;
+    try {
+      final experiment =
+          await _controlService.getExperimentStatus(state.experiment!.id);
+      state = state.copyWith(experiment: experiment);
+      _addLog('info', '状态已同步');
+    } catch (e) {
+      _addLog('warn', '状态同步失败: $e');
     }
   }
 
