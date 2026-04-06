@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/common/widgets/custom_title_bar.dart';
 import 'login_view.dart';
 
 /// 登录页面主入口
@@ -24,13 +25,20 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: SafeArea(
-        child: LoginView(
-          redirectPath: redirectPath,
-          sessionExpired: sessionExpired,
+    return Column(
+      children: [
+        const CustomTitleBar(),
+        Expanded(
+          child: Scaffold(
+            body: SafeArea(
+              child: LoginView(
+                redirectPath: redirectPath,
+                sessionExpired: sessionExpired,
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

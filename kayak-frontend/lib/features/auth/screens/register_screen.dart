@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/common/widgets/custom_title_bar.dart';
 import 'register_view.dart';
 
 /// 注册页面主入口
@@ -14,10 +15,17 @@ class RegisterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const Scaffold(
-      body: SafeArea(
-        child: RegisterView(),
-      ),
+    return const Column(
+      children: [
+        CustomTitleBar(),
+        Expanded(
+          child: Scaffold(
+            body: SafeArea(
+              child: RegisterView(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -216,9 +216,8 @@ async fn create_default_admin(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         return Ok(());
     }
 
-    // bcrypt hash for "admin123" with default cost
-    // Cost: 12, Salt: "LQv3c1yqBWVHxkd0LHAkCO"
-    let password_hash = "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.HtJtTHHl3BHJjC";
+    // bcrypt hash for "Admin123" with cost 12
+    let password_hash = "$2b$12$62qkfPu99ygDL9RkyKz.8.xBVGObeAzaZMTiJ0DV98MZREV4aA5Ae";
 
     sqlx::query(
         r#"
@@ -234,7 +233,7 @@ async fn create_default_admin(pool: &SqlitePool) -> Result<(), sqlx::Error> {
     .execute(pool)
     .await?;
 
-    info!("Default admin user created: admin@kayak.local / admin123");
+    info!("Default admin user created: admin@kayak.local / Admin123");
 
     Ok(())
 }

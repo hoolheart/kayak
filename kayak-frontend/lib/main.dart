@@ -18,7 +18,7 @@ void main() async {
     title: 'Kayak - 科学研究支持平台',
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
+    // titleBarStyle: TitleBarStyle.hidden, // 使用自定义标题栏
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../common/widgets/custom_title_bar.dart';
 import 'breadcrumb_nav.dart';
 import 'sidebar.dart';
 
@@ -54,41 +55,50 @@ class _AppShellState extends State<AppShell> {
           }
         }
 
-        return Scaffold(
-          body: Row(
-            children: [
-              // Sidebar
-              Sidebar(
-                isCollapsed: _isSidebarCollapsed,
-                selectedRoute: widget.selectedRoute,
-                onToggleCollapse: () {
-                  setState(() {
-                    _isSidebarCollapsed = !_isSidebarCollapsed;
-                  });
-                },
-              ),
-
-              // Main content area
-              Expanded(
-                child: Column(
+        return Column(
+          children: [
+            // Custom title bar for desktop
+            const CustomTitleBar(),
+            // Main content
+            Expanded(
+              child: Scaffold(
+                body: Row(
                   children: [
-                    // Breadcrumb navigation
-                    const BreadcrumbNav(),
+                    // Sidebar
+                    Sidebar(
+                      isCollapsed: _isSidebarCollapsed,
+                      selectedRoute: widget.selectedRoute,
+                      onToggleCollapse: () {
+                        setState(() {
+                          _isSidebarCollapsed = !_isSidebarCollapsed;
+                        });
+                      },
+                    ),
 
-                    // Content
+                    // Main content area
                     Expanded(
-                      child: Container(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerLowest,
-                        child: widget.child,
+                      child: Column(
+                        children: [
+                          // Breadcrumb navigation
+                          const BreadcrumbNav(),
+
+                          // Content
+                          Expanded(
+                            child: Container(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLowest,
+                              child: widget.child,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
