@@ -137,8 +137,9 @@ class SecureTokenStorage implements TokenStorageInterface {
     final expiry = await getAccessTokenExpiry();
     if (expiry == null) return true;
 
+    // 如果 token 在5分钟内过期，就需要刷新
     final refreshThreshold = DateTime.now().add(const Duration(minutes: 5));
-    return refreshThreshold.isAfter(expiry);
+    return expiry.isBefore(refreshThreshold);
   }
 }
 
@@ -216,7 +217,8 @@ class SharedPrefsTokenStorage implements TokenStorageInterface {
     final expiry = await getAccessTokenExpiry();
     if (expiry == null) return true;
 
+    // 如果 token 在5分钟内过期，就需要刷新
     final refreshThreshold = DateTime.now().add(const Duration(minutes: 5));
-    return refreshThreshold.isAfter(expiry);
+    return expiry.isBefore(refreshThreshold);
   }
 }
