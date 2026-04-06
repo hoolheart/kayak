@@ -1,8 +1,8 @@
 # Kayak 科学研究支持软件 - 架构设计文档
 
-**版本**: 1.0  
-**日期**: 2024-03-15  
-**状态**: Draft
+**版本**: 1.1  
+**日期**: 2026-04-06  
+**状态**: Active
 
 ---
 
@@ -196,6 +196,8 @@ classDiagram
         +refresh_token(token) Result~AccessToken~
         +logout(token) Result~
         +verify_token(token) Result~Claims~
+        +get_user_by_id(id) Result~Option~User~~
+        +verify_access_token(token) Result~Claims~
     }
     
     class UserRepository {
@@ -1104,6 +1106,7 @@ kayak-frontend/lib/
 | 版本 | 日期 | 修改人 | 修改内容 |
 |------|------|--------|----------|
 | 1.0 | 2024-03-15 | Architecture Team | 初始版本 |
+| 1.1 | 2026-04-06 | Architecture Team | 更新认证模块，添加 get_user_by_id 和 verify_access_token 方法 |
 
 ---
 

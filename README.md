@@ -240,8 +240,8 @@ docker-compose -f docker-compose.separate.yml up -d
 
 ### Release 0 (当前)
 - [x] 基础架构设计
-- [ ] 用户认证系统
-- [ ] 工作台与虚拟设备管理
+- [x] 用户认证系统
+- [x] 工作台与虚拟设备管理
 - [ ] 试验过程基础框架
 - [ ] 数据管理基础
 
