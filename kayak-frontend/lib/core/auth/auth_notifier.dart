@@ -106,15 +106,18 @@ class AuthStateNotifier extends StateNotifier<AuthState>
   @override
   Future<bool> login(String email, String password) async {
     state = AuthState.loading();
+    debugPrint('Login: Starting login for $email');
 
     try {
       final response = await _authApiService.login(email, password);
+      debugPrint('Login: API response received');
 
       await _tokenStorage.saveTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         expiresIn: response.expiresIn,
       );
+      debugPrint('Login: Tokens saved');
 
       final user = User(
         id: response.userId,
@@ -123,8 +126,11 @@ class AuthStateNotifier extends StateNotifier<AuthState>
       );
 
       state = AuthState.authenticated(user, response.accessToken);
+      debugPrint('Login: Auth state set to authenticated, userId=${user.id}');
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Login: FAILED - $e');
+      debugPrint('Login: Stack - $st');
       state = AuthState.error(e.toString());
       return false;
     }

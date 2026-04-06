@@ -7,7 +7,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -21,7 +20,7 @@ import '../../screens/settings/settings_page.dart';
 import '../navigation/app_shell.dart';
 import '../auth/providers.dart';
 
-/// 简单的启动页，后续可以替换为真正的SplashScreen
+/// 启动页 - 负责初始化认证状态并导航
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -31,18 +30,20 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   bool _initialized = false;
+  bool _navigated = false; // 防止重复导航
 
   @override
   void initState() {
     super.initState();
     // 使用addPostFrameCallback在第一帧渲染后初始化，避免在build期间修改状态
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAuth();
     });
   }
 
   Future<void> _initializeAuth() async {
     if (_initialized) return; // Prevent double initialization
+    _initialized = true;
 
     try {
       debugPrint('SplashScreen: Starting auth initialization...');
@@ -54,8 +55,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       debugPrint('SplashScreen: Auth initialization failed: $e');
       debugPrint('Stack: $stack');
     }
-    _initialized = true;
-    // Trigger rebuild to update UI
+
+    // 触发重建
     if (mounted) {
       setState(() {});
     }
@@ -63,29 +64,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 监听auth state变化，完成后跳转
+    // 监听 auth state 变化
     final authState = ref.watch(authStateProvider);
 
-    debugPrint(
-        'SplashScreen build: authState.isAuthenticated=${authState.isAuthenticated}, _initialized=$_initialized');
+    // 初始化完成后只导航一次
+    if (_initialized && !_navigated) {
+      _navigated = true;
+      final targetPath =
+          authState.isAuthenticated ? AppRoutes.dashboard : AppRoutes.login;
 
-    // 初始化完成后根据状态跳转
-    if (_initialized) {
-      if (authState.isAuthenticated) {
-        debugPrint('SplashScreen: Navigating to dashboard');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(AppRoutes.dashboard);
-          }
-        });
-      } else {
-        debugPrint('SplashScreen: Navigating to login');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted) {
-            context.go(AppRoutes.login);
-          }
-        });
-      }
+      debugPrint('SplashScreen: Navigating to $targetPath');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          context.go(targetPath);
+        }
+      });
     }
 
     return const Scaffold(
@@ -141,6 +134,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final isLoggedIn = authState.isAuthenticated;
       final path = state.uri.path;
+      debugPrint('Router redirect: isLoggedIn=$isLoggedIn, path=$path');
 
       // 公共路由
       const publicRoutes = ['/login', '/register', '/'];
@@ -149,11 +143,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 未登录访问受保护路由 -> 重定向到登录
       if (!isLoggedIn && !isPublicRoute) {
         final redirect = Uri.encodeComponent(path);
+        debugPrint('Router redirect: -> /login (unauthenticated)');
         return '/login?redirect=$redirect';
       }
 
       // 已登录访问登录页 -> 重定向到首页
       if (isLoggedIn && path == '/login') {
+        debugPrint('Router redirect: -> /dashboard (already logged in)');
         return AppRoutes.dashboard;
       }
 

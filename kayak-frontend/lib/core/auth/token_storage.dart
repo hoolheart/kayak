@@ -167,18 +167,24 @@ class SharedPrefsTokenStorage implements TokenStorageInterface {
   }) async {
     final prefs = await _preferences;
     final expiryTime = DateTime.now().add(Duration(seconds: expiresIn));
+    debugPrint(
+        'SharedPrefsTokenStorage.saveTokens: saving tokens, expiresIn=$expiresIn');
 
     await Future.wait([
       prefs.setString(_accessTokenKey, accessToken),
       prefs.setString(_refreshTokenKey, refreshToken),
       prefs.setString(_expiryKey, expiryTime.toIso8601String()),
     ]);
+    debugPrint('SharedPrefsTokenStorage.saveTokens: done');
   }
 
   @override
   Future<String?> getAccessToken() async {
     final prefs = await _preferences;
-    return prefs.getString(_accessTokenKey);
+    final token = prefs.getString(_accessTokenKey);
+    debugPrint(
+        'SharedPrefsTokenStorage.getAccessToken: ${token != null ? "found" : "null"}');
+    return token;
   }
 
   @override

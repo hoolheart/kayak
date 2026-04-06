@@ -173,6 +173,14 @@ impl AuthService for AuthServiceImpl {
         // Release 1中可以添加Token黑名单功能
         Ok(())
     }
+
+    async fn get_user_by_id(&self, user_id: Uuid) -> Result<Option<User>, AppError> {
+        self.user_repo.find_by_id(user_id).await
+    }
+
+    fn verify_access_token(&self, token: &str) -> Result<TokenClaims, AppError> {
+        self.token_service.verify_access_token(token)
+    }
 }
 
 /// JWT Token服务实现

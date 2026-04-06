@@ -21,6 +21,12 @@ pub trait AuthService: Send + Sync {
 
     /// 用户登出
     async fn logout(&self, user_id: uuid::Uuid) -> Result<(), AppError>;
+
+    /// 根据ID获取用户
+    async fn get_user_by_id(&self, user_id: uuid::Uuid) -> Result<Option<User>, AppError>;
+
+    /// 验证Access Token
+    fn verify_access_token(&self, token: &str) -> Result<TokenClaims, AppError>;
 }
 
 /// 登录响应

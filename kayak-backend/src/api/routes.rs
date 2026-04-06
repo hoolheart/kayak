@@ -20,7 +20,7 @@ use crate::api::handlers::user;
 use crate::api::handlers::workbench;
 use crate::api::middleware::error::not_found_handler;
 use crate::auth::{
-    handlers::{login, refresh_token, register},
+    handlers::{get_authenticated_user, login, refresh_token, register},
     services::{AuthServiceImpl, BcryptPasswordHasher, JwtTokenService},
     user_repo_adapter::UserRepositoryAdapter,
 };
@@ -167,6 +167,7 @@ where
             .route("/register", post(register::<S>))
             .route("/login", post(login::<S>))
             .route("/refresh", post(refresh_token::<S>))
+            .route("/me", get(get_authenticated_user::<S>))
             .with_state(auth_service),
     )
 }

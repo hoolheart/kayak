@@ -7,9 +7,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/auth/auth_state.dart';
 import '../../../core/auth/providers.dart';
-import '../../../core/router/app_router.dart';
 
 /// 登录视图层组件
 class LoginView extends ConsumerWidget {
@@ -30,20 +28,6 @@ class LoginView extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
     final authNotifier = ref.watch(authStateNotifierProvider);
     final colorScheme = Theme.of(context).colorScheme;
-
-    // 监听登录成功状态，跳转
-    ref.listen<AuthState>(authStateProvider, (previous, next) {
-      if (next.isAuthenticated && previous?.isAuthenticated != true) {
-        // 登录成功，跳转
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (redirectPath != null) {
-            context.go(Uri.decodeComponent(redirectPath!));
-          } else {
-            context.go(AppRoutes.dashboard);
-          }
-        });
-      }
-    });
 
     return Center(
       child: SingleChildScrollView(
