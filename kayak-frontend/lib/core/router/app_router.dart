@@ -20,7 +20,7 @@ import '../../screens/settings/settings_page.dart';
 import '../navigation/app_shell.dart';
 import '../auth/providers.dart';
 
-/// 启动页 - 负责初始化认证状态并导航
+/// 启动页 - 仅显示加载状态，路由重定向处理导航
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -29,58 +29,29 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  bool _initialized = false;
-  bool _navigated = false; // 防止重复导航
-
   @override
   void initState() {
     super.initState();
-    // 使用addPostFrameCallback在第一帧渲染后初始化，避免在build期间修改状态
+    // 在第一帧渲染后启动认证初始化
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAuth();
     });
   }
 
   Future<void> _initializeAuth() async {
-    if (_initialized) return; // Prevent double initialization
-    _initialized = true;
-
     try {
       debugPrint('SplashScreen: Starting auth initialization...');
       final authNotifier = ref.read(authStateNotifierProvider);
-      debugPrint('SplashScreen: Got authNotifier, calling initialize...');
       await authNotifier.initialize();
       debugPrint('SplashScreen: Auth initialization complete');
     } catch (e, stack) {
       debugPrint('SplashScreen: Auth initialization failed: $e');
       debugPrint('Stack: $stack');
     }
-
-    // 触发重建
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 监听 auth state 变化
-    final authState = ref.watch(authStateProvider);
-
-    // 初始化完成后只导航一次
-    if (_initialized && !_navigated) {
-      _navigated = true;
-      final targetPath =
-          authState.isAuthenticated ? AppRoutes.dashboard : AppRoutes.login;
-
-      debugPrint('SplashScreen: Navigating to $targetPath');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          context.go(targetPath);
-        }
-      });
-    }
-
     return const Scaffold(
       body: Center(
         child: Column(
@@ -133,12 +104,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     refreshListenable: AuthStateChangeNotifier(ref),
     redirect: (context, state) {
       final isLoggedIn = authState.isAuthenticated;
+      final isInitialized = authState.isInitialized;
       final path = state.uri.path;
-      debugPrint('Router redirect: isLoggedIn=$isLoggedIn, path=$path');
+      debugPrint(
+          'Router redirect: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path');
 
-      // 公共路由
-      const publicRoutes = ['/login', '/register', '/'];
+      // 公共路由 - 登录和注册页面始终可访问
+      const publicRoutes = ['/login', '/register'];
       final isPublicRoute = publicRoutes.contains(path);
+
+      // 未初始化 -> 留在 splash 页面等待
+      if (!isInitialized) {
+        debugPrint(
+            'Router redirect: -> / (not initialized, waiting on splash)');
+        return null; // 留在当前页面
+      }
 
       // 未登录访问受保护路由 -> 重定向到登录
       if (!isLoggedIn && !isPublicRoute) {
@@ -150,6 +130,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 已登录访问登录页 -> 重定向到首页
       if (isLoggedIn && path == '/login') {
         debugPrint('Router redirect: -> /dashboard (already logged in)');
+        return AppRoutes.dashboard;
+      }
+
+      // 已登录访问启动页 -> 直接跳转到首页（跳过 SplashScreen）
+      if (isLoggedIn && path == '/') {
+        debugPrint(
+            'Router redirect: -> /dashboard (authenticated, skip splash)');
         return AppRoutes.dashboard;
       }
 

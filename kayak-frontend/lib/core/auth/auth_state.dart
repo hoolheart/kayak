@@ -95,6 +95,7 @@ class LoginResponse {
 class AuthState {
   final bool isAuthenticated;
   final bool isLoading;
+  final bool isInitialized; // 是否已完成首次初始化
   final User? user;
   final String? accessToken;
   final String? error;
@@ -102,6 +103,7 @@ class AuthState {
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
+    this.isInitialized = false,
     this.user,
     this.accessToken,
     this.error,
@@ -110,6 +112,7 @@ class AuthState {
   AuthState copyWith({
     bool? isAuthenticated,
     bool? isLoading,
+    bool? isInitialized,
     User? user,
     String? accessToken,
     String? error,
@@ -117,21 +120,28 @@ class AuthState {
     return AuthState(
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       isLoading: isLoading ?? this.isLoading,
+      isInitialized: isInitialized ?? this.isInitialized,
       user: user ?? this.user,
       accessToken: accessToken ?? this.accessToken,
       error: error ?? this.error,
     );
   }
 
-  factory AuthState.initial() => const AuthState();
+  /// 未初始化状态 - 首次创建时使用，isLoading=true 表示正在检查认证状态
+  factory AuthState.initial() =>
+      const AuthState(isLoading: true, isInitialized: false);
 
-  factory AuthState.loading() => const AuthState(isLoading: true);
+  factory AuthState.loading() =>
+      const AuthState(isLoading: true, isInitialized: false);
 
   factory AuthState.authenticated(User user, String accessToken) => AuthState(
         isAuthenticated: true,
+        isLoading: false,
+        isInitialized: true,
         user: user,
         accessToken: accessToken,
       );
 
-  factory AuthState.error(String message) => AuthState(error: message);
+  factory AuthState.error(String message) =>
+      AuthState(error: message, isInitialized: true);
 }

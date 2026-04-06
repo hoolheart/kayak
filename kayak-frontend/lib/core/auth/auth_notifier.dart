@@ -43,10 +43,11 @@ class AuthStateNotifier extends StateNotifier<AuthState>
   /// 从安全存储恢复会话
   @override
   Future<void> initialize() async {
-    if (state.isLoading) return;
+    // 如果已经初始化完成，不再重复初始化
+    if (state.isInitialized) return;
 
     debugPrint('AuthStateNotifier.initialize: Starting');
-    state = AuthState.loading();
+    state = AuthState.loading(); // 保持 isLoading = true, isInitialized = false
 
     try {
       debugPrint('AuthStateNotifier.initialize: Getting tokens');
@@ -57,7 +58,9 @@ class AuthStateNotifier extends StateNotifier<AuthState>
 
       if (accessToken == null || refreshToken == null) {
         debugPrint('AuthStateNotifier.initialize: No tokens, going to initial');
-        state = AuthState.initial();
+        // 未登录状态 - isInitialized = true, isLoading = false
+        state = const AuthState(
+            isAuthenticated: false, isLoading: false, isInitialized: true);
         return;
       }
 
@@ -68,7 +71,8 @@ class AuthStateNotifier extends StateNotifier<AuthState>
         if (!success) {
           debugPrint('AuthStateNotifier.initialize: Refresh failed');
           await _tokenStorage.clearTokens();
-          state = AuthState.initial();
+          state = const AuthState(
+              isAuthenticated: false, isLoading: false, isInitialized: true);
           return;
         }
       }
@@ -77,7 +81,8 @@ class AuthStateNotifier extends StateNotifier<AuthState>
       final currentAccessToken = await _tokenStorage.getAccessToken();
       if (currentAccessToken == null) {
         debugPrint('AuthStateNotifier.initialize: No current access token');
-        state = AuthState.initial();
+        state = const AuthState(
+            isAuthenticated: false, isLoading: false, isInitialized: true);
         return;
       }
 
@@ -92,13 +97,15 @@ class AuthStateNotifier extends StateNotifier<AuthState>
       } else {
         debugPrint('AuthStateNotifier.initialize: No user, going to initial');
         await _tokenStorage.clearTokens();
-        state = AuthState.initial();
+        state = const AuthState(
+            isAuthenticated: false, isLoading: false, isInitialized: true);
       }
     } catch (e, st) {
       debugPrint('AuthStateNotifier.initialize: EXCEPTION: $e');
       debugPrint('AuthStateNotifier.initialize: Stack: $st');
       await _tokenStorage.clearTokens();
-      state = AuthState.initial();
+      state = const AuthState(
+          isAuthenticated: false, isLoading: false, isInitialized: true);
     }
   }
 
