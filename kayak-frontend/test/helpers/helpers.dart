@@ -6,6 +6,7 @@
 /// ```dart
 /// import 'package:kayak_frontend/test/helpers/helpers.dart';
 /// ```
+library;
 
 export 'widget_finders.dart';
 export 'widget_interactions.dart';

@@ -3,7 +3,6 @@
 /// 测试 MethodEditNotifier 类的行为
 library;
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/methods/models/method.dart';
@@ -32,8 +31,6 @@ void main() {
     group('加载方法', () {
       test('loadMethod加载现有方法', () async {
         final method = createTestMethod(
-          id: 'test-id',
-          name: 'Test Method',
           description: 'A test method',
           processDefinition: {
             'nodes': [
@@ -117,7 +114,7 @@ void main() {
 
       test('addParameterWithConfig添加带配置的参数', () async {
         final notifier = MethodEditNotifier(mockService);
-        final config = ParameterConfig(
+        const config = ParameterConfig(
           name: 'custom_param',
           type: 'number',
           defaultValue: 42.0,
@@ -148,7 +145,7 @@ void main() {
         notifier.addParameter();
         final oldName = notifier.state.parameters.keys.first;
 
-        final newConfig = ParameterConfig(
+        const newConfig = ParameterConfig(
           name: 'updated_param',
           type: 'integer',
           defaultValue: 100,
@@ -162,9 +159,9 @@ void main() {
 
     group('验证方法', () {
       test('validateMethod验证有效JSON', () async {
-        final validJson = '{"nodes": [{"id": "start", "type": "Start"}]}';
-        when(() => mockService.validateMethod(any()))
-            .thenAnswer((_) async => ValidationResult(valid: true, errors: []));
+        const validJson = '{"nodes": [{"id": "start", "type": "Start"}]}';
+        when(() => mockService.validateMethod(any())).thenAnswer(
+            (_) async => const ValidationResult(valid: true, errors: []));
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateProcessDefinition(validJson);
@@ -175,9 +172,9 @@ void main() {
       });
 
       test('validateMethod处理无效JSON', () async {
-        final invalidJson = 'not valid json';
-        when(() => mockService.validateMethod(any()))
-            .thenAnswer((_) async => ValidationResult(valid: true, errors: []));
+        const invalidJson = 'not valid json';
+        when(() => mockService.validateMethod(any())).thenAnswer(
+            (_) async => const ValidationResult(valid: true, errors: []));
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateProcessDefinition(invalidJson);
@@ -187,9 +184,9 @@ void main() {
       });
 
       test('validateMethod处理验证失败', () async {
-        final validJson = '{"nodes": []}';
+        const validJson = '{"nodes": []}';
         when(() => mockService.validateMethod(any())).thenAnswer(
-          (_) async => ValidationResult(
+          (_) async => const ValidationResult(
             valid: false,
             errors: ['Missing Start node', 'Missing End node'],
           ),
@@ -224,7 +221,7 @@ void main() {
 
       test('saveMethod更新现有方法', () async {
         when(() => mockService.getMethod('test-id'))
-            .thenAnswer((_) async => createTestMethod(id: 'test-id'));
+            .thenAnswer((_) async => createTestMethod());
         when(() => mockService.updateMethod(
               any(),
               name: any(named: 'name'),
@@ -312,7 +309,7 @@ void main() {
     });
 
     test('canSave需要非空名称', () {
-      const state1 = MethodEditState(name: '');
+      const state1 = MethodEditState();
       expect(state1.canSave, isFalse);
 
       const state2 = MethodEditState(name: 'Valid Name');

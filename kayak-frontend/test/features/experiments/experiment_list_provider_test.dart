@@ -103,7 +103,7 @@ void main() {
         addTearDown(container.dispose);
 
         final notifier = container.read(experimentListProvider.notifier);
-        final startDate = DateTime(2024, 1, 1);
+        final startDate = DateTime(2024);
         final endDate = DateTime(2024, 12, 31);
 
         notifier.setDateRangeFilter(startDate, endDate);
@@ -118,7 +118,7 @@ void main() {
         addTearDown(container.dispose);
 
         final notifier = container.read(experimentListProvider.notifier);
-        final startDate = DateTime(2024, 3, 1);
+        final startDate = DateTime(2024, 3);
         final endDate = DateTime(2024, 6, 30);
 
         notifier.setDateRange(startDate, endDate);
@@ -133,8 +133,7 @@ void main() {
         addTearDown(container.dispose);
 
         final notifier = container.read(experimentListProvider.notifier);
-        notifier.setDateRangeFilter(
-            DateTime(2024, 1, 1), DateTime(2024, 12, 31));
+        notifier.setDateRangeFilter(DateTime(2024), DateTime(2024, 12, 31));
         notifier.clearDateRangeFilter();
 
         final state = container.read(experimentListProvider);
@@ -167,7 +166,6 @@ void main() {
             )).thenAnswer((_) async => createPagedResponse(
               items: [],
               page: 1,
-              total: 0,
             ));
 
         final notifier = ExperimentListNotifier(mockService);
@@ -261,7 +259,6 @@ void main() {
             )).thenAnswer((_) async => createPagedResponse(
               items: [],
               page: 1,
-              total: 0,
             ));
 
         final notifier = ExperimentListNotifier(mockService);
@@ -350,7 +347,6 @@ void main() {
             )).thenAnswer((_) async => createPagedResponse(
               items: [],
               page: 1,
-              total: 0,
             ));
 
         final notifier = ExperimentListNotifier(mockService);
@@ -370,7 +366,7 @@ void main() {
         final notifier = container.read(experimentListProvider.notifier);
 
         notifier.setStatusFilter(ExperimentStatus.running);
-        notifier.setDateRange(DateTime(2024, 1, 1), DateTime(2024, 12, 31));
+        notifier.setDateRange(DateTime(2024), DateTime(2024, 12, 31));
 
         notifier.clearFilters();
 
@@ -422,7 +418,6 @@ void main() {
           return createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           );
         });
 
@@ -455,7 +450,6 @@ void main() {
           return createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           );
         });
 
@@ -489,7 +483,6 @@ void main() {
           return createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           );
         });
 
@@ -520,7 +513,6 @@ void main() {
           return createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           );
         });
 

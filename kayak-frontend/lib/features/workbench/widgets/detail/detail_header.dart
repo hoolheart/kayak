@@ -28,7 +28,6 @@ class DetailHeader extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
       ),

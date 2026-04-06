@@ -71,7 +71,6 @@ class _DeviceListTabState extends ConsumerState<DeviceListTab> {
 
         // 测点列表
         const Expanded(
-          flex: 1,
           child: PointListPanel(),
         ),
       ],

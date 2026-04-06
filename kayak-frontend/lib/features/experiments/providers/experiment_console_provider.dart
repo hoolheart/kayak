@@ -169,12 +169,11 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   /// Initialize the console - load methods and optionally load/create experiment
   /// C-05 fix: Accept optional experimentId to load existing experiment
   Future<void> initialize({String? experimentId}) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true);
 
     try {
       // Load available methods
-      final methodsResponse =
-          await _methodService.getMethods(page: 1, size: 100);
+      final methodsResponse = await _methodService.getMethods(size: 100);
       final methods = methodsResponse.items;
 
       // Load existing experiment or create new one
@@ -191,7 +190,6 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         experiment: experiment,
         availableMethods: methods,
         isLoading: false,
-        error: null,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -282,13 +280,13 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         if (schema.containsKey('minLength')) {
           final minLen = schema['minLength'] as int;
           if (value.toString().length < minLen) {
-            return '最短${minLen}个字符';
+            return '最短$minLen个字符';
           }
         }
         if (schema.containsKey('maxLength')) {
           final maxLen = schema['maxLength'] as int;
           if (value.toString().length > maxLen) {
-            return '最长${maxLen}个字符';
+            return '最长$maxLen个字符';
           }
         }
         break;
@@ -345,9 +343,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation to track which operation is in progress
     state = state.copyWith(
-        isControlling: true,
-        currentOperation: ControlOperation.load,
-        error: null);
+        isControlling: true, currentOperation: ControlOperation.load);
 
     try {
       // C-01 fix: pass parameter values to backend
@@ -382,9 +378,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true,
-        currentOperation: ControlOperation.start,
-        error: null);
+        isControlling: true, currentOperation: ControlOperation.start);
 
     try {
       final experiment =
@@ -414,9 +408,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true,
-        currentOperation: ControlOperation.pause,
-        error: null);
+        isControlling: true, currentOperation: ControlOperation.pause);
 
     try {
       final experiment =
@@ -446,9 +438,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true,
-        currentOperation: ControlOperation.resume,
-        error: null);
+        isControlling: true, currentOperation: ControlOperation.resume);
 
     try {
       final experiment =
@@ -478,9 +468,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true,
-        currentOperation: ControlOperation.stop,
-        error: null);
+        isControlling: true, currentOperation: ControlOperation.stop);
 
     try {
       final experiment =
@@ -593,7 +581,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   }
 
   void clearError() {
-    state = state.copyWith(error: null);
+    state = state.copyWith();
   }
 
   // M-04 fix: Toggle auto-scroll when user manually scrolls

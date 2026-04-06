@@ -334,7 +334,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
     // Normal dropdown
     return DropdownButtonFormField<String>(
       key: const Key('method_selector'),
-      value: state.selectedMethodId,
+      initialValue: state.selectedMethodId,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         isDense: true,

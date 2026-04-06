@@ -22,8 +22,8 @@ void main() {
         ownerId: 'owner-123',
         ownerType: 'user',
         status: 'active',
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
       );
     });
 
@@ -85,12 +85,11 @@ void main() {
       final workbenchNoDesc = Workbench(
         id: 'test-id-2',
         name: 'No Description Workbench',
-        description: null,
         ownerId: 'owner-123',
         ownerType: 'user',
         status: 'active',
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
       );
 
       await tester.pumpWidget(
@@ -258,19 +257,13 @@ void main() {
     test('isValid returns true when name is not empty and no errors', () {
       const state = WorkbenchFormState(
         name: 'Test',
-        nameError: null,
-        descriptionError: null,
       );
 
       expect(state.isValid, isTrue);
     });
 
     test('isValid returns false when name is empty', () {
-      const state = WorkbenchFormState(
-        name: '',
-        nameError: null,
-        descriptionError: null,
-      );
+      const state = WorkbenchFormState();
 
       expect(state.isValid, isFalse);
     });
@@ -279,7 +272,6 @@ void main() {
       const state = WorkbenchFormState(
         name: 'Test',
         nameError: 'Name is required',
-        descriptionError: null,
       );
 
       expect(state.isValid, isFalse);

@@ -27,7 +27,6 @@ class BreadcrumbNav extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
       ),

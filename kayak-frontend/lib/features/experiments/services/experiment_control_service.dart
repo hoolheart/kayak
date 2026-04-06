@@ -94,12 +94,13 @@ class ExperimentControlService implements ExperimentControlServiceInterface {
 
   @override
   Future<List<Experiment>> getExperiments({int page = 1, int size = 10}) async {
-    final response = await _apiClient.get(
+    final response = await _apiClient.get<Map<String, dynamic>>(
       '/api/v1/experiments',
       queryParameters: {'page': page, 'size': size},
     );
     final data = response as Map<String, dynamic>;
-    final items = data['data']['items'] as List<dynamic>;
+    final items =
+        (data['data'] as Map<String, dynamic>)['items'] as List<dynamic>;
     return items
         .map((e) => Experiment.fromJson(e as Map<String, dynamic>))
         .toList();

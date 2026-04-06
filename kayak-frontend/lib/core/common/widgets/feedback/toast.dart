@@ -153,7 +153,6 @@ class Toast {
       context,
       title: title,
       message: message,
-      severity: ToastSeverity.info,
     );
   }
 }

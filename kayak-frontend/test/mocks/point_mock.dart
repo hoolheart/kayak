@@ -29,8 +29,8 @@ Point createMockPoint({
     maxValue: maxValue,
     defaultValue: defaultValue,
     status: status,
-    createdAt: DateTime(2026, 1, 1),
-    updatedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
   );
 }
 
@@ -40,7 +40,6 @@ List<Point> createMockPoints() {
     createMockPoint(
       id: 'point-temperature',
       name: 'Temperature',
-      dataType: DataType.number,
       unit: '°C',
       minValue: -40.0,
       maxValue: 85.0,
@@ -48,7 +47,6 @@ List<Point> createMockPoints() {
     createMockPoint(
       id: 'point-pressure',
       name: 'Pressure',
-      dataType: DataType.number,
       unit: 'Pa',
       minValue: 0.0,
       maxValue: 1000.0,
@@ -57,7 +55,6 @@ List<Point> createMockPoints() {
       id: 'point-status',
       name: 'Status',
       dataType: DataType.integer,
-      accessType: AccessType.ro,
     ),
     createMockPoint(
       id: 'point-switch',
@@ -69,12 +66,10 @@ List<Point> createMockPoints() {
       id: 'point-label',
       name: 'Label',
       dataType: DataType.string,
-      accessType: AccessType.ro,
     ),
     createMockPoint(
       id: 'point-disabled',
       name: 'Disabled Point',
-      dataType: DataType.number,
       status: PointStatus.disabled,
     ),
   ];
@@ -86,14 +81,11 @@ List<Point> createMockReadOnlyPoints() {
     createMockPoint(
       id: 'point-ro-1',
       name: 'Read Only Point 1',
-      dataType: DataType.number,
-      accessType: AccessType.ro,
     ),
     createMockPoint(
       id: 'point-ro-2',
       name: 'Read Only Point 2',
       dataType: DataType.integer,
-      accessType: AccessType.ro,
     ),
   ];
 }
@@ -104,7 +96,6 @@ List<Point> createMockWritablePoints() {
     createMockPoint(
       id: 'point-rw-1',
       name: 'Read Write Point 1',
-      dataType: DataType.number,
       accessType: AccessType.rw,
     ),
     createMockPoint(
@@ -134,7 +125,6 @@ Map<String, PointValue> createMockPointValues() {
   return {
     'point-temperature': createMockPointValue(
       pointId: 'point-temperature',
-      value: 25.5,
     ),
     'point-pressure': createMockPointValue(
       pointId: 'point-pressure',

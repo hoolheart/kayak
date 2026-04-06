@@ -86,7 +86,6 @@ class ExperimentFilterBar extends StatelessWidget {
           hint: const Text('全部'),
           items: [
             const DropdownMenuItem(
-              value: null,
               child: Text('全部'),
             ),
             ...ExperimentStatus.values.map((status) {

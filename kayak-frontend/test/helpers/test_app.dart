@@ -37,7 +37,6 @@ class TestApp extends StatelessWidget {
     Locale? locale,
   }) {
     return TestApp(
-      themeMode: ThemeMode.light,
       overrides: overrides,
       locale: locale,
       child: child,
@@ -103,7 +102,6 @@ class TestApp extends StatelessWidget {
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue,
-          brightness: Brightness.light,
         ),
       ),
       darkTheme: ThemeData(

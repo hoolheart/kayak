@@ -30,7 +30,6 @@ class Sidebar extends StatelessWidget {
         border: Border(
           right: BorderSide(
             color: colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
       ),
@@ -72,7 +71,6 @@ class Sidebar extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
       ),
@@ -175,7 +173,6 @@ class Sidebar extends StatelessWidget {
         border: Border(
           top: BorderSide(
             color: colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
       ),

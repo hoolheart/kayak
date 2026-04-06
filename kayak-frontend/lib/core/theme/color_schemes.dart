@@ -18,7 +18,6 @@ class AppColorSchemes {
   static ColorScheme get light {
     return ColorScheme.fromSeed(
       seedColor: seedColor,
-      brightness: Brightness.light,
     );
   }
 

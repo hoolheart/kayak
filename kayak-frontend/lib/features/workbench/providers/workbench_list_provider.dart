@@ -22,7 +22,6 @@ class WorkbenchListNotifier extends StateNotifier<WorkbenchListState> {
 
     try {
       final response = await _service.getWorkbenches(
-        page: 1,
         size: state.pageSize,
       );
 
@@ -46,7 +45,6 @@ class WorkbenchListNotifier extends StateNotifier<WorkbenchListState> {
 
     try {
       final response = await _service.getWorkbenches(
-        page: 1,
         size: state.pageSize,
       );
 

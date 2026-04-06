@@ -50,8 +50,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: colorScheme.outline.withOpacity(0.12),
-            width: 1,
+            color: colorScheme.outline.withValues(alpha: 0.12),
           ),
         ),
         color: colorScheme.surface,
@@ -89,7 +88,7 @@ class AppTheme {
       // 输入框主题
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide.none,
@@ -104,7 +103,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: colorScheme.error, width: 1),
+          borderSide: BorderSide(color: colorScheme.error),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
@@ -201,13 +200,12 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: colorScheme.outline.withOpacity(0.24),
-            width: 1,
+            color: colorScheme.outline.withValues(alpha: 0.24),
           ),
         ),
       ),
       inputDecorationTheme: light.inputDecorationTheme.copyWith(
-        fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.4),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
       ),
       bottomNavigationBarTheme: light.bottomNavigationBarTheme.copyWith(
         backgroundColor: colorScheme.surfaceContainer,

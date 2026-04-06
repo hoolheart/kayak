@@ -75,7 +75,6 @@ class SecureTokenStorage implements TokenStorageInterface {
               aOptions: AndroidOptions(encryptedSharedPreferences: true),
               iOptions:
                   IOSOptions(accessibility: KeychainAccessibility.first_unlock),
-              lOptions: LinuxOptions(), // 不使用keyring
             );
 
   @override

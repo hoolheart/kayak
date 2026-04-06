@@ -3,7 +3,6 @@
 /// 测试 MethodListNotifier 类的行为
 library;
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/methods/models/method.dart';
@@ -70,7 +69,7 @@ void main() {
           createTestMethod(name: 'Method 1'),
           createTestMethod(name: 'Method 2'),
         ];
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenAnswer((_) async => createPagedResponse(
                   items: methods,
                   page: 1,
@@ -88,7 +87,7 @@ void main() {
       });
 
       test('loadMethods显示加载状态', () async {
-        when(() => mockService.getMethods(page: 1)).thenAnswer(
+        when(() => mockService.getMethods()).thenAnswer(
           (_) async {
             await Future.delayed(const Duration(milliseconds: 10));
             return createPagedResponse(items: [], page: 1, total: 0);
@@ -106,7 +105,7 @@ void main() {
       });
 
       test('loadMethods处理错误', () async {
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenThrow(Exception('Network error'));
 
         final notifier = MethodListNotifier(mockService);
@@ -119,7 +118,7 @@ void main() {
 
     group('分页加载', () {
       test('loadMore加载下一页', () async {
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenAnswer((_) async => createPagedResponse(
                   items: List.generate(
                       10, (i) => createTestMethod(name: 'Page 1 Item $i')),
@@ -145,7 +144,7 @@ void main() {
       });
 
       test('loadMore不会在加载中时重复请求', () async {
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenAnswer((_) async => createPagedResponse(
                   items: List.generate(
                       10, (i) => createTestMethod(name: 'Item $i')),
@@ -167,7 +166,7 @@ void main() {
         await future2;
 
         // Should only have called getMethods twice (page 1 and page 2)
-        verify(() => mockService.getMethods(page: 1)).called(1);
+        verify(() => mockService.getMethods()).called(1);
       });
     });
 
@@ -175,7 +174,7 @@ void main() {
       test('deleteMethod删除指定方法', () async {
         when(() => mockService.deleteMethod('test-id'))
             .thenAnswer((_) async {});
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenAnswer((_) async => createPagedResponse(
                   items: [],
                   page: 1,
@@ -201,7 +200,7 @@ void main() {
 
     group('错误处理', () {
       test('clearError清除错误消息', () async {
-        when(() => mockService.getMethods(page: 1))
+        when(() => mockService.getMethods())
             .thenThrow(Exception('Network error'));
 
         final notifier = MethodListNotifier(mockService);
@@ -220,7 +219,6 @@ void main() {
       final state = MethodListState(
         methods: [createTestMethod()],
         isLoading: true,
-        currentPage: 1,
         totalItems: 10,
         hasMore: true,
       );

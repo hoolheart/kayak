@@ -102,19 +102,19 @@ class SettingsPage extends ConsumerWidget {
                   ),
             ),
             const SizedBox(height: 16),
-            Card(
+            const Card(
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: const Text('Kayak'),
-                    subtitle: const Text('科学研究支持平台'),
+                    leading: Icon(Icons.info_outline),
+                    title: Text('Kayak'),
+                    subtitle: Text('科学研究支持平台'),
                   ),
-                  const Divider(height: 1),
+                  Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.code),
-                    title: const Text('版本'),
-                    subtitle: const Text('1.0.0'),
+                    leading: Icon(Icons.code),
+                    title: Text('版本'),
+                    subtitle: Text('1.0.0'),
                   ),
                 ],
               ),

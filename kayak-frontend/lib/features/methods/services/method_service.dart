@@ -84,8 +84,9 @@ class MethodService implements MethodServiceInterface {
     final body = <String, dynamic>{};
     if (name != null) body['name'] = name;
     if (description != null) body['description'] = description;
-    if (processDefinition != null)
+    if (processDefinition != null) {
       body['process_definition'] = processDefinition;
+    }
     if (parameterSchema != null) body['parameter_schema'] = parameterSchema;
 
     final response = await _apiClient.put('/api/v1/methods/$id', data: body);

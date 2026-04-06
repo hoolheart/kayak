@@ -7,10 +7,10 @@ void main() {
     group('findByText', () {
       testWidgets('finds widget with exact text', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
-                children: const [
+                children: [
                   Text('Hello World'),
                   Text('Another Text'),
                 ],
@@ -26,10 +26,10 @@ void main() {
       testWidgets('finds multiple widgets with same text',
           (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
-                children: const [
+                children: [
                   Text('Duplicate'),
                   Text('Duplicate'),
                 ],
@@ -109,17 +109,17 @@ void main() {
 
       testWidgets('finds form fields by key', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
                 children: [
                   TextField(
-                    key: const ValueKey('email_field'),
-                    decoration: const InputDecoration(hintText: 'Email'),
+                    key: ValueKey('email_field'),
+                    decoration: InputDecoration(hintText: 'Email'),
                   ),
                   TextField(
-                    key: const ValueKey('password_field'),
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    key: ValueKey('password_field'),
+                    decoration: InputDecoration(hintText: 'Password'),
                   ),
                 ],
               ),
@@ -154,10 +154,10 @@ void main() {
 
       testWidgets('finds all TextFields', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
-                children: const [
+                children: [
                   TextField(decoration: InputDecoration(labelText: 'Field 1')),
                   TextField(decoration: InputDecoration(labelText: 'Field 2')),
                 ],
@@ -172,18 +172,19 @@ void main() {
 
       testWidgets('finds Container widgets', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
-              body: Container(
-                child: Container(
-                  child: const Text('Nested'),
-                ),
+              body: Column(
+                children: [
+                  SizedBox(child: Text('Widget 1')),
+                  SizedBox(child: Text('Widget 2')),
+                ],
               ),
             ),
           ),
         );
 
-        final finder = WidgetFinderHelpers.findByType<Container>();
+        final finder = WidgetFinderHelpers.findByType<SizedBox>();
         expect(finder, findsNWidgets(2));
       });
     });
@@ -237,10 +238,10 @@ void main() {
     group('findTextFieldByHint', () {
       testWidgets('finds TextField by hint text', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: TextField(
-                decoration: const InputDecoration(hintText: 'Enter email'),
+                decoration: InputDecoration(hintText: 'Enter email'),
               ),
             ),
           ),
@@ -254,10 +255,10 @@ void main() {
     group('findTextFieldByLabel', () {
       testWidgets('finds TextField by label text', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: TextField(
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: 'Email'),
               ),
             ),
           ),
@@ -311,10 +312,10 @@ void main() {
     group('findsExactly', () {
       testWidgets('matches exact count', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
-                children: const [
+                children: [
                   Text('Item'),
                   Text('Item'),
                   Text('Item'),

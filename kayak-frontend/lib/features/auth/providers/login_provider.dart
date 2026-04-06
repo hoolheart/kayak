@@ -60,7 +60,7 @@ class LoginState {
   }
 
   /// 状态工厂方法
-  factory LoginState.idle() => const LoginState(status: LoginStatus.idle);
+  factory LoginState.idle() => const LoginState();
 
   factory LoginState.loading() => const LoginState(status: LoginStatus.loading);
 

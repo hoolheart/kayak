@@ -78,7 +78,6 @@ class DeviceTreeNotifier extends StateNotifier<DeviceTreeState> {
             return DeviceTreeNode(
               device: device,
               children: buildNodes(device.id),
-              isExpanded: false,
             );
           }).toList() ??
           [];

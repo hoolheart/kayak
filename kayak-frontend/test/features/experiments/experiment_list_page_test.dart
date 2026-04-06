@@ -67,7 +67,6 @@ void main() {
           )).thenAnswer((_) async => createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           ));
 
       await tester.pumpWidget(
@@ -97,7 +96,6 @@ void main() {
           )).thenAnswer((_) async => createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           ));
 
       await tester.pumpWidget(
@@ -221,7 +219,6 @@ void main() {
           )).thenAnswer((_) async => createPagedResponse(
             items: [],
             page: 1,
-            total: 0,
           ));
 
       await tester.pumpWidget(

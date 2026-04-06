@@ -29,8 +29,8 @@ Device createTestDevice({
       'maxValue': 100.0
     },
     status: status,
-    createdAt: DateTime(2026, 1, 1),
-    updatedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
   );
 }
 
@@ -50,8 +50,8 @@ Point createTestPoint({
     accessType: accessType,
     unit: unit,
     status: status,
-    createdAt: DateTime(2026, 1, 1),
-    updatedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
   );
 }
 
@@ -250,7 +250,6 @@ void main() {
     testWidgets('point value is displayed correctly', (tester) async {
       final pointValue = createTestPointValue(
         pointId: 'pt-val-1',
-        value: 25.5,
       );
 
       await tester.pumpWidget(
@@ -273,7 +272,6 @@ void main() {
     testWidgets('number type shows decimal value', (tester) async {
       final pointValue = createTestPointValue(
         pointId: 'pt-num-1',
-        value: 25.5,
       );
 
       await tester.pumpWidget(

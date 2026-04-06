@@ -99,11 +99,11 @@ void main() {
     group('enterText', () {
       testWidgets('enters text into TextField', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: TextField(
-                key: const ValueKey('input_field'),
-                decoration: const InputDecoration(hintText: 'Enter text'),
+                key: ValueKey('input_field'),
+                decoration: InputDecoration(hintText: 'Enter text'),
               ),
             ),
           ),
@@ -120,9 +120,9 @@ void main() {
 
       testWidgets('enters text by hint', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
-              body: const TextField(
+              body: TextField(
                 decoration: InputDecoration(hintText: 'Email'),
               ),
             ),
@@ -140,9 +140,9 @@ void main() {
 
       testWidgets('enters text by label', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
-              body: const TextField(
+              body: TextField(
                 decoration: InputDecoration(labelText: 'Username'),
               ),
             ),
@@ -184,17 +184,17 @@ void main() {
 
       testWidgets('handles multiple fields', (WidgetTester tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Column(
                 children: [
                   TextField(
-                    key: const ValueKey('username'),
-                    decoration: const InputDecoration(hintText: 'Username'),
+                    key: ValueKey('username'),
+                    decoration: InputDecoration(hintText: 'Username'),
                   ),
                   TextField(
-                    key: const ValueKey('password'),
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    key: ValueKey('password'),
+                    decoration: InputDecoration(hintText: 'Password'),
                     obscureText: true,
                   ),
                 ],

@@ -62,7 +62,7 @@ class PointValueNotifier extends StateNotifier<PointValueState> {
   Future<void> _loadValue() async {
     try {
       final value = await _service.readPointValue(pointId);
-      state = state.copyWith(value: value, isLoading: false, error: null);
+      state = state.copyWith(value: value, isLoading: false);
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
     }

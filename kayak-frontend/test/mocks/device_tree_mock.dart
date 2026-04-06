@@ -33,8 +33,8 @@ Device createMockDevice({
     model: 'Test Model',
     sn: 'SN123456',
     status: status,
-    createdAt: DateTime(2026, 1, 1),
-    updatedAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
   );
 }
 
@@ -44,7 +44,6 @@ List<Device> createMockRootDevices() {
     createMockDevice(
       id: 'device-root-1',
       name: 'Root Device 1',
-      status: DeviceStatus.online,
     ),
     createMockDevice(
       id: 'device-root-2',
@@ -60,13 +59,11 @@ List<Device> createMockNestedDevices() {
     createMockDevice(
       id: 'device-parent-1',
       name: 'Parent Device',
-      status: DeviceStatus.online,
     ),
     createMockDevice(
       id: 'device-child-1',
       parentId: 'device-parent-1',
       name: 'Child Device 1',
-      status: DeviceStatus.online,
     ),
     createMockDevice(
       id: 'device-child-2',
@@ -83,19 +80,16 @@ List<Device> createMockMultiLevelDevices() {
     createMockDevice(
       id: 'device-level-1',
       name: 'Level 1 Device',
-      status: DeviceStatus.online,
     ),
     createMockDevice(
       id: 'device-level-2',
       parentId: 'device-level-1',
       name: 'Level 2 Device',
-      status: DeviceStatus.online,
     ),
     createMockDevice(
       id: 'device-level-3',
       parentId: 'device-level-2',
       name: 'Level 3 Device',
-      status: DeviceStatus.online,
     ),
   ];
 }

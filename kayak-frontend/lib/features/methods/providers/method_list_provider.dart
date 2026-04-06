@@ -56,9 +56,9 @@ class MethodListNotifier extends StateNotifier<MethodListState> {
 
   Future<void> loadMethods({int page = 1, bool append = false}) async {
     if (page == 1) {
-      state = state.copyWith(isLoading: true, error: null);
+      state = state.copyWith(isLoading: true);
     } else {
-      state = state.copyWith(isLoadingMore: true, error: null);
+      state = state.copyWith(isLoadingMore: true);
     }
 
     try {
@@ -76,7 +76,6 @@ class MethodListNotifier extends StateNotifier<MethodListState> {
         currentPage: page,
         totalItems: response.total,
         hasMore: hasMore,
-        error: null,
       );
     } catch (e) {
       state = state.copyWith(
@@ -103,7 +102,7 @@ class MethodListNotifier extends StateNotifier<MethodListState> {
   }
 
   void clearError() {
-    state = state.copyWith(error: null);
+    state = state.copyWith();
   }
 }
 

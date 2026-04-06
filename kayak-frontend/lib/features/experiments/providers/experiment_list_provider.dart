@@ -22,7 +22,6 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
 
     state = state.copyWith(
       isLoading: true,
-      error: null,
       currentPage: reset ? 1 : null,
     );
 
@@ -55,11 +54,10 @@ class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
   Future<void> refresh() async {
     if (state.isRefreshing) return;
 
-    state = state.copyWith(isRefreshing: true, error: null);
+    state = state.copyWith(isRefreshing: true);
 
     try {
       final response = await _service.getExperiments(
-        page: 1,
         size: state.pageSize,
         status: state.statusFilter,
         startedAfter: state.startDateFilter,

@@ -46,9 +46,8 @@ PointHistoryItem createTestPointHistoryItem({
 }) {
   // 使用 millisecondsSinceEpoch * 1000000 表示纳秒
   return PointHistoryItem(
-    timestamp:
-        (timestamp ?? DateTime(2024, 3, 15, 10, 0, 0)).millisecondsSinceEpoch *
-            1000000,
+    timestamp: (timestamp ?? DateTime(2024, 3, 15, 10)).millisecondsSinceEpoch *
+        1000000,
     value: value,
   );
 }
@@ -84,9 +83,9 @@ void main() {
           name: '测试实验',
           description: '这是一个测试实验',
           status: ExperimentStatus.running,
-          startedAt: DateTime(2024, 3, 15, 9, 0),
-          createdAt: DateTime(2024, 3, 15, 8, 0),
-          updatedAt: DateTime(2024, 3, 15, 9, 0),
+          startedAt: DateTime(2024, 3, 15, 9),
+          createdAt: DateTime(2024, 3, 15, 8),
+          updatedAt: DateTime(2024, 3, 15, 9),
         );
 
         when(() => mockService.getExperiment('exp-1'))
@@ -129,8 +128,8 @@ void main() {
             userId: 'user-1',
             name: '测试实验',
             status: ExperimentStatus.idle,
-            createdAt: DateTime(2024, 1, 1),
-            updatedAt: DateTime(2024, 1, 1),
+            createdAt: DateTime(2024),
+            updatedAt: DateTime(2024),
           );
         });
 
@@ -158,14 +157,12 @@ void main() {
             PointHistoryItem(
               // 使用 millisecondsSinceEpoch * 1000000 表示纳秒
               timestamp:
-                  DateTime(2024, 3, 15, 10, 0, 0).millisecondsSinceEpoch *
-                      1000000,
+                  DateTime(2024, 3, 15, 10).millisecondsSinceEpoch * 1000000,
               value: 25.5,
             ),
             PointHistoryItem(
               timestamp:
-                  DateTime(2024, 3, 15, 10, 1, 0).millisecondsSinceEpoch *
-                      1000000,
+                  DateTime(2024, 3, 15, 10, 1).millisecondsSinceEpoch * 1000000,
               value: 26.0,
             ),
           ],
@@ -193,7 +190,7 @@ void main() {
       test('loadPointHistory处理时间戳转换', () async {
         // API返回的是纳秒时间戳
         final timestampNs =
-            DateTime(2024, 3, 15, 10, 30, 0).millisecondsSinceEpoch * 1000000;
+            DateTime(2024, 3, 15, 10, 30).millisecondsSinceEpoch * 1000000;
 
         final response = PointHistoryResponse(
           experimentId: 'exp-1',
@@ -215,7 +212,7 @@ void main() {
 
         // 验证时间戳正确转换为DateTime
         expect(notifier.state.pointHistory[0].timestamp,
-            equals(DateTime(2024, 3, 15, 10, 30, 0)));
+            equals(DateTime(2024, 3, 15, 10, 30)));
       });
 
       test('loadPointHistory处理加载错误', () async {
@@ -308,11 +305,11 @@ void main() {
 
         final history = [
           PointHistoryData(
-            timestamp: DateTime(2024, 3, 15, 10, 0, 0),
+            timestamp: DateTime(2024, 3, 15, 10),
             value: 25.5,
           ),
           PointHistoryData(
-            timestamp: DateTime(2024, 3, 15, 10, 1, 0),
+            timestamp: DateTime(2024, 3, 15, 10, 1),
             value: 26.0,
           ),
         ];
@@ -372,15 +369,15 @@ void main() {
 
         final history = [
           PointHistoryData(
-            timestamp: DateTime(2024, 3, 15, 10, 0, 0),
+            timestamp: DateTime(2024, 3, 15, 10),
             value: 0.0,
           ),
           PointHistoryData(
-            timestamp: DateTime(2024, 3, 15, 10, 1, 0),
+            timestamp: DateTime(2024, 3, 15, 10, 1),
             value: -10.5,
           ),
           PointHistoryData(
-            timestamp: DateTime(2024, 3, 15, 10, 2, 0),
+            timestamp: DateTime(2024, 3, 15, 10, 2),
             value: 3.14159,
           ),
         ];
@@ -442,8 +439,8 @@ void main() {
                   userId: 'user-1',
                   name: '测试',
                   status: ExperimentStatus.idle,
-                  createdAt: DateTime(2024, 1, 1),
-                  updatedAt: DateTime(2024, 1, 1),
+                  createdAt: DateTime(2024),
+                  updatedAt: DateTime(2024),
                 ));
 
         final notifier = ExperimentDetailNotifier(mockService);
@@ -459,7 +456,7 @@ void main() {
       });
 
       test('加载历史数据时不影响详情加载状态', () async {
-        final response = PointHistoryResponse(
+        const response = PointHistoryResponse(
           experimentId: 'exp-1',
           channel: 'sensor_1',
           data: [],
@@ -485,7 +482,7 @@ void main() {
         when(() => mockService.getPointHistory(any(), any(),
             limit: any(named: 'limit'))).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 100));
-          return PointHistoryResponse(
+          return const PointHistoryResponse(
             experimentId: 'exp-1',
             channel: 'sensor_1',
             data: [],

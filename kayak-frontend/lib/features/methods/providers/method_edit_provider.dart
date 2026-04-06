@@ -94,7 +94,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
   MethodEditNotifier(this._service) : super(const MethodEditState());
 
   Future<void> loadMethod(String id) async {
-    state = state.copyWith(isLoaded: false, error: null);
+    state = state.copyWith(isLoaded: false);
 
     try {
       final method = await _service.getMethod(id);
@@ -117,7 +117,6 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
         parameters: params,
         isLoaded: true,
         isDirty: false,
-        error: null,
       );
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoaded: true);
@@ -125,8 +124,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
   }
 
   void updateName(String name) {
-    state = state.copyWith(
-        name: name, isDirty: true, error: null, validationResult: null);
+    state = state.copyWith(name: name, isDirty: true);
   }
 
   void updateDescription(String? description) {
@@ -137,8 +135,6 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
     state = state.copyWith(
       processDefinitionJson: json,
       isDirty: true,
-      error: null,
-      validationResult: null,
     );
   }
 
@@ -181,8 +177,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
       return;
     }
 
-    state =
-        state.copyWith(isValidating: true, error: null, validationResult: null);
+    state = state.copyWith(isValidating: true);
 
     try {
       final json =
@@ -205,7 +200,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
       return false;
     }
 
-    state = state.copyWith(isSaving: true, error: null);
+    state = state.copyWith(isSaving: true);
 
     try {
       final processDef =
@@ -236,7 +231,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
         );
       }
 
-      state = state.copyWith(isSaving: false, isDirty: false, error: null);
+      state = state.copyWith(isSaving: false, isDirty: false);
       return true;
     } catch (e) {
       state = state.copyWith(isSaving: false, error: e.toString());
@@ -245,7 +240,7 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
   }
 
   void clearError() {
-    state = state.copyWith(error: null);
+    state = state.copyWith();
   }
 }
 

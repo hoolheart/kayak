@@ -11,9 +11,9 @@ void main() {
   group('TestApp Golden Tests', () {
     testWidgets('Golden - TestApp Light Theme', (tester) async {
       // 设置固定屏幕尺寸（桌面端）
-      tester.binding.window.physicalSizeTestValue = const Size(1280, 800);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       // 构建测试页面（浅色主题）
       await tester.pumpWidget(
@@ -52,9 +52,9 @@ void main() {
 
     testWidgets('Golden - TestApp Dark Theme', (tester) async {
       // 设置固定屏幕尺寸（桌面端）
-      tester.binding.window.physicalSizeTestValue = const Size(1280, 800);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       // 构建测试页面（深色主题）
       await tester.pumpWidget(
@@ -92,9 +92,9 @@ void main() {
 
     testWidgets('Golden - TestApp Mobile Light', (tester) async {
       // 设置移动端屏幕尺寸
-      tester.binding.window.physicalSizeTestValue = const Size(390, 844);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         TestApp.light(
@@ -119,9 +119,9 @@ void main() {
 
     testWidgets('Golden - TestApp Mobile Dark', (tester) async {
       // 设置移动端屏幕尺寸
-      tester.binding.window.physicalSizeTestValue = const Size(390, 844);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         TestApp.dark(
@@ -145,9 +145,9 @@ void main() {
     });
 
     testWidgets('Golden - Card Component Light', (tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(400, 300);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(400, 300);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         TestApp.light(
@@ -179,9 +179,9 @@ void main() {
     });
 
     testWidgets('Golden - Card Component Dark', (tester) async {
-      tester.binding.window.physicalSizeTestValue = const Size(400, 300);
-      tester.binding.window.devicePixelRatioTestValue = 1.0;
-      addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      tester.view.physicalSize = const Size(400, 300);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         TestApp.dark(

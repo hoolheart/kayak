@@ -479,7 +479,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _paramTypeController.text,
+                    initialValue: _paramTypeController.text,
                     decoration: const InputDecoration(
                       labelText: '类型',
                       border: OutlineInputBorder(),

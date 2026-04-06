@@ -21,7 +21,6 @@ class DeviceTreeNode with _$DeviceTreeNode {
   factory DeviceTreeNode.fromDevice(Device device) => DeviceTreeNode(
         device: device,
         children: [],
-        isExpanded: false,
       );
 
   factory DeviceTreeNode.fromJson(Map<String, dynamic> json) =>

@@ -43,10 +43,10 @@ class ExperimentDataTable extends StatelessWidget {
               child: Row(
                 children: [
                   _buildHeaderCell(context, '名称', flex: 3),
-                  _buildHeaderCell(context, '状态', flex: 1),
+                  _buildHeaderCell(context, '状态'),
                   _buildHeaderCell(context, '开始时间', flex: 2),
                   _buildHeaderCell(context, '结束时间', flex: 2),
-                  _buildHeaderCell(context, '操作', flex: 1),
+                  _buildHeaderCell(context, '操作'),
                 ],
               ),
             ),
@@ -80,8 +80,7 @@ class ExperimentDataTable extends StatelessWidget {
                           child: Row(
                             children: [
                               _buildDataCell(context, experiment.name, flex: 3),
-                              _buildStatusCell(context, experiment.status,
-                                  flex: 1),
+                              _buildStatusCell(context, experiment.status),
                               _buildDataCell(
                                 context,
                                 _formatDateTime(experiment.startedAt),
@@ -92,7 +91,7 @@ class ExperimentDataTable extends StatelessWidget {
                                 _formatDateTime(experiment.endedAt),
                                 flex: 2,
                               ),
-                              _buildActionCell(context, experiment, flex: 1),
+                              _buildActionCell(context, experiment),
                             ],
                           ),
                         ),

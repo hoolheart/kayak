@@ -386,7 +386,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
           child: Row(
             children: [
               Expanded(child: _buildHeaderCell(context, '时间', flex: 2)),
-              Expanded(child: _buildHeaderCell(context, '数值', flex: 1)),
+              Expanded(child: _buildHeaderCell(context, '数值')),
             ],
           ),
         ),
@@ -425,7 +425,6 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
                         ),
                       ),
                       Expanded(
-                        flex: 1,
                         child: Text(
                           point.value.toStringAsFixed(4),
                           style: Theme.of(context).textTheme.bodyMedium,

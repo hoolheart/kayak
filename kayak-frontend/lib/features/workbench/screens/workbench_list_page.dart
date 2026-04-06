@@ -131,7 +131,6 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
       return EmptyStateWidget(
         title: '暂无工作台',
         message: '点击下方按钮创建第一个工作台',
-        icon: Icons.folder_open_outlined,
         actionLabel: '创建工作台',
         onAction: _showCreateDialog,
       );

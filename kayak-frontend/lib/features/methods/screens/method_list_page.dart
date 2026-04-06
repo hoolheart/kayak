@@ -51,7 +51,7 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('方法管理'),
+        title: const Text('方法管理'),
         actions: [
           FilledButton.icon(
             onPressed: () => context.push('/methods/create'),

@@ -40,8 +40,8 @@ void main() {
           userId: 'user-1',
           name: 'Test Experiment',
           status: ExperimentStatus.idle,
-          createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
         ),
       ];
       final state = ExperimentListState(experiments: experiments);
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('copyWith可以清除statusFilter', () {
-      final state = ExperimentListState(
+      const state = ExperimentListState(
         statusFilter: ExperimentStatus.running,
       );
       final newState = state.copyWith(clearStatusFilter: true);
@@ -64,7 +64,7 @@ void main() {
 
     test('copyWith可以清除日期筛选器', () {
       final state = ExperimentListState(
-        startDateFilter: DateTime(2024, 1, 1),
+        startDateFilter: DateTime(2024),
         endDateFilter: DateTime(2024, 12, 31),
       );
       final newState = state.copyWith(
@@ -85,7 +85,7 @@ void main() {
     });
 
     test('copyWith可以更新分页信息', () {
-      const state = ExperimentListState(currentPage: 1, total: 100);
+      const state = ExperimentListState(total: 100);
       final newState = state.copyWith(
         currentPage: 2,
         total: 50,
@@ -104,8 +104,8 @@ void main() {
           userId: 'user-1',
           name: 'Old Experiment',
           status: ExperimentStatus.idle,
-          createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
         ),
       ];
       final newExperiments = [
@@ -114,8 +114,8 @@ void main() {
           userId: 'user-1',
           name: 'New Experiment',
           status: ExperimentStatus.running,
-          createdAt: DateTime(2024, 2, 1),
-          updatedAt: DateTime(2024, 2, 1),
+          createdAt: DateTime(2024, 2),
+          updatedAt: DateTime(2024, 2),
         ),
       ];
 

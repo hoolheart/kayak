@@ -29,8 +29,8 @@ void main() {
         userId: 'user-1',
         name: '测试实验',
         status: ExperimentStatus.running,
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
       );
 
       final newState = state.copyWith(experiment: experiment);
@@ -45,8 +45,8 @@ void main() {
         userId: 'user-1',
         name: '测试实验',
         status: ExperimentStatus.running,
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
+        updatedAt: DateTime(2024),
       );
 
       final state = ExperimentDetailState(experiment: experiment);
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('copyWith使用clearError清除错误', () {
-      final state = ExperimentDetailState(
+      const state = ExperimentDetailState(
         error: '网络错误',
         historyError: '数据加载失败',
       );
@@ -70,7 +70,7 @@ void main() {
     });
 
     test('copyWith使用clearHistoryError清除历史错误', () {
-      final state = ExperimentDetailState(
+      const state = ExperimentDetailState(
         error: '网络错误',
         historyError: '数据加载失败',
       );
@@ -82,7 +82,7 @@ void main() {
     });
 
     test('copyWith可以同时清除两种错误', () {
-      final state = ExperimentDetailState(
+      const state = ExperimentDetailState(
         error: '网络错误',
         historyError: '数据加载失败',
       );
@@ -99,7 +99,7 @@ void main() {
     test('copyWith可以更新测点历史数据', () {
       final history1 = [
         PointHistoryData(
-          timestamp: DateTime(2024, 1, 1, 10, 0),
+          timestamp: DateTime(2024, 1, 1, 10),
           value: 25.5,
         ),
       ];
@@ -121,7 +121,7 @@ void main() {
     test('copyWith可以追加测点历史数据', () {
       final existingHistory = [
         PointHistoryData(
-          timestamp: DateTime(2024, 1, 1, 10, 0),
+          timestamp: DateTime(2024, 1, 1, 10),
           value: 25.5,
         ),
       ];
@@ -147,7 +147,7 @@ void main() {
         hasMoreHistory: true,
         pointHistory: [
           PointHistoryData(
-            timestamp: DateTime(2024, 1, 1),
+            timestamp: DateTime(2024),
             value: 25.5,
           ),
         ],
@@ -259,7 +259,7 @@ void main() {
     });
 
     test('historyPage正确递增', () {
-      const state = ExperimentDetailState(historyPage: 1);
+      const state = ExperimentDetailState();
 
       final newState = state.copyWith(historyPage: 2);
 
@@ -270,11 +270,11 @@ void main() {
   group('PointHistoryData', () {
     test('PointHistoryData创建正确', () {
       final data = PointHistoryData(
-        timestamp: DateTime(2024, 3, 15, 10, 30, 0),
+        timestamp: DateTime(2024, 3, 15, 10, 30),
         value: 25.567,
       );
 
-      expect(data.timestamp, equals(DateTime(2024, 3, 15, 10, 30, 0)));
+      expect(data.timestamp, equals(DateTime(2024, 3, 15, 10, 30)));
       expect(data.value, equals(25.567));
     });
 

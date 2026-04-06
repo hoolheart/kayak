@@ -39,14 +39,15 @@ class AuthApiService implements AuthApiServiceInterface {
     final url = '$_baseUrl/api/v1/auth/login';
     debugPrint('AuthApiService: Attempting login to $url with email: $email');
     try {
-      final response = await _dio.post(
+      final response = await _dio.post<Map<String, dynamic>>(
         url,
         data: {'email': email, 'password': password},
       );
       debugPrint(
           'AuthApiService: Login successful, response: ${response.data}');
+      final responseData = response.data as Map<String, dynamic>;
       return LoginResponse.fromJson(
-          response.data['data'] as Map<String, dynamic>);
+          responseData['data'] as Map<String, dynamic>);
     } catch (e, st) {
       debugPrint('AuthApiService: Login failed with error: $e');
       debugPrint('AuthApiService: Stack trace: $st');
@@ -80,21 +81,23 @@ class AuthApiService implements AuthApiServiceInterface {
 
   @override
   Future<TokenPair> refreshToken(String refreshToken) async {
-    final response = await _dio.post(
+    final response = await _dio.post<Map<String, dynamic>>(
       '$_baseUrl/api/v1/auth/refresh',
       data: {'refresh_token': refreshToken},
     );
 
-    return TokenPair.fromJson(response.data['data'] as Map<String, dynamic>);
+    final responseData = response.data as Map<String, dynamic>;
+    return TokenPair.fromJson(responseData['data'] as Map<String, dynamic>);
   }
 
   @override
   Future<User> getCurrentUser(String accessToken) async {
-    final response = await _dio.get(
+    final response = await _dio.get<Map<String, dynamic>>(
       '$_baseUrl/api/v1/auth/me',
       options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
     );
 
-    return User.fromJson(response.data['data'] as Map<String, dynamic>);
+    final responseData = response.data as Map<String, dynamic>;
+    return User.fromJson(responseData['data'] as Map<String, dynamic>);
   }
 }
