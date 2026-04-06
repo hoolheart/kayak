@@ -42,6 +42,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _initializeAuth() async {
+    if (_initialized) return; // Prevent double initialization
+
     try {
       debugPrint('SplashScreen: Starting auth initialization...');
       final authNotifier = ref.read(authStateNotifierProvider);
@@ -70,14 +72,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     // 初始化完成后根据状态跳转
     if (_initialized) {
       if (authState.isAuthenticated) {
-        debugPrint('SplashScreen: Navigating to home');
+        debugPrint('SplashScreen: Navigating to dashboard');
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go(AppRoutes.dashboard);
+          if (context.mounted) {
+            context.go(AppRoutes.dashboard);
+          }
         });
       } else {
         debugPrint('SplashScreen: Navigating to login');
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go(AppRoutes.login);
+          if (context.mounted) {
+            context.go(AppRoutes.login);
+          }
         });
       }
     }

@@ -119,7 +119,7 @@ class AuthState {
       isLoading: isLoading ?? this.isLoading,
       user: user ?? this.user,
       accessToken: accessToken ?? this.accessToken,
-      error: error,
+      error: error ?? this.error,
     );
   }
 

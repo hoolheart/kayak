@@ -35,11 +35,13 @@ class LoginView extends ConsumerWidget {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next.isAuthenticated && previous?.isAuthenticated != true) {
         // 登录成功，跳转
-        if (redirectPath != null) {
-          context.go(Uri.decodeComponent(redirectPath!));
-        } else {
-          context.go(AppRoutes.dashboard);
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (redirectPath != null) {
+            context.go(Uri.decodeComponent(redirectPath!));
+          } else {
+            context.go(AppRoutes.dashboard);
+          }
+        });
       }
     });
 
