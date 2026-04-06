@@ -1,7 +1,7 @@
 # Kayak - 科学研究支持软件
 
-[![CI](https://github.com/your-org/kayak/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/kayak/actions/workflows/ci.yml)
-[![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![CI](https://github.com/hoolheart/kayak/actions/workflows/ci.yml/badge.svg)](https://github.com/hoolheart/kayak/actions/workflows/ci.yml)
+[![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange.svg)](https://rust-lang.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.16%2B-blue.svg)](https://flutter.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -161,6 +161,15 @@ flutter build web
 flutter test
 ```
 
+## 默认管理员账户
+
+首次启动时会自动创建默认管理员账户：
+
+- **邮箱**: `admin@kayak.local`
+- **密码**: `Admin123`
+
+> ⚠️ 首次登录后请及时修改密码！
+
 ## API 文档
 
 启动后端服务后，访问 http://localhost:8080/api/docs 查看 Swagger API 文档。
@@ -168,6 +177,7 @@ flutter test
 主要 API 端点：
 
 - `POST /api/v1/auth/login` - 用户登录
+- `GET /api/v1/auth/me` - 获取当前用户信息
 - `GET /api/v1/workbenches` - 获取工作台列表
 - `GET /api/v1/devices/{id}/points` - 获取设备测点
 - `POST /api/v1/experiments` - 创建试验
@@ -264,8 +274,8 @@ docker-compose -f docker-compose.separate.yml up -d
 
 ## 联系我们
 
-- 项目主页: https://github.com/your-org/kayak
-- 问题反馈: https://github.com/your-org/kayak/issues
+- 项目主页: https://github.com/hoolheart/kayak
+- 问题反馈: https://github.com/hoolheart/kayak/issues
 - 文档: https://kayak.readthedocs.io
 
 ---

@@ -72,6 +72,8 @@ cargo run
 
 后端会在 http://localhost:8080 运行。
 
+默认管理员账户：`admin@kayak.local` / `Admin123`
+
 ### 3. 设置前端
 
 ```bash
