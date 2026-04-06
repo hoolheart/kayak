@@ -13,7 +13,9 @@ pub mod workbench_repo;
 
 // Re-exports for convenience
 pub use device_repo::{DeviceRepository, DeviceRepositoryError, SqlxDeviceRepository};
-pub use experiment_repo::{ExperimentRepository, ExperimentRepositoryError, MethodIdUpdate, SqlxExperimentRepository};
+pub use experiment_repo::{
+    ExperimentRepository, ExperimentRepositoryError, MethodIdUpdate, SqlxExperimentRepository,
+};
 pub use method_error::MethodRepositoryError;
 pub use method_repo::{MethodRepository, SqlxMethodRepository};
 pub use point_repo::{PointRepository, PointRepositoryError, SqlxPointRepository};

@@ -11,7 +11,9 @@ use super::types::ExperimentFilter;
 use crate::db::repository::ExperimentRepository;
 use crate::models::dto::experiment_query::{PagedResponse, PointHistoryResponse};
 use crate::models::entities::experiment::Experiment;
-use crate::services::point_history::{Hdf5PointHistoryRepository, PointHistoryRepository, TimeRange};
+use crate::services::point_history::{
+    Hdf5PointHistoryRepository, PointHistoryRepository, TimeRange,
+};
 
 /// Data file information
 #[derive(Debug)]
@@ -64,10 +66,7 @@ pub struct ExperimentQueryServiceImpl {
 }
 
 impl ExperimentQueryServiceImpl {
-    pub fn new(
-        experiment_repo: Arc<dyn ExperimentRepository>,
-        data_root: PathBuf,
-    ) -> Self {
+    pub fn new(experiment_repo: Arc<dyn ExperimentRepository>, data_root: PathBuf) -> Self {
         Self {
             experiment_repo,
             data_root,
@@ -183,7 +182,7 @@ impl ExperimentQueryService for ExperimentQueryServiceImpl {
             .experiment_repo
             .find_by_id(experiment_id)
             .await
-            .map_err(|e| DataFileError::ExperimentNotFound(experiment_id))?
+            .map_err(|_e| DataFileError::ExperimentNotFound(experiment_id))?
             .ok_or(DataFileError::ExperimentNotFound(experiment_id))?;
 
         if experiment.user_id != user_id {

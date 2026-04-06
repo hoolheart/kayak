@@ -66,10 +66,16 @@ mod tests {
             target_var: "temperature".to_string(),
         };
 
-        let result = executor.execute(&step, &mut ctx, &MockDriver).await.unwrap();
+        let result = executor
+            .execute(&step, &mut ctx, &MockDriver)
+            .await
+            .unwrap();
 
         assert!(ctx.get_variable("temperature").is_some());
-        assert_eq!(ctx.get_variable("temperature").unwrap().to_f64(), Some(42.0));
+        assert_eq!(
+            ctx.get_variable("temperature").unwrap().to_f64(),
+            Some(42.0)
+        );
         assert!(result.data.is_some());
     }
 

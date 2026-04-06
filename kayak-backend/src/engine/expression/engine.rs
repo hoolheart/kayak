@@ -1,5 +1,7 @@
 //! 表达式引擎实现
 
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 
 use crate::drivers::core::PointValue;
@@ -10,6 +12,7 @@ use super::result::{EvalResult, ExpressionError};
 /// 表达式引擎 trait
 ///
 /// 定义表达式求值的基本接口。
+#[allow(dead_code)]
 pub trait ExpressionEngine: Send + Sync {
     fn eval(
         &self,

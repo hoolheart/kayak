@@ -167,12 +167,10 @@ impl MethodRepository for SqlxMethodRepository {
         .map(|row| row.into())
         .collect();
 
-        let total: (i64,) = sqlx::query_as(
-            "SELECT COUNT(*) FROM methods WHERE created_by = ?1"
-        )
-        .bind(user_id.to_string())
-        .fetch_one(&self.pool)
-        .await?;
+        let total: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM methods WHERE created_by = ?1")
+            .bind(user_id.to_string())
+            .fetch_one(&self.pool)
+            .await?;
 
         Ok((methods, total.0))
     }

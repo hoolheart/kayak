@@ -172,20 +172,12 @@ fn map_experiment_control_error(error: ExperimentControlError) -> AppError {
         ExperimentControlError::MethodNotFound(id) => {
             AppError::NotFound(format!("Method not found: {}", id))
         }
-        ExperimentControlError::InvalidTransition(msg) => {
-            AppError::BadRequest(msg)
-        }
-        ExperimentControlError::OperationNotAllowed(msg) => {
-            AppError::BadRequest(msg)
-        }
-        ExperimentControlError::Repository(msg) => {
-            AppError::DatabaseError(msg)
-        }
+        ExperimentControlError::InvalidTransition(msg) => AppError::BadRequest(msg),
+        ExperimentControlError::OperationNotAllowed(msg) => AppError::BadRequest(msg),
+        ExperimentControlError::Repository(msg) => AppError::DatabaseError(msg),
         ExperimentControlError::ConcurrentConflict => {
             AppError::Conflict("Concurrent modification conflict".to_string())
         }
-        ExperimentControlError::Forbidden(msg) => {
-            AppError::Forbidden(msg)
-        }
+        ExperimentControlError::Forbidden(msg) => AppError::Forbidden(msg),
     }
 }

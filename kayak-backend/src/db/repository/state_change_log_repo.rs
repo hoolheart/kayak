@@ -67,10 +67,7 @@ fn parse_status(s: &str) -> ExperimentStatus {
 #[async_trait]
 pub trait StateChangeLogRepository: Send + Sync {
     /// Record a state change
-    async fn record(
-        &self,
-        log: &StateChangeLog,
-    ) -> Result<(), StateChangeLogRepositoryError>;
+    async fn record(&self, log: &StateChangeLog) -> Result<(), StateChangeLogRepositoryError>;
 
     /// Get all state changes for an experiment (ordered by timestamp ascending)
     async fn find_by_experiment(
@@ -98,10 +95,7 @@ impl SqlxStateChangeLogRepository {
 
 #[async_trait]
 impl StateChangeLogRepository for SqlxStateChangeLogRepository {
-    async fn record(
-        &self,
-        log: &StateChangeLog,
-    ) -> Result<(), StateChangeLogRepositoryError> {
+    async fn record(&self, log: &StateChangeLog) -> Result<(), StateChangeLogRepositoryError> {
         let prev_status = format!("{:?}", log.previous_state).to_uppercase();
         let new_status = format!("{:?}", log.new_state).to_uppercase();
 

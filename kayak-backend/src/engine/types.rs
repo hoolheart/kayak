@@ -273,6 +273,7 @@ impl ExecutionContext {
     }
 
     /// 记录环节执行日志
+    #[allow(clippy::too_many_arguments)]
     pub fn log_step(
         &mut self,
         step_id: String,

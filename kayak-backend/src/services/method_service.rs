@@ -2,9 +2,11 @@
 //!
 //! 提供试验方法的业务逻辑
 
-use crate::db::repository::method_repo::MethodRepository;
 use crate::db::repository::method_error::MethodRepositoryError;
-use crate::models::dto::method_dto::{CreateMethodRequest, MethodDto, MethodListResponse, UpdateMethodRequest};
+use crate::db::repository::method_repo::MethodRepository;
+use crate::models::dto::method_dto::{
+    CreateMethodRequest, MethodDto, MethodListResponse, UpdateMethodRequest,
+};
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -91,7 +93,11 @@ impl<R: MethodRepository> MethodService<R> {
     }
 
     /// 获取方法 (M1/M2 fix: with ownership check)
-    pub async fn get_method(&self, id: Uuid, user_id: Uuid) -> Result<MethodDto, MethodServiceError> {
+    pub async fn get_method(
+        &self,
+        id: Uuid,
+        user_id: Uuid,
+    ) -> Result<MethodDto, MethodServiceError> {
         let method = self.repository.get_by_id(id).await?;
         match method {
             Some(m) => {
@@ -114,7 +120,9 @@ impl<R: MethodRepository> MethodService<R> {
         // 验证请求
         if let Some(ref name) = request.name {
             if name.is_empty() || name.len() > 255 {
-                return Err(MethodServiceError::Validation("名称长度必须在1-255之间".to_string()));
+                return Err(MethodServiceError::Validation(
+                    "名称长度必须在1-255之间".to_string(),
+                ));
             }
         }
 
@@ -131,13 +139,16 @@ impl<R: MethodRepository> MethodService<R> {
         // m8 fix: Treat empty description string as None for consistency
         let description = request.description.filter(|d| !d.is_empty());
 
-        let updated = self.repository.update(
-            id,
-            request.name,
-            description,
-            request.process_definition,
-            request.parameter_schema,
-        ).await?;
+        let updated = self
+            .repository
+            .update(
+                id,
+                request.name,
+                description,
+                request.process_definition,
+                request.parameter_schema,
+            )
+            .await?;
 
         Ok(updated.into())
     }
@@ -176,19 +187,28 @@ impl<R: MethodRepository> MethodService<R> {
     }
 
     /// 验证创建请求
-    fn validate_create_request(&self, request: &CreateMethodRequest) -> Result<(), MethodServiceError> {
+    fn validate_create_request(
+        &self,
+        request: &CreateMethodRequest,
+    ) -> Result<(), MethodServiceError> {
         // 名称长度验证
         if request.name.is_empty() || request.name.len() > 255 {
-            return Err(MethodServiceError::Validation("名称长度必须在1-255之间".to_string()));
+            return Err(MethodServiceError::Validation(
+                "名称长度必须在1-255之间".to_string(),
+            ));
         }
 
         // JSON格式验证
         if !request.process_definition.is_object() {
-            return Err(MethodServiceError::Validation("过程定义必须是JSON对象".to_string()));
+            return Err(MethodServiceError::Validation(
+                "过程定义必须是JSON对象".to_string(),
+            ));
         }
 
         if !request.parameter_schema.is_object() {
-            return Err(MethodServiceError::Validation("参数Schema必须是JSON对象".to_string()));
+            return Err(MethodServiceError::Validation(
+                "参数Schema必须是JSON对象".to_string(),
+            ));
         }
 
         Ok(())
@@ -230,8 +250,17 @@ impl<R: MethodRepository> MethodService<R> {
 
         // 有效节点类型
         let valid_types = [
-            "Start", "Read", "Control", "Delay", "Decision",
-            "Branch", "Wait", "Record", "Config", "Subprocess", "End",
+            "Start",
+            "Read",
+            "Control",
+            "Delay",
+            "Decision",
+            "Branch",
+            "Wait",
+            "Record",
+            "Config",
+            "Subprocess",
+            "End",
         ];
 
         let mut has_start = false;
@@ -276,7 +305,7 @@ impl<R: MethodRepository> MethodService<R> {
                 for (i, conn) in conn_array.iter().enumerate() {
                     let from = conn.get("from").and_then(|v| v.as_str()).unwrap_or("");
                     let to = conn.get("to").and_then(|v| v.as_str()).unwrap_or("");
-                    
+
                     if !node_ids.contains(from) {
                         errors.push(format!("连接{}: 源节点'{}'不存在", i, from));
                     }
@@ -293,7 +322,7 @@ impl<R: MethodRepository> MethodService<R> {
                 for (i, edge) in edges_array.iter().enumerate() {
                     let source = edge.get("source").and_then(|v| v.as_str()).unwrap_or("");
                     let target = edge.get("target").and_then(|v| v.as_str()).unwrap_or("");
-                    
+
                     if !node_ids.contains(source) {
                         errors.push(format!("边{}: 源节点'{}'不存在", i, source));
                     }

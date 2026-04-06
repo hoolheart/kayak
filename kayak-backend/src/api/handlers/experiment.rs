@@ -13,9 +13,7 @@ use uuid::Uuid;
 
 use crate::auth::middleware::require_auth::RequireAuth;
 use crate::core::error::{ApiResponse, AppError};
-use crate::models::dto::experiment_query::{
-    ListExperimentsRequest, PointHistoryRequest,
-};
+use crate::models::dto::experiment_query::{ListExperimentsRequest, PointHistoryRequest};
 use crate::models::entities::experiment::{Experiment, ExperimentResponse};
 use crate::services::experiment_query::{
     DataFileError, ExperimentQueryError, ExperimentQueryService, PointHistoryError,
@@ -29,14 +27,17 @@ pub async fn list_experiments(
     State(handler): State<AppState>,
     RequireAuth(user_ctx): RequireAuth,
     Query(params): Query<ListExperimentsRequest>,
-) -> Result<Json<ApiResponse<crate::models::dto::experiment_query::PagedResponse<Experiment>>>, AppError> {
+) -> Result<
+    Json<ApiResponse<crate::models::dto::experiment_query::PagedResponse<Experiment>>>,
+    AppError,
+> {
     let page = params.page.unwrap_or(1).max(1);
     let size = params.size.unwrap_or(10).clamp(1, 100);
 
     let filter = crate::services::experiment_query::ExperimentFilter {
         user_id: Some(user_ctx.user_id),
         status: params.status,
-        method_id: None,  // ListExperimentsRequest doesn't have method_id
+        method_id: None, // ListExperimentsRequest doesn't have method_id
         created_after: params.created_after,
         created_before: params.created_before,
     };
@@ -78,11 +79,11 @@ pub async fn get_point_history(
     Query(params): Query<PointHistoryRequest>,
 ) -> Result<Json<crate::models::dto::experiment_query::PointHistoryResponse>, AppError> {
     // Validate time range
-    if params.start_time.is_some() && params.end_time.is_some() {
-        let start = params.start_time.unwrap();
-        let end = params.end_time.unwrap();
+    if let (Some(start), Some(end)) = (params.start_time, params.end_time) {
         if start > end {
-            return Err(AppError::BadRequest("start_time must be before end_time".to_string()));
+            return Err(AppError::BadRequest(
+                "start_time must be before end_time".to_string(),
+            ));
         }
     }
 
@@ -116,8 +117,11 @@ pub async fn download_data_file(
     Path(experiment_id): Path<Uuid>,
 ) -> Result<(StatusCode, &'static str), AppError> {
     // Get data file info to verify access
-    match handler.get_data_file_info(experiment_id, user_ctx.user_id).await {
-        Ok(info) => {
+    match handler
+        .get_data_file_info(experiment_id, user_ctx.user_id)
+        .await
+    {
+        Ok(_info) => {
             // For now, return a simple message indicating the file exists
             // Full streaming implementation is complex and deferred
             Ok((StatusCode::OK, "Data file available for download"))

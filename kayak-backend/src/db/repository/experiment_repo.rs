@@ -26,7 +26,7 @@ pub enum MethodIdUpdate {
 pub enum ExperimentRepositoryError {
     #[error("Database error: {0}")]
     DatabaseError(#[from] sqlx::Error),
-    
+
     #[error("Not found: {0}")]
     NotFound(Uuid),
 }
@@ -61,12 +61,23 @@ impl ExperimentRow {
         Experiment {
             id: Uuid::parse_str(&self.id).unwrap_or_default(),
             user_id: Uuid::parse_str(&self.user_id).unwrap_or_default(),
-            method_id: self.method_id.as_ref().and_then(|s| Uuid::parse_str(s).ok()),
+            method_id: self
+                .method_id
+                .as_ref()
+                .and_then(|s| Uuid::parse_str(s).ok()),
             name: self.name.clone(),
             description: self.description.clone(),
             status,
-            started_at: self.started_at.as_ref().and_then(|s| DateTime::parse_from_rfc3339(s).ok().map(|dt| dt.with_timezone(&Utc))),
-            ended_at: self.ended_at.as_ref().and_then(|s| DateTime::parse_from_rfc3339(s).ok().map(|dt| dt.with_timezone(&Utc))),
+            started_at: self.started_at.as_ref().and_then(|s| {
+                DateTime::parse_from_rfc3339(s)
+                    .ok()
+                    .map(|dt| dt.with_timezone(&Utc))
+            }),
+            ended_at: self.ended_at.as_ref().and_then(|s| {
+                DateTime::parse_from_rfc3339(s)
+                    .ok()
+                    .map(|dt| dt.with_timezone(&Utc))
+            }),
             created_at: DateTime::parse_from_rfc3339(&self.created_at)
                 .map(|dt| dt.with_timezone(&Utc))
                 .unwrap_or_else(|_| Utc::now()),
@@ -99,10 +110,16 @@ pub trait ExperimentRepository: Send + Sync {
     ) -> Result<(Vec<Experiment>, u64), ExperimentRepositoryError>;
 
     /// 创建试验
-    async fn create(&self, experiment: &Experiment) -> Result<Experiment, ExperimentRepositoryError>;
+    async fn create(
+        &self,
+        experiment: &Experiment,
+    ) -> Result<Experiment, ExperimentRepositoryError>;
 
     /// 更新试验
-    async fn update(&self, experiment: &Experiment) -> Result<Experiment, ExperimentRepositoryError>;
+    async fn update(
+        &self,
+        experiment: &Experiment,
+    ) -> Result<Experiment, ExperimentRepositoryError>;
 
     /// 删除试验
     async fn delete(&self, id: Uuid) -> Result<u64, ExperimentRepositoryError>;
@@ -224,12 +241,11 @@ impl ExperimentRepository for SqlxExperimentRepository {
                 (rows, count_row.0 as u64)
             } else {
                 // Filter by user_id only
-                let count_row: (i64,) = sqlx::query_as(
-                    "SELECT COUNT(*) FROM experiments WHERE user_id = ?",
-                )
-                .bind(&uid_str)
-                .fetch_one(&self.pool)
-                .await?;
+                let count_row: (i64,) =
+                    sqlx::query_as("SELECT COUNT(*) FROM experiments WHERE user_id = ?")
+                        .bind(&uid_str)
+                        .fetch_one(&self.pool)
+                        .await?;
 
                 let rows: Vec<ExperimentRow> = sqlx::query_as(
                     r#"
@@ -251,13 +267,12 @@ impl ExperimentRepository for SqlxExperimentRepository {
             }
         } else if let Some(st) = status {
             let status_str = format!("{:?}", st).to_uppercase();
-            
-            let count_row: (i64,) = sqlx::query_as(
-                "SELECT COUNT(*) FROM experiments WHERE status = ?",
-            )
-            .bind(&status_str)
-            .fetch_one(&self.pool)
-            .await?;
+
+            let count_row: (i64,) =
+                sqlx::query_as("SELECT COUNT(*) FROM experiments WHERE status = ?")
+                    .bind(&status_str)
+                    .fetch_one(&self.pool)
+                    .await?;
 
             let rows: Vec<ExperimentRow> = sqlx::query_as(
                 r#"
@@ -302,7 +317,10 @@ impl ExperimentRepository for SqlxExperimentRepository {
         Ok((rows.into_iter().map(|r| r.to_experiment()).collect(), total))
     }
 
-    async fn create(&self, experiment: &Experiment) -> Result<Experiment, ExperimentRepositoryError> {
+    async fn create(
+        &self,
+        experiment: &Experiment,
+    ) -> Result<Experiment, ExperimentRepositoryError> {
         let status_str = format!("{:?}", experiment.status).to_uppercase();
 
         sqlx::query(
@@ -328,7 +346,10 @@ impl ExperimentRepository for SqlxExperimentRepository {
         Ok(experiment.clone())
     }
 
-    async fn update(&self, experiment: &Experiment) -> Result<Experiment, ExperimentRepositoryError> {
+    async fn update(
+        &self,
+        experiment: &Experiment,
+    ) -> Result<Experiment, ExperimentRepositoryError> {
         let status_str = format!("{:?}", experiment.status).to_uppercase();
 
         sqlx::query(
@@ -402,7 +423,9 @@ impl ExperimentRepository for SqlxExperimentRepository {
         let now = Utc::now();
 
         // First, get the current experiment to determine method_id handling
-        let current = self.find_by_id(id).await?
+        let current = self
+            .find_by_id(id)
+            .await?
             .ok_or(ExperimentRepositoryError::NotFound(id))?;
 
         // Determine the new method_id based on the update type

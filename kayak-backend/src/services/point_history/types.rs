@@ -1,7 +1,6 @@
 //! Point history repository types
 
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 
 /// Time range for time-series queries
 #[derive(Debug, Clone)]

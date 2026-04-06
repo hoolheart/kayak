@@ -1,7 +1,7 @@
 //! Point history repository - reads from HDF5 files
 
 use async_trait::async_trait;
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{TimeZone, Utc};
 use std::path::PathBuf;
 use uuid::Uuid;
 
@@ -107,10 +107,11 @@ impl PointHistoryRepository for Hdf5PointHistoryRepository {
         // Convert timestamps and filter
         let mut points: Vec<TimeSeriesDataPoint> = timestamps
             .into_iter()
-            .zip(values.into_iter())
+            .zip(values)
             .filter(|(ts, _)| {
                 let nanos = *ts;
-                let dt = Utc.timestamp_opt(nanos / 1_000_000_000, (nanos % 1_000_000_000) as u32)
+                let dt = Utc
+                    .timestamp_opt(nanos / 1_000_000_000, (nanos % 1_000_000_000) as u32)
                     .single();
                 match (dt, &time_range) {
                     (Some(dt), Some(range)) => dt >= range.start && dt <= range.end,
@@ -141,8 +142,8 @@ impl PointHistoryRepository for Hdf5PointHistoryRepository {
             return Ok(false);
         }
 
-        let file =
-            hdf5::File::open(&file_path).map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
+        let file = hdf5::File::open(&file_path)
+            .map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
 
         let group_path = format!("/{}", channel);
         match file.group(&group_path) {
@@ -162,8 +163,8 @@ impl PointHistoryRepository for Hdf5PointHistoryRepository {
             return Ok(None);
         }
 
-        let file =
-            hdf5::File::open(&file_path).map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
+        let file = hdf5::File::open(&file_path)
+            .map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
 
         let group_path = format!("/{}", channel);
         let group = match file.group(&group_path) {
@@ -210,8 +211,8 @@ impl PointHistoryRepository for Hdf5PointHistoryRepository {
             return Ok(0);
         }
 
-        let file =
-            hdf5::File::open(&file_path).map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
+        let file = hdf5::File::open(&file_path)
+            .map_err(|e| PointHistoryError::Hdf5ReadError(e.to_string()))?;
 
         let group_path = format!("/{}", channel);
         let group = match file.group(&group_path) {

@@ -10,6 +10,7 @@ use tracing::{error, info};
 pub type DbPool = SqlitePool;
 
 /// Get the migrator - created lazily to avoid initialization issues in tests
+#[allow(dead_code)]
 fn get_migrator() -> Migrator {
     sqlx::migrate!("./migrations")
 }
@@ -26,12 +27,15 @@ pub async fn init_db_without_migrations(database_url: &str) -> Result<DbPool, sq
     init_db_with_migrations(database_url, false).await
 }
 
-async fn init_db_with_migrations(database_url: &str, run_migrations: bool) -> Result<DbPool, sqlx::Error> {
+async fn init_db_with_migrations(
+    database_url: &str,
+    run_migrations: bool,
+) -> Result<DbPool, sqlx::Error> {
     info!("Initializing database connection pool...");
 
     // 解析数据库URL
     let db_path = database_url.trim_start_matches("sqlite://");
-    
+
     // 确保数据库目录存在（仅对文件数据库）
     if !db_path.contains(":memory:") {
         if let Some(parent) = Path::new(db_path).parent() {

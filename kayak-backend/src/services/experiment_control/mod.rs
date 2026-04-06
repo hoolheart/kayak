@@ -11,14 +11,16 @@ use serde::Serialize;
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::db::repository::experiment_repo::{ExperimentRepository, ExperimentRepositoryError, MethodIdUpdate};
+use crate::db::repository::experiment_repo::{
+    ExperimentRepository, ExperimentRepositoryError, MethodIdUpdate,
+};
 use crate::db::repository::method_repo::MethodRepository;
 use crate::db::repository::state_change_log_repo::StateChangeLogRepository;
 use crate::state_machine::{StateMachine, StateMachineError, StateMachineOperation};
 
 pub mod ws_manager;
 
-pub use ws_manager::{ExperimentWsManager, WsMessage, broadcast_error, broadcast_status_change};
+pub use ws_manager::{broadcast_error, broadcast_status_change, ExperimentWsManager, WsMessage};
 
 /// Experiment control service error
 #[derive(Debug, thiserror::Error)]
@@ -68,12 +70,10 @@ impl From<StateMachineError> for ExperimentControlError {
             StateMachineError::OperationNotAllowed {
                 operation,
                 current_state,
-            } => {
-                ExperimentControlError::OperationNotAllowed(format!(
-                    "Operation {:?} not allowed in state {:?}",
-                    operation, current_state
-                ))
-            }
+            } => ExperimentControlError::OperationNotAllowed(format!(
+                "Operation {:?} not allowed in state {:?}",
+                operation, current_state
+            )),
         }
     }
 }
@@ -198,7 +198,10 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<crate::models::entities::experiment::Experiment, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+        let exp = self
+            .experiment_repo
+            .find_by_id(experiment_id)
+            .await?
             .ok_or(ExperimentControlError::NotFound(experiment_id))?;
 
         // TODO: Add admin role check when user roles are implemented
@@ -221,11 +224,19 @@ where
         user_id: Uuid,
     ) {
         if let Some(ref manager) = self.ws_manager {
-            broadcast_status_change(Arc::clone(manager), experiment_id, old_status, new_status, operation, user_id);
+            broadcast_status_change(
+                Arc::clone(manager),
+                experiment_id,
+                old_status,
+                new_status,
+                operation,
+                user_id,
+            );
         }
     }
 
     /// Broadcast error if WebSocket manager is configured
+    #[allow(dead_code)]
     fn broadcast_error(&self, experiment_id: Uuid, error: &str, code: u16) {
         if let Some(ref manager) = self.ws_manager {
             broadcast_error(Arc::clone(manager), experiment_id, error, code);
@@ -246,17 +257,22 @@ where
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Load)?;
 
         // Validate method exists
-        self.method_repo.get_by_id(method_id).await
+        self.method_repo
+            .get_by_id(method_id)
+            .await
             .map_err(|_| ExperimentControlError::MethodNotFound(method_id))?;
 
         // Update state
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Set(method_id),
-            None,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Set(method_id),
+                None,
+                None,
+            )
+            .await?;
 
         // Record log
         let log = crate::models::entities::StateChangeLog::new(
@@ -266,7 +282,9 @@ where
             StateMachineOperation::Load,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -298,13 +316,16 @@ where
             None // Preserve existing
         };
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            started_at,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                started_at,
+                None,
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -313,7 +334,9 @@ where
             StateMachineOperation::Start,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -338,13 +361,16 @@ where
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Pause)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            None,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                None,
+                None,
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -353,7 +379,9 @@ where
             StateMachineOperation::Pause,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -378,13 +406,16 @@ where
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Resume)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            None,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                None,
+                None,
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -393,7 +424,9 @@ where
             StateMachineOperation::Resume,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -418,13 +451,16 @@ where
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Stop)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            None,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                None,
+                None,
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -433,7 +469,9 @@ where
             StateMachineOperation::Stop,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -454,18 +492,18 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+        let exp = self
+            .experiment_repo
+            .find_by_id(experiment_id)
+            .await?
             .ok_or(ExperimentControlError::NotFound(experiment_id))?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Reset)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Clear,
-            None,
-            None,
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(experiment_id, new_status, MethodIdUpdate::Clear, None, None)
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -474,7 +512,9 @@ where
             StateMachineOperation::Reset,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -495,18 +535,24 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+        let exp = self
+            .experiment_repo
+            .find_by_id(experiment_id)
+            .await?
             .ok_or(ExperimentControlError::NotFound(experiment_id))?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Complete)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            None,
-            Some(Utc::now()),
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                None,
+                Some(Utc::now()),
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -515,7 +561,9 @@ where
             StateMachineOperation::Complete,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -536,18 +584,24 @@ where
         experiment_id: Uuid,
         user_id: Uuid,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+        let exp = self
+            .experiment_repo
+            .find_by_id(experiment_id)
+            .await?
             .ok_or(ExperimentControlError::NotFound(experiment_id))?;
 
         let new_status = StateMachine::transition(exp.status, StateMachineOperation::Abort)?;
 
-        let updated = self.experiment_repo.update_state(
-            experiment_id,
-            new_status,
-            MethodIdUpdate::Preserve,
-            None,
-            Some(Utc::now()),
-        ).await?;
+        let updated = self
+            .experiment_repo
+            .update_state(
+                experiment_id,
+                new_status,
+                MethodIdUpdate::Preserve,
+                None,
+                Some(Utc::now()),
+            )
+            .await?;
 
         let log = crate::models::entities::StateChangeLog::new(
             experiment_id,
@@ -556,7 +610,9 @@ where
             StateMachineOperation::Abort,
             user_id,
         );
-        self.log_repo.record(&log).await
+        self.log_repo
+            .record(&log)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         // Broadcast status change via WebSocket
@@ -576,7 +632,10 @@ where
         &self,
         experiment_id: Uuid,
     ) -> Result<ExperimentStatusDto, ExperimentControlError> {
-        let exp = self.experiment_repo.find_by_id(experiment_id).await?
+        let exp = self
+            .experiment_repo
+            .find_by_id(experiment_id)
+            .await?
             .ok_or(ExperimentControlError::NotFound(experiment_id))?;
 
         Ok(ExperimentStatusDto {
@@ -595,7 +654,10 @@ where
         &self,
         experiment_id: Uuid,
     ) -> Result<Vec<StateChangeLogDto>, ExperimentControlError> {
-        let logs = self.log_repo.find_by_experiment(experiment_id).await
+        let logs = self
+            .log_repo
+            .find_by_experiment(experiment_id)
+            .await
             .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
 
         Ok(logs.iter().map(StateChangeLogDto::from_log).collect())

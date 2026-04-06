@@ -34,7 +34,6 @@ use crate::db::repository::user_repo::UserRepository;
 use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
-use crate::services::experiment_control::ws_manager::ExperimentWsManager;
 use crate::services::experiment_control::ExperimentControlService;
 use crate::services::method_service::{MethodService, MethodServiceTrait};
 use crate::services::point::{PointService, PointServiceImpl};

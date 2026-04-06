@@ -7,16 +7,16 @@
 //! - Get dataset shape
 
 use async_trait::async_trait;
-use std::path::PathBuf;
-use std::sync::RwLock;
-use std::collections::HashMap;
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
 use ndarray::Array;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::sync::RwLock;
+use uuid::Uuid;
 
 use super::error::Hdf5Error;
-use super::types::*;
 use super::path::PathStrategy;
+use super::types::*;
 
 /// HDF5 service interface
 #[async_trait]
@@ -25,7 +25,7 @@ pub trait Hdf5Service: Send + Sync {
     async fn create_file(&self, path: PathBuf) -> Result<Hdf5File, Hdf5Error>;
 
     /// Open existing HDF5 file
-    async fn open_file(&self, path: &PathBuf) -> Result<Hdf5File, Hdf5Error>;
+    async fn open_file(&self, path: &Path) -> Result<Hdf5File, Hdf5Error>;
 
     /// Close HDF5 file
     async fn close_file(&self, file: Hdf5File) -> Result<(), Hdf5Error>;
@@ -49,7 +49,11 @@ pub trait Hdf5Service: Send + Sync {
     async fn read_dataset(&self, group: &Hdf5Group, name: &str) -> Result<Vec<f64>, Hdf5Error>;
 
     /// Get dataset shape
-    async fn get_dataset_shape(&self, group: &Hdf5Group, name: &str) -> Result<Vec<usize>, Hdf5Error>;
+    async fn get_dataset_shape(
+        &self,
+        group: &Hdf5Group,
+        name: &str,
+    ) -> Result<Vec<usize>, Hdf5Error>;
 
     /// Generate experiment data path
     async fn generate_experiment_path(
@@ -59,10 +63,10 @@ pub trait Hdf5Service: Send + Sync {
     ) -> Result<PathBuf, Hdf5Error>;
 
     /// Create file with auto-create parent directories
-    async fn create_file_with_directories(&self, path: &PathBuf) -> Result<Hdf5File, Hdf5Error>;
+    async fn create_file_with_directories(&self, path: &Path) -> Result<Hdf5File, Hdf5Error>;
 
     /// Check if path is safe (no path traversal)
-    fn is_path_safe(&self, path: &PathBuf) -> bool;
+    fn is_path_safe(&self, path: &Path) -> bool;
 }
 
 /// HDF5 service implementation
@@ -81,7 +85,7 @@ impl Hdf5ServiceImpl {
     }
 
     /// Validate path safety
-    fn validate_path(&self, path: &PathBuf) -> Result<(), Hdf5Error> {
+    fn validate_path(&self, path: &Path) -> Result<(), Hdf5Error> {
         if !self.is_path_safe(path) {
             return Err(Hdf5Error::PathTraversalAttempted);
         }
@@ -93,7 +97,11 @@ impl Hdf5ServiceImpl {
     }
 
     /// Validate timeseries data length consistency
-    fn validate_timeseries_data(&self, timestamps: &[i64], values: &[f64]) -> Result<(), Hdf5Error> {
+    fn validate_timeseries_data(
+        &self,
+        timestamps: &[i64],
+        values: &[f64],
+    ) -> Result<(), Hdf5Error> {
         if timestamps.is_empty() || values.is_empty() {
             return Err(Hdf5Error::EmptyData);
         }
@@ -122,41 +130,44 @@ impl Hdf5Service for Hdf5ServiceImpl {
         if let Some(parent) = path_clone.parent() {
             if !parent.exists() {
                 return Err(Hdf5Error::ParentDirectoryNotFound(
-                    parent.to_string_lossy().to_string()
+                    parent.to_string_lossy().to_string(),
                 ));
             }
         }
 
-        let file = hdf5::File::create(&path_clone)
-            .map_err(|_| Hdf5Error::InvalidFileFormat)?;
+        let file = hdf5::File::create(&path_clone).map_err(|_| Hdf5Error::InvalidFileFormat)?;
 
-        self.file_handles.write()
+        self.file_handles
+            .write()
             .map_err(|_| Hdf5Error::FileNotOpen)?
             .insert(path_clone.clone(), file);
 
         Ok(Hdf5File { path: path_clone })
     }
 
-    async fn open_file(&self, path: &PathBuf) -> Result<Hdf5File, Hdf5Error> {
-        let path_clone = path.clone();
-        self.validate_path(&path_clone)?;
+    async fn open_file(&self, path: &Path) -> Result<Hdf5File, Hdf5Error> {
+        let path_buf = path.to_path_buf();
+        self.validate_path(&path_buf)?;
 
-        if !path_clone.exists() {
-            return Err(Hdf5Error::FileNotFound(path_clone.to_string_lossy().to_string()));
+        if !path_buf.exists() {
+            return Err(Hdf5Error::FileNotFound(
+                path_buf.to_string_lossy().to_string(),
+            ));
         }
 
-        let file = hdf5::File::open(&path_clone)
-            .map_err(|_| Hdf5Error::InvalidFileFormat)?;
+        let file = hdf5::File::open(&path_buf).map_err(|_| Hdf5Error::InvalidFileFormat)?;
 
-        self.file_handles.write()
+        self.file_handles
+            .write()
             .map_err(|_| Hdf5Error::FileNotOpen)?
-            .insert(path_clone.clone(), file);
+            .insert(path_buf.clone(), file);
 
-        Ok(Hdf5File { path: path_clone })
+        Ok(Hdf5File { path: path_buf })
     }
 
     async fn close_file(&self, file: Hdf5File) -> Result<(), Hdf5Error> {
-        self.file_handles.write()
+        self.file_handles
+            .write()
             .map_err(|_| Hdf5Error::FileNotOpen)?
             .remove(&file.path);
         Ok(())
@@ -167,8 +178,7 @@ impl Hdf5Service for Hdf5ServiceImpl {
         let parent_path = &parent.path;
         let group_name = name.to_string();
 
-        let file = hdf5::File::open(&file_path)
-            .map_err(|_| Hdf5Error::FileNotOpen)?;
+        let file = hdf5::File::open(&file_path).map_err(|_| Hdf5Error::FileNotOpen)?;
 
         let parent_path_str = if parent_path.is_empty() || parent_path == "/" {
             "/".to_string()
@@ -176,11 +186,13 @@ impl Hdf5Service for Hdf5ServiceImpl {
             parent_path.clone()
         };
 
-        let group = file.group(&parent_path_str)
+        let group = file
+            .group(&parent_path_str)
             .map_err(|_| Hdf5Error::GroupNotFound(parent_path_str.clone()))?;
 
-        let _new_group = group.create_group(&group_name)
-            .map_err(|_| Hdf5Error::GroupAlreadyExists(format!("{}/{}", parent_path_str, group_name)))?;
+        let _new_group = group.create_group(&group_name).map_err(|_| {
+            Hdf5Error::GroupAlreadyExists(format!("{}/{}", parent_path_str, group_name))
+        })?;
 
         let full_path = if parent_path_str == "/" {
             format!("/{}", group_name)
@@ -199,15 +211,15 @@ impl Hdf5Service for Hdf5ServiceImpl {
         let file_path = file.path.clone();
         let group_path = path.to_string();
 
-        let hdf5_file = hdf5::File::open(&file_path)
-            .map_err(|_| Hdf5Error::FileNotOpen)?;
+        let hdf5_file = hdf5::File::open(&file_path).map_err(|_| Hdf5Error::FileNotOpen)?;
 
-        let _group = hdf5_file.group(&group_path)
+        let _group = hdf5_file
+            .group(&group_path)
             .map_err(|_| Hdf5Error::GroupNotFound(group_path.clone()))?;
 
-        let name = group_path.split('/')
-            .filter(|s| !s.is_empty())
-            .last()
+        let name = group_path
+            .split('/')
+            .rfind(|s| !s.is_empty())
             .unwrap_or("")
             .to_string();
 
@@ -227,20 +239,24 @@ impl Hdf5Service for Hdf5ServiceImpl {
     ) -> Result<(), Hdf5Error> {
         self.validate_timeseries_data(timestamps, values)?;
 
-        let file = hdf5::File::open(&group.file_path)
-            .map_err(|_| Hdf5Error::FileNotOpen)?;
+        let file = hdf5::File::open(&group.file_path).map_err(|_| Hdf5Error::FileNotOpen)?;
 
-        let hdf5_group = file.group(&group.path)
+        let hdf5_group = file
+            .group(&group.path)
             .map_err(|_| Hdf5Error::GroupNotFound(group.path.clone()))?;
 
         let n = timestamps.len();
 
         // Delete existing datasets if they exist
         if hdf5_group.link_exists(name) {
-            hdf5_group.unlink(name).map_err(|_| Hdf5Error::DataCorrupted)?;
+            hdf5_group
+                .unlink(name)
+                .map_err(|_| Hdf5Error::DataCorrupted)?;
         }
         if hdf5_group.link_exists("timestamps") {
-            hdf5_group.unlink("timestamps").map_err(|_| Hdf5Error::DataCorrupted)?;
+            hdf5_group
+                .unlink("timestamps")
+                .map_err(|_| Hdf5Error::DataCorrupted)?;
         }
 
         // Create and write values dataset
@@ -250,7 +266,8 @@ impl Hdf5Service for Hdf5ServiceImpl {
             .create(name)
             .map_err(|_| Hdf5Error::DatasetAlreadyExists(name.to_string()))?;
 
-        values_dataset.write_raw(values)
+        values_dataset
+            .write_raw(values)
             .map_err(|_| Hdf5Error::DataCorrupted)?;
 
         // Create and write timestamps dataset
@@ -260,36 +277,43 @@ impl Hdf5Service for Hdf5ServiceImpl {
             .create("timestamps")
             .map_err(|_| Hdf5Error::DatasetAlreadyExists("timestamps".to_string()))?;
 
-        ts_dataset.write_raw(timestamps)
+        ts_dataset
+            .write_raw(timestamps)
             .map_err(|_| Hdf5Error::DataCorrupted)?;
 
         Ok(())
     }
 
     async fn read_dataset(&self, group: &Hdf5Group, name: &str) -> Result<Vec<f64>, Hdf5Error> {
-        let file = hdf5::File::open(&group.file_path)
-            .map_err(|_| Hdf5Error::FileNotOpen)?;
+        let file = hdf5::File::open(&group.file_path).map_err(|_| Hdf5Error::FileNotOpen)?;
 
-        let hdf5_group = file.group(&group.path)
+        let hdf5_group = file
+            .group(&group.path)
             .map_err(|_| Hdf5Error::GroupNotFound(group.path.clone()))?;
 
-        let dataset = hdf5_group.dataset(name)
+        let dataset = hdf5_group
+            .dataset(name)
             .map_err(|_| Hdf5Error::DatasetNotFound(name.to_string()))?;
 
-        let data: Array<f64, ndarray::Dim<[usize; 1]>> = dataset.read()
-            .map_err(|_| Hdf5Error::DataCorrupted)?;
+        let data: Array<f64, ndarray::Dim<[usize; 1]>> =
+            dataset.read().map_err(|_| Hdf5Error::DataCorrupted)?;
 
         Ok(data.into_raw_vec())
     }
 
-    async fn get_dataset_shape(&self, group: &Hdf5Group, name: &str) -> Result<Vec<usize>, Hdf5Error> {
-        let file = hdf5::File::open(&group.file_path)
-            .map_err(|_| Hdf5Error::FileNotOpen)?;
+    async fn get_dataset_shape(
+        &self,
+        group: &Hdf5Group,
+        name: &str,
+    ) -> Result<Vec<usize>, Hdf5Error> {
+        let file = hdf5::File::open(&group.file_path).map_err(|_| Hdf5Error::FileNotOpen)?;
 
-        let hdf5_group = file.group(&group.path)
+        let hdf5_group = file
+            .group(&group.path)
             .map_err(|_| Hdf5Error::GroupNotFound(group.path.clone()))?;
 
-        let dataset = hdf5_group.dataset(name)
+        let dataset = hdf5_group
+            .dataset(name)
             .map_err(|_| Hdf5Error::DatasetNotFound(name.to_string()))?;
 
         Ok(dataset.shape())
@@ -303,24 +327,23 @@ impl Hdf5Service for Hdf5ServiceImpl {
         self.path_strategy.generate_path(exp_id, timestamp)
     }
 
-    async fn create_file_with_directories(&self, path: &PathBuf) -> Result<Hdf5File, Hdf5Error> {
-        let path_clone = path.clone();
+    async fn create_file_with_directories(&self, path: &Path) -> Result<Hdf5File, Hdf5Error> {
+        let path_buf = path.to_path_buf();
 
-        if let Some(parent) = path_clone.parent() {
-            std::fs::create_dir_all(parent)
-                .map_err(|e| {
-                    if e.kind() == std::io::ErrorKind::PermissionDenied {
-                        Hdf5Error::PermissionDenied(parent.to_string_lossy().to_string())
-                    } else {
-                        Hdf5Error::ParentDirectoryNotFound(parent.to_string_lossy().to_string())
-                    }
-                })?;
+        if let Some(parent) = path_buf.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                if e.kind() == std::io::ErrorKind::PermissionDenied {
+                    Hdf5Error::PermissionDenied(parent.to_string_lossy().to_string())
+                } else {
+                    Hdf5Error::ParentDirectoryNotFound(parent.to_string_lossy().to_string())
+                }
+            })?;
         }
 
-        self.create_file(path_clone).await
+        self.create_file(path_buf).await
     }
 
-    fn is_path_safe(&self, path: &PathBuf) -> bool {
+    fn is_path_safe(&self, path: &Path) -> bool {
         let path_str = path.to_string_lossy();
         if path_str.contains("..") {
             return false;

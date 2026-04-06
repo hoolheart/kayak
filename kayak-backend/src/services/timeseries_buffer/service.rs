@@ -2,7 +2,7 @@
 
 use async_trait::async_trait;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::RwLock;
@@ -10,8 +10,7 @@ use uuid::Uuid;
 
 use super::error::TimeSeriesBufferError;
 use super::types::{
-    BufferConfig, BufferId, BufferStatus, ExperimentBuffer, FlushResult,
-    TimeSeriesPoint,
+    BufferConfig, BufferId, BufferStatus, ExperimentBuffer, FlushResult, TimeSeriesPoint,
 };
 use crate::services::hdf5::Hdf5Service;
 
@@ -43,7 +42,8 @@ pub trait TimeSeriesBufferService: Send + Sync {
     async fn flush(&self, buffer_id: &BufferId) -> Result<FlushResult, TimeSeriesBufferError>;
 
     /// Get buffer status
-    async fn get_status(&self, buffer_id: &BufferId) -> Result<BufferStatus, TimeSeriesBufferError>;
+    async fn get_status(&self, buffer_id: &BufferId)
+        -> Result<BufferStatus, TimeSeriesBufferError>;
 
     /// Close buffer (will flush all pending data)
     async fn close_buffer(&self, buffer_id: &BufferId) -> Result<(), TimeSeriesBufferError>;
@@ -70,8 +70,10 @@ impl TimeSeriesBufferServiceImpl {
     }
 
     /// Generate HDF5 file path for an experiment
-    fn get_hdf5_path(data_root: &PathBuf, experiment_id: Uuid) -> PathBuf {
-        data_root.join("experiments").join(format!("{}.h5", experiment_id))
+    fn get_hdf5_path(data_root: &Path, experiment_id: Uuid) -> PathBuf {
+        data_root
+            .join("experiments")
+            .join(format!("{}.h5", experiment_id))
     }
 
     /// Validate a time series point
@@ -95,7 +97,10 @@ impl TimeSeriesBufferServiceImpl {
         buffer: &mut ExperimentBuffer,
         manual: bool,
     ) -> Result<FlushResult, TimeSeriesBufferError> {
-        eprintln!("[flush_internal] Entering flush_internal, manual={}", manual);
+        eprintln!(
+            "[flush_internal] Entering flush_internal, manual={}",
+            manual
+        );
         // Check if flush is already in progress
         if buffer.is_flush_in_progress() {
             eprintln!("[flush_internal] Flush already in progress, returning error");
@@ -111,7 +116,11 @@ impl TimeSeriesBufferServiceImpl {
         // Take all points from all channels
         let all_points = buffer.take_all_points();
         let points_count: usize = all_points.values().map(|v| v.len()).sum();
-        eprintln!("[flush_internal] Taking {} points from {} channels", points_count, all_points.len());
+        eprintln!(
+            "[flush_internal] Taking {} points from {} channels",
+            points_count,
+            all_points.len()
+        );
 
         if all_points.is_empty() || all_points.values().all(|v| v.is_empty()) {
             eprintln!("[flush_internal] No points to flush, returning early");
@@ -125,12 +134,14 @@ impl TimeSeriesBufferServiceImpl {
 
         // Create HDF5 file and write data
         let hdf5_path = buffer.hdf5_file_path().clone();
-        
+
         // Open or create the HDF5 file
         let file = if hdf5_path.exists() {
             self.hdf5_service.open_file(&hdf5_path).await
         } else {
-            self.hdf5_service.create_file_with_directories(&hdf5_path).await
+            self.hdf5_service
+                .create_file_with_directories(&hdf5_path)
+                .await
         };
 
         let file = match file {
@@ -164,7 +175,11 @@ impl TimeSeriesBufferServiceImpl {
                             continue;
                         }
                     };
-                    match self.hdf5_service.create_group(&root_group, &channel_name).await {
+                    match self
+                        .hdf5_service
+                        .create_group(&root_group, &channel_name)
+                        .await
+                    {
                         Ok(g) => g,
                         Err(e) => {
                             // Log error but continue with other channels
@@ -202,7 +217,10 @@ impl TimeSeriesBufferServiceImpl {
         // Mark as not flushing
         buffer.set_flushing(false);
 
-        eprintln!("[flush_internal] Flush complete, flushed {} points", total_points_flushed);
+        eprintln!(
+            "[flush_internal] Flush complete, flushed {} points",
+            total_points_flushed
+        );
         Ok(FlushResult {
             points_flushed: total_points_flushed,
             flush_duration_ms: start.elapsed().as_millis() as u64,
@@ -248,15 +266,10 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         let buffer_id = BufferId::new(Uuid::new_v4());
         let hdf5_path = Self::get_hdf5_path(&config.data_root, experiment_id);
 
-        let buffer = ExperimentBuffer::new(
-            buffer_id.clone(),
-            experiment_id,
-            config,
-            hdf5_path,
-        );
+        let buffer = ExperimentBuffer::new(buffer_id.clone(), experiment_id, config, hdf5_path);
 
         let mut buffers = self.buffers.write().await;
-        
+
         // Check if buffer already exists for this experiment
         if buffers.contains_key(&experiment_id) {
             return Err(TimeSeriesBufferError::BufferAlreadyExists(
@@ -275,18 +288,25 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         point: TimeSeriesPoint,
     ) -> Result<(), TimeSeriesBufferError> {
         self.validate_point(&point)?;
-        eprintln!("[write_point] Adding point to channel '{}' with timestamp {} and value {}", 
-            point.channel, point.timestamp, point.value);
+        eprintln!(
+            "[write_point] Adding point to channel '{}' with timestamp {} and value {}",
+            point.channel, point.timestamp, point.value
+        );
 
         let buffers = self.buffers.read().await;
-        
+
         // Find buffer by experiment_id and clone the Arc
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -305,7 +325,7 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         // Check and perform auto-flush
         drop(buffer_guard);
         let mut buffer_guard = buffer.write().await;
-        self.check_and_auto_flush(&mut *buffer_guard).await?;
+        self.check_and_auto_flush(&mut buffer_guard).await?;
 
         Ok(())
     }
@@ -321,14 +341,19 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         }
 
         let buffers = self.buffers.read().await;
-        
+
         // Find buffer by experiment_id and clone the Arc
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -345,7 +370,7 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         for point in points {
             channel_points
                 .entry(point.channel.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(point);
         }
 
@@ -360,20 +385,25 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         // Check and perform auto-flush
         drop(buffer_guard);
         let mut buffer_guard = buffer.write().await;
-        self.check_and_auto_flush(&mut *buffer_guard).await?;
+        self.check_and_auto_flush(&mut buffer_guard).await?;
 
         Ok(())
     }
 
     async fn flush(&self, buffer_id: &BufferId) -> Result<FlushResult, TimeSeriesBufferError> {
         let buffers = self.buffers.read().await;
-        
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -382,15 +412,23 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
         self.flush_internal(&mut buffer_guard, true).await
     }
 
-    async fn get_status(&self, buffer_id: &BufferId) -> Result<BufferStatus, TimeSeriesBufferError> {
+    async fn get_status(
+        &self,
+        buffer_id: &BufferId,
+    ) -> Result<BufferStatus, TimeSeriesBufferError> {
         let buffers = self.buffers.read().await;
-        
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -409,13 +447,18 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
 
     async fn close_buffer(&self, buffer_id: &BufferId) -> Result<(), TimeSeriesBufferError> {
         let buffers = self.buffers.read().await;
-        
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -430,13 +473,18 @@ impl TimeSeriesBufferService for TimeSeriesBufferServiceImpl {
 
     async fn delete_buffer(&self, buffer_id: &BufferId) -> Result<(), TimeSeriesBufferError> {
         let buffers = self.buffers.read().await;
-        
-        let buffer = match buffers
-            .values()
-            .find(|b| b.try_read().map(|r| r.buffer_id() == buffer_id).unwrap_or(false))
-        {
+
+        let buffer = match buffers.values().find(|b| {
+            b.try_read()
+                .map(|r| r.buffer_id() == buffer_id)
+                .unwrap_or(false)
+        }) {
             Some(b) => Arc::clone(b),
-            None => return Err(TimeSeriesBufferError::BufferNotFound(buffer_id.0.to_string())),
+            None => {
+                return Err(TimeSeriesBufferError::BufferNotFound(
+                    buffer_id.0.to_string(),
+                ))
+            }
         };
 
         drop(buffers);
@@ -469,19 +517,34 @@ mod tests {
 
     #[async_trait]
     impl Hdf5Service for MockHdf5Service {
-        async fn create_file(&self, path: PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
+        async fn create_file(
+            &self,
+            path: PathBuf,
+        ) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
             Ok(Hdf5File { path })
         }
 
-        async fn open_file(&self, path: &PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
-            Ok(Hdf5File { path: path.clone() })
+        async fn open_file(
+            &self,
+            path: &Path,
+        ) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
+            Ok(Hdf5File {
+                path: path.to_path_buf(),
+            })
         }
 
-        async fn close_file(&self, _file: Hdf5File) -> Result<(), crate::services::hdf5::Hdf5Error> {
+        async fn close_file(
+            &self,
+            _file: Hdf5File,
+        ) -> Result<(), crate::services::hdf5::Hdf5Error> {
             Ok(())
         }
 
-        async fn create_group(&self, parent: &Hdf5Group, name: &str) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
+        async fn create_group(
+            &self,
+            parent: &Hdf5Group,
+            name: &str,
+        ) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
             let full_path = if parent.path == "/" {
                 format!("/{}", name)
             } else {
@@ -495,16 +558,24 @@ mod tests {
             })
         }
 
-        async fn get_group(&self, file: &Hdf5File, path: &str) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
+        async fn get_group(
+            &self,
+            file: &Hdf5File,
+            path: &str,
+        ) -> Result<Hdf5Group, crate::services::hdf5::Hdf5Error> {
             // Always succeed for any path - simulates that all groups exist
             let normalized = if path.starts_with("/") {
                 path.to_string()
             } else {
                 format!("/{}", path)
             };
-            
-            let name = normalized.split('/').filter(|s| !s.is_empty()).last().unwrap_or("").to_string();
-            
+
+            let name = normalized
+                .split('/')
+                .rfind(|s| !s.is_empty())
+                .unwrap_or("")
+                .to_string();
+
             Ok(Hdf5Group {
                 file_path: file.path.clone(),
                 name,
@@ -522,27 +593,44 @@ mod tests {
             Ok(())
         }
 
-        async fn read_dataset(&self, _group: &Hdf5Group, _name: &str) -> Result<Vec<f64>, crate::services::hdf5::Hdf5Error> {
+        async fn read_dataset(
+            &self,
+            _group: &Hdf5Group,
+            _name: &str,
+        ) -> Result<Vec<f64>, crate::services::hdf5::Hdf5Error> {
             Ok(vec![])
         }
 
-        async fn get_dataset_shape(&self, _group: &Hdf5Group, _name: &str) -> Result<Vec<usize>, crate::services::hdf5::Hdf5Error> {
+        async fn get_dataset_shape(
+            &self,
+            _group: &Hdf5Group,
+            _name: &str,
+        ) -> Result<Vec<usize>, crate::services::hdf5::Hdf5Error> {
             Ok(vec![])
         }
 
-        async fn generate_experiment_path(&self, _exp_id: Uuid, _timestamp: chrono::DateTime<Utc>) -> Result<PathBuf, crate::services::hdf5::Hdf5Error> {
+        async fn generate_experiment_path(
+            &self,
+            _exp_id: Uuid,
+            _timestamp: chrono::DateTime<Utc>,
+        ) -> Result<PathBuf, crate::services::hdf5::Hdf5Error> {
             Ok(PathBuf::from("/tmp/test.h5"))
         }
 
-        async fn create_file_with_directories(&self, path: &PathBuf) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
+        async fn create_file_with_directories(
+            &self,
+            path: &Path,
+        ) -> Result<Hdf5File, crate::services::hdf5::Hdf5Error> {
             // Create parent directories
             if let Some(parent) = path.parent() {
                 std::fs::create_dir_all(parent).ok();
             }
-            Ok(Hdf5File { path: path.clone() })
+            Ok(Hdf5File {
+                path: path.to_path_buf(),
+            })
         }
 
-        fn is_path_safe(&self, _path: &PathBuf) -> bool {
+        fn is_path_safe(&self, _path: &Path) -> bool {
             true
         }
     }
@@ -573,7 +661,10 @@ mod tests {
         assert!(result1.is_ok());
 
         let result2 = service.create_buffer(experiment_id, config).await;
-        assert!(matches!(result2, Err(TimeSeriesBufferError::BufferAlreadyExists(_))));
+        assert!(matches!(
+            result2,
+            Err(TimeSeriesBufferError::BufferAlreadyExists(_))
+        ));
     }
 
     #[tokio::test]
@@ -613,7 +704,10 @@ mod tests {
         };
 
         let result = service.write_point(&buffer_id, point).await;
-        assert!(matches!(result, Err(TimeSeriesBufferError::InvalidPoint(_))));
+        assert!(matches!(
+            result,
+            Err(TimeSeriesBufferError::InvalidPoint(_))
+        ));
     }
 
     #[tokio::test]
@@ -633,7 +727,10 @@ mod tests {
         };
 
         let result = service.write_point(&buffer_id, point).await;
-        assert!(matches!(result, Err(TimeSeriesBufferError::InvalidPoint(_))));
+        assert!(matches!(
+            result,
+            Err(TimeSeriesBufferError::InvalidPoint(_))
+        ));
     }
 
     #[tokio::test]
@@ -682,7 +779,10 @@ mod tests {
         };
 
         let result = service.write_point(&buffer_id, point).await;
-        assert!(matches!(result, Err(TimeSeriesBufferError::BufferNotFound(_))));
+        assert!(matches!(
+            result,
+            Err(TimeSeriesBufferError::BufferNotFound(_))
+        ));
     }
 
     #[tokio::test]
@@ -696,13 +796,11 @@ mod tests {
         let buffer_id = service.create_buffer(experiment_id, config).await.unwrap();
 
         // Write some points
-        let points = vec![
-            TimeSeriesPoint {
-                timestamp: 1000,
-                channel: "ch1".to_string(),
-                value: 1.0,
-            },
-        ];
+        let points = vec![TimeSeriesPoint {
+            timestamp: 1000,
+            channel: "ch1".to_string(),
+            value: 1.0,
+        }];
         service.write_batch(&buffer_id, points).await.unwrap();
 
         // Flush
@@ -721,16 +819,17 @@ mod tests {
         let experiment_id = Uuid::new_v4();
         let config = BufferConfig::default();
 
-        let buffer_id = service.create_buffer(experiment_id, config.clone()).await.unwrap();
+        let buffer_id = service
+            .create_buffer(experiment_id, config.clone())
+            .await
+            .unwrap();
 
         // Write some points
-        let points = vec![
-            TimeSeriesPoint {
-                timestamp: 1000,
-                channel: "ch1".to_string(),
-                value: 1.0,
-            },
-        ];
+        let points = vec![TimeSeriesPoint {
+            timestamp: 1000,
+            channel: "ch1".to_string(),
+            value: 1.0,
+        }];
         service.write_batch(&buffer_id, points).await.unwrap();
 
         // Get status
@@ -754,13 +853,11 @@ mod tests {
         let buffer_id = service.create_buffer(experiment_id, config).await.unwrap();
 
         // Write some points
-        let points = vec![
-            TimeSeriesPoint {
-                timestamp: 1000,
-                channel: "ch1".to_string(),
-                value: 1.0,
-            },
-        ];
+        let points = vec![TimeSeriesPoint {
+            timestamp: 1000,
+            channel: "ch1".to_string(),
+            value: 1.0,
+        }];
         service.write_batch(&buffer_id, points).await.unwrap();
 
         // Close buffer
@@ -783,13 +880,11 @@ mod tests {
         let buffer_id = service.create_buffer(experiment_id, config).await.unwrap();
 
         // Write some points
-        let points = vec![
-            TimeSeriesPoint {
-                timestamp: 1000,
-                channel: "ch1".to_string(),
-                value: 1.0,
-            },
-        ];
+        let points = vec![TimeSeriesPoint {
+            timestamp: 1000,
+            channel: "ch1".to_string(),
+            value: 1.0,
+        }];
         service.write_batch(&buffer_id, points).await.unwrap();
 
         // Delete buffer
@@ -798,7 +893,10 @@ mod tests {
 
         // Verify buffer not found
         let result = service.get_status(&buffer_id).await;
-        assert!(matches!(result, Err(TimeSeriesBufferError::BufferNotFound(_))));
+        assert!(matches!(
+            result,
+            Err(TimeSeriesBufferError::BufferNotFound(_))
+        ));
     }
 
     #[tokio::test]
@@ -831,8 +929,10 @@ mod tests {
         let service = TimeSeriesBufferServiceImpl::new(mock_hdf5);
 
         let experiment_id = Uuid::new_v4();
-        let mut config = BufferConfig::default();
-        config.max_size = 3; // Small size to trigger flush
+        let config = BufferConfig {
+            max_size: 3,
+            ..Default::default()
+        }; // Small size to trigger flush
 
         let buffer_id = service.create_buffer(experiment_id, config).await.unwrap();
 

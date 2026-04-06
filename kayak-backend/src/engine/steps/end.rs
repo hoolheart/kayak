@@ -5,7 +5,9 @@
 use async_trait::async_trait;
 
 use super::super::executor::{DriverAccess, StepExecutor};
-use super::super::types::{ExecutionContext, ExecutionError, ExecutionStatus, StepDefinition, StepResult};
+use super::super::types::{
+    ExecutionContext, ExecutionError, ExecutionStatus, StepDefinition, StepResult,
+};
 
 /// End 环节执行器
 pub struct EndStepExecutor;
@@ -36,8 +38,8 @@ impl StepExecutor for EndStepExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use uuid::Uuid;
     use crate::drivers::core::PointValue;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_end_sets_completed_status() {
@@ -48,7 +50,10 @@ mod tests {
             name: "End".to_string(),
         };
 
-        let result = executor.execute(&step, &mut ctx, &MockDriver).await.unwrap();
+        let result = executor
+            .execute(&step, &mut ctx, &MockDriver)
+            .await
+            .unwrap();
 
         assert_eq!(ctx.status, ExecutionStatus::Completed);
         assert!(result.data.is_none());

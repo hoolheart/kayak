@@ -7,7 +7,9 @@ use async_trait::async_trait;
 use chrono::Utc;
 
 use super::super::executor::{DriverAccess, StepExecutor};
-use super::super::types::{ExecutionContext, ExecutionError, StepDefinition, StepResult, ExecutionStatus};
+use super::super::types::{
+    ExecutionContext, ExecutionError, ExecutionStatus, StepDefinition, StepResult,
+};
 
 /// Start 环节执行器
 pub struct StartStepExecutor;
@@ -42,17 +44,24 @@ impl StepExecutor for StartStepExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use uuid::Uuid;
     use crate::drivers::core::PointValue;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_start_sets_running_status() {
         let mut ctx = ExecutionContext::new();
         let executor = StartStepExecutor;
-        let result = executor.execute(&StepDefinition::Start {
-            id: "s1".to_string(),
-            name: "Start".to_string(),
-        }, &mut ctx, &MockDriver).await.unwrap();
+        let result = executor
+            .execute(
+                &StepDefinition::Start {
+                    id: "s1".to_string(),
+                    name: "Start".to_string(),
+                },
+                &mut ctx,
+                &MockDriver,
+            )
+            .await
+            .unwrap();
 
         assert_eq!(ctx.status, ExecutionStatus::Running);
         assert!(ctx.start_time.is_some());
@@ -64,17 +73,31 @@ mod tests {
         let mut ctx = ExecutionContext::new();
         let executor = StartStepExecutor;
 
-        executor.execute(&StepDefinition::Start {
-            id: "s1".to_string(),
-            name: "Start".to_string(),
-        }, &mut ctx, &MockDriver).await.unwrap();
+        executor
+            .execute(
+                &StepDefinition::Start {
+                    id: "s1".to_string(),
+                    name: "Start".to_string(),
+                },
+                &mut ctx,
+                &MockDriver,
+            )
+            .await
+            .unwrap();
         let first_time = ctx.start_time.unwrap();
 
         // Execute again
-        executor.execute(&StepDefinition::Start {
-            id: "s1".to_string(),
-            name: "Start".to_string(),
-        }, &mut ctx, &MockDriver).await.unwrap();
+        executor
+            .execute(
+                &StepDefinition::Start {
+                    id: "s1".to_string(),
+                    name: "Start".to_string(),
+                },
+                &mut ctx,
+                &MockDriver,
+            )
+            .await
+            .unwrap();
 
         // start_time should not change
         assert_eq!(ctx.start_time.unwrap(), first_time);

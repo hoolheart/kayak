@@ -8,7 +8,9 @@ use kayak_backend::db::repository::method_repo::{MethodRepository, SqlxMethodRep
 use kayak_backend::db::repository::state_change_log_repo::SqlxStateChangeLogRepository;
 use kayak_backend::models::entities::experiment::{Experiment, ExperimentStatus};
 use kayak_backend::models::entities::method::Method;
-use kayak_backend::services::experiment_control::{ExperimentControlError, ExperimentControlService};
+use kayak_backend::services::experiment_control::{
+    ExperimentControlError, ExperimentControlService,
+};
 use uuid::Uuid;
 
 /// 创建测试所需的完整schema
@@ -26,11 +28,11 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
-        "#
+        "#,
     )
     .execute(pool)
     .await?;
-    
+
     // 创建methods表
     sqlx::query(
         r#"
@@ -45,11 +47,11 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
-        "#
+        "#,
     )
     .execute(pool)
     .await?;
-    
+
     // 创建experiments表 - 注意状态值必须使用大写，且需要CHECK约束
     sqlx::query(
         r#"
@@ -69,7 +71,7 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
     )
     .execute(pool)
     .await?;
-    
+
     // 创建state_change_logs表
     sqlx::query(
         r#"
@@ -83,11 +85,11 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
             timestamp TEXT NOT NULL,
             error_message TEXT
         );
-        "#
+        "#,
     )
     .execute(pool)
     .await?;
-    
+
     Ok(())
 }
 
@@ -95,10 +97,10 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
 async fn create_test_user(pool: &sqlx::Pool<sqlx::Sqlite>) -> Uuid {
     let user_id = Uuid::new_v4();
     let now = chrono::Utc::now().to_rfc3339();
-    
+
     sqlx::query(
         r#"INSERT INTO users (id, email, password_hash, status, created_at, updated_at) 
-           VALUES (?, ?, ?, 'active', ?, ?)"#
+           VALUES (?, ?, ?, 'active', ?, ?)"#,
     )
     .bind(user_id.to_string())
     .bind(format!("test_{}@example.com", user_id))
@@ -131,12 +133,12 @@ async fn create_experiment_with_status(
         created_at: chrono::Utc::now(),
         updated_at: chrono::Utc::now(),
     };
-    
+
     let status_str = format!("{:?}", status).to_uppercase();
-    
+
     sqlx::query(
         r#"INSERT INTO experiments (id, user_id, name, description, status, created_at, updated_at) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)"#
+           VALUES (?, ?, ?, ?, ?, ?, ?)"#,
     )
     .bind(exp.id.to_string())
     .bind(user_id.to_string())
@@ -184,9 +186,10 @@ async fn test_load_experiment_success() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Load", ExperimentStatus::Idle).await;
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test Load", ExperimentStatus::Idle).await;
     let method = create_test_method(&pool, user_id).await;
-    
+
     let result = service.load(exp.id, method.id, user_id).await;
     assert!(result.is_ok());
     let dto = result.unwrap();
@@ -204,14 +207,19 @@ async fn test_load_experiment_not_found() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
-    let result = service.load(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4()).await;
+    let result = service
+        .load(Uuid::new_v4(), Uuid::new_v4(), Uuid::new_v4())
+        .await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::NotFound(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::NotFound(_)
+    ));
 }
 
 #[tokio::test]
@@ -226,19 +234,24 @@ async fn test_load_experiment_forbidden() {
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let method_repo = SqlxMethodRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        method_repo, 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        method_repo,
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let owner_id = create_test_user(&pool).await;
     let other_user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, owner_id, "Test Forbidden", ExperimentStatus::Idle).await;
+    let exp =
+        create_experiment_with_status(&pool, owner_id, "Test Forbidden", ExperimentStatus::Idle)
+            .await;
     let method = create_test_method(&pool, owner_id).await;
-    
+
     let result = service.load(exp.id, method.id, other_user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::Forbidden(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::Forbidden(_)
+    ));
 }
 
 #[tokio::test]
@@ -256,10 +269,11 @@ async fn test_start_experiment_success() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Start", ExperimentStatus::Idle).await;
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test Start", ExperimentStatus::Idle).await;
     let method = create_test_method(&pool, user_id).await;
     service.load(exp.id, method.id, user_id).await.unwrap();
-    
+
     let result = service.start(exp.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "RUNNING");
@@ -276,17 +290,21 @@ async fn test_start_experiment_invalid_transition() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Invalid", ExperimentStatus::Idle).await;
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test Invalid", ExperimentStatus::Idle).await;
 
     let result = service.start(exp.id, user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::InvalidTransition(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::InvalidTransition(_)
+    ));
 }
 
 // ===== State Machine Tests =====
@@ -306,9 +324,11 @@ async fn test_state_transition_idle_to_loaded() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Idle->Loaded", ExperimentStatus::Idle).await;
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test Idle->Loaded", ExperimentStatus::Idle)
+            .await;
     let method = create_test_method(&pool, user_id).await;
-    
+
     let result = service.load(exp.id, method.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "LOADED");
@@ -329,8 +349,14 @@ async fn test_state_transition_loaded_to_running() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Loaded->Running", ExperimentStatus::Loaded).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        user_id,
+        "Test Loaded->Running",
+        ExperimentStatus::Loaded,
+    )
+    .await;
+
     let result = service.start(exp.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "RUNNING");
@@ -351,8 +377,14 @@ async fn test_state_transition_running_to_paused() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Running->Paused", ExperimentStatus::Running).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        user_id,
+        "Test Running->Paused",
+        ExperimentStatus::Running,
+    )
+    .await;
+
     let result = service.pause(exp.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "PAUSED");
@@ -373,8 +405,14 @@ async fn test_state_transition_paused_to_running() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Paused->Running", ExperimentStatus::Paused).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        user_id,
+        "Test Paused->Running",
+        ExperimentStatus::Paused,
+    )
+    .await;
+
     let result = service.resume(exp.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "RUNNING");
@@ -395,8 +433,14 @@ async fn test_state_transition_running_to_loaded() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Running->Loaded", ExperimentStatus::Running).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        user_id,
+        "Test Running->Loaded",
+        ExperimentStatus::Running,
+    )
+    .await;
+
     let result = service.stop(exp.id, user_id).await;
     assert!(result.is_ok());
     assert_eq!(result.unwrap().status, "LOADED");
@@ -413,17 +457,22 @@ async fn test_invalid_transition_idle_to_running() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Idle->Running", ExperimentStatus::Idle).await;
-    
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test Idle->Running", ExperimentStatus::Idle)
+            .await;
+
     let result = service.start(exp.id, user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::InvalidTransition(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::InvalidTransition(_)
+    ));
 }
 
 // ===== Permission Tests =====
@@ -440,19 +489,28 @@ async fn test_permission_non_owner_load() {
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let method_repo = SqlxMethodRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        method_repo, 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        method_repo,
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let owner_id = create_test_user(&pool).await;
     let other_user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, owner_id, "Test NonOwner Load", ExperimentStatus::Idle).await;
+    let exp = create_experiment_with_status(
+        &pool,
+        owner_id,
+        "Test NonOwner Load",
+        ExperimentStatus::Idle,
+    )
+    .await;
     let method = create_test_method(&pool, owner_id).await;
-    
+
     let result = service.load(exp.id, method.id, other_user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::Forbidden(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::Forbidden(_)
+    ));
 }
 
 #[tokio::test]
@@ -466,18 +524,27 @@ async fn test_permission_non_owner_pause() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let owner_id = create_test_user(&pool).await;
     let other_user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, owner_id, "Test NonOwner Pause", ExperimentStatus::Running).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        owner_id,
+        "Test NonOwner Pause",
+        ExperimentStatus::Running,
+    )
+    .await;
+
     let result = service.pause(exp.id, other_user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::Forbidden(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::Forbidden(_)
+    ));
 }
 
 #[tokio::test]
@@ -491,18 +558,27 @@ async fn test_permission_non_owner_stop() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let owner_id = create_test_user(&pool).await;
     let other_user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, owner_id, "Test NonOwner Stop", ExperimentStatus::Running).await;
-    
+    let exp = create_experiment_with_status(
+        &pool,
+        owner_id,
+        "Test NonOwner Stop",
+        ExperimentStatus::Running,
+    )
+    .await;
+
     let result = service.stop(exp.id, other_user_id).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::Forbidden(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::Forbidden(_)
+    ));
 }
 
 // ===== Status and History Tests =====
@@ -518,14 +594,16 @@ async fn test_get_status_success() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test GetStatus", ExperimentStatus::Running).await;
-    
+    let exp =
+        create_experiment_with_status(&pool, user_id, "Test GetStatus", ExperimentStatus::Running)
+            .await;
+
     let result = service.get_status(exp.id).await;
     assert!(result.is_ok());
     let status = result.unwrap();
@@ -544,14 +622,17 @@ async fn test_get_status_not_found() {
 
     let exp_repo = SqlxExperimentRepository::new(pool.clone());
     let service = ExperimentControlService::new(
-        exp_repo, 
-        SqlxMethodRepository::new(pool.clone()), 
-        SqlxStateChangeLogRepository::new(pool.clone())
+        exp_repo,
+        SqlxMethodRepository::new(pool.clone()),
+        SqlxStateChangeLogRepository::new(pool.clone()),
     );
 
     let result = service.get_status(Uuid::new_v4()).await;
     assert!(result.is_err());
-    assert!(matches!(result.unwrap_err(), ExperimentControlError::NotFound(_)));
+    assert!(matches!(
+        result.unwrap_err(),
+        ExperimentControlError::NotFound(_)
+    ));
 }
 
 // ===== Full Lifecycle Test =====
@@ -571,7 +652,13 @@ async fn test_full_lifecycle() {
     let service = ExperimentControlService::new(exp_repo, method_repo, log_repo);
 
     let user_id = create_test_user(&pool).await;
-    let exp = create_experiment_with_status(&pool, user_id, "Test Full Lifecycle", ExperimentStatus::Idle).await;
+    let exp = create_experiment_with_status(
+        &pool,
+        user_id,
+        "Test Full Lifecycle",
+        ExperimentStatus::Idle,
+    )
+    .await;
     let method = create_test_method(&pool, user_id).await;
 
     // Load

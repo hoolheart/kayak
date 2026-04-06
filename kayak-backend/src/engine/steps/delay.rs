@@ -42,8 +42,8 @@ impl StepExecutor for DelayStepExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use uuid::Uuid;
     use crate::drivers::core::PointValue;
+    use uuid::Uuid;
 
     #[tokio::test]
     async fn test_delay_waits_for_duration() {
@@ -56,7 +56,10 @@ mod tests {
         };
 
         let before = std::time::Instant::now();
-        let result = executor.execute(&step, &mut ctx, &MockDriver).await.unwrap();
+        let result = executor
+            .execute(&step, &mut ctx, &MockDriver)
+            .await
+            .unwrap();
         let elapsed = before.elapsed();
 
         assert!(elapsed.as_millis() >= 10);
@@ -73,7 +76,10 @@ mod tests {
             duration_ms: 0,
         };
 
-        let result = executor.execute(&step, &mut ctx, &MockDriver).await.unwrap();
+        let result = executor
+            .execute(&step, &mut ctx, &MockDriver)
+            .await
+            .unwrap();
         assert!(result.duration_ms < 50); // Should be very fast
     }
 

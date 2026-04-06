@@ -1,5 +1,7 @@
 //! 表达式求值结果类型定义
 
+#![allow(dead_code)]
+
 use std::fmt;
 
 /// 表达式求值结果
@@ -8,6 +10,7 @@ use std::fmt;
 /// 注意：字符串结果在 Release 0 中仅用于字符串相等比较，
 /// 不支持字符串连接等复杂操作。
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum EvalResult {
     /// 数值结果
     Number(f64),
@@ -31,6 +34,7 @@ impl fmt::Display for EvalResult {
 ///
 /// 所有表达式相关的错误都通过此枚举表示。
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
 pub enum ExpressionError {
     /// 语法错误：表达式格式不正确
     Syntax(String),

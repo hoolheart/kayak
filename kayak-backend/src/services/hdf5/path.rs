@@ -1,6 +1,6 @@
 //! HDF5数据文件路径策略
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
@@ -71,7 +71,7 @@ impl PathStrategy {
     /// 规范化路径
     ///
     /// 移除多余的斜杠和点号
-    pub fn normalize(&self, path: &PathBuf) -> Result<PathBuf, Hdf5Error> {
+    pub fn normalize(&self, path: &Path) -> Result<PathBuf, Hdf5Error> {
         let components: Vec<_> = path
             .components()
             .filter(|c| !matches!(c, std::path::Component::ParentDir))
@@ -82,12 +82,12 @@ impl PathStrategy {
     }
 
     /// 验证路径是否在允许的根目录下
-    pub fn is_under_root(&self, path: &PathBuf) -> bool {
+    pub fn is_under_root(&self, path: &Path) -> bool {
         path.starts_with(&self.config.root_dir)
     }
 
     /// 获取根目录
-    pub fn root_dir(&self) -> &PathBuf {
+    pub fn root_dir(&self) -> &Path {
         &self.config.root_dir
     }
 }

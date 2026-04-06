@@ -84,14 +84,19 @@ impl From<BroadcastMessage> for WsMessage {
 /// Sender handle for a subscribed connection
 #[derive(Debug, Clone)]
 pub struct ConnectionSender {
+    #[allow(dead_code)]
     experiment_id: Uuid,
+    #[allow(dead_code)]
     user_id: Uuid,
     sender: broadcast::Sender<WsMessage>,
 }
 
 impl ConnectionSender {
     /// Send a message to this connection
-    pub async fn send(&self, msg: WsMessage) -> Result<usize, broadcast::error::SendError<WsMessage>> {
+    pub async fn send(
+        &self,
+        msg: WsMessage,
+    ) -> Result<usize, broadcast::error::SendError<WsMessage>> {
         self.sender.send(msg)
     }
 }
@@ -136,7 +141,11 @@ impl ExperimentWsManager {
     }
 
     /// Unsubscribe a user from an experiment
-    pub async fn unsubscribe(&self, experiment_id: Uuid, user_id: Uuid) -> Result<(), UnsubscribeError> {
+    pub async fn unsubscribe(
+        &self,
+        experiment_id: Uuid,
+        user_id: Uuid,
+    ) -> Result<(), UnsubscribeError> {
         let mut subscriptions = self.subscriptions.write().await;
         if let Some(connections) = subscriptions.get_mut(&experiment_id) {
             connections.retain(|c| c.user_id != user_id);
@@ -148,7 +157,11 @@ impl ExperimentWsManager {
     }
 
     /// Broadcast a message to all subscribers of an experiment
-    pub async fn broadcast(&self, experiment_id: Uuid, msg: BroadcastMessage) -> Result<(), BroadcastError> {
+    pub async fn broadcast(
+        &self,
+        experiment_id: Uuid,
+        msg: BroadcastMessage,
+    ) -> Result<(), BroadcastError> {
         let subscriptions = self.subscriptions.read().await;
         let Some(connections) = subscriptions.get(&experiment_id) else {
             return Err(BroadcastError::NoSubscribers(experiment_id));
@@ -355,13 +368,18 @@ mod tests {
             timestamp: "2024-01-01T00:00:00Z".to_string(),
         };
 
-        let result = manager.broadcast(experiment_id, broadcast_msg.clone()).await;
+        let result = manager
+            .broadcast(experiment_id, broadcast_msg.clone())
+            .await;
         assert!(result.is_ok());
 
         // Verify message received
         let received = receiver.recv().await.unwrap();
         match received {
-            WsMessage::StatusChange { experiment_id: exp_id, .. } => {
+            WsMessage::StatusChange {
+                experiment_id: exp_id,
+                ..
+            } => {
                 assert_eq!(exp_id, experiment_id);
             }
             _ => panic!("Expected StatusChange message"),
@@ -384,13 +402,19 @@ mod tests {
             code: 400,
         };
 
-        let result = manager.broadcast(experiment_id, broadcast_msg.clone()).await;
+        let result = manager
+            .broadcast(experiment_id, broadcast_msg.clone())
+            .await;
         assert!(result.is_ok());
 
         // Verify message received
         let received = receiver.recv().await.unwrap();
         match received {
-            WsMessage::Error { experiment_id: exp_id, code, .. } => {
+            WsMessage::Error {
+                experiment_id: exp_id,
+                code,
+                ..
+            } => {
                 assert_eq!(exp_id, experiment_id);
                 assert_eq!(code, 400);
             }

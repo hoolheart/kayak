@@ -6,6 +6,10 @@
 //! `StepEngine` 本身不要求 `Sync`，但可以在多个线程间共享（通过 `Arc`），
 //! 因为 `execute` 方法每次调用都创建独立的 `ExecutionContext`。
 
+// Note: clippy warning about await_holding_lock is suppressed because
+// the lock is intentionally held across the step execution for consistency.
+#![allow(clippy::await_holding_lock)]
+
 use std::sync::Arc;
 
 use super::adapter::DriverAccessAdapter;
@@ -81,15 +85,17 @@ impl StepEngine {
             // 获取驱动的只读引用（读锁）
             // 注意：DeviceDriver::read_point/write_point 使用 &self（非 &mut self），
             // 因此读锁足够。锁在此作用域内持有，步骤执行完毕后自动释放。
-            let driver = driver_lock.read().map_err(|_| {
-                EngineError::LockError("Failed to acquire driver lock".to_string())
-            })?;
+            let result = {
+                let driver = driver_lock.read().map_err(|_| {
+                    EngineError::LockError("Failed to acquire driver lock".to_string())
+                })?;
 
-            // 构建 DriverAccess 适配器（泛型版本，支持任何 DeviceDriver 实现）
-            let driver_access = DriverAccessAdapter::new(&*driver);
+                // 构建 DriverAccess 适配器（泛型版本，支持任何 DeviceDriver 实现）
+                let driver_access = DriverAccessAdapter::new(&*driver);
 
-            // 执行环节
-            let result = self.execute_step(step, &mut context, &driver_access).await;
+                // 执行环节
+                self.execute_step(step, &mut context, &driver_access).await
+            };
 
             let end_time = Utc::now();
 
@@ -159,16 +165,12 @@ impl StepEngine {
         driver: &dyn DriverAccess,
     ) -> Result<StepResult, ExecutionError> {
         match step {
-            StepDefinition::Start { .. } => {
-                StartStepExecutor.execute(step, context, driver).await
-            }
+            StepDefinition::Start { .. } => StartStepExecutor.execute(step, context, driver).await,
             StepDefinition::Read { .. } => ReadStepExecutor.execute(step, context, driver).await,
             StepDefinition::Control { .. } => {
                 ControlStepExecutor.execute(step, context, driver).await
             }
-            StepDefinition::Delay { .. } => {
-                DelayStepExecutor.execute(step, context, driver).await
-            }
+            StepDefinition::Delay { .. } => DelayStepExecutor.execute(step, context, driver).await,
             StepDefinition::End { .. } => EndStepExecutor.execute(step, context, driver).await,
         }
     }
@@ -411,7 +413,10 @@ mod tests {
         assert!(result.is_err());
 
         match result.unwrap_err() {
-            EngineError::ExecutionFailed { context, source_error } => {
+            EngineError::ExecutionFailed {
+                context,
+                source_error,
+            } => {
                 // Status should be Failed
                 assert_eq!(context.status, ExecutionStatus::Failed);
                 // Only Start and Read should have logs (Read failed)

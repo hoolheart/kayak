@@ -13,13 +13,13 @@ use uuid::Uuid;
 
 use crate::auth::middleware::require_auth::RequireAuth;
 use crate::core::error::{ApiResponse, AppError};
+use crate::db::repository::method_repo::SqlxMethodRepository;
 use crate::models::dto::method_dto::{
     CreateMethodRequest, MethodDto, MethodListResponse, UpdateMethodRequest,
 };
 use crate::services::method_service::{
     MethodService, MethodServiceError, MethodServiceTrait, ValidationResult,
 };
-use crate::db::repository::method_repo::SqlxMethodRepository;
 
 /// Application state for method handlers
 pub type AppState = Arc<dyn MethodServiceTrait>;
@@ -75,7 +75,9 @@ impl MethodServiceTrait for MethodServiceAdapter {
         &self,
         process_definition: serde_json::Value,
     ) -> Result<ValidationResult, MethodServiceError> {
-        Ok(self.service.validate_process_definition(&process_definition))
+        Ok(self
+            .service
+            .validate_process_definition(&process_definition))
     }
 }
 

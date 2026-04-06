@@ -65,7 +65,10 @@ mod tests {
             value: PointValue::Number(75.0),
         };
 
-        let result = executor.execute(&step, &mut ctx, &MockDriverAdapter(mock.clone())).await.unwrap();
+        let result = executor
+            .execute(&step, &mut ctx, &MockDriverAdapter(mock.clone()))
+            .await
+            .unwrap();
         assert!(result.data.is_none());
 
         let driver = mock.lock().unwrap();
@@ -83,7 +86,13 @@ mod tests {
             value: PointValue::Number(75.0),
         };
 
-        let result = executor.execute(&step, &mut ctx, &MockDriverAdapter(Arc::new(Mutex::new(MockDriver::default())))).await;
+        let result = executor
+            .execute(
+                &step,
+                &mut ctx,
+                &MockDriverAdapter(Arc::new(Mutex::new(MockDriver::default()))),
+            )
+            .await;
         assert!(result.is_err());
     }
 

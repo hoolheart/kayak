@@ -268,7 +268,7 @@ mod tests {
                 updated_at TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-            "#
+            "#,
         )
         .execute(pool)
         .await?;
@@ -283,10 +283,10 @@ mod tests {
         let pool = init_db_without_migrations(&format!("sqlite:{}", db_path.display()))
             .await
             .unwrap();
-        
+
         // 手动创建schema
         create_test_schema(&pool).await.unwrap();
-        
+
         let repo = UserRepository::new(pool);
 
         // 创建用户
@@ -328,10 +328,10 @@ mod tests {
         let pool = init_db_without_migrations(&format!("sqlite:{}", db_path.display()))
             .await
             .unwrap();
-        
+
         // 手动创建schema
         create_test_schema(&pool).await.unwrap();
-        
+
         let repo = UserRepository::new(pool);
 
         // 创建用户

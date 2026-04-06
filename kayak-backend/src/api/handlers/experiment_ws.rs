@@ -42,12 +42,12 @@ impl Default for AppState {
 }
 
 /// WebSocket handler for experiment status subscriptions
-/// 
+///
 /// Path: /ws/experiments/{id}
-/// 
+///
 /// Authentication: JWT token via Authorization header
-/// 
-/// Heartbeat: 
+///
+/// Heartbeat:
 /// - Server sends ping every 30 seconds
 /// - 60 seconds without activity = disconnected
 pub async fn ws_handler(
@@ -66,12 +66,7 @@ pub async fn ws_handler(
 }
 
 /// Handle the WebSocket connection
-async fn handle_socket(
-    socket: WebSocket,
-    state: AppState,
-    experiment_id: Uuid,
-    user_id: Uuid,
-) {
+async fn handle_socket(socket: WebSocket, state: AppState, experiment_id: Uuid, user_id: Uuid) {
     let (mut sender, mut receiver) = socket.split();
 
     // Subscribe to experiment status updates
