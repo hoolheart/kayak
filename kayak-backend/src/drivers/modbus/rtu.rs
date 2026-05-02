@@ -26,6 +26,7 @@ use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::sync::Mutex as AsyncMutex;
 use tokio::time::timeout;
+use tokio_serial::{SerialPortBuilderExt, SerialStream};
 use uuid::Uuid;
 
 pub use crate::drivers::core::{DeviceDriver, PointValue};
@@ -36,9 +37,10 @@ pub use crate::drivers::modbus::pdu::Pdu;
 pub use crate::drivers::modbus::types::{FunctionCode, ModbusAddress, RegisterType};
 
 /// 串口校验位配置
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum Parity {
     /// 无校验
+    #[default]
     None,
     /// 偶校验
     Even,
@@ -54,12 +56,6 @@ impl Parity {
             Parity::Even => serialport::Parity::Even,
             Parity::Odd => serialport::Parity::Odd,
         }
-    }
-}
-
-impl Default for Parity {
-    fn default() -> Self {
-        Parity::None
     }
 }
 
@@ -184,7 +180,7 @@ pub struct ModbusRtuDriver {
     /// 当前状态
     state: StdMutex<DriverState>,
     /// 串口 (使用 Mutex 支持内部可变性)
-    stream: AsyncMutex<Option<Box<dyn serialport::SerialPort>>>,
+    stream: AsyncMutex<Option<SerialStream>>,
     /// 测点配置映射表 (point_id -> PointConfig)
     point_configs: Arc<StdMutex<HashMap<Uuid, PointConfig>>>,
 }
@@ -365,25 +361,23 @@ impl ModbusRtuDriver {
 
         // 组装 RTU 帧
         let frame = self.build_rtu_frame(pdu);
+        let duration = self.config.timeout();
 
-        // 发送请求
+        // 发送请求 (使用 AsyncWriteExt)
         stream.write_all(&frame).await.map_err(|e| {
             *self.state.lock().unwrap() = DriverState::Error;
             ModbusError::IoError(format!("Failed to send request: {}", e))
         })?;
 
         // 刷新确保数据发出
-        stream.flush().map_err(|e| {
+        stream.flush().await.map_err(|e| {
             *self.state.lock().unwrap() = DriverState::Error;
             ModbusError::IoError(format!("Failed to flush: {}", e))
         })?;
 
         // 计算预期响应长度
         // 最小响应: slave_id(1) + function_code(1) + data(1) + crc(2) = 5 bytes
-        // 对于读取响应，还需要考虑 byte_count
         let expected_min_len = 5;
-
-        let duration = self.config.timeout();
 
         // 读取响应 - 先读取已知最小长度
         let mut response_buf = vec![0u8; expected_min_len];
@@ -403,7 +397,7 @@ impl ModbusRtuDriver {
         }
 
         // 解析最小帧以确定完整响应长度
-        let (slave_id, pdu) = self.parse_rtu_frame(&response_buf)?;
+        let (_slave_id, pdu) = self.parse_rtu_frame(&response_buf)?;
 
         // 检查异常响应
         if pdu.is_error_response() {
@@ -422,11 +416,7 @@ impl ModbusRtuDriver {
                     let byte_count = pdu.data[0] as usize;
                     // 已经读取了 5 字节，还需要读取 (byte_count - 3) 字节
                     // 因为已经读取了 function_code(1) + byte_count(1) + 部分数据(至少1字节)
-                    if byte_count > 1 {
-                        byte_count - 1
-                    } else {
-                        0
-                    }
+                    byte_count.saturating_sub(1)
                 } else {
                     0
                 }
@@ -435,11 +425,7 @@ impl ModbusRtuDriver {
                 // 读取响应: [byte_count, data...]
                 if !pdu.data.is_empty() {
                     let byte_count = pdu.data[0] as usize;
-                    if byte_count > 1 {
-                        byte_count - 1
-                    } else {
-                        0
-                    }
+                    byte_count.saturating_sub(1)
                 } else {
                     0
                 }
@@ -665,7 +651,7 @@ impl DriverLifecycle for ModbusRtuDriver {
             })
             .parity(self.config.parity.to_serialport_parity())
             .timeout(self.config.timeout())
-            .open()
+            .open_native_async()
             .map_err(|e| {
                 *self.state.lock().unwrap() = DriverState::Error;
                 DriverError::IoError(format!("Failed to open serial port: {}", e))
@@ -891,24 +877,24 @@ mod tests {
     fn test_crc16_calculation() {
         // TC-RTU-102: CRC16 计算验证
         // 测试数据: [0x01, 0x03, 0x00, 0x00, 0x00, 0x01]
-        // 预期 CRC: 0x840A (低字节在前)
+        // 预期 CRC: 0x0A84 (低字节在前)
         let data = [0x01, 0x03, 0x00, 0x00, 0x00, 0x01];
         let crc = ModbusRtuDriver::calculate_crc16(&data);
-        assert_eq!(crc, 0x840A, "CRC16 calculation failed for standard test data");
+        assert_eq!(crc, 0x0A84, "CRC16 calculation failed for standard test data");
     }
 
     #[test]
     fn test_crc16_additional_test_cases() {
         // TC-RTU-102: 额外的 CRC16 测试数据
-        // [0x01, 0x03, 0x00, 0x00, 0x00, 0x0A] -> CRC: 0xC5CD
+        // [0x01, 0x03, 0x00, 0x00, 0x00, 0x0A] -> CRC: 0xCDC5
         let data1 = [0x01, 0x03, 0x00, 0x00, 0x00, 0x0A];
         let crc1 = ModbusRtuDriver::calculate_crc16(&data1);
-        assert_eq!(crc1, 0xC5CD);
+        assert_eq!(crc1, 0xCDC5);
 
-        // [0x01, 0x05, 0x00, 0x00, 0xFF, 0x00] -> CRC: 0x8C3A
+        // [0x01, 0x05, 0x00, 0x00, 0xFF, 0x00] -> CRC: 0x3A8C
         let data2 = [0x01, 0x05, 0x00, 0x00, 0xFF, 0x00];
         let crc2 = ModbusRtuDriver::calculate_crc16(&data2);
-        assert_eq!(crc2, 0x8C3A);
+        assert_eq!(crc2, 0x3A8C);
     }
 
     #[test]
@@ -925,7 +911,7 @@ mod tests {
         let result = ModbusRtuDriver::verify_crc16(&data, wrong_crc);
         assert!(result.is_err());
         if let Err(ModbusError::FrameChecksumMismatch { expected, actual }) = result {
-            assert_eq!(expected, 0x840A);
+            assert_eq!(expected, 0x0A84);
             assert_eq!(actual, 0x0000);
         } else {
             panic!("Expected FrameChecksumMismatch error");
@@ -935,13 +921,13 @@ mod tests {
     #[test]
     fn test_parse_crc() {
         // 低字节在前
-        let bytes = [0x0A, 0x84]; // 0x840A
-        let crc = ModbusRtuDriver::parse_crc(bytes);
-        assert_eq!(crc, Some(0x840A));
+        let bytes = [0x84, 0x0A]; // 0x0A84
+        let crc = ModbusRtuDriver::parse_crc(&bytes);
+        assert_eq!(crc, Some(0x0A84));
 
         // 字节不足
         let bytes_short = [0x0A];
-        assert_eq!(ModbusRtuDriver::parse_crc(bytes_short), None);
+        assert_eq!(ModbusRtuDriver::parse_crc(&bytes_short), None);
     }
 
     // ========== RTU Frame Tests ==========
@@ -955,7 +941,7 @@ mod tests {
         let pdu = Pdu::read_holding_registers(ModbusAddress::new(0), 1).unwrap();
         let frame = driver.build_rtu_frame(&pdu);
 
-        // 预期帧: [0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x0A, 0x84]
+        // 预期帧: [0x01, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x0A]
         //                                    |--- PDU ---|   |--- CRC ---|
         assert_eq!(frame.len(), 8);
         assert_eq!(frame[0], 0x01); // slave_id
@@ -964,8 +950,8 @@ mod tests {
         assert_eq!(frame[3], 0x00); // address low
         assert_eq!(frame[4], 0x00); // quantity high
         assert_eq!(frame[5], 0x01); // quantity low
-        assert_eq!(frame[6], 0x0A); // CRC low
-        assert_eq!(frame[7], 0x84); // CRC high
+        assert_eq!(frame[6], 0x84); // CRC low
+        assert_eq!(frame[7], 0x0A); // CRC high
     }
 
     #[test]
@@ -1032,7 +1018,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_read_point_not_connected() {
-        let mut driver = ModbusRtuDriver::with_defaults();
+        let driver = ModbusRtuDriver::with_defaults();
         let point_id = Uuid::new_v4();
         let result = driver.read_point_async(point_id).await;
         assert!(matches!(result, Err(DriverError::NotConnected)));
@@ -1040,7 +1026,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_point_not_connected() {
-        let mut driver = ModbusRtuDriver::with_defaults();
+        let driver = ModbusRtuDriver::with_defaults();
         let point_id = Uuid::new_v4();
         let result = driver.write_point_async(point_id, PointValue::Boolean(true)).await;
         assert!(matches!(result, Err(DriverError::NotConnected)));
@@ -1049,7 +1035,7 @@ mod tests {
     #[tokio::test]
     async fn test_read_point_not_found() {
         let config = ModbusRtuConfig::new("/dev/ttyUSB0", 9600, 8, 1, Parity::None, 1000, 1);
-        let mut driver = ModbusRtuDriver::new(config);
+        let driver = ModbusRtuDriver::new(config);
 
         let point_id = Uuid::new_v4();
         let result = driver.read_point_async(point_id).await;

@@ -116,7 +116,9 @@ impl std::fmt::Display for FunctionCode {
 ///
 /// 地址范围: 0x0000 - 0xFFFF (0 - 65535)
 /// 注意：某些设备可能限制有效地址范围，但本类型不做限制。
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default, Serialize, Deserialize,
+)]
 pub struct ModbusAddress(u16);
 
 impl ModbusAddress {
@@ -170,21 +172,6 @@ impl ModbusAddress {
     /// 从大端字节序数组创建
     pub fn from_be_bytes(bytes: [u8; 2]) -> Self {
         Self(u16::from_be_bytes(bytes))
-    }
-
-    /// 检查地址是否在有效范围内
-    ///
-    /// Modbus 地址始终在 0x0000-0xFFFF 范围内，此方法始终返回 true。
-    /// 保留此方法用于接口一致性。
-    #[inline]
-    pub fn is_valid(&self) -> bool {
-        self.0 >= Self::MIN && self.0 <= Self::MAX
-    }
-}
-
-impl Default for ModbusAddress {
-    fn default() -> Self {
-        Self(0x0000)
     }
 }
 
@@ -397,5 +384,324 @@ impl std::fmt::Display for ModbusValue {
             Self::HoldingRegister(v) => write!(f, "HoldingRegister(0x{:04X})", v),
             Self::InputRegister(v) => write!(f, "InputRegister(0x{:04X})", v),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ========== FunctionCode Tests ==========
+
+    #[test]
+    fn test_function_code_valid_codes() {
+        // TC-001: FunctionCode 有效功能码创建
+        assert_eq!(FunctionCode::ReadCoils.code(), 0x01);
+        assert_eq!(FunctionCode::ReadDiscreteInputs.code(), 0x02);
+        assert_eq!(FunctionCode::ReadHoldingRegisters.code(), 0x03);
+        assert_eq!(FunctionCode::ReadInputRegisters.code(), 0x04);
+        assert_eq!(FunctionCode::WriteSingleCoil.code(), 0x05);
+        assert_eq!(FunctionCode::WriteSingleRegister.code(), 0x06);
+        assert_eq!(FunctionCode::WriteMultipleCoils.code(), 0x0F);
+        assert_eq!(FunctionCode::WriteMultipleRegisters.code(), 0x10);
+    }
+
+    #[test]
+    fn test_function_code_from_u8_valid() {
+        // TC-003: FunctionCode::from_u8 转换 - 有效值
+        assert_eq!(FunctionCode::from_u8(0x01), Some(FunctionCode::ReadCoils));
+        assert_eq!(
+            FunctionCode::from_u8(0x10),
+            Some(FunctionCode::WriteMultipleRegisters)
+        );
+    }
+
+    #[test]
+    fn test_function_code_from_u8_invalid() {
+        // TC-002: FunctionCode 无效功能码拒绝
+        let invalid_codes = [0x00, 0x09, 0x7F, 0xFF];
+        for code in invalid_codes {
+            assert!(
+                FunctionCode::from_u8(code).is_none(),
+                "Code {:02x} should be rejected",
+                code
+            );
+        }
+    }
+
+    #[test]
+    fn test_function_code_is_read() {
+        // TC-004: FunctionCode 代码匹配性 - 读取类功能码
+        assert!(FunctionCode::ReadCoils.is_read());
+        assert!(FunctionCode::ReadDiscreteInputs.is_read());
+        assert!(FunctionCode::ReadHoldingRegisters.is_read());
+        assert!(FunctionCode::ReadInputRegisters.is_read());
+        assert!(!FunctionCode::WriteSingleCoil.is_read());
+        assert!(!FunctionCode::WriteSingleRegister.is_read());
+    }
+
+    #[test]
+    fn test_function_code_is_write() {
+        // TC-004: FunctionCode 代码匹配性 - 写入类功能码
+        assert!(FunctionCode::WriteSingleCoil.is_write());
+        assert!(FunctionCode::WriteSingleRegister.is_write());
+        assert!(FunctionCode::WriteMultipleCoils.is_write());
+        assert!(FunctionCode::WriteMultipleRegisters.is_write());
+        assert!(!FunctionCode::ReadCoils.is_write());
+        assert!(!FunctionCode::ReadHoldingRegisters.is_write());
+    }
+
+    #[test]
+    fn test_function_code_has_byte_count() {
+        // TC-004: 需要 byte_count 字段的功能码
+        assert!(FunctionCode::WriteMultipleCoils.has_byte_count());
+        assert!(FunctionCode::WriteMultipleRegisters.has_byte_count());
+        assert!(!FunctionCode::ReadCoils.has_byte_count());
+        assert!(!FunctionCode::ReadHoldingRegisters.has_byte_count());
+    }
+
+    // ========== ModbusAddress Tests ==========
+
+    #[test]
+    fn test_modbus_address_valid_range() {
+        // TC-005: ModbusAddress 有效地址范围
+        let addresses = [0x0000u16, 0x0001, 0x7FFF, 0x8000, 0xFFFF];
+        for addr in addresses {
+            let result = ModbusAddress::new(addr);
+            assert_eq!(result.value(), addr);
+        }
+    }
+
+    #[test]
+    fn test_modbus_address_min() {
+        // TC-006: ModbusAddress 最小地址
+        let addr = ModbusAddress::new(0);
+        assert_eq!(addr.value(), 0);
+        assert_eq!(addr.value(), ModbusAddress::MIN);
+    }
+
+    #[test]
+    fn test_modbus_address_max() {
+        // TC-007: ModbusAddress 最大地址
+        let addr = ModbusAddress::new(0xFFFF);
+        assert_eq!(addr.value(), 0xFFFF);
+        assert_eq!(addr.value(), ModbusAddress::MAX);
+    }
+
+    #[test]
+    fn test_modbus_address_bytes_conversion() {
+        // TC-005: ModbusAddress 字节序转换
+        let addr = ModbusAddress::new(0x1234);
+        assert_eq!(addr.high_byte(), 0x12);
+        assert_eq!(addr.low_byte(), 0x34);
+        assert_eq!(addr.to_be_bytes(), [0x12, 0x34]);
+        assert_eq!(ModbusAddress::from_be_bytes([0x12, 0x34]).value(), 0x1234);
+    }
+
+    #[test]
+    fn test_modbus_address_from_u16() {
+        // ModbusAddress From<u16> 实现
+        let addr: ModbusAddress = 0x0001.into();
+        assert_eq!(addr.value(), 0x0001);
+    }
+
+    #[test]
+    fn test_modbus_address_into_u16() {
+        // ModbusAddress Into<u16> 实现
+        let addr = ModbusAddress::new(0xFFFF);
+        let value: u16 = addr.into();
+        assert_eq!(value, 0xFFFF);
+    }
+
+    // ========== RegisterType Tests ==========
+
+    #[test]
+    fn test_register_type_variants() {
+        // TC-017: RegisterType 所有变体
+        use RegisterType::*;
+        let variants = [Coil, DiscreteInput, HoldingRegister, InputRegister];
+        assert_eq!(variants.len(), 4);
+    }
+
+    #[test]
+    fn test_register_type_read_function_code() {
+        // TC-018: RegisterType 与 FunctionCode 关联 - 读取
+        assert_eq!(
+            RegisterType::Coil.read_function_code(),
+            FunctionCode::ReadCoils
+        );
+        assert_eq!(
+            RegisterType::DiscreteInput.read_function_code(),
+            FunctionCode::ReadDiscreteInputs
+        );
+        assert_eq!(
+            RegisterType::HoldingRegister.read_function_code(),
+            FunctionCode::ReadHoldingRegisters
+        );
+        assert_eq!(
+            RegisterType::InputRegister.read_function_code(),
+            FunctionCode::ReadInputRegisters
+        );
+    }
+
+    #[test]
+    fn test_register_type_write_function_code() {
+        // TC-018: RegisterType 与 FunctionCode 关联 - 写入
+        assert_eq!(
+            RegisterType::Coil.write_function_code(),
+            Some(FunctionCode::WriteSingleCoil)
+        );
+        assert_eq!(
+            RegisterType::HoldingRegister.write_function_code(),
+            Some(FunctionCode::WriteSingleRegister)
+        );
+        assert_eq!(RegisterType::DiscreteInput.write_function_code(), None);
+        assert_eq!(RegisterType::InputRegister.write_function_code(), None);
+    }
+
+    #[test]
+    fn test_register_type_is_read_only() {
+        // TC-018: RegisterType 只读属性
+        assert!(!RegisterType::Coil.is_read_only());
+        assert!(RegisterType::DiscreteInput.is_read_only());
+        assert!(!RegisterType::HoldingRegister.is_read_only());
+        assert!(RegisterType::InputRegister.is_read_only());
+    }
+
+    #[test]
+    fn test_register_type_is_boolean() {
+        // TC-018: RegisterType 布尔类型
+        assert!(RegisterType::Coil.is_boolean());
+        assert!(RegisterType::DiscreteInput.is_boolean());
+        assert!(!RegisterType::HoldingRegister.is_boolean());
+        assert!(!RegisterType::InputRegister.is_boolean());
+    }
+
+    #[test]
+    fn test_register_type_is_register() {
+        // TC-018: RegisterType 寄存器类型
+        assert!(!RegisterType::Coil.is_register());
+        assert!(!RegisterType::DiscreteInput.is_register());
+        assert!(RegisterType::HoldingRegister.is_register());
+        assert!(RegisterType::InputRegister.is_register());
+    }
+
+    // ========== ModbusValue Tests ==========
+
+    #[test]
+    fn test_modbus_value_coil() {
+        // TC-010: ModbusValue Coil 类型创建
+        let coil_on = ModbusValue::Coil(true);
+        let coil_off = ModbusValue::Coil(false);
+
+        assert_eq!(coil_on.as_bool(), Some(true));
+        assert_eq!(coil_off.as_bool(), Some(false));
+        assert_eq!(coil_on.as_u16(), None);
+    }
+
+    #[test]
+    fn test_modbus_value_discrete_input() {
+        // TC-011: ModbusValue DiscreteInput 类型创建
+        let di_on = ModbusValue::DiscreteInput(true);
+        let di_off = ModbusValue::DiscreteInput(false);
+
+        assert_eq!(di_on.as_bool(), Some(true));
+        assert_eq!(di_off.as_bool(), Some(false));
+        assert_eq!(di_on.as_u16(), None);
+    }
+
+    #[test]
+    fn test_modbus_value_holding_register() {
+        // TC-012: ModbusValue HoldingRegister 类型创建
+        let hr_min = ModbusValue::HoldingRegister(0);
+        let hr_mid = ModbusValue::HoldingRegister(32768);
+        let hr_max = ModbusValue::HoldingRegister(65535);
+
+        assert_eq!(hr_min.as_u16(), Some(0));
+        assert_eq!(hr_mid.as_u16(), Some(32768));
+        assert_eq!(hr_max.as_u16(), Some(65535));
+        assert_eq!(hr_min.as_bool(), None);
+    }
+
+    #[test]
+    fn test_modbus_value_input_register() {
+        // TC-013: ModbusValue InputRegister 类型创建
+        let ir_min = ModbusValue::InputRegister(0);
+        let ir_max = ModbusValue::InputRegister(65535);
+
+        assert_eq!(ir_min.as_u16(), Some(0));
+        assert_eq!(ir_max.as_u16(), Some(65535));
+        assert_eq!(ir_max.as_bool(), None);
+    }
+
+    #[test]
+    fn test_modbus_value_type_mismatch() {
+        // TC-014: ModbusValue 类型不匹配访问
+        let coil = ModbusValue::Coil(true);
+        let hr = ModbusValue::HoldingRegister(100);
+
+        assert_eq!(coil.as_u16(), None); // Coil doesn't have u16 value
+        assert_eq!(hr.as_bool(), None); // Register doesn't have bool value
+    }
+
+    #[test]
+    fn test_modbus_value_boundary_values() {
+        // TC-015: ModbusValue 边界值测试
+        let hr_zero = ModbusValue::HoldingRegister(0);
+        let hr_max = ModbusValue::HoldingRegister(65535);
+        let ir_zero = ModbusValue::InputRegister(0);
+        let ir_max = ModbusValue::InputRegister(65535);
+
+        assert_eq!(hr_zero.as_u16(), Some(0));
+        assert_eq!(hr_max.as_u16(), Some(65535));
+        assert_eq!(ir_zero.as_u16(), Some(0));
+        assert_eq!(ir_max.as_u16(), Some(65535));
+    }
+
+    #[test]
+    fn test_modbus_value_bit_length() {
+        // TC-015: ModbusValue 位长度
+        assert_eq!(ModbusValue::Coil(true).bit_length(), 1);
+        assert_eq!(ModbusValue::DiscreteInput(true).bit_length(), 1);
+        assert_eq!(ModbusValue::HoldingRegister(0).bit_length(), 16);
+        assert_eq!(ModbusValue::InputRegister(0).bit_length(), 16);
+    }
+
+    #[test]
+    fn test_modbus_value_is_true() {
+        // ModbusValue is_true 方法
+        assert!(ModbusValue::Coil(true).is_true());
+        assert!(!ModbusValue::Coil(false).is_true());
+        assert!(!ModbusValue::HoldingRegister(1).is_true()); // 非布尔类型返回 false
+    }
+
+    #[test]
+    fn test_modbus_value_from_bool() {
+        // ModbusValue From<bool> 实现
+        let value: ModbusValue = true.into();
+        assert_eq!(value, ModbusValue::Coil(true));
+    }
+
+    #[test]
+    fn test_modbus_value_from_u16() {
+        // ModbusValue From<u16> 实现
+        let value: ModbusValue = 42u16.into();
+        assert_eq!(value, ModbusValue::HoldingRegister(42));
+    }
+
+    #[test]
+    fn test_modbus_value_default() {
+        // ModbusValue Default 实现
+        let default: ModbusValue = Default::default();
+        assert_eq!(default, ModbusValue::HoldingRegister(0));
+    }
+
+    #[test]
+    fn test_modbus_value_display() {
+        // ModbusValue Display 实现
+        let coil = ModbusValue::Coil(true);
+        let hr = ModbusValue::HoldingRegister(0x1234);
+        assert_eq!(format!("{}", coil), "Coil(true)");
+        assert_eq!(format!("{}", hr), "HoldingRegister(0x1234)");
     }
 }

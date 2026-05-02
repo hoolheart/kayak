@@ -25,7 +25,8 @@ pub struct VirtualConfig {
     /// 随机值上界（不包含）
     pub max_value: f64,
     /// 固定值（Fixed模式下使用）
-    pub fixed_value: PointValue,
+    #[serde(default)]
+    pub fixed_value: Option<PointValue>,
     /// 采样间隔（毫秒）
     pub sample_interval_ms: u64,
 }
@@ -38,7 +39,7 @@ impl Default for VirtualConfig {
             access_type: AccessType::RO,
             min_value: 0.0,
             max_value: 100.0,
-            fixed_value: PointValue::Number(0.0),
+            fixed_value: Some(PointValue::Number(0.0)),
             sample_interval_ms: 1000,
         }
     }
@@ -120,7 +121,7 @@ impl VirtualDriver {
     fn generate_value(&self) -> PointValue {
         match self.config.mode {
             VirtualMode::Random => self.generate_random(),
-            VirtualMode::Fixed => self.config.fixed_value.clone(),
+            VirtualMode::Fixed => self.config.fixed_value.clone().unwrap_or(PointValue::Number(0.0)),
             VirtualMode::Sine => self.generate_sine(),
             VirtualMode::Ramp => self.generate_ramp(),
         }

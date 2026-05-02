@@ -50,6 +50,7 @@ tokio-util = { version = "0.7", features = ["codec"] }
 
 # Serial port support for Modbus RTU
 serialport = "4.6"
+tokio-serial = "5.4"
 
 # HDF5 support
 hdf5 = "0.8"

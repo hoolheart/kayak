@@ -2,30 +2,23 @@
 //!
 //! 将具体驱动实例适配为 DriverAccess trait 对象，供 StepExecutor 使用。
 //! 此适配器在引擎内部创建，对外屏蔽具体驱动类型。
-//!
-//! # 技术债务 (TODO)
-//! 当前实现绑定到 VirtualConfig/DriverError 关联类型。这是因为 DeviceManager
-//! 当前只支持 VirtualDriver。未来添加其他驱动类型时，应重构 DeviceManager
-//! 使其返回 `&dyn DriverAccess` 而非 `&dyn DeviceDriver`，从而完全解耦。
 
 use uuid::Uuid;
 
 use super::executor::DriverAccess;
 use super::types::ExecutionError;
-use crate::drivers::core::{DeviceDriver, PointValue};
-use crate::drivers::r#virtual::VirtualConfig;
-use crate::drivers::DriverError;
+use crate::drivers::core::PointValue;
 
 /// DriverAccess 适配器
 ///
-/// 将 DeviceDriver trait 对象适配为 DriverAccess trait 对象。
-/// 当前绑定到 VirtualConfig/DriverError 关联类型（S2-009 限制）。
+/// 将实现 DriverAccess trait 的驱动适配为 DriverAccess trait 对象。
+/// 用于 StepEngine 通过统一接口访问各种驱动实现。
 pub struct DriverAccessAdapter<'a> {
-    driver: &'a dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>,
+    driver: &'a dyn DriverAccess,
 }
 
 impl<'a> DriverAccessAdapter<'a> {
-    pub fn new(driver: &'a dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>) -> Self {
+    pub fn new(driver: &'a dyn DriverAccess) -> Self {
         Self { driver }
     }
 }

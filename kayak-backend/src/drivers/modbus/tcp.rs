@@ -5,10 +5,11 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex as StdMutex};
 use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
+use tokio::sync::Mutex as AsyncMutex;
 use tokio::time::timeout;
 use uuid::Uuid;
 
@@ -62,9 +63,10 @@ impl Default for ModbusTcpConfig {
 }
 
 /// 驱动状态
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum DriverState {
     /// 断开状态
+    #[default]
     Disconnected,
     /// 连接中
     Connecting,
@@ -72,12 +74,6 @@ pub enum DriverState {
     Connected,
     /// 连接失败
     Error,
-}
-
-impl Default for DriverState {
-    fn default() -> Self {
-        Self::Disconnected
-    }
 }
 
 /// 测点配置
@@ -118,14 +114,14 @@ impl PointConfig {
 pub struct ModbusTcpDriver {
     /// 配置
     config: ModbusTcpConfig,
-    /// 当前状态
-    state: DriverState,
-    /// TCP 流
-    stream: Option<TcpStream>,
+    /// 当前状态 (使用标准 Mutex 支持内部可变性)
+    state: StdMutex<DriverState>,
+    /// TCP 流 (使用异步 Mutex 支持 &self 访问)
+    stream: AsyncMutex<Option<TcpStream>>,
     /// 事务 ID (原子递增)
-    transaction_id: Arc<Mutex<u16>>,
+    transaction_id: Arc<StdMutex<u16>>,
     /// 测点配置映射表 (point_id -> PointConfig)
-    point_configs: Arc<Mutex<HashMap<Uuid, PointConfig>>>,
+    point_configs: Arc<StdMutex<HashMap<Uuid, PointConfig>>>,
 }
 
 unsafe impl Send for ModbusTcpDriver {}
@@ -136,10 +132,10 @@ impl ModbusTcpDriver {
     pub fn new(config: ModbusTcpConfig) -> Self {
         Self {
             config,
-            state: DriverState::Disconnected,
-            stream: None,
-            transaction_id: Arc::new(Mutex::new(0)),
-            point_configs: Arc::new(Mutex::new(HashMap::new())),
+            state: StdMutex::new(DriverState::Disconnected),
+            stream: AsyncMutex::new(None),
+            transaction_id: Arc::new(StdMutex::new(0)),
+            point_configs: Arc::new(StdMutex::new(HashMap::new())),
         }
     }
 
@@ -150,10 +146,7 @@ impl ModbusTcpDriver {
 
     /// 配置主机和端口
     pub fn with_host_port(host: impl Into<String>, port: u16) -> Self {
-        let mut config = ModbusTcpConfig::default();
-        config.host = host.into();
-        config.port = port;
-        Self::new(config)
+        Self::new(ModbusTcpConfig::new(host, port, 1, 3000))
     }
 
     /// 获取当前配置引用
@@ -163,7 +156,7 @@ impl ModbusTcpDriver {
 
     /// 获取当前状态
     pub fn state(&self) -> DriverState {
-        self.state
+        *self.state.lock().unwrap()
     }
 
     /// 配置测点映射
@@ -196,12 +189,13 @@ impl ModbusTcpDriver {
     }
 
     /// 发送请求并接收响应
-    async fn send_request(&mut self, pdu: &Pdu) -> Result<Pdu, ModbusError> {
+    async fn send_request(&self, pdu: &Pdu) -> Result<Pdu, ModbusError> {
         // 先获取事务 ID 和配置（不 borrow stream）
         let tid = self.next_transaction_id();
         let slave_id = self.config.slave_id;
 
-        let stream = self.stream.as_mut().ok_or(ModbusError::NotConnected)?;
+        let mut stream = self.stream.lock().await;
+        let stream = stream.as_mut().ok_or(ModbusError::NotConnected)?;
 
         let mbap = MbapHeader::new(tid, slave_id, pdu.len() as u16);
 
@@ -212,7 +206,7 @@ impl ModbusTcpDriver {
 
         // 发送请求
         stream.write_all(&frame).await.map_err(|e| {
-            self.state = DriverState::Error;
+            *self.state.lock().unwrap() = DriverState::Error;
             ModbusError::IoError(format!("Failed to send request: {}", e))
         })?;
 
@@ -224,11 +218,11 @@ impl ModbusTcpDriver {
 
         match result {
             Err(_) => {
-                self.state = DriverState::Error;
+                *self.state.lock().unwrap() = DriverState::Error;
                 return Err(ModbusError::Timeout { duration });
             }
             Ok(Err(e)) => {
-                self.state = DriverState::Error;
+                *self.state.lock().unwrap() = DriverState::Error;
                 return Err(ModbusError::IoError(format!("Failed to read MBAP: {}", e)));
             }
             Ok(Ok(_bytes_read)) => {
@@ -255,11 +249,11 @@ impl ModbusTcpDriver {
 
         match result {
             Err(_) => {
-                self.state = DriverState::Error;
+                *self.state.lock().unwrap() = DriverState::Error;
                 return Err(ModbusError::Timeout { duration });
             }
             Ok(Err(e)) => {
-                self.state = DriverState::Error;
+                *self.state.lock().unwrap() = DriverState::Error;
                 return Err(ModbusError::IoError(format!("Failed to read PDU: {}", e)));
             }
             Ok(Ok(_bytes_read)) => {
@@ -282,7 +276,7 @@ impl ModbusTcpDriver {
     }
 
     /// 读取单个线圈值
-    async fn read_single_coil(&mut self, address: ModbusAddress) -> Result<bool, ModbusError> {
+    async fn read_single_coil(&self, address: ModbusAddress) -> Result<bool, ModbusError> {
         let pdu = Pdu::read_coils(address, 1)?;
         let response = self.send_request(&pdu).await?;
         let coils = response.parse_coils_response()?;
@@ -291,7 +285,7 @@ impl ModbusTcpDriver {
 
     /// 读取单个离散输入值
     async fn read_single_discrete_input(
-        &mut self,
+        &self,
         address: ModbusAddress,
     ) -> Result<bool, ModbusError> {
         let pdu = Pdu::read_discrete_inputs(address, 1)?;
@@ -302,7 +296,7 @@ impl ModbusTcpDriver {
 
     /// 读取单个保持寄存器值
     async fn read_single_holding_register(
-        &mut self,
+        &self,
         address: ModbusAddress,
     ) -> Result<u16, ModbusError> {
         let pdu = Pdu::read_holding_registers(address, 1)?;
@@ -312,7 +306,7 @@ impl ModbusTcpDriver {
     }
 
     /// 读取单个输入寄存器值
-    async fn read_single_input_register(&mut self, address: ModbusAddress) -> Result<u16, ModbusError> {
+    async fn read_single_input_register(&self, address: ModbusAddress) -> Result<u16, ModbusError> {
         let pdu = Pdu::read_input_registers(address, 1)?;
         let response = self.send_request(&pdu).await?;
         let registers = response.parse_registers_response()?;
@@ -320,7 +314,7 @@ impl ModbusTcpDriver {
     }
 
     /// 写入单个线圈值
-    async fn write_single_coil(&mut self, address: ModbusAddress, value: bool) -> Result<(), ModbusError> {
+    async fn write_single_coil(&self, address: ModbusAddress, value: bool) -> Result<(), ModbusError> {
         let pdu = Pdu::write_single_coil(address, value)?;
         self.send_request(&pdu).await?;
         Ok(())
@@ -328,7 +322,7 @@ impl ModbusTcpDriver {
 
     /// 写入单个寄存器值
     async fn write_single_register(
-        &mut self,
+        &self,
         address: ModbusAddress,
         value: u16,
     ) -> Result<(), ModbusError> {
@@ -342,11 +336,11 @@ impl ModbusTcpDriver {
 impl DriverLifecycle for ModbusTcpDriver {
     /// 连接到 Modbus TCP 服务器
     async fn connect(&mut self) -> Result<(), DriverError> {
-        if self.state == DriverState::Connected {
+        if *self.state.lock().unwrap() == DriverState::Connected {
             return Err(DriverError::AlreadyConnected);
         }
 
-        self.state = DriverState::Connecting;
+        *self.state.lock().unwrap() = DriverState::Connecting;
 
         let addr = format!("{}:{}", self.config.host, self.config.port);
         let duration = self.config.timeout();
@@ -355,36 +349,34 @@ impl DriverLifecycle for ModbusTcpDriver {
 
         match result {
             Err(_) => {
-                self.state = DriverState::Error;
-                return Err(DriverError::Timeout {
-                    duration,
-                });
+                *self.state.lock().unwrap() = DriverState::Error;
+                Err(DriverError::Timeout { duration })
             }
             Ok(Err(e)) => {
-                self.state = DriverState::Error;
-                return Err(DriverError::IoError(format!(
+                *self.state.lock().unwrap() = DriverState::Error;
+                Err(DriverError::IoError(format!(
                     "Connection failed: {}",
                     e
-                )));
+                )))
             }
             Ok(Ok(stream)) => {
-                self.stream = Some(stream);
-                self.state = DriverState::Connected;
-                return Ok(());
+                *self.stream.lock().await = Some(stream);
+                *self.state.lock().unwrap() = DriverState::Connected;
+                Ok(())
             }
         }
     }
 
     /// 断开与 Modbus TCP 服务器的连接
     async fn disconnect(&mut self) -> Result<(), DriverError> {
-        self.stream = None;
-        self.state = DriverState::Disconnected;
+        *self.stream.lock().await = None;
+        *self.state.lock().unwrap() = DriverState::Disconnected;
         Ok(())
     }
 
     /// 检查是否已连接
     fn is_connected(&self) -> bool {
-        self.state == DriverState::Connected
+        *self.state.lock().unwrap() == DriverState::Connected
     }
 }
 
@@ -401,20 +393,18 @@ impl DeviceDriver for ModbusTcpDriver {
         DriverLifecycle::disconnect(self).await
     }
 
-    fn read_point(&self, _point_id: Uuid) -> Result<PointValue, Self::Error> {
-        // 注意：DeviceDriver::read_point 是同步的，但我们需要异步操作
-        // 这里暂时返回错误，实际使用时应该通过 send_async 方法
-        Err(DriverError::IoError(
-            "Synchronous read_point not supported, use async version".into(),
-        ))
+    fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error> {
+        // 使用 Handle::current().block_on 在同步上下文中调用异步方法
+        // 注意：这会在没有运行时的情况下失败
+        tokio::runtime::Handle::current()
+            .block_on(self.read_point_async(point_id))
     }
 
-    fn write_point(&self, _point_id: Uuid, _value: PointValue) -> Result<(), Self::Error> {
-        // 注意：DeviceDriver::write_point 是同步的，但我们需要异步操作
-        // 这里暂时返回错误，实际使用时应该通过 send_async 方法
-        Err(DriverError::IoError(
-            "Synchronous write_point not supported, use async version".into(),
-        ))
+    fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error> {
+        // 使用 Handle::current().block_on 在同步上下文中调用异步方法
+        // 注意：这会在没有运行时的情况下失败
+        tokio::runtime::Handle::current()
+            .block_on(self.write_point_async(point_id, value))
     }
 
     fn is_connected(&self) -> bool {
@@ -426,7 +416,7 @@ impl DeviceDriver for ModbusTcpDriver {
 impl ModbusTcpDriver {
     /// 异步读取测点值
     pub async fn read_point_async(
-        &mut self,
+        &self,
         point_id: Uuid,
     ) -> Result<PointValue, DriverError> {
         if !DriverLifecycle::is_connected(self) {
@@ -444,28 +434,28 @@ impl ModbusTcpDriver {
                 let coil_value = self
                     .read_single_coil(point_config.address)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
                 ModbusValue::Coil(coil_value)
             }
             RegisterType::DiscreteInput => {
                 let input_value = self
                     .read_single_discrete_input(point_config.address)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
                 ModbusValue::DiscreteInput(input_value)
             }
             RegisterType::HoldingRegister => {
                 let register_value = self
                     .read_single_holding_register(point_config.address)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
                 ModbusValue::HoldingRegister(register_value)
             }
             RegisterType::InputRegister => {
                 let register_value = self
                     .read_single_input_register(point_config.address)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
                 ModbusValue::InputRegister(register_value)
             }
         };
@@ -483,7 +473,7 @@ impl ModbusTcpDriver {
 
     /// 异步写入测点值
     pub async fn write_point_async(
-        &mut self,
+        &self,
         point_id: Uuid,
         value: PointValue,
     ) -> Result<(), DriverError> {
@@ -512,18 +502,20 @@ impl ModbusTcpDriver {
                     })?;
                 self.write_single_coil(point_config.address, coil_value)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
             }
             RegisterType::HoldingRegister => {
                 let register_value = match value {
                     PointValue::Number(n) => n as u16,
                     PointValue::Integer(n) => n as u16,
                     PointValue::Boolean(b) => if b { 1 } else { 0 },
-                    PointValue::String(s) => s.parse().unwrap_or(0),
+                    PointValue::String(s) => s.parse::<u16>().map_err(|_| DriverError::InvalidValue {
+                        message: format!("Cannot parse '{}' as u16", s),
+                    })?,
                 };
                 self.write_single_register(point_config.address, register_value)
                     .await
-                    .map_err(|e| DriverError::from(e))?;
+                    .map_err(DriverError::from)?;
             }
             RegisterType::DiscreteInput | RegisterType::InputRegister => {
                 return Err(DriverError::ReadOnlyPoint);
@@ -713,7 +705,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_read_point_not_connected() {
-        let mut driver = ModbusTcpDriver::with_defaults();
+        let driver = ModbusTcpDriver::with_defaults();
         let point_id = Uuid::new_v4();
         let result = driver.read_point_async(point_id).await;
         assert!(matches!(result, Err(DriverError::NotConnected)));
@@ -721,7 +713,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_point_not_connected() {
-        let mut driver = ModbusTcpDriver::with_defaults();
+        let driver = ModbusTcpDriver::with_defaults();
         let point_id = Uuid::new_v4();
         let result = driver.write_point_async(point_id, PointValue::Boolean(true)).await;
         assert!(matches!(result, Err(DriverError::NotConnected)));
@@ -730,7 +722,7 @@ mod tests {
     #[tokio::test]
     async fn test_read_point_not_found() {
         let config = ModbusTcpConfig::new("127.0.0.1", 1502, 1, 1000);
-        let mut driver = ModbusTcpDriver::new(config);
+        let driver = ModbusTcpDriver::new(config);
 
         // 连接可能会失败，但我们先测试测点未找到的情况
         // 注意：这里假设连接会成功，实际测试需要 mock 服务器

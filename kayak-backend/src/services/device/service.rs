@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::db::repository::device_repo::{DeviceRepository, DeviceRepositoryError};
 use crate::db::repository::point_repo::PointRepository;
 use crate::db::repository::workbench_repo::WorkbenchRepository;
-use crate::drivers::{DeviceManager, VirtualConfig, VirtualDriver};
+use crate::drivers::{DeviceManager, DriverWrapper, VirtualConfig, VirtualDriver};
 use crate::models::entities::device::{Device, ProtocolType};
 
 use super::error::{CreateDeviceEntity, DeviceError, UpdateDeviceEntity};
@@ -230,7 +230,8 @@ impl DeviceService for DeviceServiceImpl {
             let driver = VirtualDriver::with_config(config)
                 .map_err(|e| DeviceError::ValidationError(e.to_string()))?;
 
-            let _ = self.device_manager.register_device(device.id, driver);
+            let wrapper = DriverWrapper::new_virtual(driver);
+            let _ = self.device_manager.register_device(device.id, wrapper);
         }
 
         Ok(Self::to_dto(device))

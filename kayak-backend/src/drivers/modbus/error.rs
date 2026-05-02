@@ -411,3 +411,284 @@ impl From<ParseError> for ModbusError {
         ModbusError::MbapError(err.message)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::time::Duration;
+
+    // ========== ModbusException Tests ==========
+
+    #[test]
+    fn test_modbus_exception_from_u8() {
+        // TC-027: ModbusError From u8 构造
+        assert_eq!(
+            ModbusException::from_u8(0x01),
+            ModbusException::IllegalFunction
+        );
+        assert_eq!(
+            ModbusException::from_u8(0x02),
+            ModbusException::IllegalDataAddress
+        );
+        assert_eq!(
+            ModbusException::from_u8(0x03),
+            ModbusException::IllegalDataValue
+        );
+        assert_eq!(
+            ModbusException::from_u8(0x04),
+            ModbusException::ServerDeviceFailure
+        );
+        assert_eq!(ModbusException::from_u8(0x05), ModbusException::Acknowledge);
+        assert_eq!(ModbusException::from_u8(0x06), ModbusException::ServerBusy);
+        assert_eq!(
+            ModbusException::from_u8(0x08),
+            ModbusException::MemoryParityError
+        );
+    }
+
+    #[test]
+    fn test_modbus_exception_unknown() {
+        // TC-028: ModbusError Invalid 异常码
+        assert_eq!(
+            ModbusException::from_u8(0x00),
+            ModbusException::Unknown(0x00)
+        );
+        assert_eq!(
+            ModbusException::from_u8(0x09),
+            ModbusException::Unknown(0x09)
+        );
+        assert_eq!(
+            ModbusException::from_u8(0xFF),
+            ModbusException::Unknown(0xFF)
+        );
+    }
+
+    #[test]
+    fn test_modbus_exception_code() {
+        // TC-020-025: ModbusException 异常码映射
+        assert_eq!(ModbusException::IllegalFunction.code(), 0x01);
+        assert_eq!(ModbusException::IllegalDataAddress.code(), 0x02);
+        assert_eq!(ModbusException::IllegalDataValue.code(), 0x03);
+        assert_eq!(ModbusException::ServerDeviceFailure.code(), 0x04);
+        assert_eq!(ModbusException::Acknowledge.code(), 0x05);
+        assert_eq!(ModbusException::ServerBusy.code(), 0x06);
+        assert_eq!(ModbusException::MemoryParityError.code(), 0x08);
+    }
+
+    #[test]
+    fn test_modbus_exception_is_known() {
+        // ModbusException 已知异常码判断
+        assert!(ModbusException::IllegalFunction.is_known());
+        assert!(ModbusException::Unknown(0x00).is_known() == false);
+    }
+
+    // ========== ModbusError Tests ==========
+
+    #[test]
+    fn test_modbus_error_illegal_function() {
+        // TC-020: ModbusError 异常码映射 - IllegalFunction
+        let error = ModbusError::IllegalFunction;
+        assert_eq!(error.error_code(), "EX_ILLEGAL_FUNCTION");
+    }
+
+    #[test]
+    fn test_modbus_error_illegal_data_address() {
+        // TC-021: ModbusError 异常码映射 - IllegalDataAddress
+        let error = ModbusError::IllegalDataAddress;
+        assert_eq!(error.error_code(), "EX_ILLEGAL_DATA_ADDRESS");
+    }
+
+    #[test]
+    fn test_modbus_error_illegal_data_value() {
+        // TC-022: ModbusError 异常码映射 - IllegalDataValue
+        let error = ModbusError::IllegalDataValue;
+        assert_eq!(error.error_code(), "EX_ILLEGAL_DATA_VALUE");
+    }
+
+    #[test]
+    fn test_modbus_error_server_device_failure() {
+        // TC-023: ModbusError 异常码映射 - ServerDeviceFailure
+        let error = ModbusError::ServerDeviceFailure;
+        assert_eq!(error.error_code(), "EX_SERVER_DEVICE_FAILURE");
+    }
+
+    #[test]
+    fn test_modbus_error_acknowledge() {
+        // TC-024: ModbusError Acknowledge 异常码
+        let error = ModbusError::Acknowledge;
+        assert_eq!(error.error_code(), "EX_ACKNOWLEDGE");
+    }
+
+    #[test]
+    fn test_modbus_error_server_busy() {
+        // TC-025: ModbusError ServerBusy 异常码
+        let error = ModbusError::ServerBusy;
+        assert_eq!(error.error_code(), "EX_SERVER_BUSY");
+    }
+
+    #[test]
+    fn test_modbus_error_timeout() {
+        // TC-026a: ModbusError Timeout 通信错误
+        let timeout = ModbusError::Timeout {
+            duration: Duration::from_secs(5),
+        };
+        assert!(timeout.is_timeout());
+        assert_eq!(timeout.error_code(), "ERR_TIMEOUT");
+    }
+
+    #[test]
+    fn test_modbus_error_is_connection_error() {
+        // ModbusError 连接错误判断
+        assert!(ModbusError::ConnectionFailed("test".into()).is_connection_error());
+        assert!(ModbusError::ConnectionRefused.is_connection_error());
+        assert!(ModbusError::NotConnected.is_connection_error());
+        assert!(ModbusError::RemoteHostClosedConnection.is_connection_error());
+        assert!(!ModbusError::Timeout {
+            duration: Duration::ZERO
+        }
+        .is_connection_error());
+    }
+
+    #[test]
+    fn test_modbus_error_is_protocol_error() {
+        // ModbusError 协议错误判断
+        assert!(ModbusError::InvalidFunctionCode(0xFF).is_protocol_error());
+        assert!(ModbusError::InvalidAddress(0).is_protocol_error());
+        assert!(ModbusError::IncompleteFrame.is_protocol_error());
+        assert!(!ModbusError::Timeout {
+            duration: Duration::ZERO
+        }
+        .is_protocol_error());
+    }
+
+    // ========== ModbusError to DriverError Conversion ==========
+
+    #[test]
+    fn test_modbus_error_to_driver_error_illegal_function() {
+        // TC-026: ModbusError 转换为 DriverError
+        let driver_error: DriverError = ModbusError::IllegalFunction.into();
+        assert!(matches!(driver_error, DriverError::InvalidValue { .. }));
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_illegal_data_address() {
+        // TC-026: ModbusError 转换为 DriverError
+        let driver_error: DriverError = ModbusError::IllegalDataAddress.into();
+        assert!(matches!(driver_error, DriverError::InvalidValue { .. }));
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_timeout() {
+        // TC-026a: ModbusError Timeout 转换为 DriverError
+        let timeout = ModbusError::Timeout {
+            duration: Duration::from_secs(5),
+        };
+        let driver_error: DriverError = timeout.into();
+        assert!(
+            matches!(driver_error, DriverError::Timeout { duration } if duration == Duration::from_secs(5))
+        );
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_not_connected() {
+        // ModbusError NotConnected 转换为 DriverError
+        let error: DriverError = ModbusError::NotConnected.into();
+        assert!(matches!(error, DriverError::NotConnected));
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_connection_failed() {
+        // ModbusError ConnectionFailed 转换为 DriverError
+        let error: DriverError = ModbusError::ConnectionFailed("connection refused".into()).into();
+        assert!(matches!(error, DriverError::IoError(_)));
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_invalid_function_code() {
+        // ModbusError InvalidFunctionCode 转换为 DriverError
+        let error: DriverError = ModbusError::InvalidFunctionCode(0xFF).into();
+        assert!(matches!(error, DriverError::InvalidValue { .. }));
+    }
+
+    #[test]
+    fn test_modbus_error_to_driver_error_invalid_address() {
+        // ModbusError InvalidAddress 转换为 DriverError
+        let error: DriverError = ModbusError::InvalidAddress(0xFFFF).into();
+        assert!(matches!(error, DriverError::InvalidValue { .. }));
+    }
+
+    // ========== ModbusException to ModbusError Conversion ==========
+
+    #[test]
+    fn test_modbus_exception_to_modbus_error() {
+        let exc = ModbusException::IllegalFunction;
+        let error: ModbusError = exc.into();
+        assert!(matches!(error, ModbusError::IllegalFunction));
+
+        let exc = ModbusException::IllegalDataAddress;
+        let error: ModbusError = exc.into();
+        assert!(matches!(error, ModbusError::IllegalDataAddress));
+    }
+
+    #[test]
+    fn test_modbus_exception_unknown_to_modbus_error() {
+        let exc = ModbusException::Unknown(0xFF);
+        let error: ModbusError = exc.into();
+        assert!(matches!(error, ModbusError::Unknown(_)));
+    }
+
+    // ========== ParseError Tests ==========
+
+    #[test]
+    fn test_parse_error_new() {
+        let error = ParseError::new("test error");
+        assert_eq!(error.message, "test error");
+        assert_eq!(error.offset, None);
+    }
+
+    #[test]
+    fn test_parse_error_with_offset() {
+        let error = ParseError::with_offset("test error", 10);
+        assert_eq!(error.message, "test error");
+        assert_eq!(error.offset, Some(10));
+    }
+
+    #[test]
+    fn test_parse_error_display() {
+        let error = ParseError::new("test error");
+        assert_eq!(format!("{}", error), "Parse error: test error");
+
+        let error = ParseError::with_offset("test error", 10);
+        assert_eq!(format!("{}", error), "Parse error at offset 10: test error");
+    }
+
+    #[test]
+    fn test_parse_error_to_modbus_error() {
+        let parse_error = ParseError::new("MBAP parse failed");
+        let modbus_error: ModbusError = parse_error.into();
+        assert!(matches!(modbus_error, ModbusError::MbapError(_)));
+    }
+
+    // ========== ModbusError Display Tests ==========
+
+    #[test]
+    fn test_modbus_error_display() {
+        assert_eq!(
+            format!("{}", ModbusError::IllegalFunction),
+            "Illegal function"
+        );
+        assert_eq!(
+            format!("{}", ModbusError::IllegalDataAddress),
+            "Illegal data address"
+        );
+        assert_eq!(
+            format!(
+                "{}",
+                ModbusError::Timeout {
+                    duration: Duration::from_secs(5)
+                }
+            ),
+            "Timeout after 5s"
+        );
+    }
+}

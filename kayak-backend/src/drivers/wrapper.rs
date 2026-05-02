@@ -6,12 +6,12 @@
 use async_trait::async_trait;
 use uuid::Uuid;
 
-use super::core::PointValue;
+use super::core::{DeviceDriver, PointValue};
 use super::error::DriverError;
 use super::lifecycle::DriverLifecycle;
 use super::r#virtual::VirtualDriver;
-use crate::engine::executor::DriverAccess;
-use crate::engine::types::ExecutionError;
+use crate::engine::DriverAccess;
+use crate::engine::ExecutionError;
 
 /// 统一驱动类型枚举
 ///
@@ -60,13 +60,13 @@ impl DriverWrapper {
 impl DriverLifecycle for DriverWrapper {
     async fn connect(&mut self) -> Result<(), DriverError> {
         match &mut self.inner {
-            AnyDriver::Virtual(d) => d.connect().await.map_err(Into::into),
+            AnyDriver::Virtual(d) => d.connect().await,
         }
     }
 
     async fn disconnect(&mut self) -> Result<(), DriverError> {
         match &mut self.inner {
-            AnyDriver::Virtual(d) => d.disconnect().await.map_err(Into::into),
+            AnyDriver::Virtual(d) => d.disconnect().await,
         }
     }
 
@@ -83,7 +83,7 @@ impl DriverAccess for DriverWrapper {
         match &self.inner {
             AnyDriver::Virtual(d) => d
                 .read_point(point_id)
-                .map_err(|e| ExecutionError::DriverError(e.to_string())),
+                .map_err(|e: DriverError| ExecutionError::DriverError(e.to_string())),
         }
     }
 
@@ -91,7 +91,7 @@ impl DriverAccess for DriverWrapper {
         match &self.inner {
             AnyDriver::Virtual(d) => d
                 .write_point(point_id, value)
-                .map_err(|e| ExecutionError::DriverError(e.to_string())),
+                .map_err(|e: DriverError| ExecutionError::DriverError(e.to_string())),
         }
     }
 }

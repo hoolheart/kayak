@@ -179,12 +179,14 @@ impl StepEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::drivers::r#virtual::VirtualDriver;
+    use crate::drivers::lifecycle::DriverLifecycle;
+    use crate::drivers::wrapper::DriverWrapper;
+    use crate::drivers::VirtualDriver;
 
     fn create_test_engine() -> (StepEngine, uuid::Uuid) {
         let manager = Arc::new(DeviceManager::new());
         let device_id = uuid::Uuid::new_v4();
-        let driver = VirtualDriver::new();
+        let driver = DriverWrapper::new_virtual(VirtualDriver::new());
         manager
             .register_device(device_id, driver)
             .expect("Failed to register device");
@@ -318,7 +320,7 @@ mod tests {
 
         let manager = Arc::new(DeviceManager::new());
         let device_id = uuid::Uuid::new_v4();
-        let driver = VirtualDriver::new();
+        let driver = DriverWrapper::new_virtual(VirtualDriver::new());
         manager
             .register_device(device_id, driver)
             .expect("Failed to register device");
@@ -356,7 +358,7 @@ mod tests {
         // Register a VirtualDriver but DON'T connect it — read_point will fail
         let manager = Arc::new(DeviceManager::new());
         let device_id = uuid::Uuid::new_v4();
-        let driver = VirtualDriver::new();
+        let driver = DriverWrapper::new_virtual(VirtualDriver::new());
         manager
             .register_device(device_id, driver)
             .expect("Failed to register device");

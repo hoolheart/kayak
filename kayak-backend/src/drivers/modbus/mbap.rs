@@ -138,3 +138,122 @@ impl std::fmt::Display for MbapHeader {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::super::error::ModbusError;
+    use super::*;
+
+    // ========== MbapHeader Tests ==========
+
+    #[test]
+    fn test_mbap_header_parse_valid() {
+        // TC-029: MBAP 头部解析 - 有效帧
+        let data = [0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x01];
+        let header = MbapHeader::parse(&data).unwrap();
+
+        assert_eq!(header.transaction_id, 1);
+        assert_eq!(header.protocol_id, 0);
+        assert_eq!(header.length, 6);
+        assert_eq!(header.unit_id, 1);
+    }
+
+    #[test]
+    fn test_mbap_header_new() {
+        // TC-030: MBAP 头部构建
+        let header = MbapHeader::new(1, 1, 5);
+        assert_eq!(header.transaction_id, 1);
+        assert_eq!(header.protocol_id, 0);
+        assert_eq!(header.length, 6); // 1 (unit_id) + 5 (pdu_length)
+        assert_eq!(header.unit_id, 1);
+    }
+
+    #[test]
+    fn test_mbap_header_to_bytes() {
+        // TC-030: MBAP 头部构建 - 序列化
+        let header = MbapHeader::new(1, 1, 5);
+        let bytes = header.to_bytes();
+
+        assert_eq!(bytes, [0x00, 0x01, 0x00, 0x00, 0x00, 0x06, 0x01]);
+    }
+
+    #[test]
+    fn test_mbap_header_serialization_roundtrip() {
+        // TC-030: MBAP 头部序列化/反序列化往返
+        let header = MbapHeader::new(0x1234, 0x56, 10);
+        let bytes = header.to_bytes();
+        let parsed = MbapHeader::parse(&bytes).unwrap();
+
+        assert_eq!(parsed.transaction_id, header.transaction_id);
+        assert_eq!(parsed.protocol_id, header.protocol_id);
+        assert_eq!(parsed.length, header.length);
+        assert_eq!(parsed.unit_id, header.unit_id);
+    }
+
+    #[test]
+    fn test_mbap_header_parse_too_short() {
+        // TC-032: MBAP 头部解析 - 数据太短
+        let data = [0x00, 0x01, 0x00, 0x00, 0x00]; // 只有5字节，需要7字节
+        let result = MbapHeader::parse(&data);
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), ModbusError::IncompleteFrame));
+    }
+
+    #[test]
+    fn test_mbap_header_parse_invalid_protocol_id() {
+        // TC-031: MBAP 头部解析 - 无效协议标识符
+        let data = [0x00, 0x01, 0x00, 0x01, 0x00, 0x06, 0x01]; // protocol_id = 1
+        let result = MbapHeader::parse(&data);
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), ModbusError::MbapError(_)));
+    }
+
+    #[test]
+    fn test_mbap_header_parse_invalid_length() {
+        // TC-031: MBAP 头部解析 - 无效长度
+        let data = [0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01]; // length = 0
+        let result = MbapHeader::parse(&data);
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), ModbusError::MbapError(_)));
+    }
+
+    #[test]
+    fn test_mbap_header_pdu_length() {
+        // 获取 PDU 长度
+        let header = MbapHeader::new(1, 1, 10);
+        assert_eq!(header.pdu_length(), 10);
+    }
+
+    #[test]
+    fn test_mbap_header_is_complete() {
+        // TC-040: PDU 与 MBAP 组装 - 检查数据完整性
+        let header = MbapHeader::new(1, 1, 5); // length = 6, need 7 + 6 = 13 bytes total
+        assert!(header.is_complete(13));
+        assert!(!header.is_complete(12));
+    }
+
+    #[test]
+    fn test_mbap_header_default() {
+        let default = MbapHeader::default();
+        assert_eq!(default.transaction_id, 0);
+        assert_eq!(default.protocol_id, MbapHeader::MODBUS_PROTOCOL_ID);
+        assert_eq!(default.length, 1);
+        assert_eq!(default.unit_id, 0);
+    }
+
+    #[test]
+    fn test_mbap_header_constants() {
+        assert_eq!(MbapHeader::LENGTH, 7);
+        assert_eq!(MbapHeader::MODBUS_PROTOCOL_ID, 0x0000);
+    }
+
+    #[test]
+    fn test_mbap_header_display() {
+        let header = MbapHeader::new(1, 1, 5);
+        let display = format!("{}", header);
+        assert!(display.contains("tid: 1"));
+        assert!(display.contains("proto: 0x0000"));
+        assert!(display.contains("len: 6"));
+        assert!(display.contains("uid: 1"));
+    }
+}

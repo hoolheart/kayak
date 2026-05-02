@@ -8,6 +8,7 @@ use crate::db::repository::device_repo::{DeviceRepository, DeviceRepositoryError
 use crate::db::repository::point_repo::{PointRepository, PointRepositoryError};
 use crate::db::repository::workbench_repo::WorkbenchRepository;
 use crate::drivers::{DeviceManager, DriverError, PointValue};
+use crate::engine::{DriverAccess, ExecutionError};
 use crate::models::entities::point::{AccessType, Point};
 
 use super::error::{CreatePointEntity, PointError, UpdatePointEntity};
@@ -178,6 +179,12 @@ impl From<DriverError> for PointError {
             DriverError::InvalidValue { message } => PointError::ValidationError(message),
             _ => PointError::DatabaseError(err.to_string()),
         }
+    }
+}
+
+impl From<ExecutionError> for PointError {
+    fn from(_err: ExecutionError) -> Self {
+        PointError::DeviceNotConnected
     }
 }
 
