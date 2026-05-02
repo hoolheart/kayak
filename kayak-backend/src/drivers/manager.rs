@@ -1,36 +1,23 @@
 //! 设备管理器实现
+//!
+//! 管理所有设备的生命周期，支持异构驱动类型。
+//! 使用 DriverWrapper 统一封装所有驱动类型，消除泛型硬编码。
 
 use futures::future::join_all;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use uuid::Uuid;
 
-pub use super::core::{DeviceDriver, DriverError};
-pub use super::r#virtual::VirtualConfig;
+use super::error::DriverError;
+use super::lifecycle::DriverLifecycle;
+use super::wrapper::DriverWrapper;
 
 /// 设备管理器
 ///
 /// 负责管理所有设备的生命周期，支持批量操作。
-///
-/// # 存储设计说明
-///
-/// 设备存储使用 `Arc<RwLock<dyn DeviceDriver>>` 而不是简单的 `Arc<dyn DeviceDriver>`，
-/// 这是因为 `DeviceDriver` trait 的 `connect()` 和 `disconnect()` 方法需要 `&mut self`。
-///
-/// 通过将每个驱动包装在 `RwLock` 中，我们可以：
-/// 1. 通过 `Arc<RwLock<...>>` 提供安全的共享访问
-/// 2. 使用 `.write().unwrap()` 获取 `&mut dyn DeviceDriver` 来调用需要可变引用的方法
-/// 3. 保持线程安全性，同时支持可变操作
-#[allow(clippy::type_complexity)]
+/// 存储 `Arc<RwLock<DriverWrapper>>`，支持异构驱动类型。
 pub struct DeviceManager {
-    devices: Arc<
-        RwLock<
-            HashMap<
-                Uuid,
-                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
-            >,
-        >,
-    >,
+    devices: Arc<RwLock<HashMap<Uuid, Arc<RwLock<DriverWrapper>>>>>,
 }
 
 #[allow(clippy::await_holding_lock)]
@@ -46,13 +33,11 @@ impl DeviceManager {
     ///
     /// # Arguments
     /// * `id` - 设备唯一标识
-    /// * `driver` - 设备驱动实例
-    pub fn register_device<
-        D: DeviceDriver<Config = VirtualConfig, Error = DriverError> + 'static,
-    >(
+    /// * `driver` - 设备驱动包装器（DriverWrapper）
+    pub fn register_device(
         &self,
         id: Uuid,
-        driver: D,
+        driver: DriverWrapper,
     ) -> Result<(), DriverError> {
         let mut devices = self.devices.write().unwrap();
         if devices.contains_key(&id) {
@@ -77,7 +62,7 @@ impl DeviceManager {
 
     /// 获取设备驱动引用
     ///
-    /// 返回 `Arc<RwLock<dyn DeviceDriver>>` 以允许调用者获取可变访问权限。
+    /// 返回 `Arc<RwLock<DriverWrapper>>`，可直接作为 DriverAccess 使用。
     /// 使用者需要通过锁来调用 `connect()` 或 `disconnect()` 等需要 `&mut self` 的方法。
     ///
     /// # Example
@@ -90,7 +75,7 @@ impl DeviceManager {
     pub fn get_device(
         &self,
         id: Uuid,
-    ) -> Option<Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>> {
+    ) -> Option<Arc<RwLock<DriverWrapper>>> {
         let devices = self.devices.read().unwrap();
         devices.get(&id).cloned()
     }
@@ -99,7 +84,9 @@ impl DeviceManager {
     ///
     /// 遍历所有已注册的设备并尝试连接它们。
     /// 使用 `join_all` 并行执行所有连接操作。
-    pub async fn connect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
+    pub async fn connect_all(
+        &self,
+    ) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
             devices
@@ -111,7 +98,7 @@ impl DeviceManager {
         let futures = device_locks.into_iter().map(
             |(id, driver_lock): (
                 Uuid,
-                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
+                Arc<RwLock<DriverWrapper>>,
             )| async move {
                 // 获取可变访问权限
                 let mut driver = driver_lock.write().unwrap();
@@ -129,7 +116,9 @@ impl DeviceManager {
     ///
     /// 遍历所有已注册的设备并断开连接。
     /// 使用 `join_all` 并行执行所有断开操作。
-    pub async fn disconnect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
+    pub async fn disconnect_all(
+        &self,
+    ) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
             devices
@@ -141,7 +130,7 @@ impl DeviceManager {
         let futures = device_locks.into_iter().map(
             |(id, driver_lock): (
                 Uuid,
-                Arc<RwLock<dyn DeviceDriver<Config = VirtualConfig, Error = DriverError>>>,
+                Arc<RwLock<DriverWrapper>>,
             )| async move {
                 // 获取可变访问权限
                 let mut driver = driver_lock.write().unwrap();
@@ -164,5 +153,47 @@ impl DeviceManager {
 impl Default for DeviceManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::drivers::factory::DriverFactory;
+
+    #[test]
+    fn test_register_and_get_device() {
+        let manager = DeviceManager::new();
+        let id = Uuid::new_v4();
+        let driver = DriverFactory::create_virtual_default();
+
+        manager.register_device(id, driver).unwrap();
+        assert_eq!(manager.device_count(), 1);
+
+        let retrieved = manager.get_device(id);
+        assert!(retrieved.is_some());
+    }
+
+    #[test]
+    fn test_unregister_device() {
+        let manager = DeviceManager::new();
+        let id = Uuid::new_v4();
+        let driver = DriverFactory::create_virtual_default();
+
+        manager.register_device(id, driver).unwrap();
+        manager.unregister_device(id).unwrap();
+        assert_eq!(manager.device_count(), 0);
+    }
+
+    #[test]
+    fn test_register_duplicate_device() {
+        let manager = DeviceManager::new();
+        let id = Uuid::new_v4();
+        let driver1 = DriverFactory::create_virtual_default();
+        let driver2 = DriverFactory::create_virtual_default();
+
+        manager.register_device(id, driver1).unwrap();
+        let result = manager.register_device(id, driver2);
+        assert!(result.is_err());
     }
 }
