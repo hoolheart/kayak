@@ -479,7 +479,7 @@ mod tests {
     fn test_modbus_exception_is_known() {
         // ModbusException 已知异常码判断
         assert!(ModbusException::IllegalFunction.is_known());
-        assert!(ModbusException::Unknown(0x00).is_known() == false);
+        assert!(!ModbusException::Unknown(0x00).is_known());
     }
 
     // ========== ModbusError Tests ==========

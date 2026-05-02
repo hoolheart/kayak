@@ -3,8 +3,8 @@
 ## Sprint Information
 - **Sprint Start**: 2026-05-02
 - **Sprint End**: 2026-05-30 (4周，2个Sprint)
-- **Total Tasks**: 23
-- **Completed Tasks**: 0
+- **Total Tasks**: 24
+- **Completed Tasks**: 5
 
 ---
 
@@ -20,6 +20,9 @@
 | R2-ANALYSIS-001 | 时序数据绘图工具 | - | P1 |
 | R2-PYTHON-001 | Python SDK核心功能 | - | P2 |
 | R2-TEAM-001 | 团队管理功能 | - | P1 |
+| R1-S1-006 | 协议配置UI - Modbus TCP 表单（基于新设计） | sw-tom | P0 |
+| R1-S1-UI-002 | Web 模式适配与主题系统重构 | sw-tom | P0 |
+| R1-S1-UI-003 | 核心页面前端重构（登录页 + Dashboard + 工作台） | sw-tom | P0 |
 
 ---
 
@@ -35,15 +38,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| R1-S1-001 | DeviceManager 泛型消除重构 | sw-tom | 🔵 待开始 |
-| R1-S1-002 | Modbus 核心数据类型与错误定义 | sw-tom | 🔵 待开始 |
-| R1-S1-003 | Modbus TCP 模拟设备实现 | sw-tom | 🔵 待开始 |
-| R1-S1-004 | Modbus TCP 协议驱动核心实现 | sw-tom | 🔵 待开始 |
-| R1-S1-005 | Modbus TCP 驱动单元测试 | sw-mike | 🔵 待开始 |
 | R1-S1-006 | 协议配置UI - Modbus TCP 表单（基于新设计） | sw-tom | 🔵 待开始 |
-| R1-S1-007 | Modbus RTU 模拟设备实现 | sw-tom | 🔵 待开始 |
-| R1-S1-008 | Modbus RTU 协议驱动核心实现 | sw-tom | 🔵 待开始 |
-| R1-S1-009 | Modbus RTU 驱动单元测试 | sw-mike | 🔵 待开始 |
 | R1-S1-UI-002 | Web 模式适配与主题系统重构 | sw-tom | 🔵 待开始 |
 | R1-S1-UI-003 | 核心页面前端重构（登录页 + Dashboard + 工作台） | sw-tom | 🔵 待开始 |
 
@@ -69,7 +64,11 @@
 
 | Task ID | Description | Completed Date |
 |---------|-------------|----------------|
-| - | - | - |
+| R1-S1-001 | DeviceManager 泛型消除重构 | 2026-05-03 |
+| R1-S1-002 | Modbus 核心数据类型与错误定义 | 2026-05-03 |
+| R1-S1-003 | Modbus TCP 驱动实现 | 2026-05-03 |
+| R1-S1-004 | Modbus RTU 驱动实现 | 2026-05-03 |
+| R1-S1-005 | 后端依赖清理（移除 5 个未使用依赖） | 2026-05-03 |
 
 ---
 
@@ -94,17 +93,17 @@
 
 | Task ID | Blocker Description | Blocking Tasks |
 |---------|-------------------|----------------|
-| - | - | - |
+| Git Workflow | 所有修改都在一个分支上，需要按任务分离提交 | R1-S1-001~005 |
 
 ---
 
 ## Sprint Metrics
 
 ### Sprint 1 Progress
-- **Total**: 13 tasks
-- **Completed**: 0
+- **Total**: 14 tasks (含新增依赖清理)
+- **Completed**: 5
 - **In Progress**: 0
-- **Remaining**: 13
+- **Remaining**: 9
 
 ### Sprint 2 Progress
 - **Total**: 10 tasks
@@ -113,8 +112,8 @@
 - **Remaining**: 10
 
 ### Overall Release 1 Progress
-- **Completion**: 0% (0/23 tasks)
+- **Completion**: 21% (5/24 tasks)
 
 ---
 
-**Last Updated**: 2026-05-02
+**Last Updated**: 2026-05-03

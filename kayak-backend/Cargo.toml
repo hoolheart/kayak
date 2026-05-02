@@ -31,7 +31,6 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Error Handling
 thiserror = "1.0"
-anyhow = "1.0"
 
 # Database
 sqlx = { version = "0.7", features = ["runtime-tokio-native-tls", "sqlite", "uuid", "chrono", "json", "migrate"] }
@@ -46,7 +45,6 @@ async-trait = "0.1"
 # Async futures
 futures = "0.3"
 futures-util = "0.3"
-tokio-util = { version = "0.7", features = ["codec"] }
 
 # Serial port support for Modbus RTU
 serialport = "4.6"
@@ -66,12 +64,6 @@ jsonwebtoken = "9"
 bcrypt = "0.15"
 validator = { version = "0.18", features = ["derive"] }
 ndarray = "0.15.6"
-
-[dev-dependencies]
-# Testing
-tokio-test = "0.4"
-reqwest = { version = "0.11", features = ["json"] }
-tempfile = "3.10"
 
 [profile.release]
 opt-level = 3
