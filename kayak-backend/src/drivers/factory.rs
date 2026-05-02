@@ -63,7 +63,13 @@ impl DriverFactory {
     pub fn from_device(
         device: &crate::models::entities::device::Device,
     ) -> Result<DriverWrapper, DriverError> {
-        Self::create(device.protocol_type, device.config.clone())
+        Self::create(
+            device.protocol_type,
+            device
+                .protocol_params
+                .clone()
+                .unwrap_or(serde_json::json!({})),
+        )
     }
 }
 
