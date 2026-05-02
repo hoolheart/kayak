@@ -14,7 +14,7 @@
 //! # CRC16 计算
 //!
 //! Modbus RTU 使用 CRC16-MODBUS 算法：
-//! - 多项式: 0x8005 (AUIUTOH)
+//! - 多项式: 0x8005 (对应反射形式 0xA001)
 //! - 初始值: 0xFFFF
 //! - 低字节在前 (little-endian)
 
@@ -321,7 +321,10 @@ impl ModbusRtuDriver {
     /// 解析 RTU 响应帧
     ///
     /// 帧格式: [slave_id, function_code, data..., crc_low, crc_high]
-    fn parse_rtu_frame(&self, frame: &[u8]) -> Result<(u8, Pdu), ModbusError> {
+    ///
+    /// 注意: 此方法用于解析完整的 RTU 帧。对于串口通信中的响应读取，
+    /// `send_request` 方法使用更精细的分步读取策略来处理变长响应。
+    pub fn parse_rtu_frame(&self, frame: &[u8]) -> Result<(u8, Pdu), ModbusError> {
         // 最小帧长: slave_id(1) + function_code(1) + crc(2) = 4 bytes
         if frame.len() < 4 {
             return Err(ModbusError::IncompleteFrame);
@@ -355,6 +358,13 @@ impl ModbusRtuDriver {
     // ========== 串口读写 ==========
 
     /// 发送请求并接收响应
+    ///
+    /// 响应读取流程:
+    /// 1. 读取固定头部 (slave_id + function_code = 2 bytes)
+    /// 2. 判断响应类型 (正常响应/异常响应/读取响应)
+    /// 3. 对于读取响应,读取 byte_count 并计算总帧长度
+    /// 4. 读取剩余字节
+    /// 5. 验证 CRC
     async fn send_request(&self, pdu: &Pdu) -> Result<Pdu, ModbusError> {
         let mut stream = self.stream.lock().await;
         let stream = stream.as_mut().ok_or(ModbusError::NotConnected)?;
@@ -375,14 +385,9 @@ impl ModbusRtuDriver {
             ModbusError::IoError(format!("Failed to flush: {}", e))
         })?;
 
-        // 计算预期响应长度
-        // 最小响应: slave_id(1) + function_code(1) + data(1) + crc(2) = 5 bytes
-        let expected_min_len = 5;
-
-        // 读取响应 - 先读取已知最小长度
-        let mut response_buf = vec![0u8; expected_min_len];
-
-        let result = timeout(duration, stream.read_exact(&mut response_buf)).await;
+        // ========== 步骤 1: 读取固定头部 (slave_id + function_code = 2 bytes) ==========
+        let mut header = [0u8; 2];
+        let result = timeout(duration, stream.read_exact(&mut header)).await;
 
         match result {
             Err(_) => {
@@ -391,58 +396,33 @@ impl ModbusRtuDriver {
             }
             Ok(Err(e)) => {
                 *self.state.lock().unwrap() = DriverState::Error;
-                return Err(ModbusError::IoError(format!("Failed to read response: {}", e)));
+                return Err(ModbusError::IoError(format!(
+                    "Failed to read response header: {}",
+                    e
+                )));
             }
             Ok(Ok(_)) => {}
         }
 
-        // 解析最小帧以确定完整响应长度
-        let (_slave_id, pdu) = self.parse_rtu_frame(&response_buf)?;
-
-        // 检查异常响应
-        if pdu.is_error_response() {
-            if let Some(exception_code) = pdu.exception_code() {
-                let exception = ModbusException::from_u8(exception_code);
-                return Err(ModbusError::from(exception));
-            }
+        // 验证从站 ID 匹配
+        let slave_id = header[0];
+        if slave_id != self.config.slave_id {
+            return Err(ModbusError::InvalidValue(format!(
+                "Slave ID mismatch: expected {}, got {}",
+                self.config.slave_id, slave_id
+            )));
         }
 
-        // 对于读取请求，需要读取完整数据
-        // 根据功能码和数据确定是否需要读取更多字节
-        let additional_bytes = match pdu.function_code {
-            FunctionCode::ReadCoils | FunctionCode::ReadDiscreteInputs => {
-                // 读取响应: [byte_count, data...]
-                if !pdu.data.is_empty() {
-                    let byte_count = pdu.data[0] as usize;
-                    // 已经读取了 5 字节，还需要读取 (byte_count - 3) 字节
-                    // 因为已经读取了 function_code(1) + byte_count(1) + 部分数据(至少1字节)
-                    byte_count.saturating_sub(1)
-                } else {
-                    0
-                }
-            }
-            FunctionCode::ReadHoldingRegisters | FunctionCode::ReadInputRegisters => {
-                // 读取响应: [byte_count, data...]
-                if !pdu.data.is_empty() {
-                    let byte_count = pdu.data[0] as usize;
-                    byte_count.saturating_sub(1)
-                } else {
-                    0
-                }
-            }
-            _ => 0,
-        };
+        let function_code_byte = header[1];
 
-        // 如果需要读取更多字节
-        if additional_bytes > 0 {
-            let start_pos = response_buf.len();
-            response_buf.resize(start_pos + additional_bytes, 0);
+        // ========== 步骤 2: 判断响应类型 ==========
 
-            let result = timeout(
-                duration,
-                stream.read_exact(&mut response_buf[start_pos..]),
-            )
-            .await;
+        // 检查是否为异常响应 (功能码最高位被置位)
+        if function_code_byte & 0x80 != 0 {
+            // 异常响应: [slave_id, function_code+0x80, exception_code, crc_low, crc_high]
+            // 还需要读取 1 字节 (exception_code) + 2 字节 (CRC)
+            let mut remaining = [0u8; 3];
+            let result = timeout(duration, stream.read_exact(&mut remaining)).await;
 
             match result {
                 Err(_) => {
@@ -452,19 +432,136 @@ impl ModbusRtuDriver {
                 Ok(Err(e)) => {
                     *self.state.lock().unwrap() = DriverState::Error;
                     return Err(ModbusError::IoError(format!(
-                        "Failed to read additional data: {}",
+                        "Failed to read exception response: {}",
                         e
                     )));
                 }
                 Ok(Ok(_)) => {}
             }
 
-            // 重新解析完整帧
-            let (_, pdu) = self.parse_rtu_frame(&response_buf)?;
-            return Ok(pdu);
+            // 组装完整帧并验证 CRC
+            let mut full_frame = Vec::with_capacity(5);
+            full_frame.extend_from_slice(&header);
+            full_frame.extend_from_slice(&remaining);
+
+            let received_crc = Self::parse_crc(&full_frame[3..5])
+                .ok_or(ModbusError::IncompleteFrame)?;
+            let data_for_crc = &full_frame[..3]; // slave_id + function_code + exception_code
+            Self::verify_crc16(data_for_crc, received_crc)?;
+
+            // 提取异常码
+            let exception_code = remaining[0];
+            let exception = ModbusException::from_u8(exception_code);
+            return Err(ModbusError::from(exception));
         }
 
-        Ok(pdu)
+        // 解析功能码
+        let function_code =
+            FunctionCode::from_u8(function_code_byte).ok_or(ModbusError::InvalidFunctionCode(
+                function_code_byte,
+            ))?;
+
+        // ========== 步骤 3: 根据功能码确定响应长度 ==========
+
+        let total_frame_len = match function_code {
+            // 读取响应: [slave_id, function_code, byte_count, data..., crc_low, crc_high]
+            FunctionCode::ReadCoils | FunctionCode::ReadDiscreteInputs => {
+                // 读取 byte_count (1 byte)
+                let mut byte_count_buf = [0u8; 1];
+                let result = timeout(duration, stream.read_exact(&mut byte_count_buf)).await;
+                match result {
+                    Err(_) => {
+                        *self.state.lock().unwrap() = DriverState::Error;
+                        return Err(ModbusError::Timeout { duration });
+                    }
+                    Ok(Err(e)) => {
+                        *self.state.lock().unwrap() = DriverState::Error;
+                        return Err(ModbusError::IoError(format!(
+                            "Failed to read byte count: {}",
+                            e
+                        )));
+                    }
+                    Ok(Ok(_)) => {}
+                }
+
+                let byte_count = byte_count_buf[0] as usize;
+                // 总长度 = slave_id(1) + function_code(1) + byte_count(1) + data(byte_count) + crc(2)
+                1 + 1 + 1 + byte_count + 2
+            }
+            FunctionCode::ReadHoldingRegisters | FunctionCode::ReadInputRegisters => {
+                // 读取 byte_count (1 byte)
+                let mut byte_count_buf = [0u8; 1];
+                let result = timeout(duration, stream.read_exact(&mut byte_count_buf)).await;
+                match result {
+                    Err(_) => {
+                        *self.state.lock().unwrap() = DriverState::Error;
+                        return Err(ModbusError::Timeout { duration });
+                    }
+                    Ok(Err(e)) => {
+                        *self.state.lock().unwrap() = DriverState::Error;
+                        return Err(ModbusError::IoError(format!(
+                            "Failed to read byte count: {}",
+                            e
+                        )));
+                    }
+                    Ok(Ok(_)) => {}
+                }
+
+                let byte_count = byte_count_buf[0] as usize;
+                // 总长度 = slave_id(1) + function_code(1) + byte_count(1) + data(byte_count) + crc(2)
+                1 + 1 + 1 + byte_count + 2
+            }
+            // 写入单个线圈响应: [slave_id, function_code, address(2), value(2), crc(2)] = 8 bytes
+            FunctionCode::WriteSingleCoil => 8,
+            // 写入单个寄存器响应: [slave_id, function_code, address(2), value(2), crc(2)] = 8 bytes
+            FunctionCode::WriteSingleRegister => 8,
+            // 写入多个线圈响应: [slave_id, function_code, address(2), quantity(2), crc(2)] = 8 bytes
+            FunctionCode::WriteMultipleCoils => 8,
+            // 写入多个寄存器响应: [slave_id, function_code, address(2), quantity(2), crc(2)] = 8 bytes
+            FunctionCode::WriteMultipleRegisters => 8,
+        };
+
+        // ========== 步骤 4: 读取剩余字节 ==========
+
+        // 已经读取了 2 字节 (header)，还需要读取剩余字节
+        let already_read = 2usize;
+        let remaining_len = total_frame_len.saturating_sub(already_read);
+
+        let mut response_buf = Vec::with_capacity(total_frame_len);
+        response_buf.extend_from_slice(&header);
+        response_buf.resize(total_frame_len, 0);
+
+        if remaining_len > 0 {
+            let result = timeout(duration, stream.read_exact(&mut response_buf[already_read..])).await;
+
+            match result {
+                Err(_) => {
+                    *self.state.lock().unwrap() = DriverState::Error;
+                    return Err(ModbusError::Timeout { duration });
+                }
+                Ok(Err(e)) => {
+                    *self.state.lock().unwrap() = DriverState::Error;
+                    return Err(ModbusError::IoError(format!(
+                        "Failed to read response data: {}",
+                        e
+                    )));
+                }
+                Ok(Ok(_)) => {}
+            }
+        }
+
+        // ========== 步骤 5: 验证 CRC ==========
+
+        let received_crc = Self::parse_crc(&response_buf[response_buf.len() - 2..])
+            .ok_or(ModbusError::IncompleteFrame)?;
+        let data_for_crc = &response_buf[..response_buf.len() - 2]; // 不含 CRC 部分
+        Self::verify_crc16(data_for_crc, received_crc)?;
+
+        // 提取 PDU (function_code + data)
+        let pdu_data = &response_buf[1..response_buf.len() - 2];
+        let response_pdu = Pdu::parse(pdu_data)?;
+
+        Ok(response_pdu)
     }
 
     /// 读取单个线圈值
