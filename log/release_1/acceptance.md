@@ -40,11 +40,11 @@
 | 错误处理 | ✅ | Timeout/IoError/InvalidValue 全映射 |
 | 连接/断开 | ✅ | `DriverLifecycle` trait实现 |
 | 只读保护 | ✅ | `RegisterType::is_read_only()` 检查 |
-| `connection_pool_size` | ⚠️ | 配置schema中定义，驱动未实现连接池（单连接） |
+| `connection_pool_size` | ✅ | Semaphore + VecDeque 连接池，pool_size 可配置 (R1-S2-012) |
 
 **实现文件**: `kayak-backend/src/drivers/modbus/tcp.rs` (777行)  
 **单元测试**: 15个测试用例，覆盖配置、连接、读写、错误路径  
-**评分**: 🟢 核心功能完整，连接池为可选优化（需Release 2实现）
+**评分**: 🟢 核心功能完整，连接池已通过 R1-S2-012 实现（Semaphore + VecDeque 架构）
 
 ### 2.2 Modbus RTU 协议驱动 (R1-PROTO-002) — ✅ 通过
 
@@ -256,7 +256,7 @@
 
 | ID | 严重度 | 描述 | 影响 | 建议 |
 |----|--------|------|------|------|
-| ISS-001 | 低 | Modbus TCP连接池未实现 | `connection_pool_size` 配置被schema接收但驱动未使用 | Release 2实现连接池 |
+| ISS-001 | 低 | Modbus TCP连接池已实现 | ✅ 已通过 R1-S2-012 修复：Semaphore + VecDeque 连接池，pool_size 可配 | - |
 | ISS-002 | 低 | 自动重试未实现 | PRD要求"连接断开自动重试最多3次" | Release 2在DeviceManager层添加 |
 | ISS-003 | 低 | Docker模式未实现 | PRD列出Docker部署但未提供Dockerfile | 可手工创建 |
 
@@ -350,7 +350,7 @@
 | 前端测试 | - | 345用例 |
 
 **下一步**: Release 2 任务排序建议：
-1. 连接池实现 (ISS-001)
+1. ~~连接池实现 (ISS-001)~~ ✅ 已在 Release 1 完成
 2. 自动重试机制 (ISS-002)
 3. CAN/CAN-FD 驱动
 4. VISA 驱动
