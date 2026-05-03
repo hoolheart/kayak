@@ -6,11 +6,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/color_schemes.dart';
 import '../../models/protocol_config.dart';
 import '../../validators/device_validators.dart';
 import '../../services/protocol_service.dart';
-import 'modbus_tcp_form.dart' show ConnectionTestState;
+import 'connection_test_widget.dart';
 
 /// 串口扫描状态
 enum ScanState { idle, scanning, completed, noDevices, failed }
@@ -21,11 +20,15 @@ class ModbusRtuForm extends ConsumerStatefulWidget {
   final bool isEditMode;
   final String? deviceId;
 
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
+
   const ModbusRtuForm({
     super.key,
     this.initialConfig,
     this.isEditMode = false,
     this.deviceId,
+    this.onFieldChanged,
   });
 
   @override
@@ -215,18 +218,12 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
           ),
           const SizedBox(height: 16),
           // 连接测试按钮
-          _buildConnectionTestButton(theme),
-          // 测试结果消息
-          if (_testState == ConnectionTestState.failed &&
-              _testMessage != null) ...[
-            const SizedBox(height: 8),
-            _buildTestResultMessage(theme),
-          ],
-          if (_testState == ConnectionTestState.success &&
-              _testMessage != null) ...[
-            const SizedBox(height: 8),
-            _buildTestResultMessage(theme),
-          ],
+          ConnectionTestWidget(
+            state: _testState,
+            message: _testMessage,
+            latencyMs: _testLatencyMs,
+            onTest: _testConnection,
+          ),
         ],
       ),
     );
@@ -309,6 +306,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
             onChanged: (value) {
               if (value != null) {
                 setState(() => _selectedPort = value);
+                widget.onFieldChanged?.call();
               }
             },
             validator: DeviceValidators.serialPort,
@@ -376,7 +374,10 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
               );
             }).toList(),
             onChanged: (value) {
-              if (value != null) setState(() => _baudRate = value);
+              if (value != null) {
+                setState(() => _baudRate = value);
+                widget.onFieldChanged?.call();
+              }
             },
           ),
         ),
@@ -396,7 +397,10 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
               );
             }).toList(),
             onChanged: (value) {
-              if (value != null) setState(() => _dataBits = value);
+              if (value != null) {
+                setState(() => _dataBits = value);
+                widget.onFieldChanged?.call();
+              }
             },
           ),
         ),
@@ -416,7 +420,10 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
               );
             }).toList(),
             onChanged: (value) {
-              if (value != null) setState(() => _stopBits = value);
+              if (value != null) {
+                setState(() => _stopBits = value);
+                widget.onFieldChanged?.call();
+              }
             },
           ),
         ),
@@ -436,7 +443,10 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
               );
             }).toList(),
             onChanged: (value) {
-              if (value != null) setState(() => _parity = value);
+              if (value != null) {
+                setState(() => _parity = value);
+                widget.onFieldChanged?.call();
+              }
             },
           ),
         ),
@@ -453,6 +463,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         filled: true,
       ),
       keyboardType: TextInputType.number,
+      onChanged: (_) => widget.onFieldChanged?.call(),
       validator: DeviceValidators.slaveId,
     );
   }
@@ -467,94 +478,8 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         filled: true,
       ),
       keyboardType: TextInputType.number,
+      onChanged: (_) => widget.onFieldChanged?.call(),
       validator: DeviceValidators.timeout,
-    );
-  }
-
-  Widget _buildConnectionTestButton(ThemeData theme) {
-    final isTesting = _testState == ConnectionTestState.testing;
-
-    const successFg = AppColorSchemes.success;
-
-    Color? fgColor;
-    if (_testState == ConnectionTestState.success) {
-      fgColor = successFg;
-    } else if (_testState == ConnectionTestState.failed) {
-      fgColor = theme.colorScheme.error;
-    } else {
-      fgColor = theme.colorScheme.primary;
-    }
-
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        key: const Key('connection-test-button'),
-        onPressed: isTesting ? null : _testConnection,
-        icon: isTesting
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Icon(
-                _testState == ConnectionTestState.success
-                    ? Icons.check_circle
-                    : _testState == ConnectionTestState.failed
-                        ? Icons.error
-                        : Icons.bug_report,
-                size: 20,
-              ),
-        label: Text(
-          isTesting
-              ? '测试中...'
-              : _testState == ConnectionTestState.success
-                  ? '连接成功'
-                  : _testState == ConnectionTestState.failed
-                      ? '连接失败'
-                      : '测试连接',
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: fgColor,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestResultMessage(ThemeData theme) {
-    final isSuccess = _testState == ConnectionTestState.success;
-    final message = isSuccess
-        ? '$_testMessage · 延迟 ${_testLatencyMs ?? '?'}ms'
-        : _testMessage ?? '';
-
-    const successFg = AppColorSchemes.success;
-    final successBg = AppColorSchemes.success.withValues(alpha: 0.12);
-    final errorFg = theme.colorScheme.error;
-    final errorBg = theme.colorScheme.errorContainer;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSuccess ? successBg : errorBg,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isSuccess ? Icons.check_circle : Icons.error,
-            size: 16,
-            color: isSuccess ? successFg : errorFg,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isSuccess ? successFg : errorFg,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

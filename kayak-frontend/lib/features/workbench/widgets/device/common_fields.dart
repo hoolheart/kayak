@@ -16,12 +16,16 @@ class CommonFields extends StatelessWidget {
   final TextEditingController modelController;
   final TextEditingController snController;
 
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
+
   const CommonFields({
     super.key,
     required this.nameController,
     required this.manufacturerController,
     required this.modelController,
     required this.snController,
+    this.onFieldChanged,
   });
 
   @override
@@ -49,7 +53,7 @@ class CommonFields extends StatelessWidget {
             filled: true,
           ),
           validator: (value) => DeviceValidators.required(value, '设备名称不能为空'),
-          onChanged: (_) {},
+          onChanged: (_) => onFieldChanged?.call(),
         ),
         const SizedBox(height: 16),
         // 制造商
@@ -60,6 +64,7 @@ class CommonFields extends StatelessWidget {
             hintText: '输入制造商（可选）',
             filled: true,
           ),
+          onChanged: (_) => onFieldChanged?.call(),
         ),
         const SizedBox(height: 16),
         // 型号
@@ -70,6 +75,7 @@ class CommonFields extends StatelessWidget {
             hintText: '输入型号（可选）',
             filled: true,
           ),
+          onChanged: (_) => onFieldChanged?.call(),
         ),
         const SizedBox(height: 16),
         // 序列号
@@ -80,6 +86,7 @@ class CommonFields extends StatelessWidget {
             hintText: '输入序列号（可选）',
             filled: true,
           ),
+          onChanged: (_) => onFieldChanged?.call(),
         ),
       ],
     );

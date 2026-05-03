@@ -50,6 +50,7 @@ class ProtocolSelector extends StatelessWidget {
     return DropdownButtonFormField<ProtocolType>(
       key: const Key('protocol-type-dropdown'),
       initialValue: value,
+      isDense: true,
       decoration: const InputDecoration(
         labelText: '协议类型 *',
         filled: true,
@@ -58,37 +59,49 @@ class ProtocolSelector extends StatelessWidget {
         return DropdownMenuItem<ProtocolType>(
           value: opt.type,
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 opt.icon,
-                size: 24,
+                size: 20,
                 color: theme.colorScheme.primary,
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      opt.label,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSurface,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    opt.label,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onSurface,
                     ),
-                    Text(
-                      opt.description,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                  ),
+                  Text(
+                    opt.description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
         );
       }).toList(),
+      selectedItemBuilder: (context) {
+        return _options.map((opt) {
+          return DropdownMenuItem<ProtocolType>(
+            value: opt.type,
+            child: Text(
+              opt.label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          );
+        }).toList();
+      },
       onChanged: enabled
           ? (value) {
               if (value != null) onChanged(value);

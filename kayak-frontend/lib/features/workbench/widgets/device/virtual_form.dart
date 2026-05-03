@@ -12,10 +12,14 @@ class VirtualProtocolForm extends StatefulWidget {
   final VirtualConfig? initialConfig;
   final bool isEditMode;
 
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
+
   const VirtualProtocolForm({
     super.key,
     this.initialConfig,
     this.isEditMode = false,
+    this.onFieldChanged,
   });
 
   @override
@@ -201,6 +205,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
       onChanged: (value) {
         if (value != null) {
           setState(() => _mode = value);
+          widget.onFieldChanged?.call();
         }
       },
     );
@@ -225,6 +230,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
             onChanged: (value) {
               if (value != null) {
                 setState(() => _dataType = value);
+                widget.onFieldChanged?.call();
               }
             },
           ),
@@ -246,6 +252,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
             onChanged: (value) {
               if (value != null) {
                 setState(() => _accessType = value);
+                widget.onFieldChanged?.call();
               }
             },
           ),
@@ -263,6 +270,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
         filled: true,
       ),
       keyboardType: TextInputType.number,
+      onChanged: (_) => widget.onFieldChanged?.call(),
       validator: (value) {
         if (value == null || value.isEmpty) return '请输入采样间隔';
         final interval = int.tryParse(value);
@@ -284,6 +292,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
               filled: true,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (_) => widget.onFieldChanged?.call(),
             validator: (value) {
               if (value == null || value.isEmpty) return '请输入最小值';
               if (double.tryParse(value) == null) return '请输入有效数字';
@@ -301,6 +310,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
               filled: true,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (_) => widget.onFieldChanged?.call(),
             validator: (value) {
               if (value == null || value.isEmpty) return '请输入最大值';
               if (double.tryParse(value) == null) return '请输入有效数字';
@@ -330,6 +340,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
           filled: true,
         ),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        onChanged: (_) => widget.onFieldChanged?.call(),
         validator: (value) {
           if (value == null || value.isEmpty) return '请输入固定值';
           if (double.tryParse(value) == null) return '请输入有效数字';

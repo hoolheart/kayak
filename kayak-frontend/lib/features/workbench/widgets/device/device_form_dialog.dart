@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/theme/color_schemes.dart';
 import '../../models/device.dart';
 import '../../models/protocol_config.dart';
 import '../../services/device_service.dart';
@@ -144,6 +145,7 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
       manufacturerController: _manufacturerController,
       modelController: _modelController,
       snController: _snController,
+      onFieldChanged: () => setState(() => _isDirty = true),
     );
   }
 
@@ -197,20 +199,26 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
               key: _virtualFormKey,
               initialConfig: _isEditMode ? _buildInitialVirtualConfig() : null,
               isEditMode: _isEditMode,
+              onFieldChanged: () => setState(() => _isDirty = true),
             ),
           ProtocolType.modbusTcp => ModbusTcpForm(
               key: _tcpFormKey,
               initialConfig: _isEditMode ? _buildInitialTcpConfig() : null,
               isEditMode: _isEditMode,
               deviceId: widget.device?.id,
+              onFieldChanged: () => setState(() => _isDirty = true),
             ),
           ProtocolType.modbusRtu => ModbusRtuForm(
               key: _rtuFormKey,
               initialConfig: _isEditMode ? _buildInitialRtuConfig() : null,
               isEditMode: _isEditMode,
               deviceId: widget.device?.id,
+              onFieldChanged: () => setState(() => _isDirty = true),
             ),
-          _ => const SizedBox.shrink(),
+          _ => Container(
+              key: ValueKey('${_selectedProtocol.name}-empty'),
+              child: const SizedBox(),
+            ),
         },
       ),
     );
@@ -249,12 +257,12 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
         key: const Key('submit-device-button'),
         onPressed: _isSubmitting ? null : _submit,
         child: _isSubmitting
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                 ),
               )
             : Text(_isEditMode ? '保存' : '创建'),
@@ -279,7 +287,8 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        icon: const Icon(Icons.warning, color: Colors.orange, size: 48),
+        icon:
+            const Icon(Icons.warning, color: AppColorSchemes.warning, size: 48),
         title: const Text('切换协议？'),
         content: const Text('切换协议类型将清空当前已填写的协议参数。是否继续？'),
         actions: [
@@ -338,7 +347,9 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
   // === 提交逻辑 ===
   Future<void> _submit() async {
     // Step 1: 验证通用字段
-    if (!_formKey.currentState!.validate()) {
+    final formState = _formKey.currentState;
+    if (formState == null) return;
+    if (!formState.validate()) {
       return;
     }
 
@@ -415,19 +426,23 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
   /// 验证失败提示
   void _showValidationError() {
     if (!mounted) return;
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
-            Icon(Icons.error, color: Colors.white, size: 20),
-            SizedBox(width: 8),
+            Icon(Icons.error, color: theme.colorScheme.onError, size: 20),
+            const SizedBox(width: 8),
             Expanded(
-              child: Text('请检查协议参数字段并修正错误'),
+              child: Text(
+                '请检查协议参数字段并修正错误',
+                style: TextStyle(color: theme.colorScheme.onError),
+              ),
             ),
           ],
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         duration: const Duration(seconds: 3),
       ),
     );
@@ -444,20 +459,26 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
       message = '操作失败: $error';
     }
 
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error, color: Colors.white, size: 20),
+            Icon(Icons.error, color: theme.colorScheme.onError, size: 20),
             const SizedBox(width: 8),
-            Expanded(child: Text(message)),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: theme.colorScheme.onError),
+              ),
+            ),
           ],
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Theme.of(context).colorScheme.error,
+        backgroundColor: theme.colorScheme.error,
         action: SnackBarAction(
           label: '重试',
-          textColor: Colors.white,
+          textColor: theme.colorScheme.onError,
           onPressed: _submit,
         ),
       ),
