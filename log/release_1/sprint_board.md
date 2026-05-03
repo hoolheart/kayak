@@ -4,7 +4,7 @@
 - **Sprint Start**: 2026-05-02
 - **Sprint End**: 2026-05-30 (4周，2个Sprint)
 - **Total Tasks**: 24
-- **Completed Tasks**: 5
+- **Completed Tasks**: 7
 
 ---
 
@@ -20,8 +20,6 @@
 | R2-ANALYSIS-001 | 时序数据绘图工具 | - | P1 |
 | R2-PYTHON-001 | Python SDK核心功能 | - | P2 |
 | R2-TEAM-001 | 团队管理功能 | - | P1 |
-| R1-S1-006 | 协议配置UI - Modbus TCP 表单（基于新设计） | sw-tom | P0 |
-| R1-S1-UI-002 | Web 模式适配与主题系统重构 | sw-tom | P0 |
 | R1-S1-UI-003 | 核心页面前端重构（登录页 + Dashboard + 工作台） | sw-tom | P0 |
 
 ---
@@ -69,6 +67,9 @@
 | R1-S1-003 | Modbus TCP 驱动实现 | 2026-05-03 |
 | R1-S1-004 | Modbus RTU 驱动实现 | 2026-05-03 |
 | R1-S1-005 | 后端依赖清理（移除 5 个未使用依赖） | 2026-05-03 |
+| R1-S1-006 | 多协议设备配置UI（含37个Widget测试） | 2026-05-03 |
+| R1-S1-UI-001 | 全新 UI/UX 设计 - 核心页面 Figma 原型 | 2026-05-03 |
+| R1-S1-UI-002 | Web 模式适配与主题系统重构 | 2026-05-03 |
 
 ---
 
@@ -101,9 +102,9 @@
 
 ### Sprint 1 Progress
 - **Total**: 14 tasks (含新增依赖清理)
-- **Completed**: 5
+- **Completed**: 7
 - **In Progress**: 0
-- **Remaining**: 9
+- **Remaining**: 7
 
 ### Sprint 2 Progress
 - **Total**: 10 tasks
@@ -112,7 +113,7 @@
 - **Remaining**: 10
 
 ### Overall Release 1 Progress
-- **Completion**: 21% (5/24 tasks)
+- **Completion**: 29% (7/24 tasks)
 
 ---
 
