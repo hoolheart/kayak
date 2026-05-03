@@ -105,7 +105,7 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 配置表单
-            _buildFormSection(theme),
+            _buildFormSection(theme, formNotifier),
             const Divider(height: 32),
             // 已配置列表
             _buildListSection(theme, configList, formNotifier, listNotifier),
@@ -119,7 +119,8 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
   }
 
   /// 表单区域
-  Widget _buildFormSection(ThemeData theme) {
+  Widget _buildFormSection(
+      ThemeData theme, PointConfigFormNotifier formNotifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -135,7 +136,9 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
           ],
         ),
         const SizedBox(height: 12),
-        const PointConfigForm(),
+        PointConfigForm(
+          key: ValueKey('point_config_form_${formNotifier.editingIndex}'),
+        ),
         const SizedBox(height: 12),
         // 添加/更新按钮
         _buildAddUpdateButton(theme),
@@ -177,8 +180,11 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
       return;
     }
 
+    // 保存编辑状态（reset() 会清除 editingIndex）
+    final wasEditing = formNotifier.isEditing;
+
     bool success;
-    if (formNotifier.isEditing) {
+    if (wasEditing) {
       success = listNotifier.updateConfig(formNotifier.editingIndex, config);
     } else {
       success = listNotifier.addConfig(config);
@@ -195,7 +201,7 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
 
     formNotifier.reset();
     _showSnackBar(
-      formNotifier.isEditing ? '测点已更新' : '测点已添加',
+      wasEditing ? '测点已更新' : '测点已添加',
       isError: false,
     );
   }
