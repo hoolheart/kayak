@@ -250,7 +250,7 @@ void main() {
       final modeDropdown = find.byWidgetPredicate(
         (w) =>
             w is DropdownButtonFormField<dynamic> &&
-            (w.decoration as InputDecoration).labelText == '数据模式 *',
+            w.decoration.labelText == '数据模式 *',
       );
       await tester.ensureVisible(modeDropdown);
       await tester.pumpAndSettle();
@@ -286,7 +286,7 @@ void main() {
       final modeDropdown = find.byWidgetPredicate(
         (w) =>
             w is DropdownButtonFormField<dynamic> &&
-            (w.decoration as InputDecoration).labelText == '数据模式 *',
+            w.decoration.labelText == '数据模式 *',
       );
       await tester.ensureVisible(modeDropdown);
       await tester.pumpAndSettle();
@@ -310,7 +310,7 @@ void main() {
       final typeDropdown = find.byWidgetPredicate(
         (w) =>
             w is DropdownButtonFormField<dynamic> &&
-            (w.decoration as InputDecoration).labelText == '数据类型 *',
+            w.decoration.labelText == '数据类型 *',
       );
       await tester.ensureVisible(typeDropdown);
       await tester.pumpAndSettle();
@@ -334,7 +334,7 @@ void main() {
       final accessDropdown = find.byWidgetPredicate(
         (w) =>
             w is DropdownButtonFormField<dynamic> &&
-            (w.decoration as InputDecoration).labelText == '访问类型 *',
+            w.decoration.labelText == '访问类型 *',
       );
       await tester.ensureVisible(accessDropdown);
       await tester.pumpAndSettle();
