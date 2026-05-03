@@ -61,18 +61,30 @@ async fn init_sqlite_tables(pool: &SqlitePool) -> Result<(), sqlx::Error> {
         r#"
         CREATE TABLE IF NOT EXISTS workbenches (
             id TEXT PRIMARY KEY,
-            user_id TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
-            status TEXT DEFAULT 'active',
+            owner_id TEXT NOT NULL,
+            owner_type TEXT DEFAULT 'user' CHECK (owner_type IN ('user', 'team')),
+            status TEXT DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted')),
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
         )
         "#,
     )
     .execute(pool)
     .await?;
+
+    // 创建 workbenches 索引
+    sqlx::query(
+        "CREATE INDEX IF NOT EXISTS idx_workbenches_owner ON workbenches(owner_id, owner_type)",
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_workbenches_status ON workbenches(status)")
+        .execute(pool)
+        .await?;
 
     info!("Workbenches table created successfully");
 
