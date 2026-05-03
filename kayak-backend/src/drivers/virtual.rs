@@ -121,7 +121,11 @@ impl VirtualDriver {
     fn generate_value(&self) -> PointValue {
         match self.config.mode {
             VirtualMode::Random => self.generate_random(),
-            VirtualMode::Fixed => self.config.fixed_value.clone().unwrap_or(PointValue::Number(0.0)),
+            VirtualMode::Fixed => self
+                .config
+                .fixed_value
+                .clone()
+                .unwrap_or(PointValue::Number(0.0)),
             VirtualMode::Sine => self.generate_sine(),
             VirtualMode::Ramp => self.generate_ramp(),
         }

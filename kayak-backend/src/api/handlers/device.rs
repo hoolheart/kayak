@@ -196,6 +196,7 @@ pub async fn connect_device(
             DeviceError::NotFound => AppError::NotFound("Device not found".to_string()),
             DeviceError::AccessDenied => AppError::Forbidden("Access denied".to_string()),
             DeviceError::ValidationError(msg) => AppError::BadRequest(msg),
+            DeviceError::ConnectionFailed(msg) => AppError::ExternalServiceError(msg),
             _ => AppError::InternalError(e.to_string()),
         })?;
 

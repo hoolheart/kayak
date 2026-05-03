@@ -22,6 +22,7 @@ use crate::api::handlers::workbench;
 use crate::api::middleware::error::not_found_handler;
 use crate::auth::{
     handlers::{get_authenticated_user, login, refresh_token, register},
+    middleware::{AuthLayer, JwtAuthMiddleware},
     services::{AuthServiceImpl, BcryptPasswordHasher, JwtTokenService},
     user_repo_adapter::UserRepositoryAdapter,
 };
@@ -61,6 +62,12 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     ));
 
     let password_hasher = Arc::new(BcryptPasswordHasher);
+
+    // 创建认证中间件（JWT注入到request.extensions，用于RequireAuth提取器）
+    // allow_anonymous(true) 允许公开端点正常工作；
+    // 受保护端点通过 RequireAuth 提取器强制执行认证。
+    let auth_middleware = JwtAuthMiddleware::new(token_service.clone()).allow_anonymous(true);
+    let auth_layer = AuthLayer::new(auth_middleware);
 
     // 创建认证服务
     let user_repo_adapter = Arc::new(UserRepositoryAdapter::new(UserRepository::new(
@@ -164,6 +171,8 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         // NEW: 协议列表与系统信息
         .merge(protocol_routes())
         .merge(system_routes())
+        // 应用认证中间件（JWT验证 + UserContext注入）
+        .layer(auth_layer)
         // API 404处理
         .fallback(not_found_handler);
 

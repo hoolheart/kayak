@@ -8,16 +8,12 @@ use uuid::Uuid;
 use crate::db::repository::device_repo::{DeviceRepository, DeviceRepositoryError};
 use crate::db::repository::point_repo::PointRepository;
 use crate::db::repository::workbench_repo::WorkbenchRepository;
-use crate::drivers::{
-    DeviceManager, DriverFactory, DriverWrapper, VirtualConfig, VirtualDriver,
-};
 use crate::drivers::lifecycle::DriverLifecycle;
+use crate::drivers::{DeviceManager, DriverFactory, DriverWrapper, VirtualConfig, VirtualDriver};
 use crate::models::entities::device::{Device, DeviceStatus, ProtocolType};
 
 use super::error::{CreateDeviceEntity, DeviceError, UpdateDeviceEntity};
-use super::types::{
-    DeviceConnectionStatus, DeviceDto, PagedDeviceDto, TestConnectionResult,
-};
+use super::types::{DeviceConnectionStatus, DeviceDto, PagedDeviceDto, TestConnectionResult};
 
 /// 设备服务接口
 #[async_trait]
@@ -496,15 +492,7 @@ impl DeviceService for DeviceServiceImpl {
 
         let _ = self
             .device_repo
-            .update(
-                device_id,
-                None,
-                None,
-                None,
-                None,
-                None,
-                Some(new_status),
-            )
+            .update(device_id, None, None, None, None, None, Some(new_status))
             .await;
 
         // 6. Return result
@@ -519,7 +507,7 @@ impl DeviceService for DeviceServiceImpl {
                         status: "connected".to_string(),
                     })
                 } else {
-                    Err(DeviceError::ValidationError(format!(
+                    Err(DeviceError::ConnectionFailed(format!(
                         "Connection failed: {}",
                         e
                     )))

@@ -89,7 +89,7 @@ fn scan_serial_ports() -> Vec<SerialPortInfo> {
             .into_iter()
             .map(|p| SerialPortInfo {
                 path: p.port_name.clone(),
-                description: format!("{:?}", p.port_type),
+                description: format!("{:?} {}", p.port_type, p.port_name),
             })
             .collect(),
         Err(_) => {
@@ -251,7 +251,7 @@ mod tests {
     fn test_protocol_list_contains_all_three() {
         // Unit test for data integrity: the hardcoded list must have exactly 3 protocols
         // with unique IDs
-        let protocols = vec![
+        let protocols = [
             ProtocolInfo {
                 id: "virtual".to_string(),
                 name: "Virtual".to_string(),

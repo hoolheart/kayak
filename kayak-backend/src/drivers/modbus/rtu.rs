@@ -312,7 +312,7 @@ impl ModbusRtuDriver {
 
         // 计算 CRC (包含 slave_id + pdu)
         let crc = Self::calculate_crc16(&frame);
-        frame.push((crc & 0xFF) as u8);       // 低字节
+        frame.push((crc & 0xFF) as u8); // 低字节
         frame.push(((crc >> 8) & 0xFF) as u8); // 高字节
 
         frame
@@ -334,12 +334,10 @@ impl ModbusRtuDriver {
 
         // 验证从站 ID 匹配
         if slave_id != self.config.slave_id {
-            return Err(ModbusError::InvalidValue(
-                format!(
-                    "Slave ID mismatch: expected {}, got {}",
-                    self.config.slave_id, slave_id
-                )
-            ));
+            return Err(ModbusError::InvalidValue(format!(
+                "Slave ID mismatch: expected {}, got {}",
+                self.config.slave_id, slave_id
+            )));
         }
 
         // 提取 PDU 部分 (不含 slave_id 和 CRC)
@@ -347,8 +345,8 @@ impl ModbusRtuDriver {
         let pdu = Pdu::parse(pdu_data)?;
 
         // 验证 CRC
-        let received_crc = Self::parse_crc(&frame[frame.len() - 2..])
-            .ok_or(ModbusError::IncompleteFrame)?;
+        let received_crc =
+            Self::parse_crc(&frame[frame.len() - 2..]).ok_or(ModbusError::IncompleteFrame)?;
         let data_for_crc = &frame[..frame.len() - 2]; // 不含 CRC 部分
         Self::verify_crc16(data_for_crc, received_crc)?;
 
@@ -444,8 +442,8 @@ impl ModbusRtuDriver {
             full_frame.extend_from_slice(&header);
             full_frame.extend_from_slice(&remaining);
 
-            let received_crc = Self::parse_crc(&full_frame[3..5])
-                .ok_or(ModbusError::IncompleteFrame)?;
+            let received_crc =
+                Self::parse_crc(&full_frame[3..5]).ok_or(ModbusError::IncompleteFrame)?;
             let data_for_crc = &full_frame[..3]; // slave_id + function_code + exception_code
             Self::verify_crc16(data_for_crc, received_crc)?;
 
@@ -456,10 +454,8 @@ impl ModbusRtuDriver {
         }
 
         // 解析功能码
-        let function_code =
-            FunctionCode::from_u8(function_code_byte).ok_or(ModbusError::InvalidFunctionCode(
-                function_code_byte,
-            ))?;
+        let function_code = FunctionCode::from_u8(function_code_byte)
+            .ok_or(ModbusError::InvalidFunctionCode(function_code_byte))?;
 
         // ========== 步骤 3: 根据功能码确定响应长度 ==========
 
@@ -532,7 +528,11 @@ impl ModbusRtuDriver {
         response_buf.resize(total_frame_len, 0);
 
         if remaining_len > 0 {
-            let result = timeout(duration, stream.read_exact(&mut response_buf[already_read..])).await;
+            let result = timeout(
+                duration,
+                stream.read_exact(&mut response_buf[already_read..]),
+            )
+            .await;
 
             match result {
                 Err(_) => {
@@ -603,7 +603,11 @@ impl ModbusRtuDriver {
     }
 
     /// 写入单个线圈值
-    async fn write_single_coil(&self, address: ModbusAddress, value: bool) -> Result<(), ModbusError> {
+    async fn write_single_coil(
+        &self,
+        address: ModbusAddress,
+        value: bool,
+    ) -> Result<(), ModbusError> {
         let pdu = Pdu::write_single_coil(address, value)?;
         self.send_request(&pdu).await?;
         Ok(())
@@ -621,19 +625,16 @@ impl ModbusRtuDriver {
     }
 
     /// 异步读取测点值
-    pub async fn read_point_async(
-        &self,
-        point_id: Uuid,
-    ) -> Result<PointValue, DriverError> {
+    pub async fn read_point_async(&self, point_id: Uuid) -> Result<PointValue, DriverError> {
         if !DriverLifecycle::is_connected(self) {
             return Err(DriverError::NotConnected);
         }
 
-        let point_config = self
-            .get_point_config(&point_id)
-            .ok_or_else(|| DriverError::InvalidValue {
-                message: format!("Point {} not found", point_id),
-            })?;
+        let point_config =
+            self.get_point_config(&point_id)
+                .ok_or_else(|| DriverError::InvalidValue {
+                    message: format!("Point {} not found", point_id),
+                })?;
 
         let value = match point_config.register_type {
             RegisterType::Coil => {
@@ -679,11 +680,11 @@ impl ModbusRtuDriver {
             return Err(DriverError::NotConnected);
         }
 
-        let point_config = self
-            .get_point_config(&point_id)
-            .ok_or_else(|| DriverError::InvalidValue {
-                message: format!("Point {} not found", point_id),
-            })?;
+        let point_config =
+            self.get_point_config(&point_id)
+                .ok_or_else(|| DriverError::InvalidValue {
+                    message: format!("Point {} not found", point_id),
+                })?;
 
         // 检查是否为只读类型
         if point_config.register_type.is_read_only() {
@@ -692,12 +693,13 @@ impl ModbusRtuDriver {
 
         match point_config.register_type {
             RegisterType::Coil => {
-                let coil_value = value
-                    .to_f64()
-                    .map(|f| f != 0.0)
-                    .ok_or_else(|| DriverError::InvalidValue {
-                        message: "Invalid boolean value for coil".into(),
-                    })?;
+                let coil_value =
+                    value
+                        .to_f64()
+                        .map(|f| f != 0.0)
+                        .ok_or_else(|| DriverError::InvalidValue {
+                            message: "Invalid boolean value for coil".into(),
+                        })?;
                 self.write_single_coil(point_config.address, coil_value)
                     .await
                     .map_err(DriverError::from)?;
@@ -706,10 +708,18 @@ impl ModbusRtuDriver {
                 let register_value = match value {
                     PointValue::Number(n) => n as u16,
                     PointValue::Integer(n) => n as u16,
-                    PointValue::Boolean(b) => if b { 1 } else { 0 },
-                    PointValue::String(s) => s.parse::<u16>().map_err(|_| DriverError::InvalidValue {
-                        message: format!("Cannot parse '{}' as u16", s),
-                    })?,
+                    PointValue::Boolean(b) => {
+                        if b {
+                            1
+                        } else {
+                            0
+                        }
+                    }
+                    PointValue::String(s) => {
+                        s.parse::<u16>().map_err(|_| DriverError::InvalidValue {
+                            message: format!("Cannot parse '{}' as u16", s),
+                        })?
+                    }
                 };
                 self.write_single_register(point_config.address, register_value)
                     .await
@@ -786,13 +796,11 @@ impl DeviceDriver for ModbusRtuDriver {
     }
 
     fn read_point(&self, point_id: Uuid) -> Result<PointValue, Self::Error> {
-        tokio::runtime::Handle::current()
-            .block_on(self.read_point_async(point_id))
+        tokio::runtime::Handle::current().block_on(self.read_point_async(point_id))
     }
 
     fn write_point(&self, point_id: Uuid, value: PointValue) -> Result<(), Self::Error> {
-        tokio::runtime::Handle::current()
-            .block_on(self.write_point_async(point_id, value))
+        tokio::runtime::Handle::current().block_on(self.write_point_async(point_id, value))
     }
 
     fn is_connected(&self) -> bool {
@@ -861,8 +869,14 @@ mod tests {
 
     #[test]
     fn test_parity_to_serialport_parity() {
-        assert_eq!(Parity::None.to_serialport_parity(), serialport::Parity::None);
-        assert_eq!(Parity::Even.to_serialport_parity(), serialport::Parity::Even);
+        assert_eq!(
+            Parity::None.to_serialport_parity(),
+            serialport::Parity::None
+        );
+        assert_eq!(
+            Parity::Even.to_serialport_parity(),
+            serialport::Parity::Even
+        );
         assert_eq!(Parity::Odd.to_serialport_parity(), serialport::Parity::Odd);
     }
 
@@ -977,7 +991,10 @@ mod tests {
         // 预期 CRC: 0x0A84 (低字节在前)
         let data = [0x01, 0x03, 0x00, 0x00, 0x00, 0x01];
         let crc = ModbusRtuDriver::calculate_crc16(&data);
-        assert_eq!(crc, 0x0A84, "CRC16 calculation failed for standard test data");
+        assert_eq!(
+            crc, 0x0A84,
+            "CRC16 calculation failed for standard test data"
+        );
     }
 
     #[test]
@@ -1125,7 +1142,9 @@ mod tests {
     async fn test_write_point_not_connected() {
         let driver = ModbusRtuDriver::with_defaults();
         let point_id = Uuid::new_v4();
-        let result = driver.write_point_async(point_id, PointValue::Boolean(true)).await;
+        let result = driver
+            .write_point_async(point_id, PointValue::Boolean(true))
+            .await;
         assert!(matches!(result, Err(DriverError::NotConnected)));
     }
 

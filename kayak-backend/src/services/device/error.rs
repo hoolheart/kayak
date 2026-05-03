@@ -21,6 +21,9 @@ pub enum DeviceError {
     #[error("Invalid parent: circular reference detected")]
     CircularReference,
 
+    #[error("Connection failed: {0}")]
+    ConnectionFailed(String),
+
     #[error("Database error: {0}")]
     DatabaseError(String),
 }

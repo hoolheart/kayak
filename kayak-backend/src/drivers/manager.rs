@@ -36,11 +36,7 @@ impl DeviceManager {
     /// # Arguments
     /// * `id` - 设备唯一标识
     /// * `driver` - 设备驱动包装器（DriverWrapper）
-    pub fn register_device(
-        &self,
-        id: Uuid,
-        driver: DriverWrapper,
-    ) -> Result<(), DriverError> {
+    pub fn register_device(&self, id: Uuid, driver: DriverWrapper) -> Result<(), DriverError> {
         let mut devices = self.devices.write().unwrap();
         if devices.contains_key(&id) {
             return Err(DriverError::ConfigError(format!(
@@ -74,10 +70,7 @@ impl DeviceManager {
     ///     driver.connect().await?;
     /// }
     /// ```
-    pub fn get_device(
-        &self,
-        id: Uuid,
-    ) -> Option<Arc<Mutex<DriverWrapper>>> {
+    pub fn get_device(&self, id: Uuid) -> Option<Arc<Mutex<DriverWrapper>>> {
         let devices = self.devices.read().unwrap();
         devices.get(&id).cloned()
     }
@@ -86,9 +79,7 @@ impl DeviceManager {
     ///
     /// 遍历所有已注册的设备并尝试连接它们。
     /// 使用 `join_all` 并行执行所有连接操作。
-    pub async fn connect_all(
-        &self,
-    ) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
+    pub async fn connect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
             devices
@@ -98,10 +89,7 @@ impl DeviceManager {
         };
 
         let futures = device_locks.into_iter().map(
-            |(id, driver_lock): (
-                Uuid,
-                Arc<Mutex<DriverWrapper>>,
-            )| async move {
+            |(id, driver_lock): (Uuid, Arc<Mutex<DriverWrapper>>)| async move {
                 // 获取可变访问权限（tokio Mutex - async）
                 let mut driver = driver_lock.lock().await;
                 match driver.connect().await {
@@ -118,9 +106,7 @@ impl DeviceManager {
     ///
     /// 遍历所有已注册的设备并断开连接。
     /// 使用 `join_all` 并行执行所有断开操作。
-    pub async fn disconnect_all(
-        &self,
-    ) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
+    pub async fn disconnect_all(&self) -> Vec<Result<Uuid, (Uuid, DriverError)>> {
         let device_locks: Vec<_> = {
             let devices = self.devices.read().unwrap();
             devices
@@ -130,10 +116,7 @@ impl DeviceManager {
         };
 
         let futures = device_locks.into_iter().map(
-            |(id, driver_lock): (
-                Uuid,
-                Arc<Mutex<DriverWrapper>>,
-            )| async move {
+            |(id, driver_lock): (Uuid, Arc<Mutex<DriverWrapper>>)| async move {
                 // 获取可变访问权限（tokio Mutex - async）
                 let mut driver = driver_lock.lock().await;
                 match driver.disconnect().await {
