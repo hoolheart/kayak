@@ -269,7 +269,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         Expanded(
           child: DropdownButtonFormField<String>(
             key: const Key('rtu-port-dropdown'),
-            value: _selectedPort,
+            initialValue: _selectedPort,
             decoration: InputDecoration(
               labelText: '串口 *',
               hintText: _scanState == ScanState.scanning
@@ -363,7 +363,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         Flexible(
           child: DropdownButtonFormField<int>(
             isDense: true,
-            value: _baudRate,
+            initialValue: _baudRate,
             decoration: const InputDecoration(
               labelText: '波特率',
               filled: true,
@@ -388,7 +388,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         Flexible(
           child: DropdownButtonFormField<int>(
             isDense: true,
-            value: _dataBits,
+            initialValue: _dataBits,
             decoration: const InputDecoration(
               labelText: '数据位',
               filled: true,
@@ -413,7 +413,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         Flexible(
           child: DropdownButtonFormField<int>(
             isDense: true,
-            value: _stopBits,
+            initialValue: _stopBits,
             decoration: const InputDecoration(
               labelText: '停止位',
               filled: true,
@@ -438,7 +438,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         Flexible(
           child: DropdownButtonFormField<String>(
             isDense: true,
-            value: _parity,
+            initialValue: _parity,
             decoration: const InputDecoration(
               labelText: '校验',
               filled: true,

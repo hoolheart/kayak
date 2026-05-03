@@ -49,7 +49,7 @@ class ProtocolSelector extends StatelessWidget {
 
     return DropdownButtonFormField<ProtocolType>(
       key: const Key('protocol-type-dropdown'),
-      value: value,
+      initialValue: value,
       isDense: true,
       decoration: const InputDecoration(
         labelText: '协议类型 *',
