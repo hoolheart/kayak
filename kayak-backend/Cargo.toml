@@ -56,6 +56,12 @@ hdf5 = "0.8"
 # Random number generation
 rand = "0.8"
 
+# CLI argument parsing
+clap = { version = "4", features = ["derive"] }
+
+# TOML config file parsing
+toml = "0.8"
+
 # Expression evaluation
 evalexpr = "10"
 
@@ -70,6 +76,10 @@ opt-level = 3
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[[bin]]
+name = "modbus-simulator"
+path = "src/bin/modbus-simulator/main.rs"
 
 [profile.dev]
 opt-level = 0
