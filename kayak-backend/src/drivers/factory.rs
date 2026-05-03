@@ -7,7 +7,8 @@ use crate::models::entities::device::ProtocolType;
 
 use super::error::DriverError;
 use super::modbus::rtu::{ModbusRtuConfig, ModbusRtuDriver};
-use super::modbus::tcp::{ModbusTcpConfig, ModbusTcpDriver};
+use super::modbus::tcp::ModbusTcpDriver;
+use super::modbus::types::ModbusTcpPoolConfig;
 use super::r#virtual::{VirtualConfig, VirtualDriver};
 use super::wrapper::DriverWrapper;
 
@@ -41,7 +42,7 @@ impl DriverFactory {
                 Ok(DriverWrapper::new_virtual(driver))
             }
             ProtocolType::ModbusTcp => {
-                let config: ModbusTcpConfig = serde_json::from_value(config).map_err(|e| {
+                let config: ModbusTcpPoolConfig = serde_json::from_value(config).map_err(|e| {
                     DriverError::ConfigError(format!("Invalid Modbus TCP config: {}", e))
                 })?;
                 let driver = ModbusTcpDriver::new(config);

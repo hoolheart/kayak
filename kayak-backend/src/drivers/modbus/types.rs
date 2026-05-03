@@ -1,4 +1,75 @@
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
+
+use super::constants::{DEFAULT_POOL_SIZE, MAX_POOL_SIZE};
+
+/// serde 反序列化时 `pool_size` 字段的默认值
+fn default_pool_size() -> usize {
+    DEFAULT_POOL_SIZE
+}
+
+/// Modbus TCP 连接池配置
+///
+/// 在 Modbus TCP 单连接配置基础上增加连接池大小参数。
+/// 平铺字段设计使 JSON 序列化与 API schema 一致。
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ModbusTcpPoolConfig {
+    /// 服务器主机地址
+    pub host: String,
+    /// TCP 端口
+    pub port: u16,
+    /// 从站 ID
+    pub slave_id: u8,
+    /// 操作超时时间 (毫秒)
+    pub timeout_ms: u64,
+    /// 连接池大小 (预建连接数)
+    /// 自动钳制到 [1, MAX_POOL_SIZE] 范围
+    #[serde(default = "default_pool_size")]
+    pub pool_size: usize,
+}
+
+impl ModbusTcpPoolConfig {
+    /// 创建新的连接池配置
+    ///
+    /// `pool_size` 自动钳制到 [1, MAX_POOL_SIZE] 范围。
+    pub fn new(
+        host: impl Into<String>,
+        port: u16,
+        slave_id: u8,
+        timeout_ms: u64,
+        pool_size: usize,
+    ) -> Self {
+        Self {
+            host: host.into(),
+            port,
+            slave_id,
+            timeout_ms,
+            pool_size: pool_size.clamp(1, MAX_POOL_SIZE),
+        }
+    }
+
+    /// 获取服务器地址字符串 "host:port"
+    pub fn addr(&self) -> String {
+        format!("{}:{}", self.host, self.port)
+    }
+
+    /// 获取超时时长
+    pub fn timeout(&self) -> Duration {
+        Duration::from_millis(self.timeout_ms)
+    }
+}
+
+impl Default for ModbusTcpPoolConfig {
+    fn default() -> Self {
+        Self {
+            host: "127.0.0.1".to_string(),
+            port: 502,
+            slave_id: 1,
+            timeout_ms: 3000,
+            pool_size: DEFAULT_POOL_SIZE,
+        }
+    }
+}
 
 /// Modbus 功能码枚举
 ///

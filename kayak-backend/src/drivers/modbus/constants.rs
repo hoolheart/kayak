@@ -42,3 +42,14 @@ pub const DEFAULT_UNIT_ID: u8 = 1;
 
 /// 协议标识符（Modbus TCP 固定为 0）
 pub const MODBUS_PROTOCOL_ID: u16 = 0x0000;
+
+// ========== 连接池常量 ==========
+
+/// 默认连接池大小
+pub const DEFAULT_POOL_SIZE: usize = 4;
+
+/// 最大连接池大小（防止资源耗尽）
+pub const MAX_POOL_SIZE: usize = 32;
+
+/// 连接池内部重试最大次数
+pub const MAX_POOL_RETRIES: usize = 3;

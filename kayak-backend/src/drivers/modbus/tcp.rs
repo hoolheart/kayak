@@ -1,6 +1,6 @@
 //! Modbus TCP 驱动实现
 //!
-//! 提供基于 TCP 的 Modbus 通信驱动实现。
+//! 提供基于 TCP 的 Modbus 通信驱动实现，使用连接池支持并发请求。
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -8,8 +8,6 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex as StdMutex};
 use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use tokio::net::TcpStream;
-use tokio::sync::Mutex as AsyncMutex;
 use tokio::time::timeout;
 use uuid::Uuid;
 
@@ -19,9 +17,12 @@ pub use crate::drivers::lifecycle::DriverLifecycle;
 pub use crate::drivers::modbus::error::{ModbusError, ModbusException};
 pub use crate::drivers::modbus::mbap::MbapHeader;
 pub use crate::drivers::modbus::pdu::Pdu;
-pub use crate::drivers::modbus::types::{FunctionCode, ModbusAddress, ModbusValue, RegisterType};
+pub use crate::drivers::modbus::pool::ModbusTcpConnectionPool;
+pub use crate::drivers::modbus::types::{FunctionCode, ModbusAddress, ModbusTcpPoolConfig, ModbusValue, RegisterType};
 
-/// Modbus TCP 驱动配置
+/// Modbus TCP 驱动配置（单连接，向后兼容）
+///
+/// 推荐使用 `ModbusTcpPoolConfig` 代替此类型。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModbusTcpConfig {
     /// 服务器主机地址
@@ -59,6 +60,18 @@ impl Default for ModbusTcpConfig {
             slave_id: 1,
             timeout_ms: 3000,
         }
+    }
+}
+
+impl From<ModbusTcpConfig> for ModbusTcpPoolConfig {
+    fn from(config: ModbusTcpConfig) -> Self {
+        ModbusTcpPoolConfig::new(
+            config.host,
+            config.port,
+            config.slave_id,
+            config.timeout_ms,
+            1, // 单连接模式
+        )
     }
 }
 
@@ -110,14 +123,14 @@ impl PointConfig {
 
 /// Modbus TCP 驱动
 ///
-/// 实现 DeviceDriver trait，提供 Modbus TCP 通信能力。
+/// 实现 DeviceDriver trait，通过连接池提供 Modbus TCP 通信能力。
 pub struct ModbusTcpDriver {
     /// 配置
-    config: ModbusTcpConfig,
+    config: ModbusTcpPoolConfig,
     /// 当前状态 (使用标准 Mutex 支持内部可变性)
     state: StdMutex<DriverState>,
-    /// TCP 流 (使用异步 Mutex 支持 &self 访问)
-    stream: AsyncMutex<Option<TcpStream>>,
+    /// 连接池
+    pool: Arc<ModbusTcpConnectionPool>,
     /// 事务 ID (原子递增)
     transaction_id: Arc<StdMutex<u16>>,
     /// 测点配置映射表 (point_id -> PointConfig)
@@ -129,34 +142,40 @@ unsafe impl Sync for ModbusTcpDriver {}
 
 impl ModbusTcpDriver {
     /// 创建新的驱动实例
-    pub fn new(config: ModbusTcpConfig) -> Self {
+    pub fn new(config: ModbusTcpPoolConfig) -> Self {
+        let pool = Arc::new(ModbusTcpConnectionPool::new(config.clone()));
         Self {
             config,
             state: StdMutex::new(DriverState::Disconnected),
-            stream: AsyncMutex::new(None),
+            pool,
             transaction_id: Arc::new(StdMutex::new(0)),
             point_configs: Arc::new(StdMutex::new(HashMap::new())),
         }
     }
 
-    /// 使用默认配置创建驱动
+    /// 使用默认配置创建驱动（pool_size = 4）
     pub fn with_defaults() -> Self {
-        Self::new(ModbusTcpConfig::default())
+        Self::new(ModbusTcpPoolConfig::default())
     }
 
     /// 配置主机和端口
     pub fn with_host_port(host: impl Into<String>, port: u16) -> Self {
-        Self::new(ModbusTcpConfig::new(host, port, 1, 3000))
+        Self::new(ModbusTcpPoolConfig::new(host, port, 1, 3000, 4))
     }
 
     /// 获取当前配置引用
-    pub fn config(&self) -> &ModbusTcpConfig {
+    pub fn config(&self) -> &ModbusTcpPoolConfig {
         &self.config
     }
 
     /// 获取当前状态
     pub fn state(&self) -> DriverState {
         *self.state.lock().unwrap()
+    }
+
+    /// 获取连接池引用
+    pub fn pool(&self) -> &Arc<ModbusTcpConnectionPool> {
+        &self.pool
     }
 
     /// 配置测点映射
@@ -188,91 +207,153 @@ impl ModbusTcpDriver {
         *tid
     }
 
-    /// 发送请求并接收响应
+    /// 判断 ModbusError 是否应该触发重试
+    fn should_retry(err: &ModbusError) -> bool {
+        matches!(
+            err,
+            ModbusError::IoError(_)
+                | ModbusError::Timeout { .. }
+                | ModbusError::ConnectionFailed(_)
+                | ModbusError::RemoteHostClosedConnection
+        )
+    }
+
+    /// 发送请求并接收响应（带连接池和重试逻辑）
     async fn send_request(&self, pdu: &Pdu) -> Result<Pdu, ModbusError> {
-        // 先获取事务 ID 和配置（不 borrow stream）
         let tid = self.next_transaction_id();
         let slave_id = self.config.slave_id;
+        let max_retries = self.config.pool_size.min(3);
+        let mut last_error = ModbusError::NotConnected;
 
-        let mut stream = self.stream.lock().await;
-        let stream = stream.as_mut().ok_or(ModbusError::NotConnected)?;
+        for _retry in 0..max_retries {
+            // 从池获取连接
+            let mut guard = match self.pool.acquire().await {
+                Ok(g) => g,
+                Err(e) => {
+                    last_error = e;
+                    break;
+                }
+            };
 
-        let mbap = MbapHeader::new(tid, slave_id, pdu.len() as u16);
+            let mbap = MbapHeader::new(tid, slave_id, pdu.len() as u16);
 
-        // 组装完整帧
-        let mut frame = Vec::with_capacity(MbapHeader::LENGTH + pdu.len());
-        frame.extend_from_slice(&mbap.to_bytes());
-        frame.extend_from_slice(&pdu.to_bytes());
+            // 组装完整帧
+            let mut frame = Vec::with_capacity(MbapHeader::LENGTH + pdu.len());
+            frame.extend_from_slice(&mbap.to_bytes());
+            frame.extend_from_slice(&pdu.to_bytes());
 
-        // 发送请求
-        stream.write_all(&frame).await.map_err(|e| {
-            *self.state.lock().unwrap() = DriverState::Error;
-            ModbusError::IoError(format!("Failed to send request: {}", e))
-        })?;
-
-        // 接收响应 - 先读取 MBAP 头部
-        let mut mbap_buf = [0u8; MbapHeader::LENGTH];
-        let duration = self.config.timeout();
-
-        let result = timeout(duration, stream.read_exact(&mut mbap_buf)).await;
-
-        match result {
-            Err(_) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                return Err(ModbusError::Timeout { duration });
+            // 发送请求
+            if let Err(e) = guard.write_all(&frame).await {
+                let modbus_err = ModbusError::IoError(format!("Failed to send request: {}", e));
+                if Self::should_retry(&modbus_err) {
+                    guard.mark_broken();
+                    drop(guard);
+                    last_error = modbus_err;
+                    continue;
+                }
+                return Err(modbus_err);
             }
-            Ok(Err(e)) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                return Err(ModbusError::IoError(format!("Failed to read MBAP: {}", e)));
+
+            // 接收响应 - 先读取 MBAP 头部
+            let mut mbap_buf = [0u8; MbapHeader::LENGTH];
+            let duration = self.config.timeout();
+
+            let result = timeout(duration, guard.read_exact(&mut mbap_buf)).await;
+
+            match result {
+                Err(_) => {
+                    let timeout_err = ModbusError::Timeout { duration };
+                    guard.mark_broken();
+                    drop(guard);
+                    last_error = timeout_err;
+                    continue;
+                }
+                Ok(Err(e)) => {
+                    let io_err = ModbusError::IoError(format!("Failed to read MBAP: {}", e));
+                    if Self::should_retry(&io_err) {
+                        guard.mark_broken();
+                        drop(guard);
+                        last_error = io_err;
+                        continue;
+                    }
+                    return Err(io_err);
+                }
+                Ok(Ok(_bytes_read)) => {
+                    // read_exact reads exactly len bytes
+                }
             }
-            Ok(Ok(_bytes_read)) => {
-                // read_exact reads exactly len bytes, so we don't need the count
+
+            // 解析 MBAP 头部
+            let response_mbap = match MbapHeader::parse(&mbap_buf) {
+                Ok(mbap) => mbap,
+                Err(e) => {
+                    // Protocol error: don't mark broken, don't retry
+                    return Err(e);
+                }
+            };
+
+            // 验证事务 ID
+            if response_mbap.transaction_id != tid {
+                return Err(ModbusError::MbapError(format!(
+                    "Transaction ID mismatch: expected {}, got {}",
+                    tid, response_mbap.transaction_id
+                )));
             }
+
+            // 读取 PDU 数据
+            let pdu_len = response_mbap.pdu_length() as usize;
+            let mut pdu_buf = vec![0u8; pdu_len];
+
+            let result = timeout(duration, guard.read_exact(&mut pdu_buf)).await;
+
+            match result {
+                Err(_) => {
+                    let timeout_err = ModbusError::Timeout { duration };
+                    guard.mark_broken();
+                    drop(guard);
+                    last_error = timeout_err;
+                    continue;
+                }
+                Ok(Err(e)) => {
+                    let io_err = ModbusError::IoError(format!("Failed to read PDU: {}", e));
+                    if Self::should_retry(&io_err) {
+                        guard.mark_broken();
+                        drop(guard);
+                        last_error = io_err;
+                        continue;
+                    }
+                    return Err(io_err);
+                }
+                Ok(Ok(_bytes_read)) => {
+                    // read_exact reads exactly len bytes
+                }
+            }
+
+            // 解析 PDU
+            let response_pdu = match Pdu::parse(&pdu_buf) {
+                Ok(pdu) => pdu,
+                Err(e) => {
+                    // Protocol error: don't mark broken, don't retry
+                    return Err(e);
+                }
+            };
+
+            // 检查是否为异常响应
+            if response_pdu.is_error_response() {
+                if let Some(exception_code) = response_pdu.exception_code() {
+                    let exception = ModbusException::from_u8(exception_code);
+                    // Modbus exception: don't mark connection broken, don't retry
+                    return Err(ModbusError::from(exception));
+                }
+            }
+
+            // 成功 - 连接正常，guard 会在 drop 时自动归还
+            return Ok(response_pdu);
         }
 
-        // 解析 MBAP 头部
-        let response_mbap = MbapHeader::parse(&mbap_buf)?;
-
-        // 验证事务 ID
-        if response_mbap.transaction_id != tid {
-            return Err(ModbusError::MbapError(format!(
-                "Transaction ID mismatch: expected {}, got {}",
-                tid, response_mbap.transaction_id
-            )));
-        }
-
-        // 读取 PDU 数据
-        let pdu_len = response_mbap.pdu_length() as usize;
-        let mut pdu_buf = vec![0u8; pdu_len];
-
-        let result = timeout(duration, stream.read_exact(&mut pdu_buf)).await;
-
-        match result {
-            Err(_) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                return Err(ModbusError::Timeout { duration });
-            }
-            Ok(Err(e)) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                return Err(ModbusError::IoError(format!("Failed to read PDU: {}", e)));
-            }
-            Ok(Ok(_bytes_read)) => {
-                // read_exact reads exactly len bytes
-            }
-        }
-
-        // 解析 PDU
-        let response_pdu = Pdu::parse(&pdu_buf)?;
-
-        // 检查是否为异常响应
-        if response_pdu.is_error_response() {
-            if let Some(exception_code) = response_pdu.exception_code() {
-                let exception = ModbusException::from_u8(exception_code);
-                return Err(ModbusError::from(exception));
-            }
-        }
-
-        Ok(response_pdu)
+        // 所有重试均失败
+        *self.state.lock().unwrap() = DriverState::Error;
+        Err(last_error)
     }
 
     /// 读取单个线圈值
@@ -338,7 +419,7 @@ impl ModbusTcpDriver {
 
 #[async_trait]
 impl DriverLifecycle for ModbusTcpDriver {
-    /// 连接到 Modbus TCP 服务器
+    /// 连接到 Modbus TCP 服务器（预建连接池）
     async fn connect(&mut self) -> Result<(), DriverError> {
         if *self.state.lock().unwrap() == DriverState::Connected {
             return Err(DriverError::AlreadyConnected);
@@ -346,31 +427,20 @@ impl DriverLifecycle for ModbusTcpDriver {
 
         *self.state.lock().unwrap() = DriverState::Connecting;
 
-        let addr = format!("{}:{}", self.config.host, self.config.port);
-        let duration = self.config.timeout();
+        self.pool.connect_all().await.map_err(|e| {
+            *self.state.lock().unwrap() = DriverState::Error;
+            DriverError::IoError(format!("Pool connect failed: {}", e))
+        })?;
 
-        let result = timeout(duration, TcpStream::connect(&addr)).await;
-
-        match result {
-            Err(_) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                Err(DriverError::Timeout { duration })
-            }
-            Ok(Err(e)) => {
-                *self.state.lock().unwrap() = DriverState::Error;
-                Err(DriverError::IoError(format!("Connection failed: {}", e)))
-            }
-            Ok(Ok(stream)) => {
-                *self.stream.lock().await = Some(stream);
-                *self.state.lock().unwrap() = DriverState::Connected;
-                Ok(())
-            }
-        }
+        *self.state.lock().unwrap() = DriverState::Connected;
+        Ok(())
     }
 
-    /// 断开与 Modbus TCP 服务器的连接
+    /// 断开与 Modbus TCP 服务器的连接（关闭所有池连接）
     async fn disconnect(&mut self) -> Result<(), DriverError> {
-        *self.stream.lock().await = None;
+        self.pool.disconnect_all().await.map_err(|e| {
+            DriverError::IoError(format!("Pool disconnect failed: {}", e))
+        })?;
         *self.state.lock().unwrap() = DriverState::Disconnected;
         Ok(())
     }
@@ -383,7 +453,7 @@ impl DriverLifecycle for ModbusTcpDriver {
 
 #[async_trait]
 impl DeviceDriver for ModbusTcpDriver {
-    type Config = ModbusTcpConfig;
+    type Config = ModbusTcpPoolConfig;
     type Error = DriverError;
 
     async fn connect(&mut self) -> Result<(), Self::Error> {
@@ -535,7 +605,7 @@ impl ModbusTcpDriver {
 mod tests {
     use super::*;
 
-    // ========== ModbusTcpConfig Tests ==========
+    // ========== ModbusTcpConfig Tests (backward compat) ==========
 
     #[test]
     fn test_modbus_tcp_config_default() {
@@ -559,6 +629,60 @@ mod tests {
     fn test_modbus_tcp_config_timeout() {
         let config = ModbusTcpConfig::new("localhost", 502, 1, 3000);
         assert_eq!(config.timeout(), Duration::from_millis(3000));
+    }
+
+    #[test]
+    fn test_modbus_tcp_config_to_pool_config() {
+        let config = ModbusTcpConfig::new("192.168.1.100", 1502, 5, 5000);
+        let pool_config: ModbusTcpPoolConfig = config.into();
+        assert_eq!(pool_config.host, "192.168.1.100");
+        assert_eq!(pool_config.port, 1502);
+        assert_eq!(pool_config.slave_id, 5);
+        assert_eq!(pool_config.timeout_ms, 5000);
+        assert_eq!(pool_config.pool_size, 1); // backward compat: single connection
+    }
+
+    // ========== ModbusTcpPoolConfig Tests ==========
+
+    #[test]
+    fn test_modbus_tcp_pool_config_default() {
+        let config = ModbusTcpPoolConfig::default();
+        assert_eq!(config.host, "127.0.0.1");
+        assert_eq!(config.port, 502);
+        assert_eq!(config.slave_id, 1);
+        assert_eq!(config.timeout_ms, 3000);
+        assert_eq!(config.pool_size, 4); // default pool size
+    }
+
+    #[test]
+    fn test_modbus_tcp_pool_config_new() {
+        let config = ModbusTcpPoolConfig::new("192.168.1.100", 1502, 1, 5000, 8);
+        assert_eq!(config.host, "192.168.1.100");
+        assert_eq!(config.port, 1502);
+        assert_eq!(config.timeout_ms, 5000);
+        assert_eq!(config.pool_size, 8);
+    }
+
+    #[test]
+    fn test_modbus_tcp_pool_config_addr() {
+        let config = ModbusTcpPoolConfig::new("192.168.1.100", 1502, 1, 5000, 4);
+        assert_eq!(config.addr(), "192.168.1.100:1502");
+    }
+
+    #[test]
+    fn test_modbus_tcp_pool_config_timeout() {
+        let config = ModbusTcpPoolConfig::new("localhost", 502, 1, 3000, 4);
+        assert_eq!(config.timeout(), Duration::from_millis(3000));
+    }
+
+    #[test]
+    fn test_modbus_tcp_pool_config_clamp() {
+        // pool_size=0 should clamp to 1
+        let config = ModbusTcpPoolConfig::new("localhost", 502, 1, 3000, 0);
+        assert_eq!(config.pool_size, 1);
+        // pool_size > MAX should clamp
+        let config = ModbusTcpPoolConfig::new("localhost", 502, 1, 3000, 65535);
+        assert_eq!(config.pool_size, 32); // MAX_POOL_SIZE
     }
 
     // ========== DriverState Tests ==========
@@ -600,16 +724,18 @@ mod tests {
 
     #[test]
     fn test_modbus_tcp_driver_new() {
-        let config = ModbusTcpConfig::new("localhost", 502, 1, 3000);
+        let config = ModbusTcpPoolConfig::new("localhost", 502, 1, 3000, 4);
         let driver = ModbusTcpDriver::new(config);
         assert_eq!(driver.state(), DriverState::Disconnected);
         assert!(driver.config().host == "localhost");
+        assert_eq!(driver.config().pool_size, 4);
     }
 
     #[test]
     fn test_modbus_tcp_driver_with_defaults() {
         let driver = ModbusTcpDriver::with_defaults();
         assert_eq!(driver.state(), DriverState::Disconnected);
+        assert_eq!(driver.config().pool_size, 4);
     }
 
     #[test]
@@ -617,12 +743,20 @@ mod tests {
         let driver = ModbusTcpDriver::with_host_port("192.168.1.1", 1502);
         assert_eq!(driver.config().host, "192.168.1.1");
         assert_eq!(driver.config().port, 1502);
+        assert_eq!(driver.config().pool_size, 4);
     }
 
     #[test]
     fn test_modbus_tcp_driver_not_connected() {
         let driver = ModbusTcpDriver::with_defaults();
         assert!(!DriverLifecycle::is_connected(&driver));
+    }
+
+    #[test]
+    fn test_modbus_tcp_driver_pool_access() {
+        let driver = ModbusTcpDriver::with_defaults();
+        let pool = driver.pool();
+        assert_eq!(pool.max_size(), 4);
     }
 
     #[test]
@@ -686,14 +820,50 @@ mod tests {
         assert_ne!(tid1, tid2);
     }
 
-    // ========== Connection Tests (需要 mock TCP 服务器) ==========
+    // ========== should_retry Tests ==========
+
+    #[test]
+    fn test_should_retry_io_error() {
+        assert!(ModbusTcpDriver::should_retry(&ModbusError::IoError(
+            "test".into()
+        )));
+    }
+
+    #[test]
+    fn test_should_retry_timeout() {
+        assert!(ModbusTcpDriver::should_retry(&ModbusError::Timeout {
+            duration: Duration::from_secs(1)
+        }));
+    }
+
+    #[test]
+    fn test_should_retry_connection_failed() {
+        assert!(ModbusTcpDriver::should_retry(
+            &ModbusError::ConnectionFailed("test".into())
+        ));
+    }
+
+    #[test]
+    fn test_should_not_retry_illegal_function() {
+        assert!(!ModbusTcpDriver::should_retry(
+            &ModbusError::IllegalFunction
+        ));
+    }
+
+    #[test]
+    fn test_should_not_retry_not_connected() {
+        assert!(!ModbusTcpDriver::should_retry(
+            &ModbusError::NotConnected
+        ));
+    }
+
+    // ========== Connection Tests (需 mock TCP 服务器) ==========
 
     #[tokio::test]
     async fn test_connect_invalid_host() {
-        let config = ModbusTcpConfig::new("192.0.2.1", 1502, 1, 1000); // TEST-NET-1, 不可路由
+        let config = ModbusTcpPoolConfig::new("192.0.2.1", 1502, 1, 2000, 2);
         let mut driver = ModbusTcpDriver::new(config);
         let result: Result<(), DriverError> = DriverLifecycle::connect(&mut driver).await;
-        // 连接应该超时或失败
         assert!(result.is_err());
         assert_eq!(driver.state(), DriverState::Error);
     }
@@ -728,11 +898,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_read_point_not_found() {
-        let config = ModbusTcpConfig::new("127.0.0.1", 1502, 1, 1000);
+        let config = ModbusTcpPoolConfig::new("127.0.0.1", 1502, 1, 2000, 2);
         let driver = ModbusTcpDriver::new(config);
 
-        // 连接可能会失败，但我们先测试测点未找到的情况
-        // 注意：这里假设连接会成功，实际测试需要 mock 服务器
         let point_id = Uuid::new_v4();
         let result = driver.read_point_async(point_id).await;
 
