@@ -82,14 +82,11 @@ impl StepEngine {
 
             let start_time = Utc::now();
 
-            // 获取驱动的只读引用（读锁）
+            // 获取驱动的引用（使用 tokio Mutex 锁 - async）
             // 注意：DeviceDriver::read_point/write_point 使用 &self（非 &mut self），
-            // 因此读锁足够。锁在此作用域内持有，步骤执行完毕后自动释放。
+            // 因此共享锁足够。锁在此作用域内持有，步骤执行完毕后自动释放。
             let result = {
-                let driver = driver_lock.read().map_err(|_| {
-                    EngineError::LockError("Failed to acquire driver lock".to_string())
-                })?;
-
+                let driver = driver_lock.lock().await;
                 // 构建 DriverAccess 适配器（泛型版本，支持任何 DeviceDriver 实现）
                 let driver_access = DriverAccessAdapter::new(&*driver);
 
@@ -243,7 +240,7 @@ mod tests {
         // Connect the virtual driver first
         {
             let driver_lock = engine.device_manager.get_device(device_id).unwrap();
-            let mut driver = driver_lock.write().unwrap();
+            let mut driver = driver_lock.lock().await;
             driver.connect().await.unwrap();
         }
 

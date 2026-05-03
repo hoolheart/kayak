@@ -6,6 +6,8 @@
 use crate::models::entities::device::ProtocolType;
 
 use super::error::DriverError;
+use super::modbus::rtu::{ModbusRtuConfig, ModbusRtuDriver};
+use super::modbus::tcp::{ModbusTcpConfig, ModbusTcpDriver};
 use super::r#virtual::{VirtualConfig, VirtualDriver};
 use super::wrapper::DriverWrapper;
 
@@ -37,6 +39,20 @@ impl DriverFactory {
                 let driver = VirtualDriver::with_config(config)
                     .map_err(|e| DriverError::ConfigError(e.to_string()))?;
                 Ok(DriverWrapper::new_virtual(driver))
+            }
+            ProtocolType::ModbusTcp => {
+                let config: ModbusTcpConfig = serde_json::from_value(config).map_err(|e| {
+                    DriverError::ConfigError(format!("Invalid Modbus TCP config: {}", e))
+                })?;
+                let driver = ModbusTcpDriver::new(config);
+                Ok(DriverWrapper::new_modbus_tcp(driver))
+            }
+            ProtocolType::ModbusRtu => {
+                let config: ModbusRtuConfig = serde_json::from_value(config).map_err(|e| {
+                    DriverError::ConfigError(format!("Invalid Modbus RTU config: {}", e))
+                })?;
+                let driver = ModbusRtuDriver::new(config);
+                Ok(DriverWrapper::new_modbus_rtu(driver))
             }
             _ => Err(DriverError::ConfigError(format!(
                 "Protocol {:?} not yet implemented",
@@ -95,7 +111,7 @@ mod tests {
     #[test]
     fn test_create_unsupported_protocol() {
         let config = serde_json::json!({});
-        let result = DriverFactory::create(ProtocolType::ModbusTcp, config);
+        let result = DriverFactory::create(ProtocolType::Can, config);
         assert!(result.is_err());
     }
 
@@ -103,5 +119,34 @@ mod tests {
     fn test_create_virtual_default() {
         let wrapper = DriverFactory::create_virtual_default();
         assert_eq!(wrapper.driver_type(), "virtual");
+    }
+
+    #[test]
+    fn test_create_modbus_tcp_driver() {
+        let config = serde_json::json!({
+            "host": "127.0.0.1",
+            "port": 502,
+            "slave_id": 1,
+            "timeout_ms": 3000
+        });
+
+        let result = DriverFactory::create(ProtocolType::ModbusTcp, config);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_create_modbus_rtu_driver() {
+        let config = serde_json::json!({
+            "port": "/dev/ttyUSB0",
+            "baud_rate": 9600,
+            "data_bits": 8,
+            "stop_bits": 1,
+            "parity": "None",
+            "timeout_ms": 3000,
+            "slave_id": 1
+        });
+
+        let result = DriverFactory::create(ProtocolType::ModbusRtu, config);
+        assert!(result.is_ok());
     }
 }

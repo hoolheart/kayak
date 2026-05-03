@@ -161,6 +161,9 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(point_routes(point_service))
         .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
+        // NEW: 协议列表与系统信息
+        .merge(protocol_routes())
+        .merge(system_routes())
         // API 404处理
         .fallback(not_found_handler);
 
@@ -228,6 +231,15 @@ fn device_routes(device_service: Arc<dyn DeviceService>) -> Router<()> {
             .route("/devices/{id}", get(device::get_device))
             .route("/devices/{id}", put(device::update_device))
             .route("/devices/{id}", delete(device::delete_device))
+            // NEW: R1-S2-005 设备连接测试
+            .route(
+                "/devices/{id}/test-connection",
+                post(device::test_connection),
+            )
+            // NEW: R1-S2-011 设备连接/断开/状态
+            .route("/devices/{id}/connect", post(device::connect_device))
+            .route("/devices/{id}/disconnect", post(device::disconnect_device))
+            .route("/devices/{id}/status", get(device::get_device_status))
             .with_state(device_service),
     )
 }
@@ -310,4 +322,20 @@ fn ws_routes(ws_state: experiment_ws::AppState) -> Router<()> {
 /// 获取健康检查路由（用于测试）
 pub fn health_routes() -> Router<()> {
     Router::new().route("/health", get(health::health_check))
+}
+
+/// 协议列表路由（无需服务状态，仅需认证）
+fn protocol_routes() -> Router<()> {
+    Router::new().route(
+        "/api/v1/protocols",
+        get(crate::api::handlers::protocol::list_protocols),
+    )
+}
+
+/// 系统信息路由（无需服务状态，仅需认证）
+fn system_routes() -> Router<()> {
+    Router::new().route(
+        "/api/v1/system/serial-ports",
+        get(crate::api::handlers::protocol::list_serial_ports),
+    )
 }

@@ -306,7 +306,7 @@ impl PointService for PointServiceImpl {
 
         // 直接同步调用（read_point 现在是同步方法）
         let value = {
-            let driver = driver_arc.read().unwrap();
+            let driver = driver_arc.lock().await;
             driver.read_point(point_id)?
         };
 
@@ -344,7 +344,7 @@ impl PointService for PointServiceImpl {
 
         // 直接同步调用（write_point 现在是同步方法）
         {
-            let driver = driver_arc.read().unwrap();
+            let driver = driver_arc.lock().await;
             driver.write_point(point_id, value)?;
         }
 

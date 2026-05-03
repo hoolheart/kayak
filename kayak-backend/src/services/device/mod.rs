@@ -6,4 +6,6 @@ pub mod types;
 
 pub use error::{CreateDeviceEntity, DeviceError, UpdateDeviceEntity};
 pub use service::{DeviceService, DeviceServiceImpl};
-pub use types::{DeviceDto, PagedDeviceDto};
+pub use types::{
+    DeviceConnectionStatus, DeviceDto, PagedDeviceDto, TestConnectionResult,
+};

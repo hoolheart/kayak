@@ -6,6 +6,7 @@
 use futures::future::join_all;
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
+use tokio::sync::Mutex;
 use uuid::Uuid;
 
 use super::error::DriverError;
@@ -15,12 +16,13 @@ use super::wrapper::DriverWrapper;
 /// 设备管理器
 ///
 /// 负责管理所有设备的生命周期，支持批量操作。
-/// 存储 `Arc<RwLock<DriverWrapper>>`，支持异构驱动类型。
+/// 存储 `Arc<Mutex<DriverWrapper>>`，支持异构驱动类型。
+/// 使用 Mutex（而非 RwLock）作为每设备锁，因为 MutexGuard 是 Send，
+/// 可在 #[async_trait] 上下文中跨 await 持有。
 pub struct DeviceManager {
-    devices: Arc<RwLock<HashMap<Uuid, Arc<RwLock<DriverWrapper>>>>>,
+    devices: Arc<RwLock<HashMap<Uuid, Arc<Mutex<DriverWrapper>>>>>,
 }
 
-#[allow(clippy::await_holding_lock)]
 impl DeviceManager {
     /// 创建新的设备管理器
     pub fn new() -> Self {
@@ -46,8 +48,8 @@ impl DeviceManager {
                 id
             )));
         }
-        // 将驱动包装在 RwLock 中以支持可变访问
-        devices.insert(id, Arc::new(RwLock::new(driver)));
+        // 将驱动包装在 Mutex 中以支持可变访问
+        devices.insert(id, Arc::new(Mutex::new(driver)));
         Ok(())
     }
 
@@ -62,20 +64,20 @@ impl DeviceManager {
 
     /// 获取设备驱动引用
     ///
-    /// 返回 `Arc<RwLock<DriverWrapper>>`，可直接作为 DriverAccess 使用。
+    /// 返回 `Arc<Mutex<DriverWrapper>>`，可直接作为 DriverAccess 使用。
     /// 使用者需要通过锁来调用 `connect()` 或 `disconnect()` 等需要 `&mut self` 的方法。
     ///
     /// # Example
     /// ```ignore
     /// if let Some(driver_lock) = manager.get_device(id) {
-    ///     let mut driver = driver_lock.write().unwrap();
+    ///     let mut driver = driver_lock.lock().unwrap();
     ///     driver.connect().await?;
     /// }
     /// ```
     pub fn get_device(
         &self,
         id: Uuid,
-    ) -> Option<Arc<RwLock<DriverWrapper>>> {
+    ) -> Option<Arc<Mutex<DriverWrapper>>> {
         let devices = self.devices.read().unwrap();
         devices.get(&id).cloned()
     }
@@ -98,10 +100,10 @@ impl DeviceManager {
         let futures = device_locks.into_iter().map(
             |(id, driver_lock): (
                 Uuid,
-                Arc<RwLock<DriverWrapper>>,
+                Arc<Mutex<DriverWrapper>>,
             )| async move {
-                // 获取可变访问权限
-                let mut driver = driver_lock.write().unwrap();
+                // 获取可变访问权限（tokio Mutex - async）
+                let mut driver = driver_lock.lock().await;
                 match driver.connect().await {
                     Ok(()) => Ok(id),
                     Err(e) => Err((id, e)),
@@ -130,10 +132,10 @@ impl DeviceManager {
         let futures = device_locks.into_iter().map(
             |(id, driver_lock): (
                 Uuid,
-                Arc<RwLock<DriverWrapper>>,
+                Arc<Mutex<DriverWrapper>>,
             )| async move {
-                // 获取可变访问权限
-                let mut driver = driver_lock.write().unwrap();
+                // 获取可变访问权限（tokio Mutex - async）
+                let mut driver = driver_lock.lock().await;
                 match driver.disconnect().await {
                     Ok(()) => Ok(id),
                     Err(e) => Err((id, e)),
@@ -147,6 +149,44 @@ impl DeviceManager {
     /// 获取已注册设备数量
     pub fn device_count(&self) -> usize {
         self.devices.read().unwrap().len()
+    }
+
+    /// 连接指定设备（持久连接）
+    ///
+    /// 获取设备驱动并建立连接。使用 tokio::sync::Mutex 使得
+    /// guard 可跨 await 持有（MutexGuard 是 Send）。
+    pub async fn connect_device(&self, id: Uuid) -> Result<(), DriverError> {
+        let lock = self
+            .get_device(id)
+            .ok_or_else(|| DriverError::ConfigError(format!("Device {} not found", id)))?;
+        let mut driver = lock.lock().await;
+        driver.connect().await
+    }
+
+    /// 断开指定设备连接
+    ///
+    /// 获取设备驱动并断开连接。
+    pub async fn disconnect_device(&self, id: Uuid) -> Result<(), DriverError> {
+        let lock = match self.get_device(id) {
+            Some(l) => l,
+            None => return Ok(()), // not registered → already disconnected
+        };
+        let mut driver = lock.lock().await;
+        driver.disconnect().await
+    }
+
+    /// 检查设备是否已连接
+    ///
+    /// 查询指定设备的实时连接状态。
+    /// 若设备未注册到管理器，返回 false。
+    pub async fn is_device_connected(&self, id: Uuid) -> bool {
+        match self.get_device(id) {
+            Some(lock) => {
+                let driver = lock.lock().await;
+                driver.is_connected()
+            }
+            None => false,
+        }
     }
 }
 
@@ -195,5 +235,16 @@ mod tests {
         manager.register_device(id, driver1).unwrap();
         let result = manager.register_device(id, driver2);
         assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_is_device_connected() {
+        let manager = DeviceManager::new();
+        let id = Uuid::new_v4();
+        let driver = DriverFactory::create_virtual_default();
+
+        manager.register_device(id, driver).unwrap();
+        // Initially disconnected
+        assert!(!manager.is_device_connected(id).await);
     }
 }
