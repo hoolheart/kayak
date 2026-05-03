@@ -371,12 +371,152 @@
 
 ---
 
+## 9. Sprint 2 后端 API 补充（审计发现）
+
+> **审计来源**: `log/release_1/review/mock_code_audit.md` 分类②  
+> **说明**: 前端 `protocol_service.dart` 和 `device_list_tab.dart` 调用了不存在的后端 API 或缺少后端端点，导致功能不可用（返回 404 或按钮无响应）。其中 3 项已在 Sprint 2 任务中规划，1 项（设备连接/断开）为新增。
+
+---
+
+### 9.1 GET /api/v1/protocols — 获取支持的协议列表
+
+| 字段 | 内容 |
+|------|------|
+| **审计项** | 审计报告 #8 (`protocol_service.dart:19`) |
+| **状态** | ✅ 已规划 — `R1-S2-004-B`（协议列表与串口扫描API） |
+| **任务描述** | 返回后端支持的所有协议类型列表及每种协议的配置 Schema。前端 `protocol_service.dart` 已调用此 API 但后端 `routes.rs` 中无对应路由，当前返回 404 |
+| **调用方** | `protocol_selector.dart` → `protocol_service.dart:19` |
+| **影响** | 协议选择器无法获取可用协议列表，Modbus TCP/RTU 配置表单无法正确显示协议选项 |
+| **验收标准** | 1. 返回 JSON 数组，每项包含 `id`, `name`, `config_schema`<br>2. 前端协议选择器可正确展示 |
+
+---
+
+### 9.2 GET /api/v1/system/serial-ports — 获取可用串口列表
+
+| 字段 | 内容 |
+|------|------|
+| **审计项** | 审计报告 #8 (`protocol_service.dart:28`) |
+| **状态** | ✅ 已规划 — `R1-S2-004-B`（协议列表与串口扫描API） |
+| **任务描述** | 扫描系统可用串口，返回端口列表（含端口名、描述、硬件信息）。前端 `protocol_service.dart` 已调用此 API 但后端 `routes.rs` 中无对应路由，当前返回 404 |
+| **调用方** | `modbus_rtu_form.dart` → `protocol_service.dart:28` |
+| **影响** | Modbus RTU 配置表单的串口下拉框无法显示可用串口 |
+| **验收标准** | 1. Linux 返回 `/dev/ttyUSB*`, `/dev/ttyACM*` 等<br>2. macOS 返回 `/dev/tty.*`, `/dev/cu.*` 等<br>3. Windows 返回 `COM1`, `COM2` 等<br>4. 无串口时返回空数组而非报错 |
+
+---
+
+### 9.3 POST /api/v1/devices/{id}/test-connection — 测试设备连接
+
+| 字段 | 内容 |
+|------|------|
+| **审计项** | 审计报告 #8 (`protocol_service.dart:41`) |
+| **状态** | ✅ 已规划 — `R1-S2-003-B`（全栈实现）+ `R1-S2-005-B`（后端 API） |
+| **任务描述** | 根据设备配置创建临时驱动实例，尝试连接目标设备，返回连接结果和延迟时间。前端 `protocol_service.dart` 已调用此 API 但后端 `routes.rs` 中无对应路由，当前返回 404 |
+| **调用方** | `modbus_tcp_form.dart:109` → `protocol_service.dart:41`<br>`modbus_rtu_form.dart:154` → `protocol_service.dart:41` |
+| **影响** | 设备配置表单中"测试连接"按钮点击后连接测试失败（404），用户无法验证设备配置是否正确 |
+| **验收标准** | 1. 返回 `{ connected: bool, latency_ms: int, error?: string }`<br>2. 支持 Virtual/Modbus TCP/Modbus RTU 三种协议<br>3. 连接失败时返回友好错误信息<br>4. 前端显示测试结果和延迟 |
+
+---
+
+### 9.4 POST /api/v1/devices/{id}/connect + /api/v1/devices/{id}/disconnect — 设备连接/断开管理（🆕 新增）
+
+| 字段 | 内容 |
+|------|------|
+| **审计项** | 审计报告 #5 (`device_list_tab.dart:213`) |
+| **状态** | ❌ 未规划 — **需新增 Sprint 2 任务** |
+| **任务描述** | 实现设备上线/下线状态管理 API。前端设备列表 Tab 中"连接/断开"按钮当前为 TODO，需要后端提供 connect/disconnect 端点来实际切换设备连接状态，并与前端 UI 状态联动 |
+| **调用方** | `device_list_tab.dart:213`（"连接/断开"按钮目前为 TODO 占位） |
+| **影响** | 用户无法在工作台详情页启用/停用设备连接，设备始终处于未知状态 |
+
+#### 9.4.1 R1-S2-011-A: 设备连接/断开 API — 测试用例设计
+
+| 字段 | 内容 |
+|------|------|
+| **任务名称** | 设备连接/断开 API — 测试用例设计 |
+| **任务描述** | sw-mike 设计测试用例：1) `connect` 成功启动设备驱动并返回状态测试 2) `disconnect` 成功关闭设备驱动测试 3) 重复 connect 幂等性测试 4) 重复 disconnect 幂等性测试 5) 连接失败错误处理测试（设备不可达）6) Virtual/Modbus TCP/Modbus RTU 三种协议类型测试 7) 连接状态查询 API 测试 |
+| **预估工时** | 2h |
+| **依赖任务** | R1-S2-005-D（设备连接测试 API 完成） |
+| **验收标准** | 1. 测试用例覆盖所有连接生命周期场景<br>2. 测试用例文档保存到 `log/release_1/test/` |
+| **分配角色** | sw-mike (测试) |
+
+#### 9.4.2 R1-S2-011-B: 设备连接/断开 API — 详细设计
+
+| 字段 | 内容 |
+|------|------|
+| **任务名称** | 设备连接/断开 API — 详细设计 |
+| **任务描述** | sw-jerry 编写详细设计：1) `POST /api/v1/devices/{id}/connect` 端点设计（请求/响应格式）2) `POST /api/v1/devices/{id}/disconnect` 端点设计 3) `GET /api/v1/devices/{id}/status` 连接状态查询端点设计 4) 与 DeviceManager 集成方案 5) 连接状态机设计（disconnected → connecting → connected → disconnecting → disconnected）6) 并发连接安全性设计 |
+| **预估工时** | 2h |
+| **依赖任务** | R1-S2-011-A（了解测试需求） |
+| **验收标准** | 1. 详细设计文档保存到 `log/release_1/design/`<br>2. 包含状态机图和 API 契约定义 |
+| **分配角色** | sw-jerry (架构设计) |
+
+#### 9.4.3 R1-S2-011-C: 设备连接/断开 API — 开发实现
+
+| 字段 | 内容 |
+|------|------|
+| **任务名称** | 设备连接/断开 API — 开发实现 |
+| **任务描述** | sw-tom 实现：1) 在 `routes.rs` 注册 `POST /api/v1/devices/{id}/connect` 和 `POST /api/v1/devices/{id}/disconnect` 路由 2) 实现连接/断开 handler（调用 DeviceManager 启动/停止驱动实例）3) 实现设备连接状态管理（内存状态 + 持久化）4) 实现 `GET /api/v1/devices/{id}/status` 查询端点 5) 实现并发安全（同一设备不可重复 connect）6) 前端 `device_list_tab.dart:213` 接入 API，实现按钮状态切换和 UI 联动 |
+| **预估工时** | 8h |
+| **依赖任务** | R1-S2-011-B（设计批准） |
+| **验收标准** | 1. `POST .../connect` 成功启动驱动并返回 `{ status: "connected" }`<br>2. `POST .../disconnect` 成功停止驱动并返回 `{ status: "disconnected" }`<br>3. `GET .../status` 返回当前连接状态<br>4. 前端按钮文案随状态切换（连接 ↔ 断开）<br>5. `cargo check` 通过<br>6. `flutter build web` 无错误 |
+| **分配角色** | sw-tom (开发) |
+
+#### 9.4.4 R1-S2-011-D: 设备连接/断开 API — 代码审查
+
+| 字段 | 内容 |
+|------|------|
+| **任务名称** | 设备连接/断开 API — 代码审查 |
+| **任务描述** | sw-jerry 审查代码：1) 检查 API 设计合理性 2) 检查 DeviceManager 集成正确性 3) 检查连接状态机实现 4) 检查并发安全性 5) 检查前端状态管理 |
+| **预估工时** | 1h |
+| **依赖任务** | R1-S2-011-C（开发完成并推送） |
+| **验收标准** | 1. 审查报告保存到 `log/release_1/review/`<br>2. 所有问题修复<br>3. 零警告通过 |
+| **分配角色** | sw-jerry (代码审查) |
+
+#### 9.4.5 R1-S2-011-E: 设备连接/断开 API — 测试执行
+
+| 字段 | 内容 |
+|------|------|
+| **任务名称** | 设备连接/断开 API — 测试执行 |
+| **任务描述** | sw-mike 执行测试：1) 运行后端单元测试 2) 运行前端 Widget 测试 3) 端到端验证（连接 → 读取数据 → 断开 → 再次连接）4) 并发连接安全性验证 5) 生成测试报告 |
+| **预估工时** | 2h |
+| **依赖任务** | R1-S2-011-D（代码审查通过） |
+| **验收标准** | 1. 所有测试通过<br>2. 测试覆盖率 > 80%<br>3. 测试报告保存到 `log/release_1/test/` |
+| **分配角色** | sw-mike (测试) |
+
+---
+
+#### 9.4 任务小结
+
+| 子任务 | 角色 | 工时 |
+|--------|------|------|
+| R1-S2-011-A (测试设计) | sw-mike | 2h |
+| R1-S2-011-B (详细设计) | sw-jerry | 2h |
+| R1-S2-011-C (开发实现) | sw-tom | 8h |
+| R1-S2-011-D (代码审查) | sw-jerry | 1h |
+| R1-S2-011-E (测试执行) | sw-mike | 2h |
+| **R1-S2-011 合计** | | **15h** |
+
+---
+
+### 9.5 Sprint 2 API 补充任务依赖关系
+
+```
+R1-S2-005-D (连接测试API完成)
+        │
+        ▼
+R1-S2-011-A (测试用例设计) → R1-S2-011-B (详细设计) → R1-S2-011-C (开发实现) → R1-S2-011-D (代码审查) → R1-S2-011-E (测试执行)
+```
+
+> **注**: R1-S2-004（协议列表+串口扫描 API）和 R1-S2-003/R1-S2-005（连接测试 API）已在主任务列表中规划，本节仅补充遗漏的设备连接/断开端点任务。
+
+---
+
 ## 任务统计与Release规划
 
 ### 按模块统计
 
 | 模块 | 任务数 | 总工时 | 建议Release |
 |------|--------|--------|-------------|
+| Sprint 2 后端 API 补充（审计） | 1 | 15h | R1-S2 |
 | 协议支持(CAN/VISA/MQTT) | 4 | 84h | R2-R3 |
 | 试验方法编辑器 | 4 | 128h | R2-R3 |
 | 数据分析模块 | 6 | 184h | R2-R3 |
@@ -385,13 +525,13 @@
 | 高级功能 | 4 | 80h | R3 |
 | 部署扩展 | 3 | 56h | R2-R3 |
 | 性能优化 | 3 | 80h | R3 |
-| **总计** | **30** | **740h** | **R2-R3** |
+| **总计** | **31** | **755h** | **R1-S2~R3** |
 
 ### Release规划建议
 
 | Release | 主要内容 | 预估工时 | 建议周期 |
 |---------|----------|----------|----------|
-| Release 1 | Modbus TCP/RTU协议、模拟设备、协议配置UI | ~170h | 4周 (已完成规划) |
+| Release 1 | Modbus TCP/RTU协议、模拟设备、协议配置UI、设备连接管理API | ~185h | 4周 (含 Sprint 2 补充) |
 | Release 2 | 可视化编辑器、Python SDK、团队管理、CAN/VISA协议、数据分析基础 | ~400h | 10周 |
 | Release 3 | 数据分析高级功能、高级功能、性能优化、MQTT协议、PostgreSQL | ~340h | 8周 |
 
