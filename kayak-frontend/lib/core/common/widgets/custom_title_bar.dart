@@ -1,12 +1,18 @@
 /// Custom Title Bar for Desktop
 ///
-/// Provides drag-to-move functionality and window controls
+/// Provides drag-to-move functionality and window controls.
+/// On Web platform, this widget renders nothing since the browser
+/// provides its own title bar / window controls.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/window_manager.dart'
+    if (dart.library.html) 'stub.dart';
 
-/// Custom title bar widget for desktop application
+/// Custom title bar widget for desktop application.
+///
+/// On Web, this widget returns an empty SizedBox(0).
 class CustomTitleBar extends StatefulWidget {
   const CustomTitleBar({super.key});
 
@@ -14,56 +20,56 @@ class CustomTitleBar extends StatefulWidget {
   State<CustomTitleBar> createState() => _CustomTitleBarState();
 }
 
-class _CustomTitleBarState extends State<CustomTitleBar> with WindowListener {
+class _CustomTitleBarState extends State<CustomTitleBar> {
   bool _isMaximized = false;
 
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
-    _checkMaximized();
-  }
-
-  @override
-  void dispose() {
-    windowManager.removeListener(this);
-    super.dispose();
+    if (!kIsWeb) {
+      _checkMaximized();
+    }
   }
 
   Future<void> _checkMaximized() async {
-    final isMaximized = await windowManager.isMaximized();
-    if (mounted && isMaximized != _isMaximized) {
-      setState(() {
-        _isMaximized = isMaximized;
-      });
+    try {
+      final isMaximized = await windowManager.isMaximized();
+      if (mounted && isMaximized != _isMaximized) {
+        setState(() => _isMaximized = isMaximized);
+      }
+    } catch (e) {
+      // Ignore on unsupported platforms
     }
   }
 
   @override
-  void onWindowMaximize() {
-    setState(() {
-      _isMaximized = true;
-    });
-  }
-
-  @override
-  void onWindowUnmaximize() {
-    setState(() {
-      _isMaximized = false;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Web 平台：不显示自定义标题栏（浏览器自带窗口控制）
+    if (kIsWeb) {
+      return const SizedBox.shrink();
+    }
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
-      onPanStart: (_) => windowManager.startDragging(),
+      onPanStart: (_) {
+        try {
+          windowManager.startDragging();
+        } catch (e) {
+          // Ignore
+        }
+      },
       onDoubleTap: () async {
-        if (_isMaximized) {
-          await windowManager.unmaximize();
-        } else {
-          await windowManager.maximize();
+        try {
+          if (_isMaximized) {
+            await windowManager.unmaximize();
+            setState(() => _isMaximized = false);
+          } else {
+            await windowManager.maximize();
+            setState(() => _isMaximized = true);
+          }
+        } catch (e) {
+          // Ignore
         }
       },
       child: Container(
@@ -72,7 +78,6 @@ class _CustomTitleBarState extends State<CustomTitleBar> with WindowListener {
         child: Row(
           children: [
             const SizedBox(width: 16),
-            // App icon and title
             Icon(
               Icons.science,
               size: 20,
@@ -88,26 +93,42 @@ class _CustomTitleBarState extends State<CustomTitleBar> with WindowListener {
               ),
             ),
             const Spacer(),
-            // Window controls
             _WindowButton(
               icon: Icons.remove,
-              onPressed: () => windowManager.minimize(),
+              onPressed: () {
+                try {
+                  windowManager.minimize();
+                } catch (e) {
+                  // Ignore
+                }
+              },
               tooltip: 'Minimize',
             ),
             _WindowButton(
               icon: _isMaximized ? Icons.filter_none : Icons.crop_square,
               onPressed: () async {
-                if (_isMaximized) {
-                  await windowManager.unmaximize();
-                } else {
-                  await windowManager.maximize();
+                try {
+                  if (_isMaximized) {
+                    await windowManager.unmaximize();
+                  } else {
+                    await windowManager.maximize();
+                  }
+                  setState(() => _isMaximized = !_isMaximized);
+                } catch (e) {
+                  // Ignore
                 }
               },
               tooltip: _isMaximized ? 'Restore' : 'Maximize',
             ),
             _WindowButton(
               icon: Icons.close,
-              onPressed: () => windowManager.close(),
+              onPressed: () {
+                try {
+                  windowManager.close();
+                } catch (e) {
+                  // Ignore
+                }
+              },
               tooltip: 'Close',
               isClose: true,
             ),
@@ -184,7 +205,9 @@ class _WindowButtonState extends State<_WindowButton> {
   }
 }
 
-/// Title bar wrapper that adds the custom title bar to any page
+/// Title bar wrapper that adds the custom title bar to any page.
+///
+/// On Web, it simply returns the child without a title bar.
 class TitleBarWrapper extends StatelessWidget {
   final Widget child;
 
@@ -195,6 +218,9 @@ class TitleBarWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return child;
+    }
     return Column(
       children: [
         const CustomTitleBar(),

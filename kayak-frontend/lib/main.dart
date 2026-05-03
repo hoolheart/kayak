@@ -1,30 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'app.dart';
+import 'core/platform/desktop_init_real.dart'
+    if (dart.library.html) 'core/platform/desktop_init_stub.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 初始化窗口管理器（桌面平台）
-  await windowManager.ensureInitialized();
-
-  const windowOptions = WindowOptions(
-    size: Size(1280, 800),
-    minimumSize: Size(800, 600),
-    center: true,
-    title: 'Kayak - 科学研究支持平台',
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    // titleBarStyle: TitleBarStyle.hidden, // 使用自定义标题栏
-  );
-
-  await windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+  // 初始化桌面窗口管理器（Web 平台使用存根实现）
+  await initDesktopWindow();
 
   // 设置首选方向
   await SystemChrome.setPreferredOrientations([

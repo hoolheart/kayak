@@ -57,7 +57,7 @@ class AppTypography {
       // Title styles - 用于卡片、对话框标题
       titleLarge: TextStyle(
         fontSize: 22,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w500,
         letterSpacing: 0,
         height: 1.27,
       ),
