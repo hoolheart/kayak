@@ -169,10 +169,16 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
       });
 
       // 5s 后自动重置成功状态
+      // Guard against stale timers: check _testState is still success,
+      // in case a re-test changed the state to failed in between.
       if (result.success) {
         Future.delayed(const Duration(seconds: 5), () {
-          if (mounted) {
-            setState(() => _testState = ConnectionTestState.idle);
+          if (mounted && _testState == ConnectionTestState.success) {
+            setState(() {
+              _testState = ConnectionTestState.idle;
+              _testMessage = null;
+              _testLatencyMs = null;
+            });
           }
         });
       }

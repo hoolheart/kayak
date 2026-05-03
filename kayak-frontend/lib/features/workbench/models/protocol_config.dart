@@ -243,7 +243,9 @@ class ConnectionTestResult {
 
   factory ConnectionTestResult.fromJson(Map<String, dynamic> json) =>
       ConnectionTestResult(
-        success: json['success'] as bool,
+        // Backend TestConnectionResult field is named "connected", not "success"
+        // See: kayak-backend/src/services/device/types.rs:41
+        success: json['connected'] as bool,
         latencyMs: json['latency_ms'] as int?,
         message: json['message'] as String? ?? '',
       );
