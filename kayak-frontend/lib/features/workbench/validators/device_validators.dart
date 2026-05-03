@@ -107,4 +107,79 @@ class DeviceValidators {
     }
     return null;
   }
+
+  // === Modbus 测点配置验证 ===
+
+  /// Modbus 地址验证 (0-65535)
+  static String? modbusAddress(String? value) {
+    if (value == null || value.trim().isEmpty) return '请输入 Modbus 地址';
+    final addr = int.tryParse(value.trim());
+    if (addr == null) return '请输入有效数字';
+    if (addr < 0 || addr > 65535) return '地址范围 0-65535';
+    return null;
+  }
+
+  /// Modbus 数量验证 (1-125)
+  static String? modbusQuantity(String? value) {
+    if (value == null || value.trim().isEmpty) return '请输入数量';
+    final qty = int.tryParse(value.trim());
+    if (qty == null) return '请输入有效数字';
+    if (qty < 1 || qty > 125) return '数量范围 1-125';
+    return null;
+  }
+
+  /// Modbus 地址 + 数量联合约束验证 (非 float32 场景)
+  ///
+  /// address + quantity ≤ 65536
+  static String? modbusAddressQuantity(String? address, String? quantity) {
+    if (address == null || address.trim().isEmpty) return null;
+    if (quantity == null || quantity.trim().isEmpty) return null;
+    final addr = int.tryParse(address.trim());
+    final qty = int.tryParse(quantity.trim());
+    if (addr == null || qty == null) return null;
+    if (addr + qty > 65536) return '地址+数量超出范围 (最大65536)';
+    return null;
+  }
+
+  /// Modbus float32 类型数量双重约束验证
+  ///
+  /// 1. quantity × 2 ≤ 125   (float32 每个占2个寄存器, 最多62个)
+  /// 2. address + quantity × 2 ≤ 65536
+  static String? modbusQuantityForFloat32(String? quantity, String? address) {
+    if (quantity == null || quantity.trim().isEmpty) return null;
+    final qty = int.tryParse(quantity.trim());
+    if (qty == null) return null;
+
+    // 基本数量约束 (1-125)
+    if (qty < 1 || qty > 125) return '数量范围 1-125';
+
+    // float32 数量上限约束 (quantity × 2 ≤ 125, 即 quantity ≤ 62)
+    if (qty * 2 > 125) return 'float32 类型下数量不能超过 62';
+
+    // 地址+寄存器数联合约束
+    if (address != null && address.trim().isNotEmpty) {
+      final addr = int.tryParse(address.trim());
+      if (addr != null) {
+        if (addr + qty * 2 > 65536) return '地址+数量超出范围 (最大65536)';
+      }
+    }
+
+    return null;
+  }
+
+  /// Modbus 缩放因子验证 (有效浮点数)
+  static String? modbusScale(String? value) {
+    if (value == null || value.trim().isEmpty) return '请输入有效数字';
+    final scale = double.tryParse(value.trim());
+    if (scale == null) return '请输入有效数字';
+    return null;
+  }
+
+  /// Modbus 偏移量验证 (有效浮点数)
+  static String? modbusOffset(String? value) {
+    if (value == null || value.trim().isEmpty) return '请输入有效数字';
+    final offset = double.tryParse(value.trim());
+    if (offset == null) return '请输入有效数字';
+    return null;
+  }
 }
