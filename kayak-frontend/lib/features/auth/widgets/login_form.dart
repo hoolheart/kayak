@@ -7,6 +7,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../validators/validators.dart';
+import '../../../core/auth/providers.dart';
 import '../providers/login_provider.dart';
 import 'email_field.dart';
 import 'password_field.dart';
@@ -56,18 +57,24 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             controller: _passwordController,
             focusNode: _passwordFocusNode,
             enabled: !isLoading,
-            onSubmitted: (_) => _submitForm(),
+            onSubmitted: (_) {
+              _submitForm();
+            },
           ),
           const SizedBox(height: 24),
           LoginButton(
-            onPressed: isLoading ? null : _submitForm,
+            onPressed: isLoading
+                ? null
+                : () {
+                    _submitForm();
+                  },
           ),
         ],
       ),
     );
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     // 验证表单
     final emailError = Validators.validateEmail(_emailController.text);
     final passwordError = Validators.validatePassword(_passwordController.text);
@@ -87,12 +94,21 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
     // 提交登录
     ref.read(loginProvider.notifier).setLoading();
-    // TODO: 调用后端API进行登录
-    // 模拟登录成功，直接跳转
-    Future.delayed(const Duration(seconds: 1), () {
+
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    try {
+      await ref.read(authStateNotifierProvider).login(email, password);
+      // 登录成功后，AuthStateNotifier 会设置认证状态为已登录，
+      // 路由器通过 AuthStateChangeNotifier 检测到状态变化后自动跳转到仪表盘
       if (mounted) {
         ref.read(loginProvider.notifier).setSuccess();
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        ref.read(loginProvider.notifier).setErrorMessage(e.toString());
+      }
+    }
   }
 }

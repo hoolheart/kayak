@@ -85,6 +85,15 @@ class LoginNotifier extends StateNotifier<LoginState> {
     state = LoginState.error(type);
   }
 
+  /// 使用原始错误消息设置错误状态（用于异常捕获）
+  void setErrorMessage(String message) {
+    state = LoginState(
+      status: LoginStatus.error,
+      errorMessage: message,
+      errorType: LoginErrorType.unknown,
+    );
+  }
+
   void reset() => state = LoginState.idle();
 }
 
