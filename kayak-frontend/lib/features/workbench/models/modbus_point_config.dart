@@ -252,9 +252,7 @@ class PointConfigFormState {
   });
 
   /// 带默认值的初始状态
-  factory PointConfigFormState.initial() => const PointConfigFormState(
-        
-      );
+  factory PointConfigFormState.initial() => const PointConfigFormState();
 
   /// 从 ModbusPointConfig 预填充
   factory PointConfigFormState.fromConfig(ModbusPointConfig config) {
