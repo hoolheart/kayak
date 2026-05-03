@@ -101,6 +101,8 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
     if (DeviceValidators.slaveId(_slaveIdController.text) != null) return false;
     // 串口参数组合验证 (Modbus RTU 不支持 7N1)
     if (_dataBits == 7 && _parity == 'None') return false;
+    // 超时验证
+    if (DeviceValidators.timeout(_timeoutController.text) != null) return false;
     return true;
   }
 
