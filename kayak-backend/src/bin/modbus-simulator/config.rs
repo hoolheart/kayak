@@ -86,9 +86,9 @@ pub struct CliArgs {
     #[arg(short = 'v', long = "verbose")]
     pub verbose: bool,
 
-    /// Log level [possible values: trace, debug, info, warn, error] [default: info]
-    #[arg(long = "log-level", value_name = "LEVEL", default_value = DEFAULT_LOG_LEVEL)]
-    pub log_level: String,
+    /// Log level [possible values: trace, debug, info, warn, error]
+    #[arg(long = "log-level", value_name = "LEVEL")]
+    pub log_level: Option<String>,
 }
 
 // ============================================================================
@@ -227,7 +227,7 @@ impl SimulatorConfig {
             config.port = port;
         }
         if let Some(slave_id) = cli.slave_id {
-            if slave_id < 1 || slave_id > 247 {
+            if !(1..=247).contains(&slave_id) {
                 return Err(format!(
                     "Invalid slave-id: {}. Must be between 1 and 247.",
                     slave_id
@@ -244,8 +244,8 @@ impl SimulatorConfig {
         if cli.verbose {
             config.verbose = true;
             config.log_level = "debug".to_string();
-        } else {
-            config.log_level = cli.log_level.clone();
+        } else if let Some(ref level) = cli.log_level {
+            config.log_level = level.clone();
         }
 
         Ok(config)
@@ -501,7 +501,7 @@ mod tests {
         assert!(args.port.is_none());
         assert!(args.slave_id.is_none());
         assert!(!args.verbose);
-        assert_eq!(args.log_level, "info");
+        assert_eq!(args.log_level, None);
     }
 
     #[test]
