@@ -11,6 +11,7 @@ import '../../providers/device_tree_provider.dart';
 import '../../providers/point_list_provider.dart';
 import '../../models/device.dart';
 import '../../models/point.dart';
+import '../../services/device_service.dart';
 import '../../../../core/theme/color_schemes.dart';
 
 /// 设备列表Tab内容组件
@@ -136,6 +137,42 @@ class _DeviceCard extends ConsumerStatefulWidget {
 
 class _DeviceCardState extends ConsumerState<_DeviceCard> {
   bool _isHovering = false;
+  bool _isConnecting = false;
+
+  Future<void> _toggleConnection() async {
+    if (_isConnecting) return;
+
+    setState(() => _isConnecting = true);
+    try {
+      final deviceService = ref.read(deviceServiceProvider);
+      if (widget.device.status == DeviceStatus.online) {
+        await deviceService.disconnectDevice(widget.device.id);
+      } else {
+        await deviceService.connectDevice(widget.device.id);
+      }
+      // 刷新设备树以更新状态
+      if (mounted) {
+        // WorkbenchId is needed for refresh, derive from device
+        final workbenchId = widget.device.workbenchId;
+        ref.read(deviceTreeProvider(workbenchId).notifier).refresh();
+      }
+    } catch (_) {
+      // Connection toggle failed — device status handled by provider
+    } finally {
+      if (mounted) {
+        setState(() => _isConnecting = false);
+      }
+    }
+  }
+
+  /// Returns the button label based on device status
+  String get _connectionLabel {
+    return switch (widget.device.status) {
+      DeviceStatus.online => '断开',
+      DeviceStatus.offline => '连接',
+      DeviceStatus.error => '重试',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -210,15 +247,16 @@ class _DeviceCardState extends ConsumerState<_DeviceCard> {
                     ),
                     // 连接/断开按钮
                     OutlinedButton(
-                      onPressed: () {
-                        // TODO: Toggle connection
-                      },
+                      onPressed: _isConnecting ? null : _toggleConnection,
                       style: OutlinedButton.styleFrom(
                         visualDensity: VisualDensity.compact,
                         minimumSize: const Size(48, 32),
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
-                      child: const Text('连接', style: TextStyle(fontSize: 12)),
+                      child: Text(
+                        _connectionLabel,
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     // 展开/折叠图标

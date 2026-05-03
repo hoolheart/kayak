@@ -361,7 +361,19 @@ jobs:
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
-    needs: [build-backend, build-frontend]
+    needs:
+      [
+        format-backend,
+        format-frontend,
+        lint-backend,
+        lint-frontend,
+        test-backend,
+        test-frontend,
+        coverage-backend,
+        coverage-frontend,
+        build-backend,
+        build-frontend,
+      ]
     if: always()
     steps:
       - name: Checkout code

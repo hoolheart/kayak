@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../providers/core/theme_provider.dart';
 
@@ -51,7 +52,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 32),
             FilledButton.icon(
               onPressed: () {
-                // TODO: 导航到工作台
+                context.go('/workbenches');
               },
               icon: const Icon(Icons.dashboard),
               label: const Text('进入工作台'),
@@ -59,7 +60,7 @@ class HomeScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             TextButton.icon(
               onPressed: () {
-                // TODO: 导航到设置
+                context.go('/settings');
               },
               icon: const Icon(Icons.settings),
               label: const Text('设置'),

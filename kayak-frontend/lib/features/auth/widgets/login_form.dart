@@ -6,7 +6,9 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../validators/validators.dart';
+import '../../../core/auth/providers.dart';
 import '../providers/login_provider.dart';
 import 'email_field.dart';
 import 'password_field.dart';
@@ -67,7 +69,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     );
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     // 验证表单
     final emailError = Validators.validateEmail(_emailController.text);
     final passwordError = Validators.validatePassword(_passwordController.text);
@@ -85,14 +87,31 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     ref.read(emailValidationProvider.notifier).state = null;
     ref.read(passwordValidationProvider.notifier).state = null;
 
-    // 提交登录
+    // 提交登录 — 调用后端API进行认证
     ref.read(loginProvider.notifier).setLoading();
-    // TODO: 调用后端API进行登录
-    // 模拟登录成功，直接跳转
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
+
+    try {
+      final authNotifier = ref.read(authStateNotifierProvider);
+      final success = await authNotifier.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      if (success) {
         ref.read(loginProvider.notifier).setSuccess();
+        // 导航到仪表盘
+        context.go('/dashboard');
+      } else {
+        ref
+            .read(loginProvider.notifier)
+            .setError(LoginErrorType.invalidCredentials);
       }
-    });
+    } catch (_) {
+      if (mounted) {
+        ref.read(loginProvider.notifier).setError(LoginErrorType.networkError);
+      }
+    }
   }
 }

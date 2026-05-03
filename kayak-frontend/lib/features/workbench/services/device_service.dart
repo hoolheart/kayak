@@ -32,6 +32,8 @@ abstract class DeviceServiceInterface {
   });
   Future<Device> getDevice(String deviceId);
   Future<void> deleteDevice(String deviceId);
+  Future<void> connectDevice(String deviceId);
+  Future<void> disconnectDevice(String deviceId);
 }
 
 /// 设备服务实现
@@ -124,6 +126,16 @@ class DeviceService implements DeviceServiceInterface {
   @override
   Future<void> deleteDevice(String deviceId) async {
     await _apiClient.delete('/api/v1/devices/$deviceId');
+  }
+
+  @override
+  Future<void> connectDevice(String deviceId) async {
+    await _apiClient.post('/api/v1/devices/$deviceId/connect');
+  }
+
+  @override
+  Future<void> disconnectDevice(String deviceId) async {
+    await _apiClient.post('/api/v1/devices/$deviceId/disconnect');
   }
 }
 
