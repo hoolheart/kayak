@@ -122,7 +122,8 @@ class _SearchFilterBarState extends ConsumerState<SearchFilterBar> {
       },
       offset: const Offset(0, 40),
       child: OutlinedButton(
-        onPressed: null, // PopupMenuButton handles tap
+        onPressed:
+            () {}, // PopupMenuButton handles tap; non-null to prevent disabled appearance
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           visualDensity: VisualDensity.compact,
@@ -172,7 +173,8 @@ class _SearchFilterBarState extends ConsumerState<SearchFilterBar> {
       },
       offset: const Offset(0, 40),
       child: OutlinedButton(
-        onPressed: null,
+        onPressed:
+            () {}, // PopupMenuButton handles tap; non-null to prevent disabled appearance
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           visualDensity: VisualDensity.compact,

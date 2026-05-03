@@ -57,7 +57,10 @@ void main() {
       final container =
           ProviderScope.containerOf(tester.element(find.byType(LoginButton)));
       container.read(loginProvider.notifier).setLoading();
+      // Trigger a frame to react to state change, then advance
+      // past the 200ms AnimatedSwitcher animation so the old child is removed
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('登录'), findsNothing);

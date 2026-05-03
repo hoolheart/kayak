@@ -7,6 +7,8 @@
 
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/greeting_provider.dart';
@@ -85,19 +87,26 @@ class _TimeDisplay extends StatefulWidget {
 
 class _TimeDisplayState extends State<_TimeDisplay> {
   late DateTime _now;
+  StreamSubscription<dynamic>? _subscription;
 
   @override
   void initState() {
     super.initState();
     _now = DateTime.now();
     // 每秒更新一次时间
-    Stream.periodic(const Duration(seconds: 1)).listen((_) {
+    _subscription = Stream.periodic(const Duration(seconds: 1)).listen((_) {
       if (mounted) {
         setState(() {
           _now = DateTime.now();
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
