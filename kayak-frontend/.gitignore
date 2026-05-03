@@ -46,10 +46,7 @@ app.*.map.json
 /android/app/release
 
 # Flutter Widget Testing - Golden Test exclusions
-/test/golden_files/failures/
+# Exclude all golden test failure artifacts in any test directory
+**/golden/failures/
 **/.test_runner.dart
 /test/widget_tests.temp.dart
-
-# Golden test generated temporary files
-*.diff.png
-*.masked.png
