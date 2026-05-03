@@ -1,0 +1,1837 @@
+openapi: "3.0.3"
+info:
+  title: Kayak API
+  description: |
+    REST API for the Kayak industrial protocol testing platform.
+
+    ## Authentication
+    Most endpoints require JWT Bearer token authentication. Obtain tokens via
+    `POST /api/v1/auth/login` and include them in the `Authorization` header:
+    ```
+    Authorization: Bearer <access_token>
+    ```
+
+    ## Response Format
+    All API responses (excluding raw WebSocket and static files) follow a
+    unified envelope:
+
+    **Success:**
+    ```json
+    { "code": 200, "message": "success", "data": ..., "timestamp": "..." }
+    ```
+
+    **Error:**
+    ```json
+    { "code": 404, "message": "Resource not found: ...", "details": null, "timestamp": "..." }
+    ```
+
+    Field-level validation errors return `422` with `details` populated:
+    ```json
+    { "code": 422, "message": "Validation error", "details": [{"field": "email", "message": "..."}], "timestamp": "..." }
+    ```
+
+    ## Versioning
+    API endpoints are prefixed with `/api/v1/`. The health check endpoint
+    (`/health`) is unversioned.
+
+    ## Idempotency
+    `connect` and `disconnect` device endpoints are idempotent: calling them
+    on an already-connected or already-disconnected device returns success.
+  version: "1.0.0"
+  contact:
+    name: Kayak Team
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Service health check
+  - name: Auth
+    description: Authentication (register, login, token refresh, user info)
+  - name: Protocols
+    description: Protocol catalog and system serial ports
+  - name: Workbenches
+    description: Workbench CRUD operations
+  - name: Devices
+    description: Device management, connection test, connect/disconnect, status
+
+paths:
+  # ====================================================================
+  # HEALTH
+  # ====================================================================
+  /health:
+    get:
+      tags: [Health]
+      summary: Service health check
+      description: >
+        Returns service health status, version, and current timestamp.
+        This endpoint is **public** (no authentication required).
+        Suitable for load balancer probes and monitoring.
+      operationId: healthCheck
+      security: []
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "healthy"
+                version: "1.0.0"
+                timestamp: "2024-06-15T10:30:00Z"
+
+  # ====================================================================
+  # AUTH
+  # ====================================================================
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user
+      description: >
+        Creates a new user account. Password must be at least 8 characters
+        and contain at least one uppercase letter, one lowercase letter,
+        and one digit. Username is optional (2-50 characters).
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+            examples:
+              minimal:
+                summary: Minimal registration
+                value:
+                  email: "user@example.com"
+                  password: "MyP@ssw0rd"
+              full:
+                summary: With username
+                value:
+                  email: "user@example.com"
+                  password: "MyP@ssw0rd"
+                  username: "testuser"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_RegisterResponse"
+              example:
+                code: 201
+                message: "created"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  email: "user@example.com"
+                  username: "testuser"
+                  created_at: "2024-06-15T10:30:00Z"
+                timestamp: "2024-06-15T10:30:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 409
+                message: "Conflict: Resource already exists"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and obtain tokens
+      description: >
+        Authenticates a user and returns an access token (JWT) and refresh token.
+        The access token expires in `expires_in` seconds (default: 3600).
+        Include the access token as `Authorization: Bearer <token>` for
+        authenticated requests.
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: "user@example.com"
+              password: "MyP@ssw0rd"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_TokenResponse"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  access_token: "eyJhbGciOiJIUzI1NiIs..."
+                  refresh_token: "eyJhbGciOiJIUzI1NiIs..."
+                  token_type: "Bearer"
+                  expires_in: 3600
+                  user:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    email: "user@example.com"
+                    username: "testuser"
+                timestamp: "2024-06-15T10:30:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 401
+                message: "Unauthorized: invalid email or password"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      description: >
+        Use a valid refresh token to obtain a new access/refresh token pair.
+        The previous refresh token is invalidated after this call.
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRefreshRequest"
+            example:
+              refresh_token: "eyJhbGciOiJIUzI1NiIs..."
+      responses:
+        "200":
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_TokenResponse"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  access_token: "eyJhbGciOiJIUzI1NiIs..."
+                  refresh_token: "eyJhbGciOiJIUzI1NiIs..."
+                  token_type: "Bearer"
+                  expires_in: 3600
+                  user:
+                    id: "550e8400-e29b-41d4-a716-446655440000"
+                    email: "user@example.com"
+                    username: "testuser"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 401
+                message: "Unauthorized: invalid refresh token"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get authenticated user info
+      description: >
+        Returns the currently authenticated user's profile based on the
+        Bearer token in the Authorization header.
+      operationId: getAuthenticatedUser
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: User info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_UserAuthInfo"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  email: "user@example.com"
+                  username: "testuser"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          description: Missing or invalid Authorization header
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 401
+                message: "Unauthorized: Missing Authorization header"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 404
+                message: "Resource not found: User not found"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+
+  # ====================================================================
+  # PROTOCOLS & SYSTEM
+  # ====================================================================
+  /api/v1/protocols:
+    get:
+      tags: [Protocols]
+      summary: List supported protocols
+      description: >
+        Returns the catalog of supported device communication protocols
+        (Virtual, Modbus TCP, Modbus RTU). Each entry includes a
+        `config_schema` describing the parameters required for device creation.
+      operationId: listProtocols
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Protocol list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_ProtocolList"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  - id: "virtual"
+                    name: "Virtual"
+                    description: "虚拟设备（用于测试）"
+                    config_schema:
+                      mode:
+                        type: "enum"
+                        label: "模式"
+                        description: "虚拟设备数据生成模式"
+                        required: true
+                        values: ["random", "fixed", "sine", "ramp"]
+                      dataType:
+                        type: "enum"
+                        label: "数据类型"
+                        required: true
+                        values: ["number", "integer", "string", "boolean"]
+                      accessType:
+                        type: "enum"
+                        label: "访问类型"
+                        required: true
+                        values: ["ro", "wo", "rw"]
+                      minValue:
+                        type: "number"
+                        label: "最小值"
+                        required: true
+                      maxValue:
+                        type: "number"
+                        label: "最大值"
+                        required: true
+                      fixedValue:
+                        type: "number"
+                        label: "固定值"
+                        required: false
+                      sampleInterval:
+                        type: "number"
+                        label: "采样间隔(ms)"
+                        required: false
+                        default: 1000
+                  - id: "modbus_tcp"
+                    name: "Modbus TCP"
+                    description: "Modbus TCP/IP 协议"
+                    config_schema:
+                      host:
+                        type: "string"
+                        label: "主机地址"
+                        description: "Modbus 从站 IP 地址"
+                        required: true
+                        format: "ip-address"
+                      port:
+                        type: "integer"
+                        label: "端口"
+                        required: false
+                        default: 502
+                        min: 1
+                        max: 65535
+                      slave_id:
+                        type: "integer"
+                        label: "从站ID"
+                        required: false
+                        default: 1
+                        min: 1
+                        max: 247
+                      timeout_ms:
+                        type: "integer"
+                        label: "超时时间(ms)"
+                        required: false
+                        default: 5000
+                      connection_pool_size:
+                        type: "integer"
+                        label: "连接池大小"
+                        required: false
+                        default: 4
+                  - id: "modbus_rtu"
+                    name: "Modbus RTU"
+                    description: "Modbus RTU 串口协议"
+                    config_schema:
+                      port:
+                        type: "string"
+                        label: "串口"
+                        description: "串口设备路径"
+                        required: true
+                      baud_rate:
+                        type: "enum"
+                        label: "波特率"
+                        required: false
+                        default: 9600
+                        values: [9600, 19200, 38400, 57600, 115200]
+                      data_bits:
+                        type: "enum"
+                        label: "数据位"
+                        required: false
+                        default: 8
+                        values: [7, 8]
+                      stop_bits:
+                        type: "enum"
+                        label: "停止位"
+                        required: false
+                        default: 1
+                        values: [1, 2]
+                      parity:
+                        type: "enum"
+                        label: "校验位"
+                        required: false
+                        default: "None"
+                        values: ["None", "Even", "Odd"]
+                      slave_id:
+                        type: "integer"
+                        label: "从站ID"
+                        required: false
+                        default: 1
+                        min: 1
+                        max: 247
+                      timeout_ms:
+                        type: "integer"
+                        label: "超时时间(ms)"
+                        required: false
+                        default: 1000
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/system/serial-ports:
+    get:
+      tags: [Protocols]
+      summary: List available serial ports
+      description: >
+        Scans the host system for available serial (COM) ports.
+        Returns an empty array if no ports are found or the platform
+        does not support enumeration (e.g., Docker containers).
+      operationId: listSerialPorts
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Serial port list (may be empty)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_SerialPortList"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  - path: "/dev/ttyUSB0"
+                    description: "UsbPort /dev/ttyUSB0"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ====================================================================
+  # WORKBENCHES
+  # ====================================================================
+  /api/v1/workbenches:
+    get:
+      tags: [Workbenches]
+      summary: List workbenches
+      description: >
+        Returns a paginated list of workbenches owned by the authenticated
+        user. Default page size is 20.
+      operationId: listWorkbenches
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Paginated workbench list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_PagedWorkbenchDto"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  items:
+                    - id: "550e8400-e29b-41d4-a716-446655440000"
+                      name: "My Workbench"
+                      description: "Test bench for Modbus devices"
+                      owner_type: "user"
+                      owner_id: "660e8400-e29b-41d4-a716-446655440001"
+                      status: "active"
+                      created_at: "2024-06-15T10:00:00Z"
+                      updated_at: "2024-06-15T10:00:00Z"
+                  page: 1
+                  size: 20
+                  total: 1
+                  total_pages: 1
+                timestamp: "2024-06-15T10:30:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Workbenches]
+      summary: Create a workbench
+      description: >
+        Creates a new workbench for the authenticated user (owner_id is
+        auto-assigned from the JWT token). `owner_type` defaults to `user`.
+      operationId: createWorkbench
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkbenchRequest"
+            example:
+              name: "My Workbench"
+              description: "Test bench for Modbus devices"
+              owner_type: "user"
+              owner_id: "660e8400-e29b-41d4-a716-446655440001"
+      responses:
+        "201":
+          description: Workbench created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_WorkbenchDto"
+              example:
+                code: 201
+                message: "created"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  name: "My Workbench"
+                  description: "Test bench for Modbus devices"
+                  owner_type: "user"
+                  owner_id: "660e8400-e29b-41d4-a716-446655440001"
+                  status: "active"
+                  created_at: "2024-06-15T10:00:00Z"
+                  updated_at: "2024-06-15T10:00:00Z"
+                timestamp: "2024-06-15T10:00:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/workbenches/{id}:
+    get:
+      tags: [Workbenches]
+      summary: Get workbench details
+      description: >
+        Returns a single workbench by ID. Access is restricted to the
+        workbench owner.
+      operationId: getWorkbench
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Workbench UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Workbench details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_WorkbenchDto"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  id: "550e8400-e29b-41d4-a716-446655440000"
+                  name: "My Workbench"
+                  description: "Test bench for Modbus devices"
+                  owner_type: "user"
+                  owner_id: "660e8400-e29b-41d4-a716-446655440001"
+                  status: "active"
+                  created_at: "2024-06-15T10:00:00Z"
+                  updated_at: "2024-06-15T10:00:00Z"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags: [Workbenches]
+      summary: Update workbench
+      description: >
+        Updates an existing workbench. All fields are optional.
+        Only the owner can update.
+      operationId: updateWorkbench
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Workbench UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkbenchRequest"
+            example:
+              name: "Updated Workbench"
+              description: "Updated description"
+              status: "archived"
+      responses:
+        "200":
+          description: Workbench updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_WorkbenchDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Workbenches]
+      summary: Delete workbench
+      description: >
+        Permanently deletes a workbench. Only the owner can delete.
+        Returns 204 No Content on success.
+      operationId: deleteWorkbench
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Workbench UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Workbench deleted successfully (no body)
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ====================================================================
+  # DEVICES
+  # ====================================================================
+  /api/v1/workbenches/{workbench_id}/devices:
+    get:
+      tags: [Devices]
+      summary: List devices in a workbench
+      description: >
+        Returns a paginated list of devices belonging to the specified
+        workbench. Optionally filter by `parent_id` for hierarchical views.
+      operationId: listDevices
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbench_id
+          in: path
+          required: true
+          description: Workbench UUID
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: Items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: parent_id
+          in: query
+          description: Filter by parent device UUID (null = top-level devices)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Paginated device list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_PagedDeviceDto"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  total: 1
+                  page: 1
+                  size: 10
+                  items:
+                    - id: "770e8400-e29b-41d4-a716-446655440002"
+                      workbench_id: "550e8400-e29b-41d4-a716-446655440000"
+                      parent_id: null
+                      name: "Temperature Sensor"
+                      protocol_type: "modbus_tcp"
+                      protocol_params:
+                        host: "192.168.1.100"
+                        port: 502
+                        slave_id: 1
+                        timeout_ms: 5000
+                      manufacturer: "Acme Corp"
+                      model: "T-1000"
+                      sn: "SN12345"
+                      status: "online"
+                      created_at: "2024-06-15T10:05:00Z"
+                      updated_at: "2024-06-15T10:05:00Z"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Workbench not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 404
+                message: "Resource not found: Workbench not found"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+
+    post:
+      tags: [Devices]
+      summary: Create a device in a workbench
+      description: >
+        Creates a new device under a workbench. Supports hierarchical
+        nesting via `parent_id`. `protocol_params` is free-form JSON
+        matching the protocol's `config_schema`.
+      operationId: createDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: workbench_id
+          in: path
+          required: true
+          description: Parent workbench UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceRequest"
+            example:
+              workbench_id: "550e8400-e29b-41d4-a716-446655440000"
+              name: "Temperature Sensor"
+              protocol_type: "modbus_tcp"
+              parent_id: null
+              protocol_params:
+                host: "192.168.1.100"
+                port: 502
+                slave_id: 1
+                timeout_ms: 5000
+              manufacturer: "Acme Corp"
+              model: "T-1000"
+              sn: "SN12345"
+      responses:
+        "201":
+          description: Device created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceDto"
+              example:
+                code: 201
+                message: "created"
+                data:
+                  id: "770e8400-e29b-41d4-a716-446655440002"
+                  workbench_id: "550e8400-e29b-41d4-a716-446655440000"
+                  parent_id: null
+                  name: "Temperature Sensor"
+                  protocol_type: "modbus_tcp"
+                  protocol_params:
+                    host: "192.168.1.100"
+                    port: 502
+                    slave_id: 1
+                    timeout_ms: 5000
+                  manufacturer: "Acme Corp"
+                  model: "T-1000"
+                  sn: "SN12345"
+                  status: "offline"
+                  created_at: "2024-06-15T10:05:00Z"
+                  updated_at: "2024-06-15T10:05:00Z"
+                timestamp: "2024-06-15T10:05:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/v1/devices/{id}:
+    get:
+      tags: [Devices]
+      summary: Get device details
+      description: Returns a single device by ID.
+      operationId: getDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Device details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceDto"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags: [Devices]
+      summary: Update device
+      description: >
+        Updates an existing device. All fields are optional.
+        The `status` field can be set to `online`, `offline`, or `error`.
+      operationId: updateDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeviceRequest"
+            example:
+              name: "Updated Sensor"
+              protocol_params:
+                host: "192.168.1.200"
+                port: 502
+              manufacturer: "Acme Corp"
+              model: "T-2000"
+              sn: "SN67890"
+              status: "online"
+      responses:
+        "200":
+          description: Device updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceDto"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Devices]
+      summary: Delete device
+      description: >
+        Permanently deletes a device. Returns 204 No Content on success.
+      operationId: deleteDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Device deleted successfully (no body)
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # --- Device connection operations ---
+  /api/v1/devices/{id}/test-connection:
+    post:
+      tags: [Devices]
+      summary: Test device connection
+      description: >
+        Creates a temporary driver instance, attempts to connect to the
+        device, measures latency, then disconnects. This operation does
+        **not** modify the database device state or register the driver
+        in the DeviceManager.
+
+        Request body is **optional**. If provided, the parameters
+        temporarily override the stored `protocol_params` for the test.
+      operationId: testDeviceConnection
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestConnectionRequest"
+            example:
+              host: "192.168.1.100"
+              port: 502
+              timeout_ms: 5000
+      responses:
+        "200":
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_TestConnectionResult"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  connected: true
+                  message: "Connection successful"
+                  latency_ms: 42
+                timestamp: "2024-06-15T10:30:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/devices/{id}/connect:
+    post:
+      tags: [Devices]
+      summary: Connect to device
+      description: >
+        Registers the device with the DeviceManager (if not already
+        registered) and establishes a persistent connection.
+        On success the device status transitions to `online`.
+
+        **Idempotent:** calling this on an already-connected device
+        returns success.
+      operationId: connectDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Device connected successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceConnectionStatus"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  status: "connected"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "502":
+          description: Connection failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+              example:
+                code: 502
+                message: "External service error: Connection refused"
+                details: null
+                timestamp: "2024-06-15T10:30:00Z"
+
+  /api/v1/devices/{id}/disconnect:
+    post:
+      tags: [Devices]
+      summary: Disconnect from device
+      description: >
+        Disconnects the device's persistent connection. The driver instance
+        remains in DeviceManager for future reconnection.
+
+        **Idempotent:** calling this on an already-disconnected device
+        returns success.
+      operationId: disconnectDevice
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Device disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceConnectionStatus"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  status: "disconnected"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/devices/{id}/status:
+    get:
+      tags: [Devices]
+      summary: Get device connection status
+      description: >
+        Returns the current connection state of the device.
+        Queries the DeviceManager for live driver status first;
+        falls back to the database `status` field if no driver is
+        registered.
+
+        Possible status values:
+        - `"connected"` — actively connected
+        - `"disconnected"` — not connected
+        - `"error"` — connection is in an error state
+      operationId: getDeviceStatus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Device UUID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Device connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse_DeviceConnectionStatus"
+              example:
+                code: 200
+                message: "success"
+                data:
+                  status: "connected"
+                timestamp: "2024-06-15T10:30:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+# ====================================================================
+# COMPONENTS
+# ====================================================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT access token obtained from `POST /api/v1/auth/login`.
+        Include in the `Authorization` header as `Bearer <token>`.
+
+  # ---- Shared Response Wrappers ----
+  schemas:
+    # ==============================
+    # Generic Envelope Schemas
+    # ==============================
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["healthy", "degraded", "unhealthy"]
+          example: "healthy"
+        version:
+          type: string
+          example: "1.0.0"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-06-15T10:30:00Z"
+      required: [status, version, timestamp]
+
+    ApiErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP status code
+          example: 404
+        message:
+          type: string
+          description: Human-readable error description
+          example: "Resource not found: Workbench not found"
+        details:
+          type: array
+          nullable: true
+          description: Field-level validation errors (422 only)
+          items:
+            $ref: "#/components/schemas/FieldError"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-06-15T10:30:00Z"
+      required: [code, message, timestamp]
+
+    FieldError:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field name
+          example: "email"
+        message:
+          type: string
+          description: Validation error message
+          example: "Invalid email format"
+      required: [field, message]
+
+    # ==============================
+    # Auth Schemas
+    # ==============================
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: >
+            Password (min 8 chars, must contain uppercase, lowercase, and digit)
+          example: "MyP@ssw0rd"
+        username:
+          type: string
+          minLength: 2
+          maxLength: 50
+          description: Optional display name
+          example: "testuser"
+      required: [email, password]
+
+    RegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        username:
+          type: string
+          nullable: true
+          example: "testuser"
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-06-15T10:30:00Z"
+      required: [id, email, created_at]
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          example: "MyP@ssw0rd"
+      required: [email, password]
+
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh_token:
+          type: string
+          description: Valid refresh token
+          example: "eyJhbGciOiJIUzI1NiIs..."
+      required: [refresh_token]
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        refresh_token:
+          type: string
+          description: JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        token_type:
+          type: string
+          description: Token type (always "Bearer")
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: Access token lifetime in seconds
+          example: 3600
+        user:
+          $ref: "#/components/schemas/UserAuthInfo"
+      required: [access_token, refresh_token, token_type, expires_in, user]
+
+    UserAuthInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        username:
+          type: string
+          nullable: true
+          example: "testuser"
+      required: [id, email]
+
+    # Typed ApiResponse wrappers (conceptual — the actual envelope is generic)
+    ApiResponse_RegisterResponse:
+      type: object
+      properties:
+        code: { type: integer, example: 201 }
+        message: { type: string, example: "created" }
+        data: { $ref: "#/components/schemas/RegisterResponse" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_TokenResponse:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/TokenResponse" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_UserAuthInfo:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/UserAuthInfo" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    # ==============================
+    # Protocol & System Schemas
+    # ==============================
+    ProtocolInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          enum: ["virtual", "modbus_tcp", "modbus_rtu"]
+          example: "modbus_tcp"
+        name:
+          type: string
+          example: "Modbus TCP"
+        description:
+          type: string
+          example: "Modbus TCP/IP 协议"
+        config_schema:
+          type: object
+          description: Free-form JSON schema describing protocol parameters
+          additionalProperties: true
+      required: [id, name, description, config_schema]
+
+    SerialPortInfo:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Device path (e.g. /dev/ttyUSB0, COM3)
+          example: "/dev/ttyUSB0"
+        description:
+          type: string
+          description: Human-readable port description
+          example: "UsbPort /dev/ttyUSB0"
+      required: [path, description]
+
+    ApiResponse_ProtocolList:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProtocolInfo"
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_SerialPortList:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SerialPortInfo"
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    # ==============================
+    # Workbench Schemas
+    # ==============================
+    OwnerType:
+      type: string
+      enum: ["user", "team"]
+      example: "user"
+
+    WorkbenchStatus:
+      type: string
+      enum: ["active", "archived", "deleted"]
+      example: "active"
+
+    WorkbenchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "My Workbench"
+        description:
+          type: string
+          nullable: true
+          example: "Test bench for Modbus devices"
+        owner_type:
+          $ref: "#/components/schemas/OwnerType"
+        owner_id:
+          type: string
+          format: uuid
+          example: "660e8400-e29b-41d4-a716-446655440001"
+        status:
+          $ref: "#/components/schemas/WorkbenchStatus"
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-06-15T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2024-06-15T10:00:00Z"
+      required: [id, name, owner_type, owner_id, status, created_at, updated_at]
+
+    PagedWorkbenchDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkbenchDto"
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 1
+        total_pages:
+          type: integer
+          example: 1
+      required: [items, page, size, total, total_pages]
+
+    CreateWorkbenchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Workbench name
+          example: "My Workbench"
+        description:
+          type: string
+          nullable: true
+          description: Optional description
+          example: "Test bench for Modbus devices"
+        owner_type:
+          $ref: "#/components/schemas/OwnerType"
+        owner_id:
+          type: string
+          format: uuid
+          description: Owner UUID (auto-populated from JWT in handler)
+          example: "660e8400-e29b-41d4-a716-446655440001"
+      required: [name, owner_type, owner_id]
+
+    UpdateWorkbenchRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: New name
+          example: "Updated Workbench"
+        description:
+          type: string
+          nullable: true
+          description: New description
+          example: "Updated description"
+        status:
+          $ref: "#/components/schemas/WorkbenchStatus"
+
+    ApiResponse_WorkbenchDto:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/WorkbenchDto" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_PagedWorkbenchDto:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/PagedWorkbenchDto" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    # ==============================
+    # Device Schemas
+    # ==============================
+    ProtocolType:
+      type: string
+      enum: ["virtual", "modbus_tcp", "modbus_rtu", "can", "visa", "mqtt"]
+      example: "modbus_tcp"
+
+    DeviceStatus:
+      type: string
+      enum: ["online", "offline", "error"]
+      example: "online"
+
+    ProtocolParams:
+      type: object
+      description: >
+        Free-form JSON object containing protocol-specific parameters.
+        Structure must match the protocol's `config_schema`.
+      additionalProperties: true
+      example:
+        host: "192.168.1.100"
+        port: 502
+        slave_id: 1
+        timeout_ms: 5000
+
+    DeviceDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "770e8400-e29b-41d4-a716-446655440002"
+        workbench_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent device UUID for hierarchical nesting
+          example: null
+        name:
+          type: string
+          example: "Temperature Sensor"
+        protocol_type:
+          $ref: "#/components/schemas/ProtocolType"
+        protocol_params:
+          $ref: "#/components/schemas/ProtocolParams"
+        manufacturer:
+          type: string
+          nullable: true
+          example: "Acme Corp"
+        model:
+          type: string
+          nullable: true
+          example: "T-1000"
+        sn:
+          type: string
+          nullable: true
+          example: "SN12345"
+        status:
+          $ref: "#/components/schemas/DeviceStatus"
+        created_at:
+          type: string
+          description: ISO 8601 timestamp
+          example: "2024-06-15T10:05:00Z"
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp
+          example: "2024-06-15T10:05:00Z"
+      required:
+        [id, workbench_id, name, protocol_type, status, created_at, updated_at]
+
+    PagedDeviceDto:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 1
+        page:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 10
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/DeviceDto"
+      required: [total, page, size, items]
+
+    CreateDeviceRequest:
+      type: object
+      properties:
+        workbench_id:
+          type: string
+          format: uuid
+          description: Parent workbench UUID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        name:
+          type: string
+          example: "Temperature Sensor"
+        protocol_type:
+          $ref: "#/components/schemas/ProtocolType"
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional parent device for nesting
+          example: null
+        protocol_params:
+          $ref: "#/components/schemas/ProtocolParams"
+        manufacturer:
+          type: string
+          nullable: true
+          example: "Acme Corp"
+        model:
+          type: string
+          nullable: true
+          example: "T-1000"
+        sn:
+          type: string
+          nullable: true
+          example: "SN12345"
+      required: [workbench_id, name, protocol_type]
+
+    UpdateDeviceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Updated Sensor"
+        protocol_params:
+          $ref: "#/components/schemas/ProtocolParams"
+        manufacturer:
+          type: string
+          nullable: true
+          example: "Acme Corp"
+        model:
+          type: string
+          nullable: true
+          example: "T-2000"
+        sn:
+          type: string
+          nullable: true
+          example: "SN67890"
+        status:
+          $ref: "#/components/schemas/DeviceStatus"
+
+    TestConnectionRequest:
+      type: object
+      description: >
+        Optional temporary override of device protocol parameters for
+        the connection test. If omitted, stored `protocol_params` are used.
+      properties:
+        host:
+          type: string
+          example: "192.168.1.100"
+        port:
+          type: integer
+          example: 502
+        timeout_ms:
+          type: integer
+          example: 5000
+      additionalProperties: true
+
+    TestConnectionResult:
+      type: object
+      properties:
+        connected:
+          type: boolean
+          description: Whether the connection was established
+          example: true
+        message:
+          type: string
+          description: Success or error description
+          example: "Connection successful"
+        latency_ms:
+          type: integer
+          description: Connection latency in milliseconds
+          example: 42
+      required: [connected, message, latency_ms]
+
+    DeviceConnectionStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["connected", "disconnected", "error"]
+          description: Current connection state
+          example: "connected"
+      required: [status]
+
+    ApiResponse_DeviceDto:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/DeviceDto" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_PagedDeviceDto:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/PagedDeviceDto" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_TestConnectionResult:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/TestConnectionResult" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+    ApiResponse_DeviceConnectionStatus:
+      type: object
+      properties:
+        code: { type: integer, example: 200 }
+        message: { type: string, example: "success" }
+        data: { $ref: "#/components/schemas/DeviceConnectionStatus" }
+        timestamp: { type: string, format: date-time }
+      required: [code, message, data, timestamp]
+
+  # ---- Reusable Responses ----
+  responses:
+    BadRequest:
+      description: Bad request (malformed JSON, invalid parameters)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+          example:
+            code: 400
+            message: "Bad request: JSON syntax error: ..."
+            details: null
+            timestamp: "2024-06-15T10:30:00Z"
+
+    Unauthorized:
+      description: Authentication required or token is invalid/expired
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+          example:
+            code: 401
+            message: "Unauthorized: Missing Authorization header"
+            details: null
+            timestamp: "2024-06-15T10:30:00Z"
+
+    Forbidden:
+      description: Authenticated but not authorized (not the resource owner)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+          example:
+            code: 403
+            message: "Forbidden: Access denied: you do not own this workbench"
+            details: null
+            timestamp: "2024-06-15T10:30:00Z"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+          example:
+            code: 404
+            message: "Resource not found: Workbench not found"
+            details: null
+            timestamp: "2024-06-15T10:30:00Z"
+
+    ValidationError:
+      description: Request validation failed (field-level errors)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiErrorResponse"
+          example:
+            code: 422
+            message: "Validation error"
+            details:
+              - field: "email"
+                message: "Invalid email format"
+              - field: "password"
+                message: "password must be at least 8 characters long"
+            timestamp: "2024-06-15T10:30:00Z"
