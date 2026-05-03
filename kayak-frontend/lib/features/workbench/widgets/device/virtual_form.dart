@@ -191,7 +191,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
 
   Widget _buildModeDropdown(ThemeData theme) {
     return DropdownButtonFormField<VirtualMode>(
-      initialValue: _mode,
+      value: _mode,
       decoration: const InputDecoration(
         labelText: '数据模式 *',
         filled: true,
@@ -216,7 +216,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
       children: [
         Expanded(
           child: DropdownButtonFormField<VirtualDataType>(
-            initialValue: _dataType,
+            value: _dataType,
             decoration: const InputDecoration(
               labelText: '数据类型 *',
               filled: true,
@@ -238,7 +238,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
         const SizedBox(width: 12),
         Expanded(
           child: DropdownButtonFormField<AccessType>(
-            initialValue: _accessType,
+            value: _accessType,
             decoration: const InputDecoration(
               labelText: '访问类型 *',
               filled: true,
