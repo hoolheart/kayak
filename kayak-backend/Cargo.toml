@@ -19,7 +19,7 @@ serde_json = "1.0"
 # Logging & Tracing
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "time", "fmt", "json"] }
-tower-http = { version = "0.5", features = ["trace", "cors", "timeout", "compression-full"] }
+tower-http = { version = "0.5", features = ["trace", "cors", "timeout", "compression-full", "fs"] }
 tower = { version = "0.4", features = ["full"] }
 
 # Configuration

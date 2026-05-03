@@ -8,6 +8,7 @@ use axum::{
     routing::{delete, get, post, put},
     Router,
 };
+use tower_http::services::{ServeDir, ServeFile};
 
 use crate::api::handlers::device;
 use crate::api::handlers::experiment_control;
@@ -139,7 +140,15 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     let method_service: Arc<dyn MethodServiceTrait> =
         Arc::new(MethodServiceAdapter::new(method_service_impl));
 
-    Router::new()
+    // 静态文件服务目录 (Flutter Web build output)
+    let static_dir = std::env::var("KAYAK_SERVE_STATIC")
+        .unwrap_or_else(|_| "../kayak-frontend/build/web".to_string());
+
+    let serve_dir =
+        ServeDir::new(&static_dir).fallback(ServeFile::new(format!("{}/index.html", static_dir)));
+
+    // API路由组（使用独立的404处理器）
+    let api_router = Router::new()
         // 健康检查（最优先，无中间件限制）
         .merge(health_routes())
         // WebSocket路由（使用自己的状态）
@@ -152,8 +161,11 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(point_routes(point_service))
         .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
-        // 404处理
-        .fallback(not_found_handler)
+        // API 404处理
+        .fallback(not_found_handler);
+
+    // 顶层路由：API优先，未匹配的由静态文件服务处理（SPA fallback）
+    Router::new().merge(api_router).fallback_service(serve_dir)
 }
 
 /// 认证路由组
