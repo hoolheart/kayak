@@ -15,7 +15,9 @@ import '../../features/experiments/screens/experiment_list_page.dart';
 import '../../features/experiments/screens/experiment_console_page.dart';
 import '../../features/methods/screens/method_list_page.dart';
 import '../../features/methods/screens/method_edit_page.dart';
-import '../../screens/dashboard/dashboard_screen.dart';
+import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/workbench/screens/workbench_list_page.dart';
+import '../../features/workbench/screens/detail/workbench_detail_page.dart';
 import '../../screens/settings/settings_page.dart';
 import '../navigation/app_shell.dart';
 import '../auth/providers.dart';
@@ -100,7 +102,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
-    debugLogDiagnostics: true, // 开发环境启用路由日志
+    debugLogDiagnostics: true,
     refreshListenable: AuthStateChangeNotifier(ref),
     redirect: (context, state) {
       final isLoggedIn = authState.isAuthenticated;
@@ -117,7 +119,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!isInitialized) {
         debugPrint(
             'Router redirect: -> / (not initialized, waiting on splash)');
-        return null; // 留在当前页面
+        return null;
       }
 
       // 未登录访问受保护路由 -> 重定向到登录
@@ -133,7 +135,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.dashboard;
       }
 
-      // 已登录访问启动页 -> 直接跳转到首页（跳过 SplashScreen）
+      // 已登录访问启动页 -> 直接跳转到首页
       if (isLoggedIn && path == '/') {
         debugPrint(
             'Router redirect: -> /dashboard (authenticated, skip splash)');
@@ -187,14 +189,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/dashboard',
             builder: (context, state) => const DashboardScreen(),
           ),
-          // 工作台
+          // 工作台列表
           GoRoute(
             path: '/workbenches',
-            builder: (context, state) => const Scaffold(
-              body: Center(
-                child: Text('工作台页面 - 开发中'),
-              ),
-            ),
+            builder: (context, state) => const WorkbenchListPage(),
+          ),
+          // 工作台详情（id 参数）
+          GoRoute(
+            path: '/workbenches/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return WorkbenchDetailPage(workbenchId: id);
+            },
           ),
           // 试验
           GoRoute(

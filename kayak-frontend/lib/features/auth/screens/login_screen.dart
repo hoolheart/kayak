@@ -1,15 +1,17 @@
 /// 登录页面
 ///
 /// 登录功能的主入口页面
+/// 全屏品牌布局，不使用侧边栏包装
 
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/common/widgets/custom_title_bar.dart';
 import 'login_view.dart';
 
 /// 登录页面主入口
+///
+/// 全屏独立页面，不包含 AppShell 侧边栏
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({
     super.key,
@@ -25,20 +27,16 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        const CustomTitleBar(),
-        Expanded(
-          child: Scaffold(
-            body: SafeArea(
-              child: LoginView(
-                redirectPath: redirectPath,
-                sessionExpired: sessionExpired,
-              ),
-            ),
-          ),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: SafeArea(
+        child: LoginView(
+          redirectPath: redirectPath,
+          sessionExpired: sessionExpired,
         ),
-      ],
+      ),
     );
   }
 }

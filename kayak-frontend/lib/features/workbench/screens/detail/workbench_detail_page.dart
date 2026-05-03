@@ -1,4 +1,8 @@
 /// 工作台详情页面
+///
+/// Figma设计：AppBar → 信息区 → 左右分栏(设备树 280px + 内容区)
+/// 左侧设备树，右侧 Tab 导航（设备列表/设置）
+
 library;
 
 import 'package:flutter/material.dart';
@@ -10,10 +14,9 @@ import '../../widgets/detail/detail_header.dart';
 import '../../widgets/detail/detail_tab_bar.dart';
 import '../../widgets/detail/device_list_tab.dart';
 import '../../widgets/detail/settings_tab.dart';
+import '../../widgets/device_tree/device_tree.dart';
 
 /// 工作台详情页面
-///
-/// 显示工作台详细信息，包含Tab导航到设备列表和设置
 class WorkbenchDetailPage extends ConsumerStatefulWidget {
   final String workbenchId;
 
@@ -35,6 +38,12 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    // Load workbench detail
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(workbenchDetailProvider(widget.workbenchId).notifier)
+          .loadWorkbench(widget.workbenchId);
+    });
   }
 
   @override
@@ -46,61 +55,158 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
   @override
   Widget build(BuildContext context) {
     final detailState = ref.watch(workbenchDetailProvider(widget.workbenchId));
+    final isWideScreen = MediaQuery.of(context).size.width >= 1024;
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/home'),
+          onPressed: () => context.go('/workbenches'),
         ),
         title: Text(detailState.workbench?.name ?? '工作台详情'),
+        actions: [
+          OutlinedButton.icon(
+            onPressed: () {
+              // TODO: Edit workbench
+            },
+            icon: const Icon(Icons.edit_outlined, size: 18),
+            label: const Text('编辑'),
+            style: OutlinedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton.icon(
+            onPressed: () {
+              _showDeleteDialog(context);
+            },
+            icon: Icon(Icons.delete_outlined,
+                size: 18, color: Theme.of(context).colorScheme.error),
+            label: Text('删除',
+                style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            style: OutlinedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              side: BorderSide(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
-      body: _buildBody(detailState),
+      body: _buildBody(detailState, isWideScreen),
     );
   }
 
-  Widget _buildBody(WorkbenchDetailState detailState) {
+  Widget _buildBody(WorkbenchDetailState detailState, bool isWideScreen) {
+    // Loading state
     if (detailState.isLoading && detailState.workbench == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // Error state
     if (detailState.error != null && detailState.workbench == null) {
-      return _buildError(context, detailState.error!);
+      return _buildErrorView(detailState.error!);
     }
 
+    // No data
     if (detailState.workbench == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
+    final workbench = detailState.workbench!;
+
     return Column(
       children: [
-        DetailHeader(workbench: detailState.workbench!),
-        DetailTabBar(tabController: _tabController),
+        // ===== 信息头部区域 =====
+        DetailHeader(
+          workbench: workbench,
+          deviceCount: 0,
+        ),
+
+        // ===== 主内容区：左右分栏 =====
         Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              ref
-                  .read(workbenchDetailProvider(widget.workbenchId).notifier)
-                  .refresh();
-            },
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                DeviceListTab(workbenchId: widget.workbenchId),
-                SettingsTab(workbench: detailState.workbench!),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // 左侧设备树面板
+              if (isWideScreen) ...[
+                SizedBox(
+                  width: 280,
+                  child: _buildDeviceTreePanel(),
+                ),
+                // 垂直分隔线
+                VerticalDivider(
+                  width: 1,
+                  thickness: 1,
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
               ],
-            ),
+
+              // 右侧内容区
+              Expanded(
+                child: Column(
+                  children: [
+                    // Tab Bar
+                    Container(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerLowest,
+                      child: DetailTabBar(tabController: _tabController),
+                    ),
+                    // Tab 内容
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          DeviceListTab(workbenchId: widget.workbenchId),
+                          SettingsTab(workbench: workbench),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildError(BuildContext context, String error) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  /// 设备树面板
+  Widget _buildDeviceTreePanel() {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    // 解析错误信息
+    return Container(
+      color: colorScheme.surface,
+      child: Column(
+        children: [
+          // 添加设备按钮
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  // TODO: Show add device dialog
+                },
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('添加设备'),
+              ),
+            ),
+          ),
+          const Divider(height: 1),
+          // 设备树列表
+          Expanded(
+            child: DeviceTree(workbenchId: widget.workbenchId),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Error view
+  Widget _buildErrorView(String error) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     String errorMessage = '加载失败，请重试';
     if (error.contains('404') || error.contains('NotFound')) {
       errorMessage = '工作台不存在或已被删除';
@@ -112,24 +218,20 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: colorScheme.error,
-          ),
+          Icon(Icons.error_outline, size: 64, color: colorScheme.error),
           const SizedBox(height: 16),
           Text(
             errorMessage,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
           ),
           const SizedBox(height: 8),
           Text(
             error,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -141,6 +243,32 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
             },
             icon: const Icon(Icons.refresh),
             label: const Text('重试'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('确认删除'),
+        content: const Text('确定要删除此工作台吗？此操作不可撤销。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // TODO: implement delete
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('删除'),
           ),
         ],
       ),
