@@ -312,7 +312,7 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
             validator: DeviceValidators.serialPort,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // 扫描按钮
         _buildScanButton(theme),
       ],
@@ -360,12 +360,14 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
     return Row(
       children: [
         // 波特率
-        Expanded(
+        Flexible(
           child: DropdownButtonFormField<int>(
+            isDense: true,
             initialValue: _baudRate,
             decoration: const InputDecoration(
               labelText: '波特率',
               filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
             items: baudRateOptions.map((rate) {
               return DropdownMenuItem<int>(
@@ -381,14 +383,16 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
             },
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // 数据位
-        Expanded(
+        Flexible(
           child: DropdownButtonFormField<int>(
+            isDense: true,
             initialValue: _dataBits,
             decoration: const InputDecoration(
               labelText: '数据位',
               filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
             items: dataBitsOptions.map((bits) {
               return DropdownMenuItem<int>(
@@ -404,14 +408,16 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
             },
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // 停止位
-        Expanded(
+        Flexible(
           child: DropdownButtonFormField<int>(
+            isDense: true,
             initialValue: _stopBits,
             decoration: const InputDecoration(
               labelText: '停止位',
               filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
             items: stopBitsOptions.map((bits) {
               return DropdownMenuItem<int>(
@@ -427,14 +433,16 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
             },
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // 校验
-        Expanded(
+        Flexible(
           child: DropdownButtonFormField<String>(
+            isDense: true,
             initialValue: _parity,
             decoration: const InputDecoration(
               labelText: '校验',
               filled: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             ),
             items: parityOptions.map((parity) {
               return DropdownMenuItem<String>(

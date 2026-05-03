@@ -263,6 +263,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
 
   Widget _buildSampleIntervalField(ThemeData theme) {
     return TextFormField(
+      key: const Key('virtual-sample-interval'),
       controller: _sampleIntervalController,
       decoration: const InputDecoration(
         labelText: '采样间隔 (ms)',
@@ -285,6 +286,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
       children: [
         Expanded(
           child: TextFormField(
+            key: const Key('virtual-min-value-field'),
             controller: _minValueController,
             decoration: const InputDecoration(
               labelText: '最小值 *',
@@ -303,6 +305,7 @@ class VirtualProtocolFormState extends State<VirtualProtocolForm> {
         const SizedBox(width: 12),
         Expanded(
           child: TextFormField(
+            key: const Key('virtual-max-value-field'),
             controller: _maxValueController,
             decoration: const InputDecoration(
               labelText: '最大值 *',
