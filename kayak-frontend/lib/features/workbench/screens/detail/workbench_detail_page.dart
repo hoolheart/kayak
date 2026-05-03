@@ -10,11 +10,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/workbench_detail_state.dart';
 import '../../providers/workbench_detail_provider.dart';
+import '../../providers/device_tree_provider.dart';
+import '../../services/workbench_service.dart';
 import '../../widgets/detail/detail_header.dart';
 import '../../widgets/detail/detail_tab_bar.dart';
 import '../../widgets/detail/device_list_tab.dart';
 import '../../widgets/detail/settings_tab.dart';
 import '../../widgets/device_tree/device_tree.dart';
+import '../../widgets/create_workbench_dialog.dart';
+import '../../widgets/device/device_form_dialog.dart';
 
 /// 工作台详情页面
 class WorkbenchDetailPage extends ConsumerStatefulWidget {
@@ -66,8 +70,15 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
         title: Text(detailState.workbench?.name ?? '工作台详情'),
         actions: [
           OutlinedButton.icon(
-            onPressed: () {
-              // TODO: Edit workbench
+            onPressed: () async {
+              final workbench = detailState.workbench;
+              if (workbench == null) return;
+              final result = await showEditWorkbenchDialog(context, workbench);
+              if (result == true && mounted) {
+                ref
+                    .read(workbenchDetailProvider(widget.workbenchId).notifier)
+                    .refresh();
+              }
             },
             icon: const Icon(Icons.edit_outlined, size: 18),
             label: const Text('编辑'),
@@ -185,8 +196,18 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
             child: Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
-                onPressed: () {
-                  // TODO: Show add device dialog
+                onPressed: () async {
+                  final result = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => DeviceFormDialog(
+                      workbenchId: widget.workbenchId,
+                    ),
+                  );
+                  if (result == true && mounted) {
+                    ref
+                        .read(deviceTreeProvider(widget.workbenchId).notifier)
+                        .refresh();
+                  }
                 },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('添加设备'),
@@ -252,26 +273,66 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('确认删除'),
-        content: const Text('确定要删除此工作台吗？此操作不可撤销。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              // TODO: implement delete
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text('删除'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        var isDeleting = false;
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('确认删除'),
+              content: const Text('确定要删除此工作台吗？此操作不可撤销。'),
+              actions: [
+                TextButton(
+                  onPressed: isDeleting ? null : () => Navigator.of(ctx).pop(),
+                  child: const Text('取消'),
+                ),
+                FilledButton(
+                  onPressed: isDeleting
+                      ? null
+                      : () async {
+                          setDialogState(() => isDeleting = true);
+                          try {
+                            await ref
+                                .read(workbenchServiceProvider)
+                                .deleteWorkbench(widget.workbenchId);
+                            if (ctx.mounted) {
+                              Navigator.of(ctx).pop();
+                            }
+                            if (mounted) {
+                              context.go('/workbenches');
+                            }
+                          } catch (e) {
+                            setDialogState(() => isDeleting = false);
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                SnackBar(
+                                  content: Text('删除失败: $e'),
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.error,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: isDeleting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('删除'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -8,7 +8,9 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/device_tree_provider.dart';
+import '../../providers/point_list_provider.dart';
 import '../../models/device.dart';
+import '../../models/point.dart';
 import '../../../../core/theme/color_schemes.dart';
 
 /// 设备列表Tab内容组件
@@ -117,7 +119,7 @@ class _DeviceListTabState extends ConsumerState<DeviceListTab> {
 }
 
 /// 设备卡片组件
-class _DeviceCard extends StatefulWidget {
+class _DeviceCard extends ConsumerStatefulWidget {
   final Device device;
   final bool isExpanded;
   final VoidCallback onTap;
@@ -129,10 +131,10 @@ class _DeviceCard extends StatefulWidget {
   });
 
   @override
-  State<_DeviceCard> createState() => _DeviceCardState();
+  ConsumerState<_DeviceCard> createState() => _DeviceCardState();
 }
 
-class _DeviceCardState extends State<_DeviceCard> {
+class _DeviceCardState extends ConsumerState<_DeviceCard> {
   bool _isHovering = false;
 
   @override
@@ -250,141 +252,178 @@ class _DeviceCardState extends State<_DeviceCard> {
   }
 
   Widget _buildPointTable(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final pointsAsync = ref.watch(pointListProvider(widget.device.id));
 
-    // Mock data - in production, fetch from PointListProvider
-    final points = <Map<String, String>>[];
-
-    if (points.isEmpty) {
-      return Padding(
+    return pointsAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      error: (error, _) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Icon(Icons.sensors, size: 32, color: colorScheme.onSurfaceVariant),
+            Icon(Icons.error_outline, size: 28, color: colorScheme.error),
             const SizedBox(height: 8),
             Text(
-              '该设备暂无测点',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+              '加载失败',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
-      );
-    }
-
-    // Table header
-    return Column(
-      children: [
-        Divider(height: 1, color: colorScheme.outlineVariant),
-        Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(color: colorScheme.surfaceContainerLow),
-          child: const Row(
-            children: [
-              SizedBox(
-                  width: 150,
-                  child: Text('名称',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500))),
-              SizedBox(
-                  width: 100,
-                  child: Text('类型',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500))),
-              SizedBox(
-                  width: 100,
-                  child: Text('值',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500))),
-              SizedBox(
-                  width: 80,
-                  child: Text('单位',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500))),
-              SizedBox(
-                  width: 80,
-                  child: Text('状态',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500))),
-            ],
-          ),
-        ),
-        ...points.asMap().entries.map((entry) {
-          final point = entry.value;
-          final isEven = entry.key % 2 == 0;
-          return Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: isEven
-                  ? colorScheme.surface
-                  : colorScheme.surfaceContainerLowest,
-              border: Border(
-                bottom: BorderSide(color: colorScheme.outlineVariant),
-              ),
-            ),
-            child: Row(
+      ),
+      data: (points) {
+        if (points.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
               children: [
-                SizedBox(
-                  width: 150,
-                  child: Text(
-                    point['name'] ?? '-',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                SizedBox(
-                  width: 100,
-                  child: Text(
-                    point['type'] ?? '-',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                SizedBox(
-                  width: 100,
-                  child: Text(
-                    point['value'] ?? '-',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontFamily: 'monospace',
-                        ),
-                  ),
-                ),
-                SizedBox(
-                  width: 80,
-                  child: Text(
-                    point['unit'] ?? '-',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                // Status dot
-                SizedBox(
-                  width: 80,
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: colorScheme.success,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '正常',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                      ),
-                    ],
+                Icon(Icons.sensors,
+                    size: 32, color: colorScheme.onSurfaceVariant),
+                const SizedBox(height: 8),
+                Text(
+                  '该设备暂无测点',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
           );
-        }),
-      ],
+        }
+
+        // Table header
+        return Column(
+          children: [
+            Divider(height: 1, color: colorScheme.outlineVariant),
+            Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(color: colorScheme.surfaceContainerLow),
+              child: const Row(
+                children: [
+                  SizedBox(
+                      width: 150,
+                      child: Text('名称',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500))),
+                  SizedBox(
+                      width: 100,
+                      child: Text('类型',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500))),
+                  SizedBox(
+                      width: 100,
+                      child: Text('值',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500))),
+                  SizedBox(
+                      width: 80,
+                      child: Text('单位',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500))),
+                  SizedBox(
+                      width: 80,
+                      child: Text('状态',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w500))),
+                ],
+              ),
+            ),
+            ...points.asMap().entries.map((entry) {
+              final point = entry.value;
+              final isEven = entry.key % 2 == 0;
+              final isActive = point.status == PointStatus.active;
+              return Container(
+                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: isEven
+                      ? colorScheme.surface
+                      : colorScheme.surfaceContainerLowest,
+                  border: Border(
+                    bottom: BorderSide(color: colorScheme.outlineVariant),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 150,
+                      child: Text(
+                        point.name,
+                        style: theme.textTheme.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Text(
+                        _dataTypeLabel(point.dataType),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Text(
+                        point.defaultValue ?? '-',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 80,
+                      child: Text(
+                        point.unit ?? '-',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                    // Status dot
+                    SizedBox(
+                      width: 80,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? colorScheme.success
+                                  : colorScheme.outlineVariant,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isActive ? '正常' : '禁用',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        );
+      },
     );
+  }
+
+  /// Convert DataType enum to display label
+  String _dataTypeLabel(DataType type) {
+    return switch (type) {
+      DataType.number => '数值',
+      DataType.integer => '整数',
+      DataType.string => '字符串',
+      DataType.boolean => '布尔',
+    };
   }
 }
