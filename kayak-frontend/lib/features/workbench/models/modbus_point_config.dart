@@ -119,12 +119,8 @@ class ModbusPointConfig {
 
   /// 默认配置 (FC03, address=0, quantity=1, uint16)
   factory ModbusPointConfig.defaults() => const ModbusPointConfig(
-        functionCode: ModbusFunctionCode.fc03,
         address: 0,
         quantity: 1,
-        dataType: ModbusDataType.uint16,
-        scale: 1.0,
-        offset: 0.0,
       );
 
   /// 从 JSON 创建
@@ -257,12 +253,7 @@ class PointConfigFormState {
 
   /// 带默认值的初始状态
   factory PointConfigFormState.initial() => const PointConfigFormState(
-        functionCode: ModbusFunctionCode.fc03,
-        address: '',
-        quantity: '',
-        dataType: ModbusDataType.uint16,
-        scale: '1.0',
-        offset: '0.0',
+        
       );
 
   /// 从 ModbusPointConfig 预填充

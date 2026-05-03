@@ -107,12 +107,11 @@ void main() {
     });
 
     test('toJson produces correct format', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         functionCode: ModbusFunctionCode.fc04,
         address: 200,
         quantity: 3,
         dataType: ModbusDataType.float32,
-        scale: 1.0,
         offset: -5.0,
       );
       final json = config.toJson();
@@ -136,10 +135,9 @@ void main() {
     });
 
     test('addressRange for non-float32 types', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         address: 10,
         quantity: 5,
-        dataType: ModbusDataType.uint16,
       );
       final (start, end) = config.addressRange;
       expect(start, 10);
@@ -147,7 +145,7 @@ void main() {
     });
 
     test('addressRange for float32 type (each quantity = 2 registers)', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         address: 10,
         quantity: 3,
         dataType: ModbusDataType.float32,
@@ -158,16 +156,15 @@ void main() {
     });
 
     test('registerCount for non-float32 types', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         address: 0,
         quantity: 5,
-        dataType: ModbusDataType.uint16,
       );
       expect(config.registerCount, 5);
     });
 
     test('registerCount for float32 type', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         address: 0,
         quantity: 5,
         dataType: ModbusDataType.float32,
@@ -177,86 +174,77 @@ void main() {
 
     group('overlapsWith', () {
       test('完全重叠检测', () {
-        final a = ModbusPointConfig(
+        const a = ModbusPointConfig(
           address: 0,
           quantity: 5,
-          dataType: ModbusDataType.uint16,
         );
-        final b = ModbusPointConfig(
+        const b = ModbusPointConfig(
           address: 0,
           quantity: 3,
-          dataType: ModbusDataType.uint16,
         );
         expect(a.overlapsWith(b), isTrue);
       });
 
       test('部分重叠检测', () {
-        final a = ModbusPointConfig(
+        const a = ModbusPointConfig(
           address: 0,
           quantity: 5,
-          dataType: ModbusDataType.uint16,
         );
-        final b = ModbusPointConfig(
+        const b = ModbusPointConfig(
           address: 3,
           quantity: 5,
-          dataType: ModbusDataType.uint16,
         );
         expect(a.overlapsWith(b), isTrue);
       });
 
       test('非重叠检测 (应通过)', () {
-        final a = ModbusPointConfig(
+        const a = ModbusPointConfig(
           address: 0,
           quantity: 5,
-          dataType: ModbusDataType.uint16,
         );
-        final b = ModbusPointConfig(
+        const b = ModbusPointConfig(
           address: 6,
           quantity: 1,
-          dataType: ModbusDataType.uint16,
         );
         expect(a.overlapsWith(b), isFalse);
       });
 
       test('紧邻边界不重叠', () {
-        final a = ModbusPointConfig(
+        const a = ModbusPointConfig(
           address: 0,
           quantity: 5,
-          dataType: ModbusDataType.uint16,
         );
-        final b = ModbusPointConfig(
+        const b = ModbusPointConfig(
           address: 5,
           quantity: 1,
-          dataType: ModbusDataType.uint16,
         );
         // a: [0,4], b: [5,5] - no overlap
         expect(a.overlapsWith(b), isFalse);
       });
 
       test('float32 重叠检测', () {
-        final a = ModbusPointConfig(
+        const a = ModbusPointConfig(
           address: 0,
           quantity: 3,
           dataType: ModbusDataType.float32,
         ); // registers [0, 5]
-        final b = ModbusPointConfig(
+        const b = ModbusPointConfig(
           address: 3,
           quantity: 1,
-          dataType: ModbusDataType.uint16,
         ); // registers [3, 3]
         expect(a.overlapsWith(b), isTrue);
       });
     });
 
     test('equality comparison', () {
-      final a = ModbusPointConfig(address: 0, quantity: 1);
-      final b = ModbusPointConfig(address: 0, quantity: 1);
+      const a = ModbusPointConfig(address: 0, quantity: 1);
+      const b = ModbusPointConfig(address: 0, quantity: 1);
       expect(a, equals(b));
     });
 
     test('hashCode consistency', () {
-      final a = ModbusPointConfig(address: 0, quantity: 1);
-      final b = ModbusPointConfig(address: 0, quantity: 1);
+      const a = ModbusPointConfig(address: 0, quantity: 1);
+      const b = ModbusPointConfig(address: 0, quantity: 1);
       expect(a.hashCode, equals(b.hashCode));
     });
   });
@@ -274,7 +262,7 @@ void main() {
     });
 
     test('fromConfig pre-fills all fields', () {
-      final config = ModbusPointConfig(
+      const config = ModbusPointConfig(
         functionCode: ModbusFunctionCode.fc01,
         address: 42,
         quantity: 3,
@@ -292,11 +280,9 @@ void main() {
     });
 
     test('tryCreateConfig succeeds with valid data', () {
-      final state = PointConfigFormState(
+      const state = PointConfigFormState(
         address: '100',
         quantity: '5',
-        scale: '1.0',
-        offset: '0.0',
       );
       final config = state.tryCreateConfig();
       expect(config, isNotNull);
@@ -305,24 +291,22 @@ void main() {
     });
 
     test('tryCreateConfig returns null with invalid data', () {
-      final state = PointConfigFormState(
+      const state = PointConfigFormState(
         address: 'abc',
         quantity: '5',
-        scale: '1.0',
-        offset: '0.0',
       );
       expect(state.tryCreateConfig(), isNull);
     });
 
     test('isValid returns false when errors present', () {
-      final state = PointConfigFormState(
+      const state = PointConfigFormState(
         addressError: 'Error',
       );
       expect(state.isValid, isFalse);
     });
 
     test('copyWith with clear errors works', () {
-      final state = PointConfigFormState(
+      const state = PointConfigFormState(
         addressError: 'Error',
         quantityError: 'Error',
       );

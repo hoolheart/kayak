@@ -89,7 +89,6 @@ class LoginView extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 16),
                 child: ErrorBanner(
                   message: loginState.errorMessage!,
-                  type: BannerType.error,
                   onDismiss: () {
                     ref.read(loginProvider.notifier).reset();
                   },

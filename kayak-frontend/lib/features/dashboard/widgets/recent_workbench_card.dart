@@ -52,7 +52,6 @@ class _RecentWorkbenchCardState extends State<RecentWorkbenchCard> {
               color: _isHovering
                   ? colorScheme.primary
                   : colorScheme.outlineVariant,
-              width: 1,
             ),
             boxShadow: _isHovering
                 ? [

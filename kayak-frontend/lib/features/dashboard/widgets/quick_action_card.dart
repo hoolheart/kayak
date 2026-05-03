@@ -72,7 +72,6 @@ class _QuickActionCardState extends State<QuickActionCard>
                 color: _isHovering
                     ? colorScheme.primary
                     : colorScheme.outlineVariant,
-                width: 1,
               ),
               boxShadow: _isHovering
                   ? [

@@ -53,7 +53,10 @@ async fn main() {
     // Initialize tracing/logging
     init_logging(&config);
 
-    tracing::info!("Starting Modbus TCP Simulator v{}", env!("CARGO_PKG_VERSION"));
+    tracing::info!(
+        "Starting Modbus TCP Simulator v{}",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Create and initialize the data store
     let mut datastore = DataStore::new(config.num_coils, config.num_registers);

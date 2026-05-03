@@ -190,7 +190,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             final wb = recentWorkbenches[index];
             return RecentWorkbenchCard(
               workbench: wb,
-              deviceCount: 0,
               onTap: () => context.go('/workbenches/${wb.id}'),
             );
           },

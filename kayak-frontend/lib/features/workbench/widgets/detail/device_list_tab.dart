@@ -155,7 +155,6 @@ class _DeviceCardState extends ConsumerState<_DeviceCard> {
             color: _isHovering || widget.isExpanded
                 ? colorScheme.primary
                 : colorScheme.outlineVariant,
-            width: 1,
           ),
         ),
         child: Column(

@@ -85,7 +85,7 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
             onSelectionChanged: (selection) {
               ref.read(viewModeProvider.notifier).setViewMode(selection.first);
             },
-            style: ButtonStyle(
+            style: const ButtonStyle(
               visualDensity: VisualDensity.compact,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
@@ -198,7 +198,6 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
               final wb = workbenches[index];
               return WorkbenchCard(
                 workbench: wb,
-                deviceCount: 0,
                 onTap: () => _onWorkbenchTap(wb),
                 onEdit: () => _showEditDialog(wb),
                 onDelete: () => _showDeleteDialog(wb),
@@ -234,7 +233,6 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
                 final wb = workbenches[index];
                 return WorkbenchListTile(
                   workbench: wb,
-                  deviceCount: 0,
                   index: index,
                   onTap: () => _onWorkbenchTap(wb),
                   onEdit: () => _showEditDialog(wb),
@@ -261,30 +259,30 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
           bottom: BorderSide(color: colorScheme.outlineVariant),
         ),
       ),
-      child: Row(
+      child: const Row(
         children: [
-          const SizedBox(width: 48), // 图标
-          const SizedBox(
+          SizedBox(width: 48), // 图标
+          SizedBox(
             width: 200,
             child: Text('名称', style: TextStyle(fontSize: 12)),
           ),
-          const SizedBox(
+          SizedBox(
             width: 240,
             child: Text('描述', style: TextStyle(fontSize: 12)),
           ),
-          const SizedBox(
+          SizedBox(
             width: 80,
             child: Text('设备数', style: TextStyle(fontSize: 12)),
           ),
-          const SizedBox(
+          SizedBox(
             width: 100,
             child: Text('状态', style: TextStyle(fontSize: 12)),
           ),
-          const SizedBox(
+          SizedBox(
             width: 100,
             child: Text('创建时间', style: TextStyle(fontSize: 12)),
           ),
-          const SizedBox(width: 80),
+          SizedBox(width: 80),
         ],
       ),
     );

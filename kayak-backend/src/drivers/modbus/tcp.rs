@@ -18,7 +18,9 @@ pub use crate::drivers::modbus::error::{ModbusError, ModbusException};
 pub use crate::drivers::modbus::mbap::MbapHeader;
 pub use crate::drivers::modbus::pdu::Pdu;
 pub use crate::drivers::modbus::pool::ModbusTcpConnectionPool;
-pub use crate::drivers::modbus::types::{FunctionCode, ModbusAddress, ModbusTcpPoolConfig, ModbusValue, RegisterType};
+pub use crate::drivers::modbus::types::{
+    FunctionCode, ModbusAddress, ModbusTcpPoolConfig, ModbusValue, RegisterType,
+};
 
 /// Modbus TCP 驱动配置（单连接，向后兼容）
 ///
@@ -438,9 +440,10 @@ impl DriverLifecycle for ModbusTcpDriver {
 
     /// 断开与 Modbus TCP 服务器的连接（关闭所有池连接）
     async fn disconnect(&mut self) -> Result<(), DriverError> {
-        self.pool.disconnect_all().await.map_err(|e| {
-            DriverError::IoError(format!("Pool disconnect failed: {}", e))
-        })?;
+        self.pool
+            .disconnect_all()
+            .await
+            .map_err(|e| DriverError::IoError(format!("Pool disconnect failed: {}", e)))?;
         *self.state.lock().unwrap() = DriverState::Disconnected;
         Ok(())
     }
@@ -852,9 +855,7 @@ mod tests {
 
     #[test]
     fn test_should_not_retry_not_connected() {
-        assert!(!ModbusTcpDriver::should_retry(
-            &ModbusError::NotConnected
-        ));
+        assert!(!ModbusTcpDriver::should_retry(&ModbusError::NotConnected));
     }
 
     // ========== Connection Tests (需 mock TCP 服务器) ==========

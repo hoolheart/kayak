@@ -147,9 +147,11 @@ impl ModbusTcpConnectionPool {
             Ok(permit) => permit,
             Err(TryAcquireError::NoPermits) => {
                 // 所有连接都在使用中，等待
-                self.semaphore.clone().acquire_owned().await.map_err(|_| {
-                    ModbusError::NotConnected
-                })?
+                self.semaphore
+                    .clone()
+                    .acquire_owned()
+                    .await
+                    .map_err(|_| ModbusError::NotConnected)?
             }
             Err(TryAcquireError::Closed) => {
                 return Err(ModbusError::NotConnected);
@@ -168,15 +170,14 @@ impl ModbusTcpConnectionPool {
             while let Some(stream) = inner.idle.pop_front() {
                 if Self::is_connection_healthy(&stream) {
                     // 找到健康连接，直接返回
-                    return Ok(PoolGuard::new(
-                        stream,
-                        Arc::clone(self),
-                        permit,
-                    ));
+                    return Ok(PoolGuard::new(stream, Arc::clone(self), permit));
                 }
                 // 连接不健康，丢弃
                 inner.alive_count = inner.alive_count.saturating_sub(1);
-                debug!("Dropped unhealthy connection from pool, alive_count={}", inner.alive_count);
+                debug!(
+                    "Dropped unhealthy connection from pool, alive_count={}",
+                    inner.alive_count
+                );
             }
 
             // 空闲队列为空，检查是否可以按需创建
@@ -275,7 +276,7 @@ impl ModbusTcpConnectionPool {
         match stream.try_read(&mut buf) {
             Ok(0) => true, // 无数据，但连接未断开
             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => true, // 正常
-            _ => false, // 连接已断开
+            _ => false,    // 连接已断开
         }
     }
 
@@ -286,7 +287,10 @@ impl ModbusTcpConnectionPool {
             inner.idle.push_back(stream);
         } else {
             inner.alive_count = inner.alive_count.saturating_sub(1);
-            debug!("Broken connection discarded, alive_count={}", inner.alive_count);
+            debug!(
+                "Broken connection discarded, alive_count={}",
+                inner.alive_count
+            );
             drop(stream); // 显式关闭
         }
     }
@@ -295,7 +299,10 @@ impl ModbusTcpConnectionPool {
     async fn decrease_alive_count(&self) {
         let mut inner = self.inner.lock().await;
         inner.alive_count = inner.alive_count.saturating_sub(1);
-        debug!("Broken connection removed, alive_count={}", inner.alive_count);
+        debug!(
+            "Broken connection removed, alive_count={}",
+            inner.alive_count
+        );
     }
 }
 
@@ -353,7 +360,9 @@ impl PoolGuard {
 
     /// 获取底层 TcpStream 的可变引用（用于直接 IO 操作）
     pub fn stream_mut(&mut self) -> &mut TcpStream {
-        self.stream.as_mut().expect("PoolGuard stream already taken")
+        self.stream
+            .as_mut()
+            .expect("PoolGuard stream already taken")
     }
 }
 
@@ -361,13 +370,17 @@ impl Deref for PoolGuard {
     type Target = TcpStream;
 
     fn deref(&self) -> &TcpStream {
-        self.stream.as_ref().expect("PoolGuard stream already taken")
+        self.stream
+            .as_ref()
+            .expect("PoolGuard stream already taken")
     }
 }
 
 impl DerefMut for PoolGuard {
     fn deref_mut(&mut self) -> &mut TcpStream {
-        self.stream.as_mut().expect("PoolGuard stream already taken")
+        self.stream
+            .as_mut()
+            .expect("PoolGuard stream already taken")
     }
 }
 
@@ -438,8 +451,8 @@ pub struct PoolStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tokio::net::TcpListener;
     use crate::drivers::modbus::constants::MAX_POOL_SIZE;
+    use tokio::net::TcpListener;
 
     /// 辅助函数：启动本地 TCP 回显服务器
     async fn start_echo_server() -> (tokio::task::JoinHandle<()>, u16) {
@@ -455,8 +468,7 @@ mod tests {
                         match socket.try_read(&mut buf) {
                             Ok(0) => break,
                             Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {
-                                tokio::time::sleep(std::time::Duration::from_millis(10))
-                                    .await;
+                                tokio::time::sleep(std::time::Duration::from_millis(10)).await;
                             }
                             Err(_) => break,
                             Ok(_) => {}

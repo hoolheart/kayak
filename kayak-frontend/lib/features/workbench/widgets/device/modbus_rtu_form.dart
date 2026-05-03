@@ -370,7 +370,6 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         // 波特率
         Flexible(
           child: DropdownButtonFormField<int>(
-            isDense: true,
             initialValue: _baudRate,
             decoration: const InputDecoration(
               labelText: '波特率',
@@ -395,7 +394,6 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         // 数据位
         Flexible(
           child: DropdownButtonFormField<int>(
-            isDense: true,
             initialValue: _dataBits,
             decoration: const InputDecoration(
               labelText: '数据位',
@@ -420,7 +418,6 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         // 停止位
         Flexible(
           child: DropdownButtonFormField<int>(
-            isDense: true,
             initialValue: _stopBits,
             decoration: const InputDecoration(
               labelText: '停止位',
@@ -445,7 +442,6 @@ class ModbusRtuFormState extends ConsumerState<ModbusRtuForm> {
         // 校验
         Flexible(
           child: DropdownButtonFormField<String>(
-            isDense: true,
             initialValue: _parity,
             decoration: const InputDecoration(
               labelText: '校验',

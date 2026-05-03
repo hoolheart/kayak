@@ -4,9 +4,7 @@
 //! and response construction. Uses the existing kayak_backend modbus types
 //! for MBAP/PDU parsing and construction.
 
-use kayak_backend::drivers::modbus::{
-    FunctionCode, MbapHeader, ModbusError, Pdu,
-};
+use kayak_backend::drivers::modbus::{FunctionCode, MbapHeader, ModbusError, Pdu};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -219,8 +217,7 @@ async fn handle_connection(
         if pdu_len == 0 {
             tracing::warn!("Zero-length PDU from {}", peer_addr);
             // Send exception: Server Device Failure
-            let exception_frame =
-                build_mbap_exception_response(&request_mbap, 0x00, 0x04);
+            let exception_frame = build_mbap_exception_response(&request_mbap, 0x00, 0x04);
             let _ = stream.write_all(&exception_frame).await;
             continue;
         }
@@ -450,10 +447,10 @@ fn build_exception_bytes(function_code: u8, exception_code: u8) -> Vec<u8> {
 fn exception_code_for_error(error: &ModbusError) -> u8 {
     match error {
         ModbusError::InvalidFunctionCode(_) => 0x01, // Illegal Function
-        ModbusError::IllegalDataAddress => 0x02,       // Illegal Data Address
-        ModbusError::IllegalDataValue => 0x03,          // Illegal Data Value
-        ModbusError::IncompleteFrame => 0x04,           // Server Device Failure
-        _ => 0x04,                                       // Server Device Failure
+        ModbusError::IllegalDataAddress => 0x02,     // Illegal Data Address
+        ModbusError::IllegalDataValue => 0x03,       // Illegal Data Value
+        ModbusError::IncompleteFrame => 0x04,        // Server Device Failure
+        _ => 0x04,                                   // Server Device Failure
     }
 }
 
@@ -588,9 +585,9 @@ mod tests {
         let pdu = Pdu::read_coils(ModbusAddress::new(0), 8).unwrap();
         let response = handle_read_coils(&pdu, &ds);
         assert!(response[0] & 0x80 == 0); // not an error response
-        // Bit pattern: coil0=true (LSB), coil1=false, coil2=true, coil3=false,
-        //              coil4=false, coil5=true, coil6=false, coil7=false
-        // => 0b00100101 = 0x25
+                                          // Bit pattern: coil0=true (LSB), coil1=false, coil2=true, coil3=false,
+                                          //              coil4=false, coil5=true, coil6=false, coil7=false
+                                          // => 0b00100101 = 0x25
         assert_eq!(response[1], 1); // byte_count
         assert_eq!(response[2], 0x25);
     }
@@ -603,7 +600,7 @@ mod tests {
         let pdu = Pdu::read_coils(ModbusAddress::new(8), 4).unwrap();
         let response = handle_read_coils(&pdu, &ds);
         assert!(response[0] & 0x80 == 0); // not an error response
-        // coil8=true, coil9=false, coil10=true, coil11=false => 0b0101 = 0x05
+                                          // coil8=true, coil9=false, coil10=true, coil11=false => 0b0101 = 0x05
         assert_eq!(response[1], 1); // byte_count
         assert_eq!(response[2], 0x05);
     }
@@ -669,7 +666,7 @@ mod tests {
         let response = handle_read_holding_registers(&pdu, &ds);
         assert!(response[0] & 0x80 == 0); // not an error response
         assert_eq!(response[1], 10); // byte_count = 10
-        // Parse back the register values (big-endian)
+                                     // Parse back the register values (big-endian)
         for i in 0..5 {
             let offset = 2 + i * 2;
             let val = u16::from_be_bytes([response[offset], response[offset + 1]]);

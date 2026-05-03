@@ -278,7 +278,6 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
       decoration: BoxDecoration(
         border: Border.all(
           color: theme.colorScheme.outlineVariant,
-          style: BorderStyle.solid,
         ),
         borderRadius: BorderRadius.circular(8),
       ),

@@ -129,14 +129,13 @@ class AuthState {
 
   /// 未初始化状态 - 首次创建时使用，isLoading=true 表示正在检查认证状态
   factory AuthState.initial() =>
-      const AuthState(isLoading: true, isInitialized: false);
+      const AuthState(isLoading: true);
 
   factory AuthState.loading() =>
-      const AuthState(isLoading: true, isInitialized: false);
+      const AuthState(isLoading: true);
 
   factory AuthState.authenticated(User user, String accessToken) => AuthState(
         isAuthenticated: true,
-        isLoading: false,
         isInitialized: true,
         user: user,
         accessToken: accessToken,

@@ -130,7 +130,6 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
         // ===== 信息头部区域 =====
         DetailHeader(
           workbench: workbench,
-          deviceCount: 0,
         ),
 
         // ===== 主内容区：左右分栏 =====
@@ -292,15 +291,14 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
                       : () async {
                           setDialogState(() => isDeleting = true);
                           try {
+                            final router = GoRouter.of(context);
                             await ref
                                 .read(workbenchServiceProvider)
                                 .deleteWorkbench(widget.workbenchId);
                             if (ctx.mounted) {
                               Navigator.of(ctx).pop();
                             }
-                            if (mounted) {
-                              context.go('/workbenches');
-                            }
+                            router.go('/workbenches');
                           } catch (e) {
                             setDialogState(() => isDeleting = false);
                             if (ctx.mounted) {
