@@ -12,12 +12,11 @@ import '../providers/login_provider.dart';
 
 /// 登录按钮组件
 class LoginButton extends ConsumerWidget {
-  final VoidCallback? onPressed;
-
   const LoginButton({
     super.key,
     this.onPressed,
   });
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

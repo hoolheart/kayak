@@ -9,13 +9,12 @@ import '../services/point_service.dart';
 
 /// 测点列表Notifier
 class PointListNotifier extends StateNotifier<AsyncValue<List<Point>>> {
-  final PointServiceInterface _service;
-  final String deviceId;
-
   PointListNotifier(this._service, this.deviceId)
       : super(const AsyncValue.loading()) {
     _loadPoints();
   }
+  final PointServiceInterface _service;
+  final String deviceId;
 
   Future<void> _loadPoints() async {
     try {

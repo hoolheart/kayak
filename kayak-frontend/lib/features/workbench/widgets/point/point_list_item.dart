@@ -11,12 +11,11 @@ import 'point_value_display.dart';
 
 /// 测点列表项组件
 class PointListItem extends ConsumerWidget {
-  final Point point;
-
   const PointListItem({
     super.key,
     required this.point,
   });
+  final Point point;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

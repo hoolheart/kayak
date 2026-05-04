@@ -11,17 +11,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// 语言设置数据模型
 class LocaleSettings {
-  final Locale locale;
-  final String displayName;
-  final String nativeDisplayName;
-  final bool isRightToLeft;
-
   const LocaleSettings({
     required this.locale,
     required this.displayName,
     required this.nativeDisplayName,
     this.isRightToLeft = false,
   });
+  final Locale locale;
+  final String displayName;
+  final String nativeDisplayName;
+  final bool isRightToLeft;
 
   /// 预定义的语言环境配置
   static const List<LocaleSettings> supportedSettings = [
@@ -56,6 +55,13 @@ class LocaleSettings {
 ///
 /// 管理语言设置的状态变更和持久化
 class LocaleNotifier extends StateNotifier<Locale> {
+  /// 构造函数
+  ///
+  /// 初始化时加载保存的语言设置，默认为英文
+  LocaleNotifier() : super(LocaleSettings.defaultLocale) {
+    _loadLocale();
+  }
+
   /// SharedPreferences中存储语言设置的键
   static const String _localeKey = 'app_locale';
 
@@ -64,13 +70,6 @@ class LocaleNotifier extends StateNotifier<Locale> {
 
   /// 是否已初始化
   bool _initialized = false;
-
-  /// 构造函数
-  ///
-  /// 初始化时加载保存的语言设置，默认为英文
-  LocaleNotifier() : super(LocaleSettings.defaultLocale) {
-    _loadLocale();
-  }
 
   /// 支持的语言列表
   static List<Locale> get supportedLocales {

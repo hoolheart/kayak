@@ -5,10 +5,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment.dart';
-import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
 import 'package:kayak_frontend/features/experiments/screens/experiment_list_page.dart';
+import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockExperimentService extends Mock
     implements ExperimentServiceInterface {}
@@ -58,16 +58,20 @@ void main() {
     });
 
     testWidgets('页面加载时显示标题', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [],
-            page: 1,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [],
+          page: 1,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -87,16 +91,20 @@ void main() {
     });
 
     testWidgets('空状态时显示暂无试验记录', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [],
-            page: 1,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [],
+          page: 1,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -116,17 +124,21 @@ void main() {
 
     testWidgets('页面正确响应数据加载完成', (tester) async {
       // 这个测试验证页面在数据加载完成后正确显示
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [createTestExperiment(name: '测试试验1')],
-            page: 1,
-            total: 1,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [createTestExperiment(name: '测试试验1')],
+          page: 1,
+          total: 1,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -146,20 +158,24 @@ void main() {
     });
 
     testWidgets('显示试验列表数据', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [
-              createTestExperiment(id: 'test-1', name: '测试试验1'),
-              createTestExperiment(id: 'test-2', name: '测试试验2'),
-            ],
-            page: 1,
-            total: 2,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [
+            createTestExperiment(id: 'test-1', name: '测试试验1'),
+            createTestExperiment(id: 'test-2', name: '测试试验2'),
+          ],
+          page: 1,
+          total: 2,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -179,17 +195,21 @@ void main() {
     });
 
     testWidgets('显示分页信息', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [createTestExperiment(name: '测试试验1')],
-            page: 1,
-            total: 25,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [createTestExperiment(name: '测试试验1')],
+          page: 1,
+          total: 25,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -210,16 +230,20 @@ void main() {
     });
 
     testWidgets('筛选工具栏显示状态筛选', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenAnswer((_) async => createPagedResponse(
-            items: [],
-            page: 1,
-          ));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenAnswer(
+        (_) async => createPagedResponse(
+          items: [],
+          page: 1,
+        ),
+      );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -241,13 +265,15 @@ void main() {
     });
 
     testWidgets('错误状态显示错误消息', (tester) async {
-      when(() => mockService.getExperiments(
-            page: any(named: 'page'),
-            size: any(named: 'size'),
-            status: any(named: 'status'),
-            startedAfter: any(named: 'startedAfter'),
-            startedBefore: any(named: 'startedBefore'),
-          )).thenThrow(Exception('Network error'));
+      when(
+        () => mockService.getExperiments(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+          startedAfter: any(named: 'startedAfter'),
+          startedBefore: any(named: 'startedBefore'),
+        ),
+      ).thenThrow(Exception('Network error'));
 
       await tester.pumpWidget(
         ProviderScope(

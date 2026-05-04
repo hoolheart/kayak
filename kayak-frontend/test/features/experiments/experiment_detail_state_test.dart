@@ -243,11 +243,12 @@ void main() {
     test('hasMoreHistory计算逻辑测试', () {
       // 测试实际的hasMoreHistory计算逻辑
       List.generate(
-          100,
-          (i) => PointHistoryData(
-                timestamp: DateTime(2024, 1, 1, 10, i),
-                value: i.toDouble(),
-              ));
+        100,
+        (i) => PointHistoryData(
+          timestamp: DateTime(2024, 1, 1, 10, i),
+          value: i.toDouble(),
+        ),
+      );
 
       // 验证：newData.length >= 100 时 hasMoreHistory 应为 true
       const newDataLength100 = 100;

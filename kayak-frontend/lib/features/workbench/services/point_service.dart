@@ -38,9 +38,8 @@ abstract class PointServiceInterface {
 
 /// 测点服务实现
 class PointService implements PointServiceInterface {
-  final ApiClientInterface _apiClient;
-
   PointService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<List<Point>> listPoints(String deviceId) async {
@@ -130,7 +129,8 @@ class PointService implements PointServiceInterface {
       '/api/v1/points/$pointId/value',
     );
     return PointValue.fromJson(
-        (response as Map)['data'] as Map<String, dynamic>);
+      (response as Map)['data'] as Map<String, dynamic>,
+    );
   }
 
   @override

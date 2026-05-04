@@ -3,10 +3,11 @@
 /// Handles method-related API calls
 library;
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/auth/authenticated_api_client.dart';
 import '../../../core/auth/providers.dart';
 import '../models/method.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Method service interface
 abstract class MethodServiceInterface {
@@ -27,14 +28,14 @@ abstract class MethodServiceInterface {
   });
   Future<void> deleteMethod(String id);
   Future<ValidationResult> validateMethod(
-      Map<String, dynamic> processDefinition);
+    Map<String, dynamic> processDefinition,
+  );
 }
 
 /// Method service implementation
 class MethodService implements MethodServiceInterface {
-  final ApiClientInterface _apiClient;
-
   MethodService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<MethodListResponse> getMethods({int page = 1, int size = 10}) async {
@@ -101,7 +102,8 @@ class MethodService implements MethodServiceInterface {
 
   @override
   Future<ValidationResult> validateMethod(
-      Map<String, dynamic> processDefinition) async {
+    Map<String, dynamic> processDefinition,
+  ) async {
     final response = await _apiClient.post(
       '/api/v1/methods/validate',
       data: {'process_definition': processDefinition},

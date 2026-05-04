@@ -9,26 +9,20 @@ import 'package:flutter/material.dart';
 
 /// 快捷操作卡片数据
 class QuickActionData {
-  final IconData icon;
-  final String title;
-  final String description;
-  final VoidCallback? onTap;
-
   const QuickActionData({
     required this.icon,
     required this.title,
     required this.description,
     this.onTap,
   });
-}
-
-/// 快捷操作卡片组件
-class QuickActionCard extends StatefulWidget {
   final IconData icon;
   final String title;
   final String description;
   final VoidCallback? onTap;
+}
 
+/// 快捷操作卡片组件
+class QuickActionCard extends StatefulWidget {
   const QuickActionCard({
     super.key,
     required this.icon,
@@ -36,6 +30,10 @@ class QuickActionCard extends StatefulWidget {
     required this.description,
     this.onTap,
   });
+  final IconData icon;
+  final String title;
+  final String description;
+  final VoidCallback? onTap;
 
   @override
   State<QuickActionCard> createState() => _QuickActionCardState();

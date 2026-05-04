@@ -8,26 +8,26 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../models/workbench_detail_state.dart';
-import '../../providers/workbench_detail_provider.dart';
 import '../../providers/device_tree_provider.dart';
+import '../../providers/workbench_detail_provider.dart';
 import '../../services/workbench_service.dart';
+import '../../widgets/create_workbench_dialog.dart';
 import '../../widgets/detail/detail_header.dart';
 import '../../widgets/detail/detail_tab_bar.dart';
 import '../../widgets/detail/device_list_tab.dart';
 import '../../widgets/detail/settings_tab.dart';
-import '../../widgets/device_tree/device_tree.dart';
-import '../../widgets/create_workbench_dialog.dart';
 import '../../widgets/device/device_form_dialog.dart';
+import '../../widgets/device_tree/device_tree.dart';
 
 /// 工作台详情页面
 class WorkbenchDetailPage extends ConsumerStatefulWidget {
-  final String workbenchId;
-
   const WorkbenchDetailPage({
     super.key,
     required this.workbenchId,
   });
+  final String workbenchId;
 
   @override
   ConsumerState<WorkbenchDetailPage> createState() =>
@@ -91,10 +91,15 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
             onPressed: () {
               _showDeleteDialog(context);
             },
-            icon: Icon(Icons.delete_outlined,
-                size: 18, color: Theme.of(context).colorScheme.error),
-            label: Text('删除',
-                style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            icon: Icon(
+              Icons.delete_outlined,
+              size: 18,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            label: Text(
+              '删除',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
             style: OutlinedButton.styleFrom(
               visualDensity: VisualDensity.compact,
               side: BorderSide(color: Theme.of(context).colorScheme.error),
@@ -156,7 +161,7 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
                 child: Column(
                   children: [
                     // Tab Bar
-                    Container(
+                    ColoredBox(
                       color:
                           Theme.of(context).colorScheme.surfaceContainerLowest,
                       child: DetailTabBar(tabController: _tabController),
@@ -185,7 +190,7 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage>
   Widget _buildDeviceTreePanel() {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
+    return ColoredBox(
       color: colorScheme.surface,
       child: Column(
         children: [

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../providers/core/theme_provider.dart';
 import '../../../providers/core/locale_provider.dart';
+import '../../../providers/core/theme_provider.dart';
 
 /// Settings page - application settings
 class SettingsPage extends ConsumerWidget {

@@ -4,10 +4,10 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/methods/models/method.dart';
 import 'package:kayak_frontend/features/methods/providers/method_list_provider.dart';
 import 'package:kayak_frontend/features/methods/services/method_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock方法服务
 class MockMethodService extends Mock implements MethodServiceInterface {}
@@ -29,8 +29,8 @@ Method createTestMethod({
         {
           'nodes': [
             {'id': 'start', 'type': 'Start'},
-            {'id': 'end', 'type': 'End'}
-          ]
+            {'id': 'end', 'type': 'End'},
+          ],
         },
     parameterSchema: parameterSchema ?? {},
     version: 1,
@@ -69,12 +69,13 @@ void main() {
           createTestMethod(name: 'Method 1'),
           createTestMethod(name: 'Method 2'),
         ];
-        when(() => mockService.getMethods())
-            .thenAnswer((_) async => createPagedResponse(
-                  items: methods,
-                  page: 1,
-                  total: 2,
-                ));
+        when(() => mockService.getMethods()).thenAnswer(
+          (_) async => createPagedResponse(
+            items: methods,
+            page: 1,
+            total: 2,
+          ),
+        );
 
         final notifier = MethodListNotifier(mockService);
         await notifier.loadMethods();
@@ -118,39 +119,48 @@ void main() {
 
     group('分页加载', () {
       test('loadMore加载下一页', () async {
-        when(() => mockService.getMethods())
-            .thenAnswer((_) async => createPagedResponse(
-                  items: List.generate(
-                      10, (i) => createTestMethod(name: 'Page 1 Item $i')),
-                  page: 1,
-                  total: 25,
-                ));
-        when(() => mockService.getMethods(page: 2))
-            .thenAnswer((_) async => createPagedResponse(
-                  items: [createTestMethod(name: 'Page 2 Item')],
-                  page: 2,
-                  total: 25,
-                ));
+        when(() => mockService.getMethods()).thenAnswer(
+          (_) async => createPagedResponse(
+            items: List.generate(
+              10,
+              (i) => createTestMethod(name: 'Page 1 Item $i'),
+            ),
+            page: 1,
+            total: 25,
+          ),
+        );
+        when(() => mockService.getMethods(page: 2)).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [createTestMethod(name: 'Page 2 Item')],
+            page: 2,
+            total: 25,
+          ),
+        );
 
         final notifier = MethodListNotifier(mockService);
         await notifier.loadMethods();
         await notifier.loadMore();
 
-        expect(notifier.state.methods.length,
-            equals(11)); // 10 from page 1 + 1 from page 2
+        expect(
+          notifier.state.methods.length,
+          equals(11),
+        ); // 10 from page 1 + 1 from page 2
         expect(notifier.state.currentPage, equals(2));
         // hasMore is false because page 2 returned only 1 item which is < page size (10)
         expect(notifier.state.hasMore, isFalse);
       });
 
       test('loadMore不会在加载中时重复请求', () async {
-        when(() => mockService.getMethods())
-            .thenAnswer((_) async => createPagedResponse(
-                  items: List.generate(
-                      10, (i) => createTestMethod(name: 'Item $i')),
-                  page: 1,
-                  total: 25,
-                ));
+        when(() => mockService.getMethods()).thenAnswer(
+          (_) async => createPagedResponse(
+            items: List.generate(
+              10,
+              (i) => createTestMethod(name: 'Item $i'),
+            ),
+            page: 1,
+            total: 25,
+          ),
+        );
 
         final notifier = MethodListNotifier(mockService);
         await notifier.loadMethods();
@@ -174,12 +184,13 @@ void main() {
       test('deleteMethod删除指定方法', () async {
         when(() => mockService.deleteMethod('test-id'))
             .thenAnswer((_) async {});
-        when(() => mockService.getMethods())
-            .thenAnswer((_) async => createPagedResponse(
-                  items: [],
-                  page: 1,
-                  total: 0,
-                ));
+        when(() => mockService.getMethods()).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [],
+            page: 1,
+            total: 0,
+          ),
+        );
 
         final notifier = MethodListNotifier(mockService);
         await notifier.deleteMethod('test-id');

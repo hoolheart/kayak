@@ -13,12 +13,11 @@ import '../../providers/experiment_detail_provider.dart';
 
 /// 试验详情页面
 class ExperimentDetailPage extends ConsumerStatefulWidget {
-  final String experimentId;
-
   const ExperimentDetailPage({
     super.key,
     required this.experimentId,
   });
+  final String experimentId;
 
   @override
   ConsumerState<ExperimentDetailPage> createState() =>
@@ -48,8 +47,10 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
       _historyAutoLoaded = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(experimentDetailProvider.notifier).loadPointHistory(
-            widget.experimentId, _selectedChannel,
-            reset: true);
+              widget.experimentId,
+              _selectedChannel,
+              reset: true,
+            );
       });
     }
 
@@ -378,7 +379,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
     return Column(
       children: [
         // 表头
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHigh,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
@@ -392,7 +393,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
         ),
         // 表体
         Expanded(
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               border: Border.all(color: colorScheme.outlineVariant),
               borderRadius:
@@ -407,7 +408,7 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
                 }
 
                 final point = state.pointHistory[index];
-                final isEven = index % 2 == 0;
+                final isEven = index.isEven;
 
                 return Container(
                   color: isEven
@@ -457,7 +458,9 @@ class _ExperimentDetailPageState extends ConsumerState<ExperimentDetailPage> {
   }
 
   Widget _buildLoadMoreButton(
-      BuildContext context, ExperimentDetailState state) {
+    BuildContext context,
+    ExperimentDetailState state,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: state.isLoadingHistory

@@ -9,10 +9,9 @@ import '../services/experiment_service.dart';
 
 /// 试验详情Notifier
 class ExperimentDetailNotifier extends StateNotifier<ExperimentDetailState> {
-  final ExperimentServiceInterface _service;
-
   ExperimentDetailNotifier(this._service)
       : super(const ExperimentDetailState());
+  final ExperimentServiceInterface _service;
 
   /// 加载试验详情
   Future<void> loadExperiment(String id) async {
@@ -122,9 +121,6 @@ final experimentDetailProvider =
 
 /// Point history item (for API response)
 class PointHistoryItem {
-  final int timestamp; // nanoseconds since epoch
-  final double value;
-
   const PointHistoryItem({
     required this.timestamp,
     required this.value,
@@ -136,17 +132,12 @@ class PointHistoryItem {
       value: (json['value'] as num).toDouble(),
     );
   }
+  final int timestamp; // nanoseconds since epoch
+  final double value;
 }
 
 /// Point history response
 class PointHistoryResponse {
-  final String experimentId;
-  final String channel;
-  final List<PointHistoryItem> data;
-  final DateTime? startTime;
-  final DateTime? endTime;
-  final int totalPoints;
-
   const PointHistoryResponse({
     required this.experimentId,
     required this.channel,
@@ -172,4 +163,10 @@ class PointHistoryResponse {
       totalPoints: json['total_points'] as int,
     );
   }
+  final String experimentId;
+  final String channel;
+  final List<PointHistoryItem> data;
+  final DateTime? startTime;
+  final DateTime? endTime;
+  final int totalPoints;
 }

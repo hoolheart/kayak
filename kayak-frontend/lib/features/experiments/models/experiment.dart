@@ -13,6 +13,8 @@ enum ExperimentStatus {
   aborted('ABORTED');
 
   final String value;
+  // The field must precede the constructor in enums for Dart syntax.
+  // ignore: sort_constructors_first
   const ExperimentStatus(this.value);
 
   static ExperimentStatus fromString(String value) {
@@ -25,17 +27,6 @@ enum ExperimentStatus {
 
 /// 实验实体
 class Experiment {
-  final String id;
-  final String userId;
-  final String? methodId;
-  final String name;
-  final String? description;
-  final ExperimentStatus status;
-  final DateTime? startedAt;
-  final DateTime? endedAt;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   const Experiment({
     required this.id,
     required this.userId,
@@ -67,6 +58,16 @@ class Experiment {
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
   }
+  final String id;
+  final String userId;
+  final String? methodId;
+  final String name;
+  final String? description;
+  final ExperimentStatus status;
+  final DateTime? startedAt;
+  final DateTime? endedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Map<String, dynamic> toJson() {
     return {
@@ -112,13 +113,6 @@ class Experiment {
 
 /// 实验列表分页响应
 class PagedExperimentResponse {
-  final List<Experiment> items;
-  final int page;
-  final int size;
-  final int total;
-  final bool hasNext;
-  final bool hasPrev;
-
   const PagedExperimentResponse({
     required this.items,
     required this.page,
@@ -140,4 +134,10 @@ class PagedExperimentResponse {
       hasPrev: json['has_prev'] as bool,
     );
   }
+  final List<Experiment> items;
+  final int page;
+  final int size;
+  final int total;
+  final bool hasNext;
+  final bool hasPrev;
 }

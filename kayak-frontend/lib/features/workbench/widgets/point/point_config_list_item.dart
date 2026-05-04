@@ -8,6 +8,14 @@ import '../../models/modbus_point_config.dart';
 
 /// 测点配置列表项组件
 class PointConfigListItem extends StatelessWidget {
+  const PointConfigListItem({
+    super.key,
+    required this.config,
+    required this.index,
+    this.onEdit,
+    this.onDelete,
+  });
+
   /// 配置数据
   final ModbusPointConfig config;
 
@@ -19,14 +27,6 @@ class PointConfigListItem extends StatelessWidget {
 
   /// 删除回调
   final VoidCallback? onDelete;
-
-  const PointConfigListItem({
-    super.key,
-    required this.config,
-    required this.index,
-    this.onEdit,
-    this.onDelete,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,10 @@ class PointConfigListItem extends StatelessWidget {
                 _buildInfoChip(context, '数量', '${config.quantity}'),
                 _buildInfoChip(context, '类型', config.dataType.value),
                 _buildInfoChip(
-                    context, '缩放/偏移', '×${config.scale} + ${config.offset}'),
+                  context,
+                  '缩放/偏移',
+                  '×${config.scale} + ${config.offset}',
+                ),
                 // 地址范围信息
                 Container(
                   padding:

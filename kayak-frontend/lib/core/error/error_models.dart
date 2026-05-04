@@ -16,12 +16,6 @@ enum NetworkErrorType {
 
 /// Application error base class
 abstract class AppError {
-  final String code;
-  final String message;
-  final DateTime timestamp;
-  final ErrorSeverity severity;
-  final Map<String, dynamic> metadata;
-
   const AppError({
     required this.code,
     required this.message,
@@ -29,6 +23,11 @@ abstract class AppError {
     required this.severity,
     this.metadata = const {},
   });
+  final String code;
+  final String message;
+  final DateTime timestamp;
+  final ErrorSeverity severity;
+  final Map<String, dynamic> metadata;
 
   @override
   String toString() => 'AppError($code): $message';
@@ -36,10 +35,6 @@ abstract class AppError {
 
 /// Field-level validation error
 class FieldError {
-  final String field;
-  final String message;
-  final String? code;
-
   const FieldError({
     required this.field,
     required this.message,
@@ -53,6 +48,9 @@ class FieldError {
       code: json['code'] as String?,
     );
   }
+  final String field;
+  final String message;
+  final String? code;
 
   Map<String, dynamic> toJson() {
     return {
@@ -65,11 +63,6 @@ class FieldError {
 
 /// API error
 class ApiError extends AppError {
-  final int? statusCode;
-  final List<FieldError> fieldErrors;
-  final String? requestPath;
-  final String? requestMethod;
-
   const ApiError({
     required super.code,
     required super.message,
@@ -81,15 +74,6 @@ class ApiError extends AppError {
     this.requestPath,
     this.requestMethod,
   });
-
-  /// Check if this is an authentication error (401/403)
-  bool get isAuthError => statusCode == 401 || statusCode == 403;
-
-  /// Check if this is a validation error (400)
-  bool get isValidationError => statusCode == 400;
-
-  /// Check if this is a server error (5xx)
-  bool get isServerError => statusCode != null && statusCode! >= 500;
 
   /// Create from HTTP status code
   factory ApiError.fromStatusCode({
@@ -114,6 +98,19 @@ class ApiError extends AppError {
       requestMethod: requestMethod,
     );
   }
+  final int? statusCode;
+  final List<FieldError> fieldErrors;
+  final String? requestPath;
+  final String? requestMethod;
+
+  /// Check if this is an authentication error (401/403)
+  bool get isAuthError => statusCode == 401 || statusCode == 403;
+
+  /// Check if this is a validation error (400)
+  bool get isValidationError => statusCode == 400;
+
+  /// Check if this is a server error (5xx)
+  bool get isServerError => statusCode != null && statusCode! >= 500;
 
   @override
   String toString() => 'ApiError($statusCode, $code): $message at $requestPath';
@@ -121,9 +118,6 @@ class ApiError extends AppError {
 
 /// Network error
 class NetworkError extends AppError {
-  final NetworkErrorType type;
-  final bool isServerError;
-
   const NetworkError({
     required super.code,
     required super.message,
@@ -167,13 +161,12 @@ class NetworkError extends AppError {
       isServerError: true,
     );
   }
+  final NetworkErrorType type;
+  final bool isServerError;
 }
 
 /// Widget rendering error
 class WidgetError extends AppError {
-  final String widgetName;
-  final String? stackTrace;
-
   const WidgetError({
     required super.code,
     required super.message,
@@ -183,6 +176,8 @@ class WidgetError extends AppError {
     this.stackTrace,
     super.metadata,
   });
+  final String widgetName;
+  final String? stackTrace;
 
   @override
   String toString() => 'WidgetError($widgetName): $message';
@@ -190,10 +185,6 @@ class WidgetError extends AppError {
 
 /// Form validation error
 class FormError extends AppError {
-  final String field;
-  final String? errorCode;
-  final List<String> messages;
-
   const FormError({
     required super.code,
     required super.message,
@@ -204,4 +195,7 @@ class FormError extends AppError {
     this.messages = const [],
     super.metadata,
   });
+  final String field;
+  final String? errorCode;
+  final List<String> messages;
 }

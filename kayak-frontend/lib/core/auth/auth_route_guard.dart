@@ -72,9 +72,8 @@ final authRouteGuardProvider = Provider<AuthRouteGuard>((ref) {
 ///
 /// 实现路由守卫逻辑
 class AuthRouteGuard {
-  final Ref _ref;
-
   AuthRouteGuard(this._ref);
+  final Ref _ref;
 
   /// 路由重定向回调
   ///

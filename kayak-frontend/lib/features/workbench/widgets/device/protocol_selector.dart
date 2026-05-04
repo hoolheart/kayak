@@ -9,16 +9,15 @@ import '../../models/device.dart';
 
 /// 协议选择器组件
 class ProtocolSelector extends StatelessWidget {
-  final ProtocolType value;
-  final bool enabled;
-  final ValueChanged<ProtocolType> onChanged;
-
   const ProtocolSelector({
     super.key,
     required this.value,
     required this.enabled,
     required this.onChanged,
   });
+  final ProtocolType value;
+  final bool enabled;
+  final ValueChanged<ProtocolType> onChanged;
 
   /// 支持的协议选项列表
   /// 目前支持三个协议: Virtual, Modbus TCP, Modbus RTU
@@ -113,15 +112,14 @@ class ProtocolSelector extends StatelessWidget {
 
 /// 协议选项内部数据类
 class _ProtocolOption {
-  final ProtocolType type;
-  final IconData icon;
-  final String label;
-  final String description;
-
   const _ProtocolOption({
     required this.type,
     required this.icon,
     required this.label,
     required this.description,
   });
+  final ProtocolType type;
+  final IconData icon;
+  final String label;
+  final String description;
 }

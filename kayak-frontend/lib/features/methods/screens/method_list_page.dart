@@ -158,7 +158,10 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
   }
 
   Widget _buildMethodCard(
-      BuildContext context, Method method, MethodListState state) {
+    BuildContext context,
+    Method method,
+    MethodListState state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(

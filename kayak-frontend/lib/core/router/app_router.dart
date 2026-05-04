@@ -9,18 +9,19 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
-import '../../features/experiments/screens/experiment_list_page.dart';
-import '../../features/experiments/screens/experiment_console_page.dart';
-import '../../features/methods/screens/method_list_page.dart';
-import '../../features/methods/screens/method_edit_page.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
-import '../../features/workbench/screens/workbench_list_page.dart';
+import '../../features/experiments/screens/experiment_console_page.dart';
+import '../../features/experiments/screens/experiment_list_page.dart';
+import '../../features/methods/screens/method_edit_page.dart';
+import '../../features/methods/screens/method_list_page.dart';
 import '../../features/workbench/screens/detail/workbench_detail_page.dart';
+import '../../features/workbench/screens/workbench_list_page.dart';
 import '../../screens/settings/settings_page.dart';
-import '../navigation/app_shell.dart';
 import '../auth/providers.dart';
+import '../navigation/app_shell.dart';
 
 /// 启动页 - 仅显示加载状态，路由重定向处理导航
 class SplashScreen extends ConsumerStatefulWidget {
@@ -109,7 +110,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isInitialized = authState.isInitialized;
       final path = state.uri.path;
       debugPrint(
-          'Router redirect: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path');
+        'Router redirect: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path',
+      );
 
       // 公共路由 - 登录和注册页面始终可访问
       const publicRoutes = ['/login', '/register'];
@@ -118,7 +120,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 未初始化 -> 留在 splash 页面等待
       if (!isInitialized) {
         debugPrint(
-            'Router redirect: -> / (not initialized, waiting on splash)');
+          'Router redirect: -> / (not initialized, waiting on splash)',
+        );
         return null;
       }
 
@@ -138,7 +141,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 已登录访问启动页 -> 直接跳转到首页
       if (isLoggedIn && path == '/') {
         debugPrint(
-            'Router redirect: -> /dashboard (authenticated, skip splash)');
+          'Router redirect: -> /dashboard (authenticated, skip splash)',
+        );
         return AppRoutes.dashboard;
       }
 

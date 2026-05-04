@@ -5,13 +5,6 @@ import 'package:flutter/material.dart';
 
 /// Confirmation dialog with customizable buttons
 class ConfirmationDialog extends StatelessWidget {
-  final String title;
-  final String message;
-  final String confirmLabel;
-  final String cancelLabel;
-  final bool isDangerous;
-  final IconData? icon;
-
   const ConfirmationDialog({
     super.key,
     required this.title,
@@ -21,6 +14,12 @@ class ConfirmationDialog extends StatelessWidget {
     this.isDangerous = false,
     this.icon,
   });
+  final String title;
+  final String message;
+  final String confirmLabel;
+  final String cancelLabel;
+  final bool isDangerous;
+  final IconData? icon;
 
   static Future<bool?> show(
     BuildContext context, {
@@ -86,12 +85,11 @@ class ConfirmationDialog extends StatelessWidget {
 
 /// Delete confirmation dialog (convenience method)
 class DeleteConfirmationDialog extends StatelessWidget {
-  final String itemName;
-
   const DeleteConfirmationDialog({
     super.key,
     required this.itemName,
   });
+  final String itemName;
 
   static Future<bool?> show(
     BuildContext context, {

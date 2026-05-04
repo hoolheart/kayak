@@ -6,22 +6,22 @@ library;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'auth_state.dart';
-import 'auth_notifier_interface.dart';
+
 import 'auth_api_service.dart';
+import 'auth_notifier_interface.dart';
+import 'auth_state.dart';
 import 'token_storage.dart';
 
 class AuthStateNotifier extends StateNotifier<AuthState>
     implements AuthStateNotifierInterface {
-  final TokenStorageInterface _tokenStorage;
-  final AuthApiServiceInterface _authApiService;
-
   AuthStateNotifier({
     required TokenStorageInterface tokenStorage,
     required AuthApiServiceInterface authApiService,
   })  : _tokenStorage = tokenStorage,
         _authApiService = authApiService,
         super(AuthState.initial());
+  final TokenStorageInterface _tokenStorage;
+  final AuthApiServiceInterface _authApiService;
 
   @override
   bool get isAuthenticated => state.isAuthenticated;
@@ -54,7 +54,8 @@ class AuthStateNotifier extends StateNotifier<AuthState>
       final accessToken = await _tokenStorage.getAccessToken();
       final refreshToken = await _tokenStorage.getRefreshToken();
       debugPrint(
-          'AuthStateNotifier.initialize: accessToken=${accessToken != null}, refreshToken=${refreshToken != null}');
+        'AuthStateNotifier.initialize: accessToken=${accessToken != null}, refreshToken=${refreshToken != null}',
+      );
 
       if (accessToken == null || refreshToken == null) {
         debugPrint('AuthStateNotifier.initialize: No tokens, going to initial');
@@ -140,8 +141,11 @@ class AuthStateNotifier extends StateNotifier<AuthState>
 
   /// 注册
   @override
-  Future<bool> register(String email, String password,
-      [String? username]) async {
+  Future<bool> register(
+    String email,
+    String password, [
+    String? username,
+  ]) async {
     state = AuthState.loading();
 
     try {

@@ -18,11 +18,6 @@ enum BannerType {
 
 /// 错误横幅组件
 class ErrorBanner extends StatelessWidget {
-  final String message;
-  final BannerType type;
-  final VoidCallback? onDismiss;
-  final VoidCallback? onRetry;
-
   const ErrorBanner({
     super.key,
     required this.message,
@@ -30,6 +25,10 @@ class ErrorBanner extends StatelessWidget {
     this.onDismiss,
     this.onRetry,
   });
+  final String message;
+  final BannerType type;
+  final VoidCallback? onDismiss;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {

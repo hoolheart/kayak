@@ -12,12 +12,11 @@ import 'workbench_list_provider.dart';
 
 /// 工作台表单Notifier
 class WorkbenchFormNotifier extends StateNotifier<WorkbenchFormState> {
+  WorkbenchFormNotifier(this._service, this._ref)
+      : super(const WorkbenchFormState());
   final WorkbenchServiceInterface _service;
   final Ref _ref;
   Workbench? _editingWorkbench;
-
-  WorkbenchFormNotifier(this._service, this._ref)
-      : super(const WorkbenchFormState());
 
   /// 初始化编辑模式
   void initForEdit(Workbench workbench) {

@@ -9,18 +9,17 @@ import '../../models/protocol_config.dart';
 
 /// Virtual 协议参数表单
 class VirtualProtocolForm extends StatefulWidget {
-  final VirtualConfig? initialConfig;
-  final bool isEditMode;
-
-  /// 字段变更回调，用于追踪表单脏状态
-  final VoidCallback? onFieldChanged;
-
   const VirtualProtocolForm({
     super.key,
     this.initialConfig,
     this.isEditMode = false,
     this.onFieldChanged,
   });
+  final VirtualConfig? initialConfig;
+  final bool isEditMode;
+
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
 
   @override
   VirtualProtocolFormState createState() => VirtualProtocolFormState();

@@ -18,8 +18,9 @@ class GoldenTestConfig {
   /// [threshold] - 允许的像素差异比例
   ///
   /// 注意：这个方法在flutter_test_config.dart中通过全局设置goldenFileComparator来使用
-  static void configureGoldenFileComparator(
-      {double threshold = defaultThreshold}) {
+  static void configureGoldenFileComparator({
+    double threshold = defaultThreshold,
+  }) {
     // 配置信息，实际比较器设置在 flutter_test_config.dart 中
     // 这里仅作为配置文档
   }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:kayak_frontend/app.dart';
-import 'package:kayak_frontend/providers/core/theme_provider.dart';
 import 'package:kayak_frontend/core/theme/app_theme.dart';
+import 'package:kayak_frontend/providers/core/theme_provider.dart';
 
 void main() {
   group('Theme Tests', () {

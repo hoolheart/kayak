@@ -7,20 +7,20 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/device_tree_provider.dart';
-import '../../providers/point_list_provider.dart';
+
+import '../../../../core/theme/color_schemes.dart';
 import '../../models/device.dart';
 import '../../models/point.dart';
-import '../../../../core/theme/color_schemes.dart';
+import '../../providers/device_tree_provider.dart';
+import '../../providers/point_list_provider.dart';
 
 /// 设备列表Tab内容组件
 class DeviceListTab extends ConsumerStatefulWidget {
-  final String workbenchId;
-
   const DeviceListTab({
     super.key,
     required this.workbenchId,
   });
+  final String workbenchId;
 
   @override
   ConsumerState<DeviceListTab> createState() => _DeviceListTabState();
@@ -120,15 +120,14 @@ class _DeviceListTabState extends ConsumerState<DeviceListTab> {
 
 /// 设备卡片组件
 class _DeviceCard extends ConsumerStatefulWidget {
-  final Device device;
-  final bool isExpanded;
-  final VoidCallback onTap;
-
   const _DeviceCard({
     required this.device,
     required this.isExpanded,
     required this.onTap,
   });
+  final Device device;
+  final bool isExpanded;
+  final VoidCallback onTap;
 
   @override
   ConsumerState<_DeviceCard> createState() => _DeviceCardState();
@@ -196,7 +195,9 @@ class _DeviceCardState extends ConsumerState<_DeviceCard> {
                     Container(
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: colorScheme.tertiaryContainer,
                         borderRadius: BorderRadius.circular(6),
@@ -281,8 +282,11 @@ class _DeviceCardState extends ConsumerState<_DeviceCard> {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                Icon(Icons.sensors,
-                    size: 32, color: colorScheme.onSurfaceVariant),
+                Icon(
+                  Icons.sensors,
+                  size: 32,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   '该设备暂无测点',
@@ -306,36 +310,61 @@ class _DeviceCardState extends ConsumerState<_DeviceCard> {
               child: const Row(
                 children: [
                   SizedBox(
-                      width: 150,
-                      child: Text('名称',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500))),
+                    width: 150,
+                    child: Text(
+                      '名称',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   SizedBox(
-                      width: 100,
-                      child: Text('类型',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500))),
+                    width: 100,
+                    child: Text(
+                      '类型',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   SizedBox(
-                      width: 100,
-                      child: Text('值',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500))),
+                    width: 100,
+                    child: Text(
+                      '值',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   SizedBox(
-                      width: 80,
-                      child: Text('单位',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500))),
+                    width: 80,
+                    child: Text(
+                      '单位',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                   SizedBox(
-                      width: 80,
-                      child: Text('状态',
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w500))),
+                    width: 80,
+                    child: Text(
+                      '状态',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
             ...points.asMap().entries.map((entry) {
               final point = entry.value;
-              final isEven = entry.key % 2 == 0;
+              final isEven = entry.key.isEven;
               final isActive = point.status == PointStatus.active;
               return Container(
                 height: 44,

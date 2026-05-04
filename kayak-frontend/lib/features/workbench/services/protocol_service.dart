@@ -10,9 +10,8 @@ import '../models/protocol_config.dart';
 
 /// 协议服务
 class ProtocolService {
-  final ApiClientInterface _apiClient;
-
   ProtocolService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   /// 获取支持的协议列表
   Future<List<ProtocolInfo>> getProtocols() async {

@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 
 /// Search input field with clear button
 class SearchInput extends StatefulWidget {
-  final String hintText;
-  final ValueChanged<String>? onChanged;
-  final ValueChanged<String>? onSubmitted;
-  final TextEditingController? controller;
-  final Duration debounceDelay;
-
   const SearchInput({
     super.key,
     this.hintText = '搜索...',
@@ -19,6 +13,11 @@ class SearchInput extends StatefulWidget {
     this.controller,
     this.debounceDelay = const Duration(milliseconds: 300),
   });
+  final String hintText;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final TextEditingController? controller;
+  final Duration debounceDelay;
 
   @override
   State<SearchInput> createState() => _SearchInputState();
@@ -85,15 +84,6 @@ class _SearchInputState extends State<SearchInput> {
 
 /// Filter chip selector for single or multiple selection
 class FilterChipSelector<T> extends StatelessWidget {
-  final List<T> options;
-  final T? selectedValue;
-  final List<T> selectedValues;
-  final ValueChanged<T?>? onChanged;
-  final ValueChanged<List<T>>? onMultiChanged;
-  final bool allowMultiple;
-  final String Function(T) labelBuilder;
-  final bool showAllOption;
-
   const FilterChipSelector({
     super.key,
     required this.options,
@@ -108,6 +98,14 @@ class FilterChipSelector<T> extends StatelessWidget {
           allowMultiple ? onMultiChanged != null : onChanged != null,
           'Either onChanged or onMultiChanged must be provided based on allowMultiple',
         );
+  final List<T> options;
+  final T? selectedValue;
+  final List<T> selectedValues;
+  final ValueChanged<T?>? onChanged;
+  final ValueChanged<List<T>>? onMultiChanged;
+  final bool allowMultiple;
+  final String Function(T) labelBuilder;
+  final bool showAllOption;
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +169,6 @@ class FilterChipSelector<T> extends StatelessWidget {
 
 /// Status badge widget
 class StatusBadge extends StatelessWidget {
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-
   const StatusBadge({
     super.key,
     required this.label,
@@ -221,6 +215,9 @@ class StatusBadge extends StatelessWidget {
       textColor: Colors.grey.shade800,
     );
   }
+  final String label;
+  final Color backgroundColor;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {

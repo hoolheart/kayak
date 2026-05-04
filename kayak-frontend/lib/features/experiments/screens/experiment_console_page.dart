@@ -20,9 +20,8 @@ import '../services/experiment_ws_client.dart';
 
 /// Experiment console page
 class ExperimentConsolePage extends ConsumerStatefulWidget {
-  final String? experimentId;
-
   const ExperimentConsolePage({super.key, this.experimentId});
+  final String? experimentId;
 
   @override
   ConsumerState<ExperimentConsolePage> createState() =>
@@ -106,7 +105,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
 
   void _setupWebSocket() {
     _wsClient = ExperimentWebSocketClient();
-    ref.read(experimentConsoleProvider.notifier).setWebSocketClient(_wsClient!);
+    ref.read(experimentConsoleProvider.notifier).webSocketClient = _wsClient!;
 
     // Listen to status changes
     _wsClient!.statusChanges.listen((statusChange) {
@@ -247,7 +246,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   }
 
   Widget _buildExperimentInfo(
-      BuildContext context, ExperimentConsoleState state) {
+    BuildContext context,
+    ExperimentConsoleState state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -286,7 +287,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
 
   // M-07/M-08 fix: Build method selector with error and empty state handling
   Widget _buildMethodSelector(
-      BuildContext context, ExperimentConsoleState state) {
+    BuildContext context,
+    ExperimentConsoleState state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Handle loading state
@@ -307,8 +310,11 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline,
-                      size: 18, color: colorScheme.onSurfaceVariant),
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -341,10 +347,12 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
         hintText: '选择试验方法',
       ),
       items: state.availableMethods
-          .map((method) => DropdownMenuItem(
-                value: method.id,
-                child: Text(method.name),
-              ))
+          .map(
+            (method) => DropdownMenuItem(
+              value: method.id,
+              child: Text(method.name),
+            ),
+          )
           .toList(),
       onChanged: state.experiment?.status == ExperimentStatus.idle
           ? (value) {
@@ -431,7 +439,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   }
 
   Widget _buildControlButtons(
-      BuildContext context, ExperimentConsoleState state) {
+    BuildContext context,
+    ExperimentConsoleState state,
+  ) {
     // m-04 fix: Check if specific operation is in progress
     final isLoading = state.currentOperation == ControlOperation.load;
     final isStarting = state.currentOperation == ControlOperation.start;
@@ -570,7 +580,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   }
 
   Widget _buildParameterConfig(
-      BuildContext context, ExperimentConsoleState state) {
+    BuildContext context,
+    ExperimentConsoleState state,
+  ) {
     final method = state.availableMethods.firstWhere(
       (m) => m.id == state.selectedMethodId,
       orElse: () => state.availableMethods.isEmpty
@@ -699,8 +711,10 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
                       if (unit != null)
                         Padding(
                           padding: const EdgeInsets.only(left: 8),
-                          child: Text(unit,
-                              style: Theme.of(context).textTheme.bodySmall),
+                          child: Text(
+                            unit,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         ),
                     ],
                   ),
@@ -727,7 +741,9 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
   // C-03 fix: Get or create controller for parameter
   // m-08 fix: Preserve cursor position when updating text
   TextEditingController _getParameterController(
-      String name, dynamic currentValue) {
+    String name,
+    dynamic currentValue,
+  ) {
     if (!_parameterControllers.containsKey(name)) {
       _parameterControllers[name] = TextEditingController(
         text: currentValue?.toString() ?? '',
@@ -876,7 +892,7 @@ class _ExperimentConsolePageState extends ConsumerState<ExperimentConsolePage>
         Expanded(
           child: Stack(
             children: [
-              Container(
+              ColoredBox(
                 color: colorScheme.surfaceContainerLowest,
                 child: ListView.builder(
                   key: const Key('log_list'),

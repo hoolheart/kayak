@@ -7,18 +7,6 @@ import '../models/experiment.dart';
 
 /// 试验列表状态
 class ExperimentListState {
-  final List<Experiment> experiments;
-  final int currentPage;
-  final int pageSize;
-  final int total;
-  final bool isLoading;
-  final bool isRefreshing;
-  final bool hasMore;
-  final ExperimentStatus? statusFilter;
-  final DateTime? startDateFilter;
-  final DateTime? endDateFilter;
-  final String? error;
-
   const ExperimentListState({
     this.experiments = const [],
     this.currentPage = 1,
@@ -32,6 +20,17 @@ class ExperimentListState {
     this.endDateFilter,
     this.error,
   });
+  final List<Experiment> experiments;
+  final int currentPage;
+  final int pageSize;
+  final int total;
+  final bool isLoading;
+  final bool isRefreshing;
+  final bool hasMore;
+  final ExperimentStatus? statusFilter;
+  final DateTime? startDateFilter;
+  final DateTime? endDateFilter;
+  final String? error;
 
   ExperimentListState copyWith({
     List<Experiment>? experiments,

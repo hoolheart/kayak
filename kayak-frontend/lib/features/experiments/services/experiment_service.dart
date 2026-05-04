@@ -30,9 +30,8 @@ abstract class ExperimentServiceInterface {
 
 /// 试验服务实现
 class ExperimentService implements ExperimentServiceInterface {
-  final ApiClientInterface _apiClient;
-
   ExperimentService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<PagedExperimentResponse> getExperiments({
@@ -70,7 +69,8 @@ class ExperimentService implements ExperimentServiceInterface {
   Future<Experiment> getExperiment(String id) async {
     final response = await _apiClient.get('/api/v1/experiments/$id');
     return Experiment.fromJson(
-        (response as Map)['data'] as Map<String, dynamic>);
+      (response as Map)['data'] as Map<String, dynamic>,
+    );
   }
 
   @override

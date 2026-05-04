@@ -46,7 +46,8 @@ void main() {
       await expectLater(
         find.byType(MaterialApp),
         matchesGoldenFile(
-            '../../golden_files/light/test_app_light_desktop.png'),
+          '../../golden_files/light/test_app_light_desktop.png',
+        ),
       );
     });
 

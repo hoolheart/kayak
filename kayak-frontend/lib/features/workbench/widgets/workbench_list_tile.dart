@@ -6,18 +6,12 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../models/workbench.dart';
+
 import '../../../core/theme/color_schemes.dart';
+import '../models/workbench.dart';
 
 /// 工作台列表项组件
 class WorkbenchListTile extends StatelessWidget {
-  final Workbench workbench;
-  final int deviceCount;
-  final int index;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-
   const WorkbenchListTile({
     super.key,
     required this.workbench,
@@ -27,12 +21,18 @@ class WorkbenchListTile extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
   });
+  final Workbench workbench;
+  final int deviceCount;
+  final int index;
+  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
-    final isEven = index % 2 == 0;
+    final isEven = index.isEven;
 
     return InkWell(
       onTap: onTap,
@@ -126,8 +126,11 @@ class WorkbenchListTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.edit_outlined,
-                        size: 18, color: colorScheme.onSurfaceVariant),
+                    icon: Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     onPressed: onEdit,
                     visualDensity: VisualDensity.compact,
                     constraints:
@@ -135,8 +138,11 @@ class WorkbenchListTile extends StatelessWidget {
                     padding: EdgeInsets.zero,
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outlined,
-                        size: 18, color: colorScheme.error),
+                    icon: Icon(
+                      Icons.delete_outlined,
+                      size: 18,
+                      color: colorScheme.error,
+                    ),
                     onPressed: onDelete,
                     visualDensity: VisualDensity.compact,
                     constraints:

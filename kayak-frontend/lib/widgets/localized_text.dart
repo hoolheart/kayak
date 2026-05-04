@@ -5,16 +5,15 @@ import 'package:flutter/material.dart';
 /// Automatically applies text direction based on current locale.
 /// This is useful for RTL language support in the future.
 class LocalizedText extends StatelessWidget {
-  final String text;
-  final TextStyle? style;
-  final TextAlign? textAlign;
-
   const LocalizedText({
     super.key,
     required this.text,
     this.style,
     this.textAlign,
   });
+  final String text;
+  final TextStyle? style;
+  final TextAlign? textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +32,13 @@ class LocalizedText extends StatelessWidget {
 ///
 /// A rich text version of LocalizedText for more complex text formatting.
 class LocalizedRichText extends StatelessWidget {
-  final InlineSpan textSpan;
-  final TextAlign? textAlign;
-
   const LocalizedRichText({
     super.key,
     required this.textSpan,
     this.textAlign,
   });
+  final InlineSpan textSpan;
+  final TextAlign? textAlign;
 
   @override
   Widget build(BuildContext context) {

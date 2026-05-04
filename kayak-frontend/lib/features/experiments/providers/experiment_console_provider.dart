@@ -4,23 +4,23 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../methods/models/method.dart';
+import '../../methods/services/method_service.dart';
 import '../models/experiment.dart';
 import '../services/experiment_control_service.dart';
 import '../services/experiment_ws_client.dart';
-import '../../methods/models/method.dart';
-import '../../methods/services/method_service.dart';
 
 /// Log entry for experiment console
 class ConsoleLogEntry {
-  final DateTime timestamp;
-  final String level;
-  final String message;
-
   const ConsoleLogEntry({
     required this.timestamp,
     required this.level,
     required this.message,
   });
+  final DateTime timestamp;
+  final String level;
+  final String message;
 
   @override
   String toString() {
@@ -41,6 +41,21 @@ enum ControlOperation {
 
 /// Experiment console state
 class ExperimentConsoleState {
+  const ExperimentConsoleState({
+    this.experiment,
+    this.availableMethods = const [],
+    this.selectedMethodId,
+    this.parameterValues = const {},
+    this.logs = const [],
+    this.isLoading = false,
+    this.isControlling = false,
+    this.currentOperation,
+    this.error,
+    this.wsConnected = false,
+    this.autoScrollEnabled = true,
+    this.newLogsAvailable = false,
+    this.parameterErrors = const {},
+  });
   final Experiment? experiment;
   final List<Method> availableMethods;
   final String? selectedMethodId;
@@ -57,22 +72,6 @@ class ExperimentConsoleState {
   final bool newLogsAvailable;
   // M-01 fix: Parameter validation errors
   final Map<String, String?> parameterErrors;
-
-  const ExperimentConsoleState({
-    this.experiment,
-    this.availableMethods = const [],
-    this.selectedMethodId,
-    this.parameterValues = const {},
-    this.logs = const [],
-    this.isLoading = false,
-    this.isControlling = false,
-    this.currentOperation,
-    this.error,
-    this.wsConnected = false,
-    this.autoScrollEnabled = true,
-    this.newLogsAvailable = false,
-    this.parameterErrors = const {},
-  });
 
   ExperimentConsoleState copyWith({
     Experiment? experiment,
@@ -157,14 +156,13 @@ class ExperimentConsoleState {
 
 /// Experiment console notifier
 class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
-  final ExperimentControlServiceInterface _controlService;
-  final MethodServiceInterface _methodService;
-  ExperimentWebSocketClient? _wsClient;
-
   ExperimentConsoleNotifier(
     this._controlService,
     this._methodService,
   ) : super(const ExperimentConsoleState());
+  final ExperimentControlServiceInterface _controlService;
+  final MethodServiceInterface _methodService;
+  ExperimentWebSocketClient? _wsClient;
 
   /// Initialize the console - load methods and optionally load/create experiment
   /// C-05 fix: Accept optional experimentId to load existing experiment
@@ -230,7 +228,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
   /// M-01 fix: Validate a parameter value against its schema
   String? validateParameterValue(
-      String name, dynamic value, Map<String, dynamic> schema) {
+    String name,
+    dynamic value,
+    Map<String, dynamic> schema,
+  ) {
     final type = schema['type'] as String? ?? 'string';
 
     switch (type) {
@@ -343,7 +344,9 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation to track which operation is in progress
     state = state.copyWith(
-        isControlling: true, currentOperation: ControlOperation.load);
+      isControlling: true,
+      currentOperation: ControlOperation.load,
+    );
 
     try {
       // C-01 fix: pass parameter values to backend
@@ -354,9 +357,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
       );
 
       state = state.copyWith(
-          experiment: experiment,
-          isControlling: false,
-          clearCurrentOperation: true);
+        experiment: experiment,
+        isControlling: false,
+        clearCurrentOperation: true,
+      );
       _addLog('info', '方法已载入');
     } catch (e) {
       // m-05 fix: Try to sync state on state conflict error
@@ -365,9 +369,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         await _syncStateFromServer();
       }
       state = state.copyWith(
-          isControlling: false,
-          clearCurrentOperation: true,
-          error: e.toString());
+        isControlling: false,
+        clearCurrentOperation: true,
+        error: e.toString(),
+      );
       _addLog('error', '载入失败: $e');
     }
   }
@@ -378,15 +383,18 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true, currentOperation: ControlOperation.start);
+      isControlling: true,
+      currentOperation: ControlOperation.start,
+    );
 
     try {
       final experiment =
           await _controlService.startExperiment(state.experiment!.id);
       state = state.copyWith(
-          experiment: experiment,
-          isControlling: false,
-          clearCurrentOperation: true);
+        experiment: experiment,
+        isControlling: false,
+        clearCurrentOperation: true,
+      );
       _addLog('info', '试验开始');
     } catch (e) {
       // m-05 fix: Try to sync state on state conflict error
@@ -395,9 +403,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         await _syncStateFromServer();
       }
       state = state.copyWith(
-          isControlling: false,
-          clearCurrentOperation: true,
-          error: e.toString());
+        isControlling: false,
+        clearCurrentOperation: true,
+        error: e.toString(),
+      );
       _addLog('error', '启动失败: $e');
     }
   }
@@ -408,15 +417,18 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true, currentOperation: ControlOperation.pause);
+      isControlling: true,
+      currentOperation: ControlOperation.pause,
+    );
 
     try {
       final experiment =
           await _controlService.pauseExperiment(state.experiment!.id);
       state = state.copyWith(
-          experiment: experiment,
-          isControlling: false,
-          clearCurrentOperation: true);
+        experiment: experiment,
+        isControlling: false,
+        clearCurrentOperation: true,
+      );
       _addLog('info', '试验已暂停');
     } catch (e) {
       // m-05 fix: Try to sync state on state conflict error
@@ -425,9 +437,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         await _syncStateFromServer();
       }
       state = state.copyWith(
-          isControlling: false,
-          clearCurrentOperation: true,
-          error: e.toString());
+        isControlling: false,
+        clearCurrentOperation: true,
+        error: e.toString(),
+      );
       _addLog('error', '暂停失败: $e');
     }
   }
@@ -438,15 +451,18 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true, currentOperation: ControlOperation.resume);
+      isControlling: true,
+      currentOperation: ControlOperation.resume,
+    );
 
     try {
       final experiment =
           await _controlService.resumeExperiment(state.experiment!.id);
       state = state.copyWith(
-          experiment: experiment,
-          isControlling: false,
-          clearCurrentOperation: true);
+        experiment: experiment,
+        isControlling: false,
+        clearCurrentOperation: true,
+      );
       _addLog('info', '试验继续');
     } catch (e) {
       // m-05 fix: Try to sync state on state conflict error
@@ -455,9 +471,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         await _syncStateFromServer();
       }
       state = state.copyWith(
-          isControlling: false,
-          clearCurrentOperation: true,
-          error: e.toString());
+        isControlling: false,
+        clearCurrentOperation: true,
+        error: e.toString(),
+      );
       _addLog('error', '继续失败: $e');
     }
   }
@@ -468,15 +485,18 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // m-04 fix: Set currentOperation
     state = state.copyWith(
-        isControlling: true, currentOperation: ControlOperation.stop);
+      isControlling: true,
+      currentOperation: ControlOperation.stop,
+    );
 
     try {
       final experiment =
           await _controlService.stopExperiment(state.experiment!.id);
       state = state.copyWith(
-          experiment: experiment,
-          isControlling: false,
-          clearCurrentOperation: true);
+        experiment: experiment,
+        isControlling: false,
+        clearCurrentOperation: true,
+      );
       _addLog('info', '试验已停止');
     } catch (e) {
       // m-05 fix: Try to sync state on state conflict error
@@ -485,9 +505,10 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
         await _syncStateFromServer();
       }
       state = state.copyWith(
-          isControlling: false,
-          clearCurrentOperation: true,
-          error: e.toString());
+        isControlling: false,
+        clearCurrentOperation: true,
+        error: e.toString(),
+      );
       _addLog('error', '停止失败: $e');
     }
   }
@@ -532,7 +553,9 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
 
     // M-11 fix: Correct string interpolation syntax
     _addLog(
-        'info', '状态变更: ${_statusLabel(oldStatus)} -> ${_statusLabel(status)}');
+      'info',
+      '状态变更: ${_statusLabel(oldStatus)} -> ${_statusLabel(status)}',
+    );
   }
 
   /// Handle WebSocket log entry
@@ -546,7 +569,7 @@ class ExperimentConsoleNotifier extends StateNotifier<ExperimentConsoleState> {
   }
 
   /// Set WebSocket client for receiving updates
-  void setWebSocketClient(ExperimentWebSocketClient client) {
+  set webSocketClient(ExperimentWebSocketClient client) {
     _wsClient = client;
   }
 

@@ -9,11 +9,6 @@ import 'package:flutter/material.dart';
 
 /// 统计卡片组件
 class StatCard extends StatefulWidget {
-  final String label;
-  final String value;
-  final String? growthInfo;
-  final IconData icon;
-
   const StatCard({
     super.key,
     required this.label,
@@ -21,6 +16,10 @@ class StatCard extends StatefulWidget {
     this.growthInfo,
     required this.icon,
   });
+  final String label;
+  final String value;
+  final String? growthInfo;
+  final IconData icon;
 
   @override
   State<StatCard> createState() => _StatCardState();

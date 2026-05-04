@@ -11,11 +11,10 @@ import '../services/device_service.dart';
 
 /// 设备树Notifier
 class DeviceTreeNotifier extends StateNotifier<DeviceTreeState> {
-  final DeviceServiceInterface _service;
-  final String workbenchId;
-
   DeviceTreeNotifier(this._service, this.workbenchId)
       : super(const DeviceTreeState());
+  final DeviceServiceInterface _service;
+  final String workbenchId;
 
   /// 加载设备树
   Future<void> loadDevices() async {

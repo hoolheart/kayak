@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 
 /// Column definition for data table
 class DataTableColumn<T> {
-  final String label;
-  final String Function(T item) valueBuilder;
-  final double? width;
-  final bool sortable;
-  final TextAlign textAlign;
-
   const DataTableColumn({
     required this.label,
     required this.valueBuilder,
@@ -18,31 +12,25 @@ class DataTableColumn<T> {
     this.sortable = false,
     this.textAlign = TextAlign.start,
   });
+  final String label;
+  final String Function(T item) valueBuilder;
+  final double? width;
+  final bool sortable;
+  final TextAlign textAlign;
 }
 
 /// Sort state for data table
 class SortState {
-  final int columnIndex;
-  final bool ascending;
-
   const SortState({
     required this.columnIndex,
     required this.ascending,
   });
+  final int columnIndex;
+  final bool ascending;
 }
 
 /// Generic data table with pagination
 class KayakDataTable<T> extends StatefulWidget {
-  final List<DataTableColumn<T>> columns;
-  final List<T> data;
-  final int pageSize;
-  final bool showPagination;
-  final bool showRowNumbers;
-  final VoidCallback? onRefresh;
-  final Future<void> Function()? onLoadMore;
-  final bool isLoading;
-  final bool hasMore;
-
   const KayakDataTable({
     super.key,
     required this.columns,
@@ -55,6 +43,15 @@ class KayakDataTable<T> extends StatefulWidget {
     this.isLoading = false,
     this.hasMore = false,
   });
+  final List<DataTableColumn<T>> columns;
+  final List<T> data;
+  final int pageSize;
+  final bool showPagination;
+  final bool showRowNumbers;
+  final VoidCallback? onRefresh;
+  final Future<void> Function()? onLoadMore;
+  final bool isLoading;
+  final bool hasMore;
 
   @override
   State<KayakDataTable<T>> createState() => _KayakDataTableState<T>();
@@ -246,16 +243,17 @@ class _KayakDataTableState<T> extends State<KayakDataTable<T>> {
           ),
           if (widget.hasMore && widget.onLoadMore != null) ...[
             const SizedBox(width: 16),
-            widget.isLoading
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : TextButton(
-                    onPressed: widget.onLoadMore,
-                    child: const Text('加载更多'),
-                  ),
+            if (widget.isLoading)
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else
+              TextButton(
+                onPressed: widget.onLoadMore,
+                child: const Text('加载更多'),
+              ),
           ],
         ],
       ),

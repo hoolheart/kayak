@@ -8,14 +8,13 @@ import '../../models/point.dart';
 
 /// 测点值显示组件
 class PointValueDisplay extends StatelessWidget {
-  final PointValue value;
-  final DataType dataType;
-
   const PointValueDisplay({
     super.key,
     required this.value,
     required this.dataType,
   });
+  final PointValue value;
+  final DataType dataType;
 
   @override
   Widget build(BuildContext context) {

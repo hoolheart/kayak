@@ -13,7 +13,10 @@ abstract class ExperimentControlServiceInterface {
   Future<Experiment> createExperiment();
   // C-01 fix: loadExperiment now accepts parameters map
   Future<Experiment> loadExperiment(
-      String experimentId, String methodId, Map<String, dynamic> parameters);
+    String experimentId,
+    String methodId,
+    Map<String, dynamic> parameters,
+  );
   Future<Experiment> startExperiment(String experimentId);
   Future<Experiment> pauseExperiment(String experimentId);
   Future<Experiment> resumeExperiment(String experimentId);
@@ -24,9 +27,8 @@ abstract class ExperimentControlServiceInterface {
 
 /// Experiment control service implementation
 class ExperimentControlService implements ExperimentControlServiceInterface {
-  final ApiClientInterface _apiClient;
-
   ExperimentControlService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<Experiment> createExperiment() async {
@@ -37,8 +39,11 @@ class ExperimentControlService implements ExperimentControlServiceInterface {
 
   // C-01 fix: loadExperiment now passes parameters to backend
   @override
-  Future<Experiment> loadExperiment(String experimentId, String methodId,
-      Map<String, dynamic> parameters) async {
+  Future<Experiment> loadExperiment(
+    String experimentId,
+    String methodId,
+    Map<String, dynamic> parameters,
+  ) async {
     final response = await _apiClient.post(
       '/api/v1/experiments/$experimentId/load',
       data: {'method_id': methodId, 'parameters': parameters},

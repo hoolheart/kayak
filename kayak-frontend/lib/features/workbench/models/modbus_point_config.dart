@@ -90,24 +90,6 @@ enum ModbusDataType {
 
 /// Modbus 测点配置
 class ModbusPointConfig {
-  /// 功能码
-  final ModbusFunctionCode functionCode;
-
-  /// 起始地址 (0-65535)
-  final int address;
-
-  /// 数量 (1-125, float32时1-62)
-  final int quantity;
-
-  /// 数据类型
-  final ModbusDataType dataType;
-
-  /// 缩放因子 (默认 1.0)
-  final double scale;
-
-  /// 偏移量 (默认 0.0)
-  final double offset;
-
   const ModbusPointConfig({
     this.functionCode = ModbusFunctionCode.fc03,
     required this.address,
@@ -135,6 +117,24 @@ class ModbusPointConfig {
       offset: (json['offset'] as num?)?.toDouble() ?? 0.0,
     );
   }
+
+  /// 功能码
+  final ModbusFunctionCode functionCode;
+
+  /// 起始地址 (0-65535)
+  final int address;
+
+  /// 数量 (1-125, float32时1-62)
+  final int quantity;
+
+  /// 数据类型
+  final ModbusDataType dataType;
+
+  /// 缩放因子 (默认 1.0)
+  final double scale;
+
+  /// 偏移量 (默认 0.0)
+  final double offset;
 
   /// 转换为 JSON (用于 API 请求 metadata.modbus)
   Map<String, dynamic> toJson() => {
@@ -208,6 +208,34 @@ class ModbusPointConfig {
 
 /// 测点配置表单状态
 class PointConfigFormState {
+  const PointConfigFormState({
+    this.functionCode = ModbusFunctionCode.fc03,
+    this.address = '',
+    this.quantity = '',
+    this.dataType = ModbusDataType.uint16,
+    this.scale = '1.0',
+    this.offset = '0.0',
+    this.addressError,
+    this.quantityError,
+    this.scaleError,
+    this.offsetError,
+  });
+
+  /// 带默认值的初始状态
+  factory PointConfigFormState.initial() => const PointConfigFormState();
+
+  /// 从 ModbusPointConfig 预填充
+  factory PointConfigFormState.fromConfig(ModbusPointConfig config) {
+    return PointConfigFormState(
+      functionCode: config.functionCode,
+      address: config.address.toString(),
+      quantity: config.quantity.toString(),
+      dataType: config.dataType,
+      scale: config.scale.toString(),
+      offset: config.offset.toString(),
+    );
+  }
+
   /// 功能码
   final ModbusFunctionCode functionCode;
 
@@ -237,34 +265,6 @@ class PointConfigFormState {
 
   /// 偏移验证错误
   final String? offsetError;
-
-  const PointConfigFormState({
-    this.functionCode = ModbusFunctionCode.fc03,
-    this.address = '',
-    this.quantity = '',
-    this.dataType = ModbusDataType.uint16,
-    this.scale = '1.0',
-    this.offset = '0.0',
-    this.addressError,
-    this.quantityError,
-    this.scaleError,
-    this.offsetError,
-  });
-
-  /// 带默认值的初始状态
-  factory PointConfigFormState.initial() => const PointConfigFormState();
-
-  /// 从 ModbusPointConfig 预填充
-  factory PointConfigFormState.fromConfig(ModbusPointConfig config) {
-    return PointConfigFormState(
-      functionCode: config.functionCode,
-      address: config.address.toString(),
-      quantity: config.quantity.toString(),
-      dataType: config.dataType,
-      scale: config.scale.toString(),
-      offset: config.offset.toString(),
-    );
-  }
 
   PointConfigFormState copyWith({
     ModbusFunctionCode? functionCode,

@@ -6,21 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// 为Widget测试提供一致的应用环境
 /// 包括主题、本地化、Provider等配置
 class TestApp extends StatelessWidget {
-  /// 要测试的子Widget
-  final Widget child;
-
-  /// 主题模式（浅色/深色/跟随系统）
-  final ThemeMode themeMode;
-
-  /// Provider覆盖列表
-  final List<Override> overrides;
-
-  /// 本地化
-  final Locale? locale;
-
-  /// 是否显示Debug标记
-  final bool showDebugBanner;
-
   const TestApp({
     super.key,
     required this.child,
@@ -91,6 +76,21 @@ class TestApp extends StatelessWidget {
       ),
     );
   }
+
+  /// 要测试的子Widget
+  final Widget child;
+
+  /// 主题模式（浅色/深色/跟随系统）
+  final ThemeMode themeMode;
+
+  /// Provider覆盖列表
+  final List<Override> overrides;
+
+  /// 本地化
+  final Locale? locale;
+
+  /// 是否显示Debug标记
+  final bool showDebugBanner;
 
   @override
   Widget build(BuildContext context) {

@@ -4,11 +4,11 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment_detail_state.dart';
 import 'package:kayak_frontend/features/experiments/providers/experiment_detail_provider.dart';
 import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock试验服务
 class MockExperimentService extends Mock
@@ -169,11 +169,13 @@ void main() {
           totalPoints: 2,
         );
 
-        when(() => mockService.getPointHistory(
-              'exp-1',
-              'temp_sensor_1',
-              limit: any(named: 'limit'),
-            )).thenAnswer((_) async => response);
+        when(
+          () => mockService.getPointHistory(
+            'exp-1',
+            'temp_sensor_1',
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => response);
 
         final notifier = ExperimentDetailNotifier(mockService);
 
@@ -204,20 +206,32 @@ void main() {
           totalPoints: 1,
         );
 
-        when(() => mockService.getPointHistory(any(), any(),
-            limit: any(named: 'limit'))).thenAnswer((_) async => response);
+        when(
+          () => mockService.getPointHistory(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => response);
 
         final notifier = ExperimentDetailNotifier(mockService);
         await notifier.loadPointHistory('exp-1', 'sensor_1');
 
         // 验证时间戳正确转换为DateTime
-        expect(notifier.state.pointHistory[0].timestamp,
-            equals(DateTime(2024, 3, 15, 10, 30)));
+        expect(
+          notifier.state.pointHistory[0].timestamp,
+          equals(DateTime(2024, 3, 15, 10, 30)),
+        );
       });
 
       test('loadPointHistory处理加载错误', () async {
-        when(() => mockService.getPointHistory(any(), any(),
-            limit: any(named: 'limit'))).thenThrow(Exception('测点不存在'));
+        when(
+          () => mockService.getPointHistory(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenThrow(Exception('测点不存在'));
 
         final notifier = ExperimentDetailNotifier(mockService);
         await notifier.loadPointHistory('exp-1', 'invalid_channel');
@@ -244,11 +258,13 @@ void main() {
           totalPoints: 150,
         );
 
-        when(() => mockService.getPointHistory(
-              'exp-1',
-              'sensor_1',
-              limit: any(named: 'limit'),
-            )).thenAnswer((_) async => page1Response);
+        when(
+          () => mockService.getPointHistory(
+            'exp-1',
+            'sensor_1',
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => page1Response);
 
         final notifier = ExperimentDetailNotifier(mockService);
         await notifier.loadPointHistory('exp-1', 'sensor_1');
@@ -274,11 +290,13 @@ void main() {
           totalPoints: 150,
         );
 
-        when(() => mockService.getPointHistory(
-              'exp-1',
-              'sensor_1',
-              limit: any(named: 'limit'),
-            )).thenAnswer((_) async => page1Response);
+        when(
+          () => mockService.getPointHistory(
+            'exp-1',
+            'sensor_1',
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => page1Response);
 
         final notifier = ExperimentDetailNotifier(mockService);
         await notifier.loadPointHistory('exp-1', 'sensor_1');
@@ -433,15 +451,16 @@ void main() {
 
     group('状态转换和并发控制', () {
       test('加载详情时不影响历史数据加载状态', () async {
-        when(() => mockService.getExperiment('exp-1'))
-            .thenAnswer((_) async => Experiment(
-                  id: 'exp-1',
-                  userId: 'user-1',
-                  name: '测试',
-                  status: ExperimentStatus.idle,
-                  createdAt: DateTime(2024),
-                  updatedAt: DateTime(2024),
-                ));
+        when(() => mockService.getExperiment('exp-1')).thenAnswer(
+          (_) async => Experiment(
+            id: 'exp-1',
+            userId: 'user-1',
+            name: '测试',
+            status: ExperimentStatus.idle,
+            createdAt: DateTime(2024),
+            updatedAt: DateTime(2024),
+          ),
+        );
 
         final notifier = ExperimentDetailNotifier(mockService);
 
@@ -463,8 +482,13 @@ void main() {
           totalPoints: 0,
         );
 
-        when(() => mockService.getPointHistory(any(), any(),
-            limit: any(named: 'limit'))).thenAnswer((_) async => response);
+        when(
+          () => mockService.getPointHistory(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async => response);
 
         final notifier = ExperimentDetailNotifier(mockService);
 
@@ -479,8 +503,13 @@ void main() {
       });
 
       test('防止重复加载历史数据', () async {
-        when(() => mockService.getPointHistory(any(), any(),
-            limit: any(named: 'limit'))).thenAnswer((_) async {
+        when(
+          () => mockService.getPointHistory(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 100));
           return const PointHistoryResponse(
             experimentId: 'exp-1',
@@ -500,8 +529,13 @@ void main() {
         await future2;
 
         // 只调用一次API
-        verify(() => mockService.getPointHistory(any(), any(),
-            limit: any(named: 'limit'))).called(1);
+        verify(
+          () => mockService.getPointHistory(
+            any(),
+            any(),
+            limit: any(named: 'limit'),
+          ),
+        ).called(1);
       });
     });
   });

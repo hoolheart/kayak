@@ -5,16 +5,6 @@ library;
 
 /// Method model
 class Method {
-  final String id;
-  final String name;
-  final String? description;
-  final Map<String, dynamic> processDefinition;
-  final Map<String, dynamic> parameterSchema;
-  final int version;
-  final String createdBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   const Method({
     required this.id,
     required this.name,
@@ -41,6 +31,15 @@ class Method {
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
   }
+  final String id;
+  final String name;
+  final String? description;
+  final Map<String, dynamic> processDefinition;
+  final Map<String, dynamic> parameterSchema;
+  final int version;
+  final String createdBy;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   /// M5 fix: Safe cast to Map<String, dynamic> that handles non-null but non-Map values
   static Map<String, dynamic> _safeCastMap(dynamic value) {
@@ -93,11 +92,6 @@ class Method {
 
 /// Method list response
 class MethodListResponse {
-  final List<Method> items;
-  final int total;
-  final int page;
-  final int size;
-
   const MethodListResponse({
     required this.items,
     required this.total,
@@ -116,13 +110,14 @@ class MethodListResponse {
       size: json['size'] as int,
     );
   }
+  final List<Method> items;
+  final int total;
+  final int page;
+  final int size;
 }
 
 /// Validation result
 class ValidationResult {
-  final bool valid;
-  final List<String> errors;
-
   const ValidationResult({
     required this.valid,
     required this.errors,
@@ -136,16 +131,12 @@ class ValidationResult {
           (json['errors'] as List<dynamic>).map((e) => e as String).toList(),
     );
   }
+  final bool valid;
+  final List<String> errors;
 }
 
 /// Parameter configuration
 class ParameterConfig {
-  final String name;
-  final String type;
-  final dynamic defaultValue;
-  final String? unit;
-  final String? description;
-
   const ParameterConfig({
     required this.name,
     required this.type,
@@ -164,6 +155,11 @@ class ParameterConfig {
       description: json['description'] as String?,
     );
   }
+  final String name;
+  final String type;
+  final dynamic defaultValue;
+  final String? unit;
+  final String? description;
 
   Map<String, dynamic> toJson() {
     return {

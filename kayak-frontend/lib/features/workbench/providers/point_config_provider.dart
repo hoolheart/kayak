@@ -9,10 +9,10 @@ import '../validators/device_validators.dart';
 
 /// 测点配置表单 Notifier
 class PointConfigFormNotifier extends StateNotifier<PointConfigFormState> {
+  PointConfigFormNotifier() : super(PointConfigFormState.initial());
+
   /// 编辑中的测点索引 (-1 表示新增)
   int _editingIndex = -1;
-
-  PointConfigFormNotifier() : super(PointConfigFormState.initial());
 
   /// 获取当前编辑索引
   int get editingIndex => _editingIndex;
@@ -111,7 +111,9 @@ class PointConfigFormNotifier extends StateNotifier<PointConfigFormState> {
 
     if (state.dataType == ModbusDataType.float32) {
       quantityError = DeviceValidators.modbusQuantityForFloat32(
-          state.quantity, state.address);
+        state.quantity,
+        state.address,
+      );
     } else {
       quantityError = DeviceValidators.modbusQuantity(state.quantity);
     }
@@ -159,7 +161,9 @@ class PointConfigFormNotifier extends StateNotifier<PointConfigFormState> {
     String? jointError;
     if (state.dataType == ModbusDataType.float32) {
       final qtyError = DeviceValidators.modbusQuantityForFloat32(
-          state.quantity, state.address);
+        state.quantity,
+        state.address,
+      );
       if (qtyError != null) {
         state = state.copyWith(quantityError: qtyError);
       }

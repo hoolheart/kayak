@@ -33,15 +33,27 @@ enum LoginErrorType {
 
 /// 登录状态数据类
 class LoginState {
-  final LoginStatus status;
-  final String? errorMessage;
-  final LoginErrorType? errorType;
-
   const LoginState({
     this.status = LoginStatus.idle,
     this.errorMessage,
     this.errorType,
   });
+
+  /// 状态工厂方法
+  factory LoginState.idle() => const LoginState();
+
+  factory LoginState.loading() => const LoginState(status: LoginStatus.loading);
+
+  factory LoginState.success() => const LoginState(status: LoginStatus.success);
+
+  factory LoginState.error(LoginErrorType type) => LoginState(
+        status: LoginStatus.error,
+        errorMessage: getErrorMessage(type),
+        errorType: type,
+      );
+  final LoginStatus status;
+  final String? errorMessage;
+  final LoginErrorType? errorType;
 
   /// 错误消息映射
   static String getErrorMessage(LoginErrorType type) {
@@ -58,19 +70,6 @@ class LoginState {
         return '发生未知错误，请稍后重试';
     }
   }
-
-  /// 状态工厂方法
-  factory LoginState.idle() => const LoginState();
-
-  factory LoginState.loading() => const LoginState(status: LoginStatus.loading);
-
-  factory LoginState.success() => const LoginState(status: LoginStatus.success);
-
-  factory LoginState.error(LoginErrorType type) => LoginState(
-        status: LoginStatus.error,
-        errorMessage: getErrorMessage(type),
-        errorType: type,
-      );
 }
 
 /// 登录状态Notifier

@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 
 /// 空状态组件
 class EmptyStateWidget extends StatelessWidget {
-  final String title;
-  final String message;
-  final IconData icon;
-  final String? actionLabel;
-  final VoidCallback? onAction;
-
   const EmptyStateWidget({
     super.key,
     required this.title,
@@ -19,6 +13,11 @@ class EmptyStateWidget extends StatelessWidget {
     this.actionLabel,
     this.onAction,
   });
+  final String title;
+  final String message;
+  final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {

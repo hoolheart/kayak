@@ -14,11 +14,6 @@ enum ConnectionTestState { idle, testing, success, failed }
 /// 封装连接测试按钮和结果消息的渲染逻辑，
 /// 在 ModbusTcpForm 和 ModbusRtuForm 中复用。
 class ConnectionTestWidget extends StatelessWidget {
-  final ConnectionTestState state;
-  final String? message;
-  final int? latencyMs;
-  final VoidCallback onTest;
-
   const ConnectionTestWidget({
     super.key,
     required this.state,
@@ -26,6 +21,10 @@ class ConnectionTestWidget extends StatelessWidget {
     this.message,
     this.latencyMs,
   });
+  final ConnectionTestState state;
+  final String? message;
+  final int? latencyMs;
+  final VoidCallback onTest;
 
   @override
   Widget build(BuildContext context) {

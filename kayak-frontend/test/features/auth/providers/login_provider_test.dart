@@ -90,8 +90,10 @@ void main() {
       expect(LoginState.idle().status, equals(LoginStatus.idle));
       expect(LoginState.loading().status, equals(LoginStatus.loading));
       expect(LoginState.success().status, equals(LoginStatus.success));
-      expect(LoginState.error(LoginErrorType.networkError).status,
-          equals(LoginStatus.error));
+      expect(
+        LoginState.error(LoginErrorType.networkError).status,
+        equals(LoginStatus.error),
+      );
     });
   });
 

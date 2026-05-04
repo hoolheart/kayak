@@ -8,12 +8,11 @@ import 'package:flutter/material.dart';
 
 /// Dashboard 空状态组件
 class EmptyWorkbenchesState extends StatelessWidget {
-  final VoidCallback onCreateWorkbench;
-
   const EmptyWorkbenchesState({
     super.key,
     required this.onCreateWorkbench,
   });
+  final VoidCallback onCreateWorkbench;
 
   @override
   Widget build(BuildContext context) {

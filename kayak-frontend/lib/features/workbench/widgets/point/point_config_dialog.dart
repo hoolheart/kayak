@@ -16,10 +16,19 @@ import 'point_config_list_item.dart';
 
 /// 测点配置对话框回调
 typedef PointConfigSubmitCallback = void Function(
-    List<ModbusPointConfig> configs);
+  List<ModbusPointConfig> configs,
+);
 
 /// 测点配置对话框
 class PointConfigDialog extends ConsumerStatefulWidget {
+  const PointConfigDialog({
+    super.key,
+    required this.deviceName,
+    required this.deviceId,
+    this.existingConfigs,
+    this.onSubmit,
+  });
+
   /// 设备名称 (用于标题)
   final String deviceName;
 
@@ -31,14 +40,6 @@ class PointConfigDialog extends ConsumerStatefulWidget {
 
   /// 提交回调
   final PointConfigSubmitCallback? onSubmit;
-
-  const PointConfigDialog({
-    super.key,
-    required this.deviceName,
-    required this.deviceId,
-    this.existingConfigs,
-    this.onSubmit,
-  });
 
   @override
   ConsumerState<PointConfigDialog> createState() => _PointConfigDialogState();
@@ -120,7 +121,9 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
 
   /// 表单区域
   Widget _buildFormSection(
-      ThemeData theme, PointConfigFormNotifier formNotifier) {
+    ThemeData theme,
+    PointConfigFormNotifier formNotifier,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -283,8 +286,11 @@ class _PointConfigDialogState extends ConsumerState<PointConfigDialog> {
       ),
       child: Column(
         children: [
-          Icon(Icons.add_circle_outline,
-              size: 40, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            Icons.add_circle_outline,
+            size: 40,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(height: 8),
           Text(
             '暂未配置测点',

@@ -24,18 +24,18 @@ final sharedPreferencesProvider = FutureProvider<SharedPreferences>((
 ///
 /// 管理主题模式的状态变更和持久化
 class ThemeNotifier extends StateNotifier<ThemeMode> {
-  /// SharedPreferences中存储主题设置的键
-  static const String _themeKey = 'app_theme_mode';
-
-  /// SharedPreferences实例
-  SharedPreferences? _prefs;
-
   /// 构造函数
   ///
   /// 初始化时加载保存的主题设置
   ThemeNotifier() : super(ThemeMode.light) {
     _loadTheme();
   }
+
+  /// SharedPreferences中存储主题设置的键
+  static const String _themeKey = 'app_theme_mode';
+
+  /// SharedPreferences实例
+  SharedPreferences? _prefs;
 
   /// 从SharedPreferences加载主题设置
   Future<void> _loadTheme() async {

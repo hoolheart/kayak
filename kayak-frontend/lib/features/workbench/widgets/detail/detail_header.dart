@@ -6,19 +6,19 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../../models/workbench.dart';
+
 import '../../../../core/theme/color_schemes.dart';
+import '../../models/workbench.dart';
 
 /// 工作台详情Header组件
 class DetailHeader extends StatelessWidget {
-  final Workbench workbench;
-  final int deviceCount;
-
   const DetailHeader({
     super.key,
     required this.workbench,
     this.deviceCount = 0,
   });
+  final Workbench workbench;
+  final int deviceCount;
 
   @override
   Widget build(BuildContext context) {

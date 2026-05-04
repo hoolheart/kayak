@@ -6,11 +6,12 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../validators/validators.dart';
 import '../providers/login_provider.dart';
 import 'email_field.dart';
-import 'password_field.dart';
 import 'login_button.dart';
+import 'password_field.dart';
 
 /// 登录表单组件
 class LoginForm extends ConsumerStatefulWidget {

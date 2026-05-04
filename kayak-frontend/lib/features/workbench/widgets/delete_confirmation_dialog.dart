@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 
 /// 删除确认对话框
 class DeleteConfirmationDialog extends StatelessWidget {
-  final String itemName;
-  final String itemType;
-
   const DeleteConfirmationDialog({
     super.key,
     required this.itemName,
     this.itemType = '工作台',
   });
+  final String itemName;
+  final String itemType;
 
   @override
   Widget build(BuildContext context) {

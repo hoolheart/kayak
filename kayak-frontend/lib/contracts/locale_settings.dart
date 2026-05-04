@@ -9,6 +9,9 @@ import '../providers/core/locale_provider.dart';
 /// This interface provides a singleton pattern access via [AppLocaleSettings.singleton]
 /// as required by test case TC-S2-018-02.
 abstract class AppLocaleSettings {
+  /// Private constructor for preventing direct instantiation
+  AppLocaleSettings._();
+
   /// Singleton instance - TC-S2-018-02 requires using AppLocaleSettings.singleton access
   /// Note: This is provided by the concrete implementation in LocaleNotifier
   static AppLocaleSettings? _instance;
@@ -20,9 +23,6 @@ abstract class AppLocaleSettings {
     _instance ??= _LocaleSettingsImpl();
     return _instance!;
   }
-
-  /// Private constructor for preventing direct instantiation
-  AppLocaleSettings._();
 
   /// Current language locale
   Locale get currentLocale;

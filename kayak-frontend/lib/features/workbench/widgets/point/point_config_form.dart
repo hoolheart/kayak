@@ -11,13 +11,13 @@ import '../../providers/point_config_provider.dart';
 
 /// 测点配置表单组件
 class PointConfigForm extends ConsumerWidget {
-  /// 是否为编辑模式
-  final bool isEditMode;
-
   const PointConfigForm({
     super.key,
     this.isEditMode = false,
   });
+
+  /// 是否为编辑模式
+  final bool isEditMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -220,7 +220,9 @@ class PointConfigForm extends ConsumerWidget {
               helperMaxLines: 1,
             ),
             keyboardType: const TextInputType.numberWithOptions(
-                decimal: true, signed: true),
+              decimal: true,
+              signed: true,
+            ),
             onChanged: notifier.updateScale,
           ),
         ),
@@ -238,7 +240,9 @@ class PointConfigForm extends ConsumerWidget {
               helperMaxLines: 1,
             ),
             keyboardType: const TextInputType.numberWithOptions(
-                decimal: true, signed: true),
+              decimal: true,
+              signed: true,
+            ),
             onChanged: notifier.updateOffset,
           ),
         ),

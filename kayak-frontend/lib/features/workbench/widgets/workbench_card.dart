@@ -6,17 +6,12 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../models/workbench.dart';
+
 import '../../../core/theme/color_schemes.dart';
+import '../models/workbench.dart';
 
 /// 工作台卡片组件
 class WorkbenchCard extends StatefulWidget {
-  final Workbench workbench;
-  final int deviceCount;
-  final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-
   const WorkbenchCard({
     super.key,
     required this.workbench,
@@ -25,6 +20,11 @@ class WorkbenchCard extends StatefulWidget {
     required this.onEdit,
     required this.onDelete,
   });
+  final Workbench workbench;
+  final int deviceCount;
+  final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   State<WorkbenchCard> createState() => _WorkbenchCardState();
@@ -148,8 +148,11 @@ class _WorkbenchCardState extends State<WorkbenchCard> {
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete_outlined,
-                      size: 20, color: colorScheme.error),
+                  Icon(
+                    Icons.delete_outlined,
+                    size: 20,
+                    color: colorScheme.error,
+                  ),
                   const SizedBox(width: 8),
                   Text('删除', style: TextStyle(color: colorScheme.error)),
                 ],

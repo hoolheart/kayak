@@ -110,7 +110,9 @@ void main() {
 
       // TCP section should be visible
       expect(
-          find.byKey(const Key('modbus-tcp-params-section')), findsOneWidget);
+        find.byKey(const Key('modbus-tcp-params-section')),
+        findsOneWidget,
+      );
       expect(find.text('Modbus TCP 协议参数'), findsOneWidget);
       // Check TCP form fields
       expect(find.text('主机地址 *'), findsOneWidget);
@@ -129,7 +131,9 @@ void main() {
 
       // RTU section should be visible
       expect(
-          find.byKey(const Key('modbus-rtu-params-section')), findsOneWidget);
+        find.byKey(const Key('modbus-rtu-params-section')),
+        findsOneWidget,
+      );
       expect(find.text('Modbus RTU 协议参数'), findsOneWidget);
       // Check RTU form fields
       expect(find.text('串口 *'), findsOneWidget);
@@ -152,7 +156,9 @@ void main() {
       // Virtual should be gone, TCP visible
       expect(find.byKey(const Key('virtual-params-section')), findsNothing);
       expect(
-          find.byKey(const Key('modbus-tcp-params-section')), findsOneWidget);
+        find.byKey(const Key('modbus-tcp-params-section')),
+        findsOneWidget,
+      );
     });
   });
 
@@ -176,7 +182,9 @@ void main() {
       expect(find.byKey(const Key('tcp-port-field')), findsNothing);
       // RTU fields should exist
       expect(
-          find.byKey(const Key('modbus-rtu-params-section')), findsOneWidget);
+        find.byKey(const Key('modbus-rtu-params-section')),
+        findsOneWidget,
+      );
     });
   });
 

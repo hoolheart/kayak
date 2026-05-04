@@ -8,12 +8,6 @@ import '../models/experiment.dart';
 
 /// 试验数据表格组件
 class ExperimentDataTable extends StatelessWidget {
-  final List<Experiment> experiments;
-  final ValueChanged<Experiment> onViewDetails;
-  final VoidCallback onLoadMore;
-  final bool isLoadingMore;
-  final bool hasMore;
-
   const ExperimentDataTable({
     super.key,
     required this.experiments,
@@ -22,6 +16,11 @@ class ExperimentDataTable extends StatelessWidget {
     this.isLoadingMore = false,
     this.hasMore = false,
   });
+  final List<Experiment> experiments;
+  final ValueChanged<Experiment> onViewDetails;
+  final VoidCallback onLoadMore;
+  final bool isLoadingMore;
+  final bool hasMore;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +32,7 @@ class ExperimentDataTable extends StatelessWidget {
         child: Column(
           children: [
             // 表头
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surfaceContainerHigh,
                 borderRadius: const BorderRadius.vertical(
@@ -52,7 +51,7 @@ class ExperimentDataTable extends StatelessWidget {
             ),
 
             // 表体
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 border: Border.all(color: colorScheme.outlineVariant),
                 borderRadius: const BorderRadius.vertical(
@@ -64,7 +63,7 @@ class ExperimentDataTable extends StatelessWidget {
                   ...experiments.asMap().entries.map((entry) {
                     final index = entry.key;
                     final experiment = entry.value;
-                    final isEven = index % 2 == 0;
+                    final isEven = index.isEven;
 
                     return Material(
                       color: isEven
@@ -155,8 +154,11 @@ class ExperimentDataTable extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusCell(BuildContext context, ExperimentStatus status,
-      {int flex = 1}) {
+  Widget _buildStatusCell(
+    BuildContext context,
+    ExperimentStatus status, {
+    int flex = 1,
+  }) {
     Color backgroundColor;
     Color textColor;
 
@@ -211,8 +213,11 @@ class ExperimentDataTable extends StatelessWidget {
     );
   }
 
-  Widget _buildActionCell(BuildContext context, Experiment experiment,
-      {int flex = 1}) {
+  Widget _buildActionCell(
+    BuildContext context,
+    Experiment experiment, {
+    int flex = 1,
+  }) {
     return Expanded(
       flex: flex,
       child: Padding(

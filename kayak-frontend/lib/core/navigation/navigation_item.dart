@@ -1,16 +1,15 @@
 /// Navigation item model for sidebar navigation
 class NavigationItem {
-  final String label;
-  final String icon;
-  final String route;
-  final List<NavigationItem>? children;
-
   const NavigationItem({
     required this.label,
     required this.icon,
     required this.route,
     this.children,
   });
+  final String label;
+  final String icon;
+  final String route;
+  final List<NavigationItem>? children;
 
   /// Navigation items for main sidebar
   static const List<NavigationItem> mainItems = [
@@ -44,15 +43,14 @@ class NavigationItem {
 
 /// Breadcrumb item model for breadcrumb navigation
 class BreadcrumbItem {
-  final String label;
-  final String? route;
-  final bool isCurrent;
-
   const BreadcrumbItem({
     required this.label,
     this.route,
     this.isCurrent = false,
   });
+  final String label;
+  final String? route;
+  final bool isCurrent;
 
   /// Generate breadcrumbs from current route path
   static List<BreadcrumbItem> fromRoute(String path) {
@@ -70,9 +68,9 @@ class BreadcrumbItem {
     // Add Dashboard as home
     items.add(const BreadcrumbItem(label: '首页', route: '/dashboard'));
 
-    String currentPath = '';
+    final currentPath = StringBuffer();
     for (int i = 0; i < segments.length; i++) {
-      currentPath += '/${segments[i]}';
+      currentPath.write('/${segments[i]}');
       final isLast = i == segments.length - 1;
 
       // Generate label from segment
@@ -87,11 +85,13 @@ class BreadcrumbItem {
         label = '方法编辑';
       }
 
-      items.add(BreadcrumbItem(
-        label: label,
-        route: isLast ? null : currentPath,
-        isCurrent: isLast,
-      ));
+      items.add(
+        BreadcrumbItem(
+          label: label,
+          route: isLast ? null : currentPath.toString(),
+          isCurrent: isLast,
+        ),
+      );
     }
 
     return items;
@@ -121,9 +121,11 @@ class BreadcrumbItem {
             .replaceAll('-', ' ')
             .replaceAll('_', ' ')
             .split(RegExp(r'(?=[A-Z])'))
-            .map((word) => word.isEmpty
-                ? ''
-                : '${word[0].toUpperCase()}${word.substring(1)}')
+            .map(
+              (word) => word.isEmpty
+                  ? ''
+                  : '${word[0].toUpperCase()}${word.substring(1)}',
+            )
             .join(' ');
     }
   }

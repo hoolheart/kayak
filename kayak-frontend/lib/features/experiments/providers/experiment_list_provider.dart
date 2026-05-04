@@ -10,9 +10,8 @@ import '../services/experiment_service.dart';
 
 /// 试验列表Notifier
 class ExperimentListNotifier extends StateNotifier<ExperimentListState> {
-  final ExperimentServiceInterface _service;
-
   ExperimentListNotifier(this._service) : super(const ExperimentListState());
+  final ExperimentServiceInterface _service;
 
   /// 加载试验列表
   Future<void> loadExperiments({bool reset = false}) async {

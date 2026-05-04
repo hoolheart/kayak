@@ -27,7 +27,7 @@ Device createTestDevice({
     protocolParams: {
       'sampleInterval': 1000,
       'minValue': 0.0,
-      'maxValue': 100.0
+      'maxValue': 100.0,
     },
     status: status,
     createdAt: DateTime(2026),
@@ -253,7 +253,9 @@ void main() {
       // Verify dialog content
       expect(find.text('确认删除'), findsOneWidget);
       expect(
-          find.text('确定要删除设备 "Device To Delete" 吗？此操作不可撤销。'), findsOneWidget);
+        find.text('确定要删除设备 "Device To Delete" 吗？此操作不可撤销。'),
+        findsOneWidget,
+      );
       expect(find.text('取消'), findsOneWidget);
       expect(find.text('删除'), findsOneWidget);
     });

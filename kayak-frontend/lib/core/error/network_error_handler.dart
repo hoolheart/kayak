@@ -11,16 +11,15 @@ import 'error_models.dart';
 ///
 /// Monitors network connectivity status and handles network errors.
 class NetworkErrorHandler {
-  final ErrorHandlerInterface _errorHandler;
-  final Connectivity _connectivity;
-  StreamSubscription<List<ConnectivityResult>>? _subscription;
-  bool _isConnected = true;
-
   NetworkErrorHandler({
     required ErrorHandlerInterface errorHandler,
     Connectivity? connectivity,
   })  : _errorHandler = errorHandler,
         _connectivity = connectivity ?? Connectivity();
+  final ErrorHandlerInterface _errorHandler;
+  final Connectivity _connectivity;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
+  bool _isConnected = true;
 
   /// Current network connection status
   bool get isConnected => _isConnected;
@@ -78,7 +77,7 @@ final networkErrorHandlerProvider = Provider<NetworkErrorHandler>((ref) {
   final handler = NetworkErrorHandler(
     errorHandler: ref.read(errorHandlerProvider),
   );
-  ref.onDispose(() => handler.dispose());
+  ref.onDispose(handler.dispose);
   return handler;
 });
 

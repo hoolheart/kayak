@@ -8,10 +8,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../auth/providers/login_provider.dart';
+import '../../auth/widgets/error_banner.dart';
 import '../../auth/widgets/login_card.dart';
 import '../../auth/widgets/login_form.dart';
-import '../../auth/widgets/error_banner.dart';
 
 /// 登录视图层组件
 class LoginView extends ConsumerWidget {

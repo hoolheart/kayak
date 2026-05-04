@@ -11,12 +11,11 @@ import '../../models/workbench.dart';
 ///
 /// 显示工作台基本信息（只读），编辑功能将在未来实现
 class SettingsTab extends ConsumerWidget {
-  final Workbench workbench;
-
   const SettingsTab({
     super.key,
     required this.workbench,
   });
+  final Workbench workbench;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,13 +109,12 @@ class SettingsTab extends ConsumerWidget {
 }
 
 class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
   const _InfoRow({
     required this.label,
     required this.value,
   });
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {

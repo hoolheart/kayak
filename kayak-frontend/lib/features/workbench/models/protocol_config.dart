@@ -73,14 +73,6 @@ extension VirtualDataTypeLabel on VirtualDataType {
 
 /// Virtual 协议配置
 class VirtualConfig {
-  final VirtualMode mode;
-  final VirtualDataType dataType;
-  final AccessType accessType;
-  final double minValue;
-  final double maxValue;
-  final double? fixedValue;
-  final int sampleInterval;
-
   const VirtualConfig({
     required this.mode,
     required this.dataType,
@@ -120,6 +112,13 @@ class VirtualConfig {
       sampleInterval: (json['sampleInterval'] as num?)?.toInt() ?? 1000,
     );
   }
+  final VirtualMode mode;
+  final VirtualDataType dataType;
+  final AccessType accessType;
+  final double minValue;
+  final double maxValue;
+  final double? fixedValue;
+  final int sampleInterval;
 
   Map<String, dynamic> toJson() => {
         'mode': mode.name,
@@ -134,12 +133,6 @@ class VirtualConfig {
 
 /// Modbus TCP 协议配置
 class TcpConfig {
-  final String host;
-  final int port;
-  final int slaveId;
-  final int timeoutMs;
-  final int connectionPoolSize;
-
   const TcpConfig({
     required this.host,
     this.port = 502,
@@ -160,6 +153,11 @@ class TcpConfig {
       connectionPoolSize: (json['connection_pool_size'] as num?)?.toInt() ?? 4,
     );
   }
+  final String host;
+  final int port;
+  final int slaveId;
+  final int timeoutMs;
+  final int connectionPoolSize;
 
   Map<String, dynamic> toJson() => {
         'host': host,
@@ -172,14 +170,6 @@ class TcpConfig {
 
 /// Modbus RTU 协议配置
 class RtuConfig {
-  final String port;
-  final int baudRate;
-  final int dataBits;
-  final int stopBits;
-  final String parity;
-  final int slaveId;
-  final int timeoutMs;
-
   const RtuConfig({
     required this.port,
     this.baudRate = 9600,
@@ -204,6 +194,13 @@ class RtuConfig {
       timeoutMs: (json['timeout_ms'] as num?)?.toInt() ?? 1000,
     );
   }
+  final String port;
+  final int baudRate;
+  final int dataBits;
+  final int stopBits;
+  final String parity;
+  final int slaveId;
+  final int timeoutMs;
 
   Map<String, dynamic> toJson() => {
         'port': port,
@@ -218,23 +215,18 @@ class RtuConfig {
 
 /// 串口信息
 class SerialPort {
-  final String path;
-  final String description;
-
   const SerialPort({required this.path, required this.description});
 
   factory SerialPort.fromJson(Map<String, dynamic> json) => SerialPort(
         path: json['path'] as String,
         description: json['description'] as String? ?? '',
       );
+  final String path;
+  final String description;
 }
 
 /// 连接测试结果
 class ConnectionTestResult {
-  final bool success;
-  final int? latencyMs;
-  final String message;
-
   const ConnectionTestResult({
     required this.success,
     this.latencyMs,
@@ -249,15 +241,13 @@ class ConnectionTestResult {
         latencyMs: json['latency_ms'] as int?,
         message: json['message'] as String? ?? '',
       );
+  final bool success;
+  final int? latencyMs;
+  final String message;
 }
 
 /// 协议信息
 class ProtocolInfo {
-  final String id;
-  final String name;
-  final String description;
-  final Map<String, dynamic> configSchema;
-
   const ProtocolInfo({
     required this.id,
     required this.name,
@@ -271,4 +261,8 @@ class ProtocolInfo {
         description: json['description'] as String? ?? '',
         configSchema: json['config_schema'] as Map<String, dynamic>? ?? {},
       );
+  final String id;
+  final String name;
+  final String description;
+  final Map<String, dynamic> configSchema;
 }

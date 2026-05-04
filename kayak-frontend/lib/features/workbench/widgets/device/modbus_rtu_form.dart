@@ -6,9 +6,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../models/protocol_config.dart';
-import '../../validators/device_validators.dart';
 import '../../services/protocol_service.dart';
+import '../../validators/device_validators.dart';
 import 'connection_test_widget.dart';
 
 /// 串口扫描状态
@@ -16,13 +17,6 @@ enum ScanState { idle, scanning, completed, noDevices, failed }
 
 /// Modbus RTU 协议参数表单
 class ModbusRtuForm extends ConsumerStatefulWidget {
-  final RtuConfig? initialConfig;
-  final bool isEditMode;
-  final String? deviceId;
-
-  /// 字段变更回调，用于追踪表单脏状态
-  final VoidCallback? onFieldChanged;
-
   const ModbusRtuForm({
     super.key,
     this.initialConfig,
@@ -30,6 +24,12 @@ class ModbusRtuForm extends ConsumerStatefulWidget {
     this.deviceId,
     this.onFieldChanged,
   });
+  final RtuConfig? initialConfig;
+  final bool isEditMode;
+  final String? deviceId;
+
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
 
   @override
   ConsumerState<ModbusRtuForm> createState() => ModbusRtuFormState();

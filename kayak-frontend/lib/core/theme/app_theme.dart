@@ -11,8 +11,9 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'color_schemes.dart';
+
 import 'app_typography.dart';
+import 'color_schemes.dart';
 
 /// 应用主题配置 v2
 class AppTheme {

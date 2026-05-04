@@ -8,14 +8,13 @@ import 'sidebar.dart';
 /// AppShell component that provides the main application layout
 /// with responsive sidebar and content area
 class AppShell extends StatefulWidget {
-  final Widget child;
-  final String? selectedRoute;
-
   const AppShell({
     super.key,
     required this.child,
     this.selectedRoute,
   });
+  final Widget child;
+  final String? selectedRoute;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -84,7 +83,7 @@ class _AppShellState extends State<AppShell> {
 
                           // Content
                           Expanded(
-                            child: Container(
+                            child: ColoredBox(
                               color: Theme.of(context)
                                   .colorScheme
                                   .surfaceContainerLowest,
@@ -107,14 +106,13 @@ class _AppShellState extends State<AppShell> {
 
 /// Shell route wrapper that provides AppShell context
 class AppShellRouteWrapper extends StatelessWidget {
-  final Widget child;
-  final String location;
-
   const AppShellRouteWrapper({
     super.key,
     required this.child,
     required this.location,
   });
+  final Widget child;
+  final String location;
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +125,11 @@ class AppShellRouteWrapper extends StatelessWidget {
 
 /// Redirects to the appropriate sub-route when accessing a parent route
 class AppShellRedirect extends StatelessWidget {
-  final String targetLocation;
-
   const AppShellRedirect({
     super.key,
     required this.targetLocation,
   });
+  final String targetLocation;
 
   @override
   Widget build(BuildContext context) {

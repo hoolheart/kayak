@@ -4,10 +4,10 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/methods/models/method.dart';
 import 'package:kayak_frontend/features/methods/providers/method_edit_provider.dart';
 import 'package:kayak_frontend/features/methods/services/method_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock方法服务
 class MockMethodService extends Mock implements MethodServiceInterface {}
@@ -35,16 +35,16 @@ void main() {
           processDefinition: {
             'nodes': [
               {'id': 'start', 'type': 'Start'},
-              {'id': 'end', 'type': 'End'}
-            ]
+              {'id': 'end', 'type': 'End'},
+            ],
           },
           parameterSchema: {
             'param1': {
               'type': 'number',
               'default': 10,
               'unit': 'ms',
-              'description': 'A parameter'
-            }
+              'description': 'A parameter',
+            },
           },
         );
 
@@ -108,7 +108,9 @@ void main() {
 
         expect(notifier.state.parameters.length, equals(1));
         expect(
-            notifier.state.parameters.containsKey('new_parameter_1'), isTrue);
+          notifier.state.parameters.containsKey('new_parameter_1'),
+          isTrue,
+        );
         expect(notifier.state.isDirty, isTrue);
       });
 
@@ -161,7 +163,8 @@ void main() {
       test('validateMethod验证有效JSON', () async {
         const validJson = '{"nodes": [{"id": "start", "type": "Start"}]}';
         when(() => mockService.validateMethod(any())).thenAnswer(
-            (_) async => const ValidationResult(valid: true, errors: []));
+          (_) async => const ValidationResult(valid: true, errors: []),
+        );
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateProcessDefinition(validJson);
@@ -174,7 +177,8 @@ void main() {
       test('validateMethod处理无效JSON', () async {
         const invalidJson = 'not valid json';
         when(() => mockService.validateMethod(any())).thenAnswer(
-            (_) async => const ValidationResult(valid: true, errors: []));
+          (_) async => const ValidationResult(valid: true, errors: []),
+        );
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateProcessDefinition(invalidJson);
@@ -203,12 +207,14 @@ void main() {
 
     group('保存方法', () {
       test('saveMethod创建新方法', () async {
-        when(() => mockService.createMethod(
-              name: any(named: 'name'),
-              description: any(named: 'description'),
-              processDefinition: any(named: 'processDefinition'),
-              parameterSchema: any(named: 'parameterSchema'),
-            )).thenAnswer((_) async => createTestMethod());
+        when(
+          () => mockService.createMethod(
+            name: any(named: 'name'),
+            description: any(named: 'description'),
+            processDefinition: any(named: 'processDefinition'),
+            parameterSchema: any(named: 'parameterSchema'),
+          ),
+        ).thenAnswer((_) async => createTestMethod());
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateName('New Method');
@@ -222,13 +228,15 @@ void main() {
       test('saveMethod更新现有方法', () async {
         when(() => mockService.getMethod('test-id'))
             .thenAnswer((_) async => createTestMethod());
-        when(() => mockService.updateMethod(
-              any(),
-              name: any(named: 'name'),
-              description: any(named: 'description'),
-              processDefinition: any(named: 'processDefinition'),
-              parameterSchema: any(named: 'parameterSchema'),
-            )).thenAnswer((_) async => createTestMethod());
+        when(
+          () => mockService.updateMethod(
+            any(),
+            name: any(named: 'name'),
+            description: any(named: 'description'),
+            processDefinition: any(named: 'processDefinition'),
+            parameterSchema: any(named: 'parameterSchema'),
+          ),
+        ).thenAnswer((_) async => createTestMethod());
 
         final notifier = MethodEditNotifier(mockService);
         await notifier.loadMethod('test-id');
@@ -236,22 +244,26 @@ void main() {
         final result = await notifier.saveMethod();
 
         expect(result, isTrue);
-        verify(() => mockService.updateMethod(
-              'test-id',
-              name: 'Updated Name',
-              description: any(named: 'description'),
-              processDefinition: any(named: 'processDefinition'),
-              parameterSchema: any(named: 'parameterSchema'),
-            )).called(1);
+        verify(
+          () => mockService.updateMethod(
+            'test-id',
+            name: 'Updated Name',
+            description: any(named: 'description'),
+            processDefinition: any(named: 'processDefinition'),
+            parameterSchema: any(named: 'parameterSchema'),
+          ),
+        ).called(1);
       });
 
       test('saveMethod处理保存失败', () async {
-        when(() => mockService.createMethod(
-              name: any(named: 'name'),
-              description: any(named: 'description'),
-              processDefinition: any(named: 'processDefinition'),
-              parameterSchema: any(named: 'parameterSchema'),
-            )).thenThrow(Exception('Save failed'));
+        when(
+          () => mockService.createMethod(
+            name: any(named: 'name'),
+            description: any(named: 'description'),
+            processDefinition: any(named: 'processDefinition'),
+            parameterSchema: any(named: 'parameterSchema'),
+          ),
+        ).thenThrow(Exception('Save failed'));
 
         final notifier = MethodEditNotifier(mockService);
         notifier.updateName('New Method');
@@ -382,8 +394,8 @@ Method createTestMethod({
         {
           'nodes': [
             {'id': 'start', 'type': 'Start'},
-            {'id': 'end', 'type': 'End'}
-          ]
+            {'id': 'end', 'type': 'End'},
+          ],
         },
     parameterSchema: parameterSchema ?? {},
     version: 1,

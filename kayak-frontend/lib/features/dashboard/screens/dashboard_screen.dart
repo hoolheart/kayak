@@ -9,13 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../workbench/providers/workbench_list_provider.dart';
 import '../../workbench/models/workbench.dart';
-import '../widgets/welcome_section.dart';
+import '../../workbench/providers/workbench_list_provider.dart';
+import '../widgets/empty_workbenches.dart';
 import '../widgets/quick_action_card.dart';
 import '../widgets/recent_workbench_card.dart';
 import '../widgets/stat_card.dart';
-import '../widgets/empty_workbenches.dart';
+import '../widgets/welcome_section.dart';
 
 /// Dashboard screen
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -126,7 +126,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           ? 2
                           : 1;
                   return _buildStatsGrid(
-                      crossAxisCount, workbenches.length, isLoading);
+                    crossAxisCount,
+                    workbenches.length,
+                    isLoading,
+                  );
                 },
               ),
             ],
@@ -138,7 +141,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   /// Build recent workbenches section with loading/error/empty states
   Widget _buildRecentWorkbenches(
-      List<Workbench> workbenches, bool isLoading, String? error) {
+    List<Workbench> workbenches,
+    bool isLoading,
+    String? error,
+  ) {
     // Loading state
     if (isLoading && workbenches.isEmpty) {
       return const Center(
@@ -240,7 +246,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   /// Stats grid
   Widget _buildStatsGrid(
-      int crossAxisCount, int workbenchCount, bool isLoading) {
+    int crossAxisCount,
+    int workbenchCount,
+    bool isLoading,
+  ) {
     final stats = [
       StatCard(
         label: '工作台总数',
@@ -281,15 +290,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
 /// Section header with title and action
 class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String actionLabel;
-  final VoidCallback onAction;
-
   const _SectionHeader({
     required this.title,
     required this.actionLabel,
     required this.onAction,
   });
+  final String title;
+  final String actionLabel;
+  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {

@@ -17,8 +17,9 @@ class LanguageSettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)?.languageSettings ??
-            'Language Settings'),
+        title: Text(
+          AppLocalizations.of(context)?.languageSettings ?? 'Language Settings',
+        ),
       ),
       body: ListView(
         children: [
@@ -26,8 +27,10 @@ class LanguageSettingsPage extends ConsumerWidget {
           // Current language display
           ListTile(
             leading: const Icon(Icons.language),
-            title: Text(AppLocalizations.of(context)?.currentLanguage ??
-                'Current Language'),
+            title: Text(
+              AppLocalizations.of(context)?.currentLanguage ??
+                  'Current Language',
+            ),
             subtitle: Text(localeNotifier.getLocaleDisplayName(currentLocale)),
           ),
           const Divider(),

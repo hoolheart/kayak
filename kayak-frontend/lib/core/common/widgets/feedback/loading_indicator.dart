@@ -5,16 +5,15 @@ import 'package:flutter/material.dart';
 
 /// A loading overlay that covers the entire screen
 class LoadingOverlay extends StatelessWidget {
-  final bool isLoading;
-  final Widget child;
-  final String? message;
-
   const LoadingOverlay({
     super.key,
     required this.isLoading,
     required this.child,
     this.message,
   });
+  final bool isLoading;
+  final Widget child;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         child,
         if (isLoading)
-          Container(
+          ColoredBox(
             color: Colors.black26,
             child: Center(
               child: Card(
@@ -49,14 +48,13 @@ class LoadingOverlay extends StatelessWidget {
 
 /// A loading indicator for inline content
 class InlineLoadingIndicator extends StatelessWidget {
-  final String? message;
-  final double size;
-
   const InlineLoadingIndicator({
     super.key,
     this.message,
     this.size = 24,
   });
+  final String? message;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -88,11 +86,6 @@ class InlineLoadingIndicator extends StatelessWidget {
 
 /// Empty state widget for lists with no data
 class EmptyState extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? description;
-  final Widget? action;
-
   const EmptyState({
     super.key,
     required this.icon,
@@ -100,6 +93,10 @@ class EmptyState extends StatelessWidget {
     this.description,
     this.action,
   });
+  final IconData icon;
+  final String title;
+  final String? description;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -145,14 +142,13 @@ class EmptyState extends StatelessWidget {
 
 /// Error state widget with retry action
 class ErrorState extends StatelessWidget {
-  final String message;
-  final VoidCallback? onRetry;
-
   const ErrorState({
     super.key,
     required this.message,
     this.onRetry,
   });
+  final String message;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {

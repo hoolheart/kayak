@@ -27,10 +27,6 @@ enum WsMessageType {
 
 /// WebSocket log entry
 class WsLogEntry {
-  final DateTime timestamp;
-  final String level;
-  final String message;
-
   const WsLogEntry({
     required this.timestamp,
     required this.level,
@@ -46,16 +42,13 @@ class WsLogEntry {
       message: json['message'] as String? ?? '',
     );
   }
+  final DateTime timestamp;
+  final String level;
+  final String message;
 }
 
 /// WebSocket status change
 class WsStatusChange {
-  final String experimentId;
-  final String oldStatus;
-  final String newStatus;
-  final String operation;
-  final DateTime timestamp;
-
   const WsStatusChange({
     required this.experimentId,
     required this.oldStatus,
@@ -75,6 +68,11 @@ class WsStatusChange {
           : DateTime.now(),
     );
   }
+  final String experimentId;
+  final String oldStatus;
+  final String newStatus;
+  final String operation;
+  final DateTime timestamp;
 }
 
 /// WebSocket client for experiment updates
@@ -144,9 +142,7 @@ class ExperimentWebSocketClient {
       _startHeartbeat();
 
       _channel!.stream.listen(
-        (data) {
-          _handleMessage(data);
-        },
+        _handleMessage,
         onError: (error) {
           _connectionState = WsConnectionState.reconnecting;
           _notifyConnectionStatus();
@@ -220,7 +216,8 @@ class ExperimentWebSocketClient {
       _connectionState = WsConnectionState.failed;
       _notifyConnectionStatus();
       _errorController.add(
-          'WebSocket connection failed after $_maxReconnectAttempts attempts');
+        'WebSocket connection failed after $_maxReconnectAttempts attempts',
+      );
       return;
     }
 

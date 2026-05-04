@@ -36,9 +36,8 @@ abstract class DeviceServiceInterface {
 
 /// 设备服务实现
 class DeviceService implements DeviceServiceInterface {
-  final ApiClientInterface _apiClient;
-
   DeviceService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<List<Device>> listDevices(String workbenchId) async {

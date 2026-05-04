@@ -10,15 +10,14 @@ final _errorLogger = Logger(level: Level.warning);
 
 /// Error state containing current error and history
 class ErrorState {
-  final AppError? currentError;
-  final bool isNetworkConnected;
-  final List<AppError> errorHistory;
-
   const ErrorState({
     this.currentError,
     this.isNetworkConnected = true,
     this.errorHistory = const [],
   });
+  final AppError? currentError;
+  final bool isNetworkConnected;
+  final List<AppError> errorHistory;
 
   ErrorState copyWith({
     AppError? currentError,
@@ -253,10 +252,12 @@ class ErrorHandler implements ErrorHandlerInterface {
         ? newHistory.sublist(newHistory.length - 10)
         : newHistory;
 
-    _emitState(_state.copyWith(
-      currentError: error,
-      errorHistory: trimmedHistory,
-    ));
+    _emitState(
+      _state.copyWith(
+        currentError: error,
+        errorHistory: trimmedHistory,
+      ),
+    );
   }
 
   void _emitState(ErrorState state) {

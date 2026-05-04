@@ -10,11 +10,6 @@ import '../../../validators/validators.dart';
 
 /// 密码输入框组件
 class PasswordField extends ConsumerStatefulWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool enabled;
-  final ValueChanged<String>? onSubmitted;
-
   const PasswordField({
     super.key,
     required this.controller,
@@ -22,6 +17,10 @@ class PasswordField extends ConsumerStatefulWidget {
     this.enabled = true,
     this.onSubmitted,
   });
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool enabled;
+  final ValueChanged<String>? onSubmitted;
 
   @override
   ConsumerState<PasswordField> createState() => _PasswordFieldState();

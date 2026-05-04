@@ -8,12 +8,11 @@ import '../providers/workbench_form_provider.dart';
 
 /// 创建/编辑工作台对话框
 class CreateWorkbenchDialog extends ConsumerStatefulWidget {
-  final Workbench? workbench;
-
   const CreateWorkbenchDialog({
     super.key,
     this.workbench,
   });
+  final Workbench? workbench;
 
   @override
   ConsumerState<CreateWorkbenchDialog> createState() =>

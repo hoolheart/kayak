@@ -5,10 +5,10 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:kayak_frontend/features/experiments/models/experiment.dart';
 import 'package:kayak_frontend/features/experiments/providers/experiment_list_provider.dart';
 import 'package:kayak_frontend/features/experiments/services/experiment_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock试验服务
 class MockExperimentService extends Mock
@@ -77,8 +77,10 @@ void main() {
 
         // 先设置
         notifier.setStatusFilter(ExperimentStatus.running);
-        expect(container.read(experimentListProvider).statusFilter,
-            equals(ExperimentStatus.running));
+        expect(
+          container.read(experimentListProvider).statusFilter,
+          equals(ExperimentStatus.running),
+        );
 
         // 再清除
         notifier.clearStatusFilter();
@@ -157,16 +159,20 @@ void main() {
     group('加载状态转换', () {
       test('loadExperiments正确转换状态', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [],
-              page: 1,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [],
+            page: 1,
+          ),
+        );
 
         final notifier = ExperimentListNotifier(mockService);
 
@@ -184,17 +190,21 @@ void main() {
 
       test('loadExperiments重置时从第一页开始', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [createTestExperiment(id: '1', name: 'Exp 1')],
-              page: 1,
-              total: 1,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [createTestExperiment(id: '1', name: 'Exp 1')],
+            page: 1,
+            total: 1,
+          ),
+        );
 
         final notifier = ExperimentListNotifier(mockService);
 
@@ -211,17 +221,21 @@ void main() {
     group('分页状态更新', () {
       test('loadMore更新分页状态正确', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [createTestExperiment(name: 'Exp 1')],
-              page: 1,
-              total: 25,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [createTestExperiment(name: 'Exp 1')],
+            page: 1,
+            total: 25,
+          ),
+        );
 
         final notifier = ExperimentListNotifier(mockService);
         await notifier.loadExperiments();
@@ -230,17 +244,21 @@ void main() {
         expect(notifier.state.hasMore, isTrue);
 
         // 设置第二页的mock
-        when(() => mockService.getExperiments(
-              page: 2,
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [createTestExperiment(name: 'Exp 2')],
-              page: 2,
-              total: 25,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: 2,
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [createTestExperiment(name: 'Exp 2')],
+            page: 2,
+            total: 25,
+          ),
+        );
 
         await notifier.loadMore();
 
@@ -250,16 +268,20 @@ void main() {
 
       test('hasMore根据响应正确设置', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [],
-              page: 1,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [],
+            page: 1,
+          ),
+        );
 
         final notifier = ExperimentListNotifier(mockService);
         await notifier.loadExperiments();
@@ -272,13 +294,15 @@ void main() {
     group('错误状态处理', () {
       test('loadExperiments正确处理错误', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenThrow(Exception('Network error'));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenThrow(Exception('Network error'));
 
         final notifier = ExperimentListNotifier(mockService);
         await notifier.loadExperiments();
@@ -290,13 +314,15 @@ void main() {
 
       test('refresh正确处理错误', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenThrow(Exception('Refresh failed'));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenThrow(Exception('Refresh failed'));
 
         final notifier = ExperimentListNotifier(mockService);
         await notifier.refresh();
@@ -309,13 +335,15 @@ void main() {
     group('刷新功能', () {
       test('refresh重新加载第一页', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((invocation) async {
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer((invocation) async {
           final page = invocation.namedArguments[const Symbol('page')] as int;
           return createPagedResponse(
             items: [createTestExperiment(name: 'Page $page')],
@@ -338,16 +366,20 @@ void main() {
 
       test('refresh时isRefreshing状态正确', () async {
         final mockService = MockExperimentService();
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async => createPagedResponse(
-              items: [],
-              page: 1,
-            ));
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer(
+          (_) async => createPagedResponse(
+            items: [],
+            page: 1,
+          ),
+        );
 
         final notifier = ExperimentListNotifier(mockService);
 
@@ -406,13 +438,15 @@ void main() {
         final mockService = MockExperimentService();
         var callCount = 0;
 
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async {
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer((_) async {
           callCount++;
           await Future.delayed(const Duration(milliseconds: 100));
           return createPagedResponse(
@@ -438,13 +472,15 @@ void main() {
         final mockService = MockExperimentService();
         var callCount = 0;
 
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async {
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer((_) async {
           callCount++;
           await Future.delayed(const Duration(milliseconds: 100));
           return createPagedResponse(
@@ -472,13 +508,15 @@ void main() {
         final mockService = MockExperimentService();
         var callCount = 0;
 
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async {
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer((_) async {
           callCount++;
           return createPagedResponse(
             items: [],
@@ -501,13 +539,15 @@ void main() {
         final mockService = MockExperimentService();
         var callCount = 0;
 
-        when(() => mockService.getExperiments(
-              page: any(named: 'page'),
-              size: any(named: 'size'),
-              status: any(named: 'status'),
-              startedAfter: any(named: 'startedAfter'),
-              startedBefore: any(named: 'startedBefore'),
-            )).thenAnswer((_) async {
+        when(
+          () => mockService.getExperiments(
+            page: any(named: 'page'),
+            size: any(named: 'size'),
+            status: any(named: 'status'),
+            startedAfter: any(named: 'startedAfter'),
+            startedBefore: any(named: 'startedBefore'),
+          ),
+        ).thenAnswer((_) async {
           callCount++;
           await Future.delayed(const Duration(milliseconds: 100));
           return createPagedResponse(

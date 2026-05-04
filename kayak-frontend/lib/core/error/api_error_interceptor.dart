@@ -1,16 +1,15 @@
 import 'package:dio/dio.dart';
 
 import 'error_handler.dart';
-import 'error_models.dart';
 import 'error_messages.dart';
+import 'error_models.dart';
 
 /// Dio error interceptor
 ///
 /// Captures all API errors and transforms them into unified ApiError format.
 class ApiErrorInterceptor extends Interceptor {
-  final ErrorHandlerInterface errorHandler;
-
   ApiErrorInterceptor({required this.errorHandler});
+  final ErrorHandlerInterface errorHandler;
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {

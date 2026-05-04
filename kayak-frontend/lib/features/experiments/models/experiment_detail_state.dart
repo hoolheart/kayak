@@ -7,15 +7,6 @@ import '../models/experiment.dart';
 
 /// 试验详情状态
 class ExperimentDetailState {
-  final Experiment? experiment;
-  final List<PointHistoryData> pointHistory;
-  final bool isLoading;
-  final bool isLoadingHistory;
-  final String? error;
-  final String? historyError;
-  final int historyPage;
-  final bool hasMoreHistory;
-
   const ExperimentDetailState({
     this.experiment,
     this.pointHistory = const [],
@@ -26,6 +17,14 @@ class ExperimentDetailState {
     this.historyPage = 1,
     this.hasMoreHistory = false,
   });
+  final Experiment? experiment;
+  final List<PointHistoryData> pointHistory;
+  final bool isLoading;
+  final bool isLoadingHistory;
+  final String? error;
+  final String? historyError;
+  final int historyPage;
+  final bool hasMoreHistory;
 
   ExperimentDetailState copyWith({
     Experiment? experiment,
@@ -55,11 +54,10 @@ class ExperimentDetailState {
 
 /// 时序数据点
 class PointHistoryData {
-  final DateTime timestamp;
-  final double value;
-
   const PointHistoryData({
     required this.timestamp,
     required this.value,
   });
+  final DateTime timestamp;
+  final double value;
 }

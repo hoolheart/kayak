@@ -5,16 +5,15 @@ import 'navigation_item.dart';
 
 /// Sidebar navigation component with collapse/expand functionality
 class Sidebar extends StatelessWidget {
-  final bool isCollapsed;
-  final VoidCallback? onToggleCollapse;
-  final String? selectedRoute;
-
   const Sidebar({
     super.key,
     this.isCollapsed = false,
     this.onToggleCollapse,
     this.selectedRoute,
   });
+  final bool isCollapsed;
+  final VoidCallback? onToggleCollapse;
+  final String? selectedRoute;
 
   @override
   Widget build(BuildContext context) {

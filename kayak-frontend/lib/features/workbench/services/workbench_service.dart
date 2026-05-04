@@ -14,15 +14,17 @@ abstract class WorkbenchServiceInterface {
   Future<Workbench> getWorkbench(String id);
   Future<Workbench> createWorkbench(String name, String? description);
   Future<Workbench> updateWorkbench(
-      String id, String name, String? description);
+    String id,
+    String name,
+    String? description,
+  );
   Future<void> deleteWorkbench(String id);
 }
 
 /// 工作台服务实现
 class WorkbenchService implements WorkbenchServiceInterface {
-  final ApiClientInterface _apiClient;
-
   WorkbenchService(this._apiClient);
+  final ApiClientInterface _apiClient;
 
   @override
   Future<PagedWorkbenchResponse> getWorkbenches({
@@ -51,7 +53,8 @@ class WorkbenchService implements WorkbenchServiceInterface {
   Future<Workbench> getWorkbench(String id) async {
     final response = await _apiClient.get('/api/v1/workbenches/$id');
     return Workbench.fromJson(
-        (response as Map)['data'] as Map<String, dynamic>);
+      (response as Map)['data'] as Map<String, dynamic>,
+    );
   }
 
   @override
@@ -65,7 +68,8 @@ class WorkbenchService implements WorkbenchServiceInterface {
       },
     );
     return Workbench.fromJson(
-        (response as Map)['data'] as Map<String, dynamic>);
+      (response as Map)['data'] as Map<String, dynamic>,
+    );
   }
 
   @override
@@ -82,7 +86,8 @@ class WorkbenchService implements WorkbenchServiceInterface {
       },
     );
     return Workbench.fromJson(
-        (response as Map)['data'] as Map<String, dynamic>);
+      (response as Map)['data'] as Map<String, dynamic>,
+    );
   }
 
   @override

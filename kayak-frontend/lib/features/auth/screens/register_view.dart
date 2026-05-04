@@ -156,8 +156,8 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                           return '请输入邮箱';
                         }
                         if (!RegExp(
-                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                            .hasMatch(value)) {
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                        ).hasMatch(value)) {
                           return '请输入有效的邮箱地址';
                         }
                         return null;

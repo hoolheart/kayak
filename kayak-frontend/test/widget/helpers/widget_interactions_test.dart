@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../helpers/widget_interactions.dart';
+
 import '../../helpers/widget_finders.dart';
+import '../../helpers/widget_interactions.dart';
 
 void main() {
   group('WidgetInteractionHelpers', () {
@@ -298,7 +299,9 @@ void main() {
         );
 
         await WidgetInteractionHelpers.longPress(
-            tester, find.byType(Container));
+          tester,
+          find.byType(Container),
+        );
 
         expect(longPressed, isTrue);
       });
@@ -347,7 +350,9 @@ void main() {
         // 注意：在Widget测试中，pump(duration)只推进模拟时钟，不等待真实时间
         // 这里测试方法能正常执行而不抛出异常
         await WidgetInteractionHelpers.wait(
-            tester, const Duration(milliseconds: 100));
+          tester,
+          const Duration(milliseconds: 100),
+        );
 
         // 验证widget树仍然正常
         expect(find.text('Test'), findsOneWidget);

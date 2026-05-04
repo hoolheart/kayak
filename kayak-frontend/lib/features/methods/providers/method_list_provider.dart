@@ -9,14 +9,6 @@ import '../services/method_service.dart';
 
 /// Method list state
 class MethodListState {
-  final List<Method> methods;
-  final bool isLoading;
-  final bool isLoadingMore;
-  final String? error;
-  final int currentPage;
-  final int totalItems;
-  final bool hasMore;
-
   const MethodListState({
     this.methods = const [],
     this.isLoading = false,
@@ -26,6 +18,13 @@ class MethodListState {
     this.totalItems = 0,
     this.hasMore = false,
   });
+  final List<Method> methods;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final String? error;
+  final int currentPage;
+  final int totalItems;
+  final bool hasMore;
 
   MethodListState copyWith({
     List<Method>? methods,
@@ -50,9 +49,8 @@ class MethodListState {
 
 /// Method list notifier
 class MethodListNotifier extends StateNotifier<MethodListState> {
-  final MethodServiceInterface _service;
-
   MethodListNotifier(this._service) : super(const MethodListState());
+  final MethodServiceInterface _service;
 
   Future<void> loadMethods({int page = 1, bool append = false}) async {
     if (page == 1) {

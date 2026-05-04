@@ -141,17 +141,16 @@ class _CustomTitleBarState extends State<CustomTitleBar> {
 
 /// Individual window control button
 class _WindowButton extends StatefulWidget {
-  final IconData icon;
-  final VoidCallback onPressed;
-  final String tooltip;
-  final bool isClose;
-
   const _WindowButton({
     required this.icon,
     required this.onPressed,
     required this.tooltip,
     this.isClose = false,
   });
+  final IconData icon;
+  final VoidCallback onPressed;
+  final String tooltip;
+  final bool isClose;
 
   @override
   State<_WindowButton> createState() => _WindowButtonState();
@@ -209,12 +208,11 @@ class _WindowButtonState extends State<_WindowButton> {
 ///
 /// On Web, it simply returns the child without a title bar.
 class TitleBarWrapper extends StatelessWidget {
-  final Widget child;
-
   const TitleBarWrapper({
     super.key,
     required this.child,
   });
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {

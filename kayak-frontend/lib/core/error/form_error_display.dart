@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 ///
 /// Used to display form validation errors.
 class FormErrorDisplay extends StatelessWidget {
+  const FormErrorDisplay({
+    super.key,
+    required this.fieldErrors,
+    this.showIcon = true,
+    this.errorStyle,
+  });
+
   /// Field error mapping
   final Map<String, List<String>> fieldErrors;
 
@@ -12,13 +19,6 @@ class FormErrorDisplay extends StatelessWidget {
 
   /// Error text style
   final TextStyle? errorStyle;
-
-  const FormErrorDisplay({
-    super.key,
-    required this.fieldErrors,
-    this.showIcon = true,
-    this.errorStyle,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +44,16 @@ class FormErrorDisplay extends StatelessWidget {
 }
 
 class _FieldErrorItem extends StatelessWidget {
-  final String field;
-  final List<String> errors;
-  final bool showIcon;
-  final TextStyle? errorStyle;
-
   const _FieldErrorItem({
     required this.field,
     required this.errors,
     required this.showIcon,
     this.errorStyle,
   });
+  final String field;
+  final List<String> errors;
+  final bool showIcon;
+  final TextStyle? errorStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -85,10 +84,12 @@ class _FieldErrorItem extends StatelessWidget {
                   field,
                   style: defaultStyle.copyWith(fontWeight: FontWeight.w500),
                 ),
-              ...errors.map((error) => Text(
-                    error,
-                    style: defaultStyle,
-                  )),
+              ...errors.map(
+                (error) => Text(
+                  error,
+                  style: defaultStyle,
+                ),
+              ),
             ],
           ),
         ),

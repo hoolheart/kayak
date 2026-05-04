@@ -8,14 +8,6 @@ import '../models/experiment.dart';
 
 /// 试验筛选工具栏组件
 class ExperimentFilterBar extends StatelessWidget {
-  final ExperimentStatus? currentStatus;
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final ValueChanged<ExperimentStatus?> onStatusChanged;
-  final void Function(DateTime?, DateTime?) onDateRangeChanged;
-  final VoidCallback onReset;
-  final VoidCallback onRefresh;
-
   const ExperimentFilterBar({
     super.key,
     this.currentStatus,
@@ -26,6 +18,13 @@ class ExperimentFilterBar extends StatelessWidget {
     required this.onReset,
     required this.onRefresh,
   });
+  final ExperimentStatus? currentStatus;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final ValueChanged<ExperimentStatus?> onStatusChanged;
+  final void Function(DateTime?, DateTime?) onDateRangeChanged;
+  final VoidCallback onReset;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {

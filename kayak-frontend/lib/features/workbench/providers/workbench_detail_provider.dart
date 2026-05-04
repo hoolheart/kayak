@@ -7,9 +7,8 @@ import '../services/workbench_service.dart';
 
 /// 工作台详情Notifier
 class WorkbenchDetailNotifier extends StateNotifier<WorkbenchDetailState> {
-  final WorkbenchServiceInterface _service;
-
   WorkbenchDetailNotifier(this._service) : super(const WorkbenchDetailState());
+  final WorkbenchServiceInterface _service;
 
   /// 加载工作台详情
   Future<void> loadWorkbench(String workbenchId) async {

@@ -13,12 +13,11 @@ import 'device_tree_node.dart';
 
 /// 设备树组件
 class DeviceTree extends ConsumerWidget {
-  final String workbenchId;
-
   const DeviceTree({
     super.key,
     required this.workbenchId,
   });
+  final String workbenchId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,7 +115,10 @@ class DeviceTree extends ConsumerWidget {
   }
 
   Future<void> _showEditDialog(
-      BuildContext context, WidgetRef ref, Device device) async {
+    BuildContext context,
+    WidgetRef ref,
+    Device device,
+  ) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => DeviceFormDialog(
@@ -131,7 +133,10 @@ class DeviceTree extends ConsumerWidget {
   }
 
   Future<void> _showDeleteConfirmation(
-      BuildContext context, WidgetRef ref, Device device) async {
+    BuildContext context,
+    WidgetRef ref,
+    Device device,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(

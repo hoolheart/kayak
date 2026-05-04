@@ -7,12 +7,11 @@ import 'package:flutter/material.dart';
 ///
 /// 提供设备列表和设置两个Tab
 class DetailTabBar extends StatelessWidget {
-  final TabController tabController;
-
   const DetailTabBar({
     super.key,
     required this.tabController,
   });
+  final TabController tabController;
 
   @override
   Widget build(BuildContext context) {

@@ -6,9 +6,10 @@ library;
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+
 import 'api_exceptions.dart';
-import 'auth_notifier_interface.dart';
 import 'auth_api_service.dart';
+import 'auth_notifier_interface.dart';
 import 'token_storage.dart';
 
 abstract class ApiClientInterface {
@@ -81,12 +82,6 @@ class RefreshMutex {
 ///
 /// 实现ApiClientInterface接口，支持401自动刷新Token
 class AuthenticatedApiClient implements ApiClientInterface {
-  final Dio _dio;
-  final AuthStateNotifierInterface _authNotifier;
-  final TokenStorageInterface _tokenStorage;
-  final AuthApiServiceInterface _authApiService;
-  final RefreshMutex _refreshMutex = RefreshMutex();
-
   AuthenticatedApiClient({
     required Dio dio,
     required AuthStateNotifierInterface authNotifier,
@@ -96,6 +91,11 @@ class AuthenticatedApiClient implements ApiClientInterface {
         _authNotifier = authNotifier,
         _tokenStorage = tokenStorage,
         _authApiService = authApiService;
+  final Dio _dio;
+  final AuthStateNotifierInterface _authNotifier;
+  final TokenStorageInterface _tokenStorage;
+  final AuthApiServiceInterface _authApiService;
+  final RefreshMutex _refreshMutex = RefreshMutex();
 
   @override
   Future<dynamic> get<T>(
@@ -103,11 +103,13 @@ class AuthenticatedApiClient implements ApiClientInterface {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return _request<T>(() => _dio.get(
-          path,
-          queryParameters: queryParameters,
-          options: _applyAuth(options),
-        ));
+    return _request<T>(
+      () => _dio.get(
+        path,
+        queryParameters: queryParameters,
+        options: _applyAuth(options),
+      ),
+    );
   }
 
   @override
@@ -117,12 +119,14 @@ class AuthenticatedApiClient implements ApiClientInterface {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return _request<T>(() => _dio.post(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: _applyAuth(options),
-        ));
+    return _request<T>(
+      () => _dio.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _applyAuth(options),
+      ),
+    );
   }
 
   @override
@@ -132,12 +136,14 @@ class AuthenticatedApiClient implements ApiClientInterface {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return _request<T>(() => _dio.put(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: _applyAuth(options),
-        ));
+    return _request<T>(
+      () => _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _applyAuth(options),
+      ),
+    );
   }
 
   @override
@@ -147,12 +153,14 @@ class AuthenticatedApiClient implements ApiClientInterface {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    return _request<T>(() => _dio.delete(
-          path,
-          data: data,
-          queryParameters: queryParameters,
-          options: _applyAuth(options),
-        ));
+    return _request<T>(
+      () => _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _applyAuth(options),
+      ),
+    );
   }
 
   @override

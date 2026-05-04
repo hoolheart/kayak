@@ -13,11 +13,6 @@ enum ToastSeverity {
 
 /// Custom snackbar content with icon
 class SnackBarContent extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String? message;
-
   const SnackBarContent({
     super.key,
     required this.icon,
@@ -25,6 +20,10 @@ class SnackBarContent extends StatelessWidget {
     required this.title,
     this.message,
   });
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {

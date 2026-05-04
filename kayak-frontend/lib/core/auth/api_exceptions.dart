@@ -7,9 +7,8 @@ library;
 ///
 /// 当认证失败时抛出（如Token无效、过期等）
 class UnauthorizedException implements Exception {
-  final String message;
-
   const UnauthorizedException([this.message = 'Unauthorized']);
+  final String message;
 
   @override
   String toString() => 'UnauthorizedException: $message';
@@ -19,13 +18,12 @@ class UnauthorizedException implements Exception {
 ///
 /// 当API请求失败时抛出
 class ApiException implements Exception {
-  final String message;
-  final int? statusCode;
-
   const ApiException({
     required this.message,
     this.statusCode,
   });
+  final String message;
+  final int? statusCode;
 
   @override
   String toString() => 'ApiException: $message (status: $statusCode)';

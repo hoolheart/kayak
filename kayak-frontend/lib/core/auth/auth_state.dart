@@ -1,10 +1,5 @@
 /// User Model
 class User {
-  final String id;
-  final String email;
-  final String? username;
-  final String? avatarUrl;
-
   const User({
     required this.id,
     required this.email,
@@ -20,6 +15,10 @@ class User {
       avatarUrl: json['avatar_url'] as String?,
     );
   }
+  final String id;
+  final String email;
+  final String? username;
+  final String? avatarUrl;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -31,10 +30,6 @@ class User {
 
 /// Token响应模型
 class TokenPair {
-  final String accessToken;
-  final String refreshToken;
-  final int expiresIn;
-
   const TokenPair({
     required this.accessToken,
     required this.refreshToken,
@@ -48,16 +43,13 @@ class TokenPair {
       expiresIn: json['expires_in'] as int,
     );
   }
+  final String accessToken;
+  final String refreshToken;
+  final int expiresIn;
 }
 
 /// 登录响应模型
 class LoginResponse {
-  final String accessToken;
-  final String refreshToken;
-  final int expiresIn;
-  final String userId;
-  final String? username;
-
   const LoginResponse({
     required this.accessToken,
     required this.refreshToken,
@@ -89,17 +81,15 @@ class LoginResponse {
       username: userJson?['username'] as String? ?? json['username'] as String?,
     );
   }
+  final String accessToken;
+  final String refreshToken;
+  final int expiresIn;
+  final String userId;
+  final String? username;
 }
 
 /// 认证状态
 class AuthState {
-  final bool isAuthenticated;
-  final bool isLoading;
-  final bool isInitialized; // 是否已完成首次初始化
-  final User? user;
-  final String? accessToken;
-  final String? error;
-
   const AuthState({
     this.isAuthenticated = false,
     this.isLoading = false,
@@ -108,6 +98,27 @@ class AuthState {
     this.accessToken,
     this.error,
   });
+
+  /// 未初始化状态 - 首次创建时使用，isLoading=true 表示正在检查认证状态
+  factory AuthState.initial() => const AuthState(isLoading: true);
+
+  factory AuthState.loading() => const AuthState(isLoading: true);
+
+  factory AuthState.authenticated(User user, String accessToken) => AuthState(
+        isAuthenticated: true,
+        isInitialized: true,
+        user: user,
+        accessToken: accessToken,
+      );
+
+  factory AuthState.error(String message) =>
+      AuthState(error: message, isInitialized: true);
+  final bool isAuthenticated;
+  final bool isLoading;
+  final bool isInitialized; // 是否已完成首次初始化
+  final User? user;
+  final String? accessToken;
+  final String? error;
 
   AuthState copyWith({
     bool? isAuthenticated,
@@ -126,19 +137,4 @@ class AuthState {
       error: error ?? this.error,
     );
   }
-
-  /// 未初始化状态 - 首次创建时使用，isLoading=true 表示正在检查认证状态
-  factory AuthState.initial() => const AuthState(isLoading: true);
-
-  factory AuthState.loading() => const AuthState(isLoading: true);
-
-  factory AuthState.authenticated(User user, String accessToken) => AuthState(
-        isAuthenticated: true,
-        isInitialized: true,
-        user: user,
-        accessToken: accessToken,
-      );
-
-  factory AuthState.error(String message) =>
-      AuthState(error: message, isInitialized: true);
 }

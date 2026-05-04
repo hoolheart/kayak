@@ -8,7 +8,7 @@
 /// ```
 library;
 
+export 'golden_config.dart';
+export 'test_app.dart';
 export 'widget_finders.dart';
 export 'widget_interactions.dart';
-export 'test_app.dart';
-export 'golden_config.dart';

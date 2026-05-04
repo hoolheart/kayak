@@ -6,12 +6,11 @@ import 'navigation_item.dart';
 /// Breadcrumb navigation component
 /// Auto-generates breadcrumbs from current route and displays clickable navigation links
 class BreadcrumbNav extends StatelessWidget {
-  final String? currentRoute;
-
   const BreadcrumbNav({
     super.key,
     this.currentRoute,
   });
+  final String? currentRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -92,17 +91,16 @@ class BreadcrumbNav extends StatelessWidget {
 
 /// Individual breadcrumb text item with styling
 class _BreadcrumbText extends StatelessWidget {
-  final String label;
-  final bool isClickable;
-  final bool isCurrent;
-  final VoidCallback? onTap;
-
   const _BreadcrumbText({
     required this.label,
     required this.isClickable,
     required this.isCurrent,
     this.onTap,
   });
+  final String label;
+  final bool isClickable;
+  final bool isCurrent;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

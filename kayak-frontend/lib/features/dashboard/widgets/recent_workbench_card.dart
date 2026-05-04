@@ -6,21 +6,21 @@
 library;
 
 import 'package:flutter/material.dart';
-import '../../workbench/models/workbench.dart';
+
 import '../../../core/theme/color_schemes.dart';
+import '../../workbench/models/workbench.dart';
 
 /// 最近工作台卡片组件
 class RecentWorkbenchCard extends StatefulWidget {
-  final Workbench workbench;
-  final int deviceCount;
-  final VoidCallback onTap;
-
   const RecentWorkbenchCard({
     super.key,
     required this.workbench,
     this.deviceCount = 0,
     required this.onTap,
   });
+  final Workbench workbench;
+  final int deviceCount;
+  final VoidCallback onTap;
 
   @override
   State<RecentWorkbenchCard> createState() => _RecentWorkbenchCardState();
@@ -121,9 +121,8 @@ class _RecentWorkbenchCardState extends State<RecentWorkbenchCard> {
 
 /// 状态 Chip 组件
 class _StatusChip extends StatelessWidget {
-  final String status;
-
   const _StatusChip({required this.status});
+  final String status;
 
   @override
   Widget build(BuildContext context) {

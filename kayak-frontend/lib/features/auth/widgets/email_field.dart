@@ -10,16 +10,15 @@ import '../../../validators/validators.dart';
 
 /// 邮箱输入框组件
 class EmailField extends ConsumerStatefulWidget {
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool enabled;
-
   const EmailField({
     super.key,
     required this.controller,
     required this.focusNode,
     this.enabled = true,
   });
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool enabled;
 
   @override
   ConsumerState<EmailField> createState() => _EmailFieldState();

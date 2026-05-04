@@ -35,15 +35,14 @@ extension SortOptionLabel on SortOption {
 
 /// 搜索状态
 class SearchState {
-  final String query;
-  final String? statusFilter;
-  final SortOption sortOption;
-
   const SearchState({
     this.query = '',
     this.statusFilter,
     this.sortOption = SortOption.default_,
   });
+  final String query;
+  final String? statusFilter;
+  final SortOption sortOption;
 
   SearchState copyWith({
     String? query,

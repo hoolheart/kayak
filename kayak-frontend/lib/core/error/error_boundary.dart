@@ -9,6 +9,13 @@ import 'network_error_handler.dart';
 ///
 /// Catches widget rendering errors and displays a friendly error page.
 class ErrorBoundary extends ConsumerWidget {
+  const ErrorBoundary({
+    super.key,
+    required this.child,
+    this.errorBuilder,
+    this.showDetails = false,
+    this.showRetry = true,
+  });
   final Widget child;
 
   /// Custom error builder function
@@ -24,14 +31,6 @@ class ErrorBoundary extends ConsumerWidget {
   /// Whether to show retry button
   final bool showRetry;
 
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.errorBuilder,
-    this.showDetails = false,
-    this.showRetry = true,
-  });
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ErrorBoundaryWidget(
@@ -44,6 +43,13 @@ class ErrorBoundary extends ConsumerWidget {
 }
 
 class ErrorBoundaryWidget extends ConsumerStatefulWidget {
+  const ErrorBoundaryWidget({
+    super.key,
+    required this.child,
+    this.errorBuilder,
+    required this.showDetails,
+    required this.showRetry,
+  });
   final Widget child;
   final Widget Function(
     BuildContext context,
@@ -52,14 +58,6 @@ class ErrorBoundaryWidget extends ConsumerStatefulWidget {
   )? errorBuilder;
   final bool showDetails;
   final bool showRetry;
-
-  const ErrorBoundaryWidget({
-    super.key,
-    required this.child,
-    this.errorBuilder,
-    required this.showDetails,
-    required this.showRetry,
-  });
 
   @override
   ConsumerState<ErrorBoundaryWidget> createState() =>
@@ -85,14 +83,16 @@ class _ErrorBoundaryWidgetState extends ConsumerState<ErrorBoundaryWidget> {
   /// Error handling method
   void _handleError(Object error, StackTrace stackTrace) {
     // Record error
-    _errorHandler.handleWidgetError(WidgetError(
-      code: 'WIDGET_ERROR',
-      message: error.toString(),
-      timestamp: DateTime.now(),
-      severity: ErrorSeverity.critical,
-      widgetName: 'Unknown',
-      stackTrace: stackTrace.toString(),
-    ));
+    _errorHandler.handleWidgetError(
+      WidgetError(
+        code: 'WIDGET_ERROR',
+        message: error.toString(),
+        timestamp: DateTime.now(),
+        severity: ErrorSeverity.critical,
+        widgetName: 'Unknown',
+        stackTrace: stackTrace.toString(),
+      ),
+    );
 
     setState(() {
       _currentError = WidgetError(
@@ -143,13 +143,12 @@ class _ErrorBoundaryWidgetState extends ConsumerState<ErrorBoundaryWidget> {
 
 /// Error catching widget that uses FlutterError.onError
 class _ErrorCatch extends StatefulWidget {
-  final Widget child;
-  final void Function(Object error, StackTrace stackTrace) onError;
-
   const _ErrorCatch({
     required this.child,
     required this.onError,
   });
+  final Widget child;
+  final void Function(Object error, StackTrace stackTrace) onError;
 
   @override
   State<_ErrorCatch> createState() => _ErrorCatchState();
@@ -185,12 +184,6 @@ class _ErrorCatchState extends State<_ErrorCatch> {
 
 /// Default error page widget
 class _DefaultErrorPage extends StatelessWidget {
-  final WidgetError error;
-  final StackTrace? stackTrace;
-  final bool showDetails;
-  final bool showRetry;
-  final VoidCallback onRetry;
-
   const _DefaultErrorPage({
     required this.error,
     this.stackTrace,
@@ -198,6 +191,11 @@ class _DefaultErrorPage extends StatelessWidget {
     required this.showRetry,
     required this.onRetry,
   });
+  final WidgetError error;
+  final StackTrace? stackTrace;
+  final bool showDetails;
+  final bool showRetry;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {

@@ -11,8 +11,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/greeting_provider.dart';
+
 import '../../../core/auth/providers.dart';
+import '../providers/greeting_provider.dart';
 
 /// 欢迎区域组件
 class WelcomeSection extends ConsumerWidget {

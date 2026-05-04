@@ -10,15 +10,14 @@ import '../services/point_service.dart';
 
 /// 测点值状态
 class PointValueState {
-  final PointValue? value;
-  final bool isLoading;
-  final String? error;
-
   const PointValueState({
     this.value,
     this.isLoading = false,
     this.error,
   });
+  final PointValue? value;
+  final bool isLoading;
+  final String? error;
 
   PointValueState copyWith({
     PointValue? value,
@@ -35,16 +34,15 @@ class PointValueState {
 
 /// 测点值Notifier
 class PointValueNotifier extends StateNotifier<PointValueState> {
-  final PointServiceInterface _service;
-  final String pointId;
-  Timer? _refreshTimer;
-  static const defaultInterval = Duration(seconds: 5);
-
   PointValueNotifier(this._service, this.pointId)
       : super(const PointValueState()) {
     _loadValue();
     _startAutoRefresh();
   }
+  final PointServiceInterface _service;
+  final String pointId;
+  Timer? _refreshTimer;
+  static const defaultInterval = Duration(seconds: 5);
 
   @override
   void dispose() {

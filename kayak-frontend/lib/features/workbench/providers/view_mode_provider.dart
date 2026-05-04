@@ -29,7 +29,9 @@ class ViewModeNotifier extends StateNotifier<ViewMode> {
     state = mode;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
-        _viewModeKey, mode == ViewMode.list ? 'list' : 'card');
+      _viewModeKey,
+      mode == ViewMode.list ? 'list' : 'card',
+    );
   }
 
   Future<void> toggle() async {

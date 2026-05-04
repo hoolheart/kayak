@@ -11,13 +11,6 @@ import '../../providers/device_tree_provider.dart';
 
 /// 设备树节点组件
 class DeviceTreeNodeWidget extends ConsumerWidget {
-  final DeviceTreeNode node;
-  final int depth;
-  final VoidCallback? onTap;
-  final VoidCallback? onExpand;
-  final void Function(Device device)? onEdit;
-  final void Function(Device device)? onDelete;
-
   const DeviceTreeNodeWidget({
     super.key,
     required this.node,
@@ -27,6 +20,12 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
     this.onEdit,
     this.onDelete,
   });
+  final DeviceTreeNode node;
+  final int depth;
+  final VoidCallback? onTap;
+  final VoidCallback? onExpand;
+  final void Function(Device device)? onEdit;
+  final void Function(Device device)? onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -128,17 +127,21 @@ class DeviceTreeNodeWidget extends ConsumerWidget {
     final items = <PopupMenuEntry<String>>[];
 
     if (onEdit != null) {
-      items.add(const PopupMenuItem<String>(
-        value: 'edit',
-        child: Text('编辑'),
-      ));
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'edit',
+          child: Text('编辑'),
+        ),
+      );
     }
 
     if (onDelete != null) {
-      items.add(const PopupMenuItem<String>(
-        value: 'delete',
-        child: Text('删除'),
-      ));
+      items.add(
+        const PopupMenuItem<String>(
+          value: 'delete',
+          child: Text('删除'),
+        ),
+      );
     }
 
     if (items.isEmpty) return;

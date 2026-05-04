@@ -41,7 +41,9 @@ void main() {
     test('displayText has correct format', () {
       expect(ModbusFunctionCode.fc01.displayText, '01 - Coil (线圈)');
       expect(
-          ModbusFunctionCode.fc03.displayText, '03 - Holding Register (保持寄存器)');
+        ModbusFunctionCode.fc03.displayText,
+        '03 - Holding Register (保持寄存器)',
+      );
     });
 
     test('defaultDataType returns correct type', () {

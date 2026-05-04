@@ -10,18 +10,6 @@ import '../services/method_service.dart';
 
 /// Method edit state
 class MethodEditState {
-  final String? id;
-  final String name;
-  final String? description;
-  final String processDefinitionJson;
-  final Map<String, ParameterConfig> parameters;
-  final bool isSaving;
-  final bool isValidating;
-  final String? error;
-  final ValidationResult? validationResult;
-  final bool isDirty;
-  final bool isLoaded;
-
   const MethodEditState({
     this.id,
     this.name = '',
@@ -36,6 +24,17 @@ class MethodEditState {
     this.isDirty = false,
     this.isLoaded = false,
   });
+  final String? id;
+  final String name;
+  final String? description;
+  final String processDefinitionJson;
+  final Map<String, ParameterConfig> parameters;
+  final bool isSaving;
+  final bool isValidating;
+  final String? error;
+  final ValidationResult? validationResult;
+  final bool isDirty;
+  final bool isLoaded;
 
   MethodEditState copyWith({
     String? id,
@@ -89,9 +88,8 @@ class MethodEditState {
 
 /// Method edit notifier
 class MethodEditNotifier extends StateNotifier<MethodEditState> {
-  final MethodServiceInterface _service;
-
   MethodEditNotifier(this._service) : super(const MethodEditState());
+  final MethodServiceInterface _service;
 
   Future<void> loadMethod(String id) async {
     state = state.copyWith(isLoaded: false);
@@ -106,7 +104,9 @@ class MethodEditNotifier extends StateNotifier<MethodEditState> {
       final schema = method.parameterSchema;
       for (final entry in schema.entries) {
         params[entry.key] = ParameterConfig.fromJson(
-            entry.key, entry.value as Map<String, dynamic>);
+          entry.key,
+          entry.value as Map<String, dynamic>,
+        );
       }
 
       state = state.copyWith(

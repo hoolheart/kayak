@@ -8,15 +8,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 问候语状态数据类
 class GreetingState {
-  final String displayName;
-  final String subtitle;
-  final String dateDisplay;
-
   const GreetingState({
     required this.displayName,
     required this.subtitle,
     required this.dateDisplay,
   });
+  final String displayName;
+  final String subtitle;
+  final String dateDisplay;
 }
 
 /// 问候语生成 Provider

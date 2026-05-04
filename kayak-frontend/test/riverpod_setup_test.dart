@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:kayak_frontend/app.dart';
-import 'package:kayak_frontend/providers/core/theme_provider.dart';
 import 'package:kayak_frontend/providers/core/locale_provider.dart';
+import 'package:kayak_frontend/providers/core/theme_provider.dart';
 
 void main() {
   group('Riverpod Setup Tests', () {

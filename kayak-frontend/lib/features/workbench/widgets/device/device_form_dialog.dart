@@ -6,29 +6,29 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/color_schemes.dart';
 import '../../models/device.dart';
 import '../../models/protocol_config.dart';
 import '../../services/device_service.dart';
 import 'common_fields.dart';
+import 'modbus_rtu_form.dart';
+import 'modbus_tcp_form.dart';
 import 'protocol_selector.dart';
 import 'virtual_form.dart';
-import 'modbus_tcp_form.dart';
-import 'modbus_rtu_form.dart';
 
 /// 设备表单对话框
 ///
 /// 使用协议路由：根据 [_selectedProtocol] 动态渲染对应的协议表单。
 /// 编辑模式下协议选择器锁定。
 class DeviceFormDialog extends ConsumerStatefulWidget {
-  final Device? device; // null = 创建模式, non-null = 编辑模式
-  final String workbenchId;
-
   const DeviceFormDialog({
     super.key,
     this.device,
     required this.workbenchId,
   });
+  final Device? device; // null = 创建模式, non-null = 编辑模式
+  final String workbenchId;
 
   @override
   ConsumerState<DeviceFormDialog> createState() => _DeviceFormDialogState();
@@ -91,9 +91,11 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      key: Key(_isEditMode
-          ? 'edit-device-dialog-${widget.device?.id}'
-          : 'create-device-dialog'),
+      key: Key(
+        _isEditMode
+            ? 'edit-device-dialog-${widget.device?.id}'
+            : 'create-device-dialog',
+      ),
       title: Row(
         children: [
           Expanded(
@@ -283,7 +285,8 @@ class _DeviceFormDialogState extends ConsumerState<DeviceFormDialog> {
 
   /// 协议切换确认对话框
   Future<void> _showProtocolSwitchConfirmDialog(
-      ProtocolType newProtocol) async {
+    ProtocolType newProtocol,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(

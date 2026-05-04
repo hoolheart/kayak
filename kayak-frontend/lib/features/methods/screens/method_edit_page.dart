@@ -11,9 +11,8 @@ import '../providers/method_edit_provider.dart';
 
 /// Method edit page
 class MethodEditPage extends ConsumerStatefulWidget {
-  final String? methodId;
-
   const MethodEditPage({super.key, this.methodId});
+  final String? methodId;
 
   @override
   ConsumerState<MethodEditPage> createState() => _MethodEditPageState();
@@ -242,7 +241,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
           ],
         ),
         const SizedBox(height: 8),
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(
               color:
@@ -330,8 +329,12 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     );
   }
 
-  Widget _buildParameterCard(BuildContext context, String name,
-      ParameterConfig param, MethodEditState state) {
+  Widget _buildParameterCard(
+    BuildContext context,
+    String name,
+    ParameterConfig param,
+    MethodEditState state,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
@@ -431,24 +434,29 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
           ),
           if (!result.valid && result.errors.isNotEmpty) ...[
             const SizedBox(height: 8),
-            ...result.errors.map((e) => Padding(
-                  padding: const EdgeInsets.only(left: 28, top: 4),
-                  child: Text(
-                    '• $e',
-                    style: TextStyle(
-                      color: colorScheme.onErrorContainer,
-                      fontSize: 13,
-                    ),
+            ...result.errors.map(
+              (e) => Padding(
+                padding: const EdgeInsets.only(left: 28, top: 4),
+                child: Text(
+                  '• $e',
+                  style: TextStyle(
+                    color: colorScheme.onErrorContainer,
+                    fontSize: 13,
                   ),
-                )),
+                ),
+              ),
+            ),
           ],
         ],
       ),
     );
   }
 
-  void _showParameterDialog(BuildContext context, String? existingName,
-      ParameterConfig? existingParam) {
+  void _showParameterDialog(
+    BuildContext context,
+    String? existingName,
+    ParameterConfig? existingParam,
+  ) {
     final notifier = ref.read(methodEditProvider.notifier);
 
     _paramNameController.text = existingName ?? '';
@@ -487,10 +495,14 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                     items: const [
                       DropdownMenuItem(value: 'number', child: Text('number')),
                       DropdownMenuItem(
-                          value: 'integer', child: Text('integer')),
+                        value: 'integer',
+                        child: Text('integer'),
+                      ),
                       DropdownMenuItem(value: 'string', child: Text('string')),
                       DropdownMenuItem(
-                          value: 'boolean', child: Text('boolean')),
+                        value: 'boolean',
+                        child: Text('boolean'),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value != null) {

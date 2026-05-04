@@ -41,15 +41,18 @@ abstract class TokenStorageInterface {
     if (!kIsWeb) {
       if (Platform.isLinux) {
         debugPrint(
-            'TokenStorage: Using SharedPrefsTokenStorage for Linux desktop');
+          'TokenStorage: Using SharedPrefsTokenStorage for Linux desktop',
+        );
         return SharedPrefsTokenStorage();
       } else if (Platform.isWindows) {
         debugPrint(
-            'TokenStorage: Using SharedPrefsTokenStorage for Windows desktop');
+          'TokenStorage: Using SharedPrefsTokenStorage for Windows desktop',
+        );
         return SharedPrefsTokenStorage();
       } else if (Platform.isMacOS) {
         debugPrint(
-            'TokenStorage: Using SharedPrefsTokenStorage for macOS desktop');
+          'TokenStorage: Using SharedPrefsTokenStorage for macOS desktop',
+        );
         return SharedPrefsTokenStorage();
       }
     }
@@ -63,12 +66,6 @@ abstract class TokenStorageInterface {
 ///
 /// 使用 flutter_secure_storage 存储Token
 class SecureTokenStorage implements TokenStorageInterface {
-  static const _accessTokenKey = 'access_token';
-  static const _refreshTokenKey = 'refresh_token';
-  static const _expiryKey = 'access_token_expiry';
-
-  final FlutterSecureStorage _secureStorage;
-
   SecureTokenStorage({FlutterSecureStorage? secureStorage})
       : _secureStorage = secureStorage ??
             const FlutterSecureStorage(
@@ -76,6 +73,11 @@ class SecureTokenStorage implements TokenStorageInterface {
               iOptions:
                   IOSOptions(accessibility: KeychainAccessibility.first_unlock),
             );
+  static const _accessTokenKey = 'access_token';
+  static const _refreshTokenKey = 'refresh_token';
+  static const _expiryKey = 'access_token_expiry';
+
+  final FlutterSecureStorage _secureStorage;
 
   @override
   Future<void> saveTokens({
@@ -168,7 +170,8 @@ class SharedPrefsTokenStorage implements TokenStorageInterface {
     final prefs = await _preferences;
     final expiryTime = DateTime.now().add(Duration(seconds: expiresIn));
     debugPrint(
-        'SharedPrefsTokenStorage.saveTokens: saving tokens, expiresIn=$expiresIn');
+      'SharedPrefsTokenStorage.saveTokens: saving tokens, expiresIn=$expiresIn',
+    );
 
     await Future.wait([
       prefs.setString(_accessTokenKey, accessToken),
@@ -183,7 +186,8 @@ class SharedPrefsTokenStorage implements TokenStorageInterface {
     final prefs = await _preferences;
     final token = prefs.getString(_accessTokenKey);
     debugPrint(
-        'SharedPrefsTokenStorage.getAccessToken: ${token != null ? "found" : "null"}');
+      'SharedPrefsTokenStorage.getAccessToken: ${token != null ? "found" : "null"}',
+    );
     return token;
   }
 

@@ -25,14 +25,13 @@ abstract class AuthApiServiceInterface {
 ///
 /// 实现AuthApiServiceInterface接口
 class AuthApiService implements AuthApiServiceInterface {
-  final Dio _dio;
-  final String _baseUrl;
-
   AuthApiService({
     required Dio dio,
     required String baseUrl,
   })  : _dio = dio,
         _baseUrl = baseUrl;
+  final Dio _dio;
+  final String _baseUrl;
 
   @override
   Future<LoginResponse> login(String email, String password) async {
@@ -44,10 +43,12 @@ class AuthApiService implements AuthApiServiceInterface {
         data: {'email': email, 'password': password},
       );
       debugPrint(
-          'AuthApiService: Login successful, response: ${response.data}');
+        'AuthApiService: Login successful, response: ${response.data}',
+      );
       final responseData = response.data as Map<String, dynamic>;
       return LoginResponse.fromJson(
-          responseData['data'] as Map<String, dynamic>);
+        responseData['data'] as Map<String, dynamic>,
+      );
     } catch (e, st) {
       debugPrint('AuthApiService: Login failed with error: $e');
       debugPrint('AuthApiService: Stack trace: $st');
@@ -56,11 +57,15 @@ class AuthApiService implements AuthApiServiceInterface {
   }
 
   @override
-  Future<void> register(String email, String password,
-      [String? username]) async {
+  Future<void> register(
+    String email,
+    String password, [
+    String? username,
+  ]) async {
     final url = '$_baseUrl/api/v1/auth/register';
     debugPrint(
-        'AuthApiService: Attempting register to $url with email: $email');
+      'AuthApiService: Attempting register to $url with email: $email',
+    );
     try {
       final response = await _dio.post(
         url,
@@ -71,7 +76,8 @@ class AuthApiService implements AuthApiServiceInterface {
         },
       );
       debugPrint(
-          'AuthApiService: Register successful, response: ${response.data}');
+        'AuthApiService: Register successful, response: ${response.data}',
+      );
     } catch (e, st) {
       debugPrint('AuthApiService: Register failed with error: $e');
       debugPrint('AuthApiService: Stack trace: $st');

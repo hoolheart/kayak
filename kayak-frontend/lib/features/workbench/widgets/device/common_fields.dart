@@ -11,14 +11,6 @@ import '../../validators/device_validators.dart';
 ///
 /// 封装设备表单的通用字段：设备名称、制造商、型号、序列号
 class CommonFields extends StatelessWidget {
-  final TextEditingController nameController;
-  final TextEditingController manufacturerController;
-  final TextEditingController modelController;
-  final TextEditingController snController;
-
-  /// 字段变更回调，用于追踪表单脏状态
-  final VoidCallback? onFieldChanged;
-
   const CommonFields({
     super.key,
     required this.nameController,
@@ -27,6 +19,13 @@ class CommonFields extends StatelessWidget {
     required this.snController,
     this.onFieldChanged,
   });
+  final TextEditingController nameController;
+  final TextEditingController manufacturerController;
+  final TextEditingController modelController;
+  final TextEditingController snController;
+
+  /// 字段变更回调，用于追踪表单脏状态
+  final VoidCallback? onFieldChanged;
 
   @override
   Widget build(BuildContext context) {
