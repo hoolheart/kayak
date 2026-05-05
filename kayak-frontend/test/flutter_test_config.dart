@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_test/flutter_test.dart';
 
 /// 自定义 Golden 文件比较器，支持像素容差
@@ -10,14 +11,14 @@ import 'package:flutter_test/flutter_test.dart';
 /// 此比较器允许指定比例的像素差异（默认 5%），
 /// 以适应不同平台（macOS vs Linux）字体渲染的微小差异。
 class ToleranceLocalFileComparator extends LocalFileComparator {
+  ToleranceLocalFileComparator(
+    super.testFile, {
+    this.tolerance = 0.05,
+  });
+
   /// 允许的像素差异比例（0.0 - 1.0）
   /// 默认 0.05 即 5% 的像素可以不同
   final double tolerance;
-
-  ToleranceLocalFileComparator(
-    Uri testFile, {
-    this.tolerance = 0.05,
-  }) : super(testFile);
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {
@@ -34,7 +35,7 @@ class ToleranceLocalFileComparator extends LocalFileComparator {
       );
     } catch (e) {
       // 无法读取 golden 文件或解码失败
-      print('Golden tolerance comparison failed: $e');
+      debugPrint('Golden tolerance comparison failed: $e');
       return false;
     }
   }
@@ -55,12 +56,8 @@ class ToleranceLocalFileComparator extends LocalFileComparator {
       return false;
     }
 
-    final testData = await testImage.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    );
-    final goldenData = await goldenImage.toByteData(
-      format: ui.ImageByteFormat.rawRgba,
-    );
+    final testData = await testImage.toByteData();
+    final goldenData = await goldenImage.toByteData();
 
     testImage.dispose();
     goldenImage.dispose();
@@ -94,9 +91,7 @@ class ToleranceLocalFileComparator extends LocalFileComparator {
   /// 将 PNG 字节数据解码为 [ui.Image]
   Future<ui.Image> _decodeImage(Uint8List bytes) {
     final completer = Completer<ui.Image>();
-    ui.decodeImageFromList(bytes, (ui.Image image) {
-      completer.complete(image);
-    });
+    ui.decodeImageFromList(bytes, completer.complete);
     return completer.future;
   }
 }
@@ -110,7 +105,6 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   // 注意：LocalFileComparator接收参考文件的URI，不是目录
   goldenFileComparator = ToleranceLocalFileComparator(
     Uri.parse('test/widget/golden/basic_golden_test.dart'),
-    tolerance: 0.05, // 5% 像素差异容忍度
   );
 
   // 加载字体确保文本渲染一致性
