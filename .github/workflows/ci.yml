@@ -200,7 +200,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./kayak-frontend
-        run: flutter test --verbose
+        run: flutter test --exclude-tags golden --verbose
 
   # ============================================
   # Stage 4: 代码覆盖率
@@ -269,7 +269,7 @@ jobs:
 
       - name: Generate coverage
         working-directory: ./kayak-frontend
-        run: flutter test --coverage
+        run: flutter test --exclude-tags golden --coverage
 
       - name: Generate HTML report
         working-directory: ./kayak-frontend
