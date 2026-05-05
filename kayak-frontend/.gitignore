@@ -45,6 +45,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Linux generated files
+linux/flutter/generated_plugins.cmake
+
 # Flutter Widget Testing - Golden Test exclusions
 # Exclude all golden test failure artifacts in any test directory
 **/golden/failures/
