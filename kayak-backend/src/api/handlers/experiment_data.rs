@@ -64,21 +64,37 @@ pub async fn query_experiment_data(
         AppError::validation_error(fields)
     })?;
 
-    // Validate time range if both are provided
-    if let (Some(start), Some(end)) = (body.start_time, body.end_time) {
-        if start > end {
-            return Err(AppError::BadRequest(
-                "start_time must be before end_time".to_string(),
-            ));
+    // Validate time range
+    match (body.start_time, body.end_time) {
+        (Some(start), Some(end)) => {
+            if start > end {
+                return Err(AppError::BadRequest(
+                    "start_time must be before end_time".to_string(),
+                ));
+            }
+            let time_window = end.timestamp_millis() - start.timestamp_millis();
+            let max_window = 30_i64 * 24 * 3600 * 1000; // 30 days in milliseconds
+            if time_window > max_window {
+                return Err(AppError::BadRequest(
+                    "Query time range must not exceed 30 days".to_string(),
+                ));
+            }
         }
-
-        let time_window = end.timestamp_millis() - start.timestamp_millis();
-        let max_window = 30_i64 * 24 * 3600 * 1000; // 30 days in milliseconds
-        if time_window > max_window {
-            return Err(AppError::BadRequest(
-                "Query time range must not exceed 30 days".to_string(),
-            ));
+        (Some(start), None) => {
+            if start > Utc::now() {
+                return Err(AppError::BadRequest(
+                    "start_time must not be in the future".to_string(),
+                ));
+            }
         }
+        (None, Some(end)) => {
+            if end > Utc::now() {
+                return Err(AppError::BadRequest(
+                    "end_time must not be in the future".to_string(),
+                ));
+            }
+        }
+        (None, None) => {}
     }
 
     // Call service
