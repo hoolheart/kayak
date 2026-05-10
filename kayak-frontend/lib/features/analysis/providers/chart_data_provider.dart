@@ -31,7 +31,8 @@ class ChartDataNotifier extends StateNotifier<ChartViewState> {
     try {
       final response = await _service.queryData(request);
 
-      if (response.points.isEmpty || response.points.every((p) => p.length == 0)) {
+      if (response.points.isEmpty ||
+          response.points.every((p) => p.timestamps.isEmpty)) {
         state = state.copyWith(
           state: ChartState.noDataInRange,
           data: response,

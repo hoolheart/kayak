@@ -4,6 +4,8 @@
 /// 支持单/多曲线显示、主题适配、空/加载/错误状态。
 library;
 
+import 'dart:math';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -298,19 +300,16 @@ class _ChartContent extends StatelessWidget {
 
   double _calculateNiceInterval(double min, double max) {
     final range = max - min;
-    if (range <= 0) return 1;
+    if (range <= 0) return 1.0;
 
     final roughInterval = range / 5;
-    final magnitude = roughInterval > 0
-        ? (roughInterval.toString().split('.')[0].length - 1)
-        : 0;
-    final power = magnitude > 0 ? magnitude : 0;
-    final base = [1, 2, 5, 10];
-    final step = base.firstWhere(
-      (b) => b * power >= roughInterval,
-      orElse: () => 1,
-    );
-    return step.toDouble();
+    final magnitude = (log(roughInterval) / log(10)).floor();
+    final power = pow(10, magnitude).toDouble();
+    final normalized = roughInterval / power;
+
+    final step =
+        normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+    return (step * power).toDouble();
   }
 
   String _formatYValue(double value) {
