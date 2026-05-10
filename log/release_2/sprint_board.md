@@ -1,10 +1,11 @@
 # Sprint Board - Release 2
 
 ## Sprint Information
-- **Sprint Start**: 2026-05-10
+- **Sprint Start**: 2026-05-11
 - **Sprint End**: 2026-05-24 (2周，2个Sprint)
-- **Total Tasks**: 7 个模块任务 / 36 个子任务
-- **Completed Tasks**: 0
+- **Total Tasks**: 7 个模块任务 / 21 个子任务
+- **Completed Tasks**: 13
+- **In Progress Tasks**: 1
 
 ---
 
@@ -12,7 +13,6 @@
 
 | Task ID | Description | Assigned | Priority |
 |---------|-------------|----------|----------|
-| R2-S2-001 | 团队管理后端 (Team CRUD + 邀请 + 权限) | sw-tom | P1 |
 | R2-S2-002 | 团队管理前端 (团队页面 + 成员管理 + 团队选择器) | sw-anna | P1 |
 | R2-S2-003 | Python SDK (HTTP封装 + 认证 + 数据下载) | sw-tom | P2 |
 | R2-S2-004 | Sprint 2 启动脚本与最终编译验证 | sw-mike | P0 |
@@ -31,7 +31,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| - | - | - | - |
+| R2-S2-001-C | 团队管理后端 - 开发实现 | sw-tom | in_progress |
 
 ---
 
@@ -68,6 +68,8 @@
 | R2-S1-002-F | 图表组件 - 测试执行 | 2026-05-10 |
 | R2-S1-003-A | Sprint 1 启动脚本开发 | 2026-05-10 |
 | R2-S1-003-B | Sprint 1 编译验证 | 2026-05-10 |
+| R2-S2-001-A | 团队管理后端 - 测试用例设计 | 2026-05-11 |
+| R2-S2-001-B | 团队管理后端 - 详细设计 | 2026-05-11 |
 
 ---
 
@@ -78,13 +80,13 @@
 - **Remaining**: 0
 
 ## Sprint 2 Progress
-- **Total**: 4 个模块任务
-- **Completed**: 0
-- **In Progress**: 0
-- **Remaining**: 4
+- **Total**: 8 个子任务 (4 个模块任务)
+- **Completed**: 2
+- **In Progress**: 1
+- **Remaining**: 5
 
 ## Overall Release 2 Progress
-- **Completion**: 57% (12/21 tasks)
+- **Completion**: 62% (13/21 tasks)
 
 ---
 
@@ -96,4 +98,4 @@
 
 ---
 
-**Last Updated**: 2026-05-10
+**Last Updated**: 2026-05-11

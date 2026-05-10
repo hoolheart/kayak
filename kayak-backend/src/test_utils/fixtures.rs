@@ -3,6 +3,7 @@
 //! 提供标准化的测试数据生成
 
 use crate::models::entities::*;
+use crate::models::entities::workbench::OwnerType;
 use chrono::Utc;
 use uuid::Uuid;
 

@@ -171,6 +171,8 @@ Compiling lib/main.dart for the Web...                             44.5s
 
 ### 问题汇总
 
+> **更新 (2026-05-10)**: 以下所有 lint 问题已在 commit 345a9a4 中修复，当前 `flutter analyze` 结果为 "No issues found!"。
+
 #### 需修复项（建议提交给 sw-tom）
 
 1. **前端 Warning: unused_local_variable** (control_panel.dart:165)

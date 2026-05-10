@@ -22,7 +22,7 @@ pub use experiment::{
 pub use method::Method;
 pub use point::{AccessType, DataType, Point, PointStatus};
 pub use state_change_log::StateChangeLog;
-pub use team::{OwnerType, Team, TeamInvitation, TeamMember, TeamRole};
+pub use team::{Team, TeamInvitation, TeamMember, TeamRole};
 pub use user::{CreateUserRequest, UpdateUserRequest, User, UserStatus};
 pub use workbench::{
     CreateWorkbenchRequest, UpdateWorkbenchRequest, Workbench, WorkbenchStatus,

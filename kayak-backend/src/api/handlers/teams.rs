@@ -8,10 +8,10 @@ use axum::{
 use std::sync::Arc;
 use uuid::Uuid;
 
-use crate::auth::{RequireAuth, TeamPath};
+use crate::auth::RequireAuth;
 use crate::core::error::{ApiResponse, AppError};
 use crate::models::dto::team_dto::*;
-use crate::services::team::{TeamService, TeamServiceError};
+use crate::services::team::TeamService;
 
 /// Team handler state type
 type TeamHandlerState = Arc<dyn TeamService>;
@@ -25,7 +25,7 @@ pub async fn create_team(
     let team = service
         .create_team(req, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::created(team)))
 }
@@ -39,7 +39,7 @@ pub async fn list_my_teams(
     let result = service
         .list_my_teams(user_ctx.user_id, query.page, query.size)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::success(result)))
 }
@@ -53,7 +53,7 @@ pub async fn get_team(
     let team = service
         .get_team(team_id, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::success(team)))
 }
@@ -68,7 +68,7 @@ pub async fn update_team(
     let team = service
         .update_team(team_id, req, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::success(team)))
 }
@@ -82,7 +82,7 @@ pub async fn delete_team(
     service
         .delete_team(team_id, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -97,7 +97,7 @@ pub async fn list_members(
     let result = service
         .list_members(team_id, user_ctx.user_id, query.page, query.size)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::success(result)))
 }
@@ -111,7 +111,7 @@ pub async fn remove_member(
     service
         .remove_member(team_id, target_user_id, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -126,7 +126,7 @@ pub async fn create_invitation(
     let invitation = service
         .create_invitation(team_id, req, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::created(invitation)))
 }
@@ -140,7 +140,7 @@ pub async fn accept_invitation(
     let result = service
         .accept_invitation(code, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(Json(ApiResponse::success(result)))
 }
@@ -154,7 +154,7 @@ pub async fn leave_team(
     service
         .leave_team(team_id, user_ctx.user_id)
         .await
-        .map_err(TeamServiceError::into)?;
+        .map_err(AppError::from)?;
 
     Ok(StatusCode::NO_CONTENT)
 }

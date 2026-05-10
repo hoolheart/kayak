@@ -207,6 +207,10 @@ pub downsample: Option<usize>,
 - 可能导致 LTTB 返回意外的 2 个点（而非 1 个）
 - 违反 PRD 对 downsample 范围的定义
 
+### Bug 修复状态
+- Bug #1 (downsample min): ✅ 已修复（commit 4fa2b46）
+- Bug #2 (N==D 行为): ✅ 关闭（设计选择，非缺陷）
+
 ---
 
 ## 八、新增测试资产

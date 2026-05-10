@@ -94,41 +94,36 @@ fn extract_team_id_from_path(parts: &Parts) -> Result<Uuid, AppError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::http::Request;
+
+    fn make_parts(uri: &str) -> Parts {
+        Request::builder().uri(uri).body(()).unwrap().into_parts().0
+    }
 
     #[test]
     fn test_extract_team_id_simple() {
-        let mut parts = Parts::default();
-        parts.uri = "/api/v1/teams/550e8400-e29b-41d4-a716-446655440000"
-            .parse()
-            .unwrap();
+        let parts = make_parts("/api/v1/teams/550e8400-e29b-41d4-a716-446655440000");
         let id = extract_team_id_from_path(&parts).unwrap();
         assert_eq!(id.to_string(), "550e8400-e29b-41d4-a716-446655440000");
     }
 
     #[test]
     fn test_extract_team_id_nested() {
-        let mut parts = Parts::default();
-        parts.uri = "/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/members"
-            .parse()
-            .unwrap();
+        let parts = make_parts("/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/members");
         let id = extract_team_id_from_path(&parts).unwrap();
         assert_eq!(id.to_string(), "550e8400-e29b-41d4-a716-446655440000");
     }
 
     #[test]
     fn test_extract_team_id_invitations() {
-        let mut parts = Parts::default();
-        parts.uri = "/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/invitations"
-            .parse()
-            .unwrap();
+        let parts = make_parts("/api/v1/teams/550e8400-e29b-41d4-a716-446655440000/invitations");
         let id = extract_team_id_from_path(&parts).unwrap();
         assert_eq!(id.to_string(), "550e8400-e29b-41d4-a716-446655440000");
     }
 
     #[test]
     fn test_extract_team_id_invalid_uuid() {
-        let mut parts = Parts::default();
-        parts.uri = "/api/v1/teams/not-a-uuid".parse().unwrap();
+        let parts = make_parts("/api/v1/teams/not-a-uuid");
         let result = extract_team_id_from_path(&parts);
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), AppError::BadRequest(_)));
@@ -136,10 +131,7 @@ mod tests {
 
     #[test]
     fn test_extract_team_id_no_team_segment() {
-        let mut parts = Parts::default();
-        parts.uri = "/api/v1/users/550e8400-e29b-41d4-a716-446655440000"
-            .parse()
-            .unwrap();
+        let parts = make_parts("/api/v1/users/550e8400-e29b-41d4-a716-446655440000");
         let result = extract_team_id_from_path(&parts);
         assert!(result.is_err());
         assert!(matches!(result.unwrap_err(), AppError::BadRequest(_)));

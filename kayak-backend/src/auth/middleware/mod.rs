@@ -26,6 +26,7 @@ pub mod context;
 pub mod extractor;
 pub mod layer;
 pub mod require_auth;
+pub mod require_team_role;
 pub mod traits;
 
 // 公共导出
@@ -33,4 +34,5 @@ pub use context::UserContext;
 pub use extractor::{BearerTokenExtractor, CompositeTokenExtractor};
 pub use layer::{AuthLayer, AuthMiddlewareService, JwtAuthMiddleware};
 pub use require_auth::{OptionalAuth, RequireAuth};
+pub use require_team_role::{TeamContext, TeamPath};
 pub use traits::{AuthConfig, AuthMiddleware, TokenExtractor};

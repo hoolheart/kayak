@@ -57,6 +57,9 @@ hdf5 = "0.8"
 # Random number generation
 rand = "0.8"
 
+# Base64 encoding
+base64 = "0.22"
+
 # CLI argument parsing
 clap = { version = "4", features = ["derive"] }
 

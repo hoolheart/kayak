@@ -2,8 +2,7 @@
 
 use async_trait::async_trait;
 use chrono::{DateTime, Duration, Utc};
-use sqlx::{FromRow, SqlitePool};
-use std::sync::Arc;
+use sqlx::FromRow;
 use uuid::Uuid;
 
 use crate::db::connection::DbPool;
@@ -110,7 +109,7 @@ impl TeamServiceImpl {
 
         let mut bytes = [0u8; 24]; // 24 bytes -> 32 Base64URL chars
         rand::thread_rng().fill_bytes(&mut bytes);
-        URL_SAFE_NO_PAD.encode(&bytes)
+        URL_SAFE_NO_PAD.encode(bytes)
     }
 
     /// Get user's role in a team
@@ -181,7 +180,7 @@ struct TeamRow {
 }
 
 impl TeamRow {
-    fn to_team(self) -> Team {
+    fn into_team(self) -> Team {
         Team {
             id: Uuid::parse_str(&self.id).unwrap_or_default(),
             name: self.name,
@@ -208,6 +207,7 @@ struct MemberRow {
 }
 
 #[derive(Debug, FromRow)]
+#[allow(dead_code)]
 struct InvitationRow {
     id: String,
     team_id: String,
@@ -395,7 +395,7 @@ impl TeamService for TeamServiceImpl {
             .await?;
 
         let team = match row {
-            Some(r) => r.to_team(),
+            Some(r) => r.into_team(),
             None => return Err(TeamServiceError::NotFound),
         };
 
@@ -489,7 +489,7 @@ impl TeamService for TeamServiceImpl {
             .fetch_one(&self.pool)
             .await?;
 
-        let team = row.to_team();
+        let team = row.into_team();
         Ok(TeamResponse {
             id: team.id,
             name: team.name,

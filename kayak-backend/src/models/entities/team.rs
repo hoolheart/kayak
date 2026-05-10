@@ -22,13 +22,13 @@ impl TeamRole {
     /// Check if this role satisfies the required role
     /// Role hierarchy: Owner > Admin > Member
     pub fn satisfies(&self, required: TeamRole) -> bool {
-        match (self, required) {
-            (TeamRole::Owner, _) => true,
-            (TeamRole::Admin, TeamRole::Admin) => true,
-            (TeamRole::Admin, TeamRole::Member) => true,
-            (TeamRole::Member, TeamRole::Member) => true,
-            _ => false,
-        }
+        matches!(
+            (self, required),
+            (TeamRole::Owner, _)
+                | (TeamRole::Admin, TeamRole::Admin)
+                | (TeamRole::Admin, TeamRole::Member)
+                | (TeamRole::Member, TeamRole::Member)
+        )
     }
 }
 
