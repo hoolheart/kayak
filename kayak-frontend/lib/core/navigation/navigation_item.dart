@@ -34,6 +34,11 @@ class NavigationItem {
       route: '/methods',
     ),
     NavigationItem(
+      label: '分析',
+      icon: 'analytics',
+      route: '/analysis',
+    ),
+    NavigationItem(
       label: '设置',
       icon: 'settings',
       route: '/settings',
@@ -109,6 +114,8 @@ class BreadcrumbItem {
         return '试验';
       case 'methods':
         return '方法';
+      case 'analysis':
+        return '分析';
       case 'settings':
         return '设置';
       case 'edit':

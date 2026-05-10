@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/analysis/screens/analysis_page.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
@@ -237,6 +238,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               final id = state.pathParameters['id']!;
               return MethodEditPage(methodId: id);
             },
+          ),
+          // 分析
+          GoRoute(
+            path: '/analysis',
+            builder: (context, state) => const AnalysisPage(),
           ),
           // 设置
           GoRoute(
