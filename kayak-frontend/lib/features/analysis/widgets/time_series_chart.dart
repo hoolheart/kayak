@@ -66,13 +66,13 @@ class TimeSeriesChart extends ConsumerWidget {
         return ChartErrorState(
           errorMessage: chartState.errorMessage,
           onRetry: () {
-            // Retry logic will be handled by parent
+            // TODO(R2-S1-002): implement retry logic
           },
         );
       case ChartState.noDataInRange:
         return ChartNoDataState(
           onAdjustRange: () {
-            // Adjust range logic will be handled by parent
+            // TODO(R2-S1-002): implement adjust range logic
           },
         );
       case ChartState.loaded:
@@ -138,6 +138,12 @@ class _ChartContent extends StatelessWidget {
     if (lineBarsData.isEmpty) {
       return const ChartEmptyState();
     }
+
+    // Calculate total points for animation optimization
+    final totalPoints = lineBarsData.fold<int>(
+      0,
+      (sum, bar) => sum + bar.spots.length,
+    );
 
     // Calculate min/max for X and Y
     final allTimestamps = <double>[];
@@ -279,7 +285,9 @@ class _ChartContent extends StatelessWidget {
             ),
           ),
         ),
-        duration: const Duration(milliseconds: 300),
+        duration: totalPoints > 500
+            ? Duration.zero
+            : const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       ),
     );
