@@ -40,6 +40,8 @@ struct ExperimentRow {
     name: String,
     description: Option<String>,
     status: String,
+    owner_type: String,
+    owner_id: String,
     started_at: Option<String>,
     ended_at: Option<String>,
     created_at: String,
@@ -68,6 +70,8 @@ impl ExperimentRow {
             name: self.name.clone(),
             description: self.description.clone(),
             status,
+            owner_type: self.owner_type.clone(),
+            owner_id: Uuid::parse_str(&self.owner_id).unwrap_or_default(),
             started_at: self.started_at.as_ref().and_then(|s| {
                 DateTime::parse_from_rfc3339(s)
                     .ok()
@@ -165,7 +169,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
         let row: Option<ExperimentRow> = sqlx::query_as(
             r#"
             SELECT id, user_id, method_id, name, description, status,
-                   started_at, ended_at, created_at, updated_at
+                   owner_type, owner_id, started_at, ended_at, created_at, updated_at
             FROM experiments
             WHERE id = ?
             "#,
@@ -184,7 +188,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
         let rows: Vec<ExperimentRow> = sqlx::query_as(
             r#"
             SELECT id, user_id, method_id, name, description, status,
-                   started_at, ended_at, created_at, updated_at
+                   owner_type, owner_id, started_at, ended_at, created_at, updated_at
             FROM experiments
             WHERE user_id = ?
             ORDER BY created_at DESC
@@ -224,7 +228,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
                 let rows: Vec<ExperimentRow> = sqlx::query_as(
                     r#"
                     SELECT id, user_id, method_id, name, description, status,
-                           started_at, ended_at, created_at, updated_at
+                           owner_type, owner_id, started_at, ended_at, created_at, updated_at
                     FROM experiments
                     WHERE user_id = ? AND status = ?
                     ORDER BY created_at DESC
@@ -250,7 +254,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
                 let rows: Vec<ExperimentRow> = sqlx::query_as(
                     r#"
                     SELECT id, user_id, method_id, name, description, status,
-                           started_at, ended_at, created_at, updated_at
+                           owner_type, owner_id, started_at, ended_at, created_at, updated_at
                     FROM experiments
                     WHERE user_id = ?
                     ORDER BY created_at DESC
@@ -277,7 +281,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
             let rows: Vec<ExperimentRow> = sqlx::query_as(
                 r#"
                 SELECT id, user_id, method_id, name, description, status,
-                       started_at, ended_at, created_at, updated_at
+                       owner_type, owner_id, started_at, ended_at, created_at, updated_at
                 FROM experiments
                 WHERE status = ?
                 ORDER BY created_at DESC
@@ -300,7 +304,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
             let rows: Vec<ExperimentRow> = sqlx::query_as(
                 r#"
                 SELECT id, user_id, method_id, name, description, status,
-                       started_at, ended_at, created_at, updated_at
+                       owner_type, owner_id, started_at, ended_at, created_at, updated_at
                 FROM experiments
                 ORDER BY created_at DESC
                 LIMIT ? OFFSET ?
@@ -326,8 +330,8 @@ impl ExperimentRepository for SqlxExperimentRepository {
         sqlx::query(
             r#"
             INSERT INTO experiments (id, user_id, method_id, name, description, status,
-                                     started_at, ended_at, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                     owner_type, owner_id, started_at, ended_at, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(experiment.id.to_string())
@@ -336,6 +340,8 @@ impl ExperimentRepository for SqlxExperimentRepository {
         .bind(&experiment.name)
         .bind(&experiment.description)
         .bind(&status_str)
+        .bind(&experiment.owner_type)
+        .bind(experiment.owner_id.to_string())
         .bind(experiment.started_at)
         .bind(experiment.ended_at)
         .bind(experiment.created_at)
@@ -356,7 +362,7 @@ impl ExperimentRepository for SqlxExperimentRepository {
             r#"
             UPDATE experiments
             SET user_id = ?, method_id = ?, name = ?, description = ?,
-                status = ?, started_at = ?, ended_at = ?, updated_at = ?
+                status = ?, owner_type = ?, owner_id = ?, started_at = ?, ended_at = ?, updated_at = ?
             WHERE id = ?
             "#,
         )
@@ -365,6 +371,8 @@ impl ExperimentRepository for SqlxExperimentRepository {
         .bind(&experiment.name)
         .bind(&experiment.description)
         .bind(&status_str)
+        .bind(&experiment.owner_type)
+        .bind(experiment.owner_id.to_string())
         .bind(experiment.started_at)
         .bind(experiment.ended_at)
         .bind(experiment.updated_at)

@@ -35,6 +35,15 @@ impl ExperimentStatus {
     }
 }
 
+/// 资源作用域
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResourceScope {
+    Personal,
+    Team,
+    All,
+}
+
 /// 试验实体
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Experiment {
@@ -50,6 +59,10 @@ pub struct Experiment {
     pub description: Option<String>,
     /// 试验状态
     pub status: ExperimentStatus,
+    /// 所有者类型 (personal/team)
+    pub owner_type: String,
+    /// 所有者ID (用户ID或团队ID)
+    pub owner_id: Uuid,
     /// 开始时间
     pub started_at: Option<DateTime<Utc>>,
     /// 结束时间
@@ -71,6 +84,8 @@ impl Experiment {
             name,
             description: None,
             status: ExperimentStatus::Idle,
+            owner_type: "personal".to_string(),
+            owner_id: user_id,
             started_at: None,
             ended_at: None,
             created_at: now,
@@ -128,6 +143,8 @@ pub struct ExperimentResponse {
     pub name: String,
     pub description: Option<String>,
     pub status: ExperimentStatus,
+    pub owner_type: String,
+    pub owner_id: Uuid,
     pub started_at: Option<DateTime<Utc>>,
     pub ended_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
@@ -143,6 +160,8 @@ impl From<Experiment> for ExperimentResponse {
             name: e.name,
             description: e.description,
             status: e.status,
+            owner_type: e.owner_type,
+            owner_id: e.owner_id,
             started_at: e.started_at,
             ended_at: e.ended_at,
             created_at: e.created_at,

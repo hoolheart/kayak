@@ -62,6 +62,8 @@ async fn create_test_schema(pool: &sqlx::Pool<sqlx::Sqlite>) -> Result<(), sqlx:
             name TEXT NOT NULL,
             description TEXT,
             status TEXT NOT NULL DEFAULT 'IDLE' CHECK (status IN ('IDLE', 'LOADED', 'RUNNING', 'PAUSED', 'COMPLETED', 'ABORTED')),
+            owner_type TEXT NOT NULL DEFAULT 'personal' CHECK (owner_type IN ('personal', 'team')),
+            owner_id TEXT NOT NULL DEFAULT user_id,
             started_at TEXT,
             ended_at TEXT,
             created_at TEXT NOT NULL,
@@ -128,6 +130,8 @@ async fn create_experiment_with_status(
         name: name.to_string(),
         description: None,
         status,
+        owner_type: "personal".to_string(),
+        owner_id: user_id,
         started_at: None,
         ended_at: None,
         created_at: chrono::Utc::now(),
@@ -137,14 +141,16 @@ async fn create_experiment_with_status(
     let status_str = format!("{:?}", status).to_uppercase();
 
     sqlx::query(
-        r#"INSERT INTO experiments (id, user_id, name, description, status, created_at, updated_at) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)"#,
+        r#"INSERT INTO experiments (id, user_id, name, description, status, owner_type, owner_id, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
     )
     .bind(exp.id.to_string())
     .bind(user_id.to_string())
     .bind(&exp.name)
     .bind(&exp.description)
     .bind(&status_str)
+    .bind(&exp.owner_type)
+    .bind(exp.owner_id.to_string())
     .bind(exp.created_at)
     .bind(exp.updated_at)
     .execute(pool)
