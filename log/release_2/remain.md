@@ -8,12 +8,18 @@
 
 ## Release 2 范围说明
 
-Release 2 已完成以下任务：
+### Sprint 1 已完成（2026-05-10）
 - ✅ 时序数据绘图工具（R2-ANALYSIS-001）
-- ✅ 团队管理功能（R2-TEAM-001 + R2-TEAM-003）
-- ✅ Python SDK 核心功能（R2-PYTHON-001 + R2-PYTHON-002）
+  - HDF5 时序数据查询 API（POST /api/v1/experiments/{id}/data/query）
+  - LTTB 降采样算法（Rust 自研实现）
+  - 时序图表组件（fl_chart，单/多曲线、图例、主题适配）
+  - 分析页面（/analysis 路由、控制面板、图表展示区）
 
-Release 2 未包含的任务将在 Release 3 及以后实现。
+### Sprint 2 待完成（计划中）
+- 🔵 团队管理功能（R2-TEAM-001 + R2-TEAM-003）
+- 🔵 Python SDK 核心功能（R2-PYTHON-001 + R2-PYTHON-002）
+
+Release 2 未包含的其他任务将在 Release 3 及以后实现。
 
 ---
 
