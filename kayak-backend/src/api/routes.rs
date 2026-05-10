@@ -2,6 +2,7 @@
 //!
 //! 定义应用的所有HTTP路由
 
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use axum::{
@@ -12,6 +13,7 @@ use tower_http::services::{ServeDir, ServeFile};
 
 use crate::api::handlers::device;
 use crate::api::handlers::experiment_control;
+use crate::api::handlers::experiment_data;
 use crate::api::handlers::experiment_ws;
 use crate::api::handlers::health;
 use crate::api::handlers::method;
@@ -37,6 +39,7 @@ use crate::db::repository::workbench_repo::SqlxWorkbenchRepository;
 use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
 use crate::services::experiment_control::ExperimentControlService;
+use crate::services::experiment_data::{ExperimentDataService, ExperimentDataServiceImpl};
 use crate::services::method_service::{MethodService, MethodServiceTrait};
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
@@ -147,6 +150,17 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     let method_service: Arc<dyn MethodServiceTrait> =
         Arc::new(MethodServiceAdapter::new(method_service_impl));
 
+    // 创建试验数据查询服务
+    let experiment_repo_for_data = SqlxExperimentRepository::new(pool.clone());
+    let data_root = std::env::var("KAYAK_DATA_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|_| PathBuf::from("./data"));
+    let experiment_data_service: Arc<dyn ExperimentDataService> =
+        Arc::new(ExperimentDataServiceImpl::new(
+            Arc::new(experiment_repo_for_data),
+            data_root,
+        ));
+
     // 静态文件服务目录 (Flutter Web build output)
     let static_dir = std::env::var("KAYAK_SERVE_STATIC")
         .unwrap_or_else(|_| "../kayak-frontend/build/web".to_string());
@@ -168,6 +182,7 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(point_routes(point_service))
         .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
+        .merge(experiment_data_routes(experiment_data_service))
         // NEW: 协议列表与系统信息
         .merge(protocol_routes())
         .merge(system_routes())
@@ -318,6 +333,21 @@ fn experiment_control_routes(
             .route("/{id}/status", get(get_experiment_status))
             .route("/{id}/history", get(get_experiment_history))
             .with_state(experiment_control_service),
+    )
+}
+
+/// 试验数据查询路由组
+fn experiment_data_routes(
+    experiment_data_service: Arc<dyn ExperimentDataService>,
+) -> Router<()> {
+    Router::new().nest(
+        "/api/v1/experiments",
+        Router::new()
+            .route(
+                "/{id}/data/query",
+                post(experiment_data::query_experiment_data),
+            )
+            .with_state(experiment_data_service),
     )
 }
 
