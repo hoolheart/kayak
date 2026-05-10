@@ -20,7 +20,7 @@ pub struct ExperimentDataQueryRequest {
     /// End time (optional, inclusive)
     pub end_time: Option<DateTime<Utc>>,
     /// Downsample target point count (optional, default 1000, range 1-10000)
-    #[validate(range(min = 1, max = 10000))]
+    #[validate(range(min = 2, max = 10000))]
     pub downsample: Option<usize>,
 }
 
