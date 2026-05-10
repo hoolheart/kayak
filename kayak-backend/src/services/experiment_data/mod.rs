@@ -3,7 +3,7 @@
 //! Provides HDF5 time-series data reading with LTTB downsampling.
 
 use async_trait::async_trait;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -14,6 +14,15 @@ use crate::models::dto::experiment_data_query::{
 };
 use crate::models::entities::experiment::ExperimentStatus;
 use crate::services::lttb::lttb_downsample;
+
+/// Data for a single point read from HDF5
+pub struct PointData {
+    pub timestamps: Vec<i64>,
+    pub values: Vec<f64>,
+    pub name: String,
+    pub unit: String,
+    pub data_type: String,
+}
 
 /// Service for querying experiment time-series data from HDF5 files
 #[async_trait]
@@ -54,19 +63,14 @@ impl ExperimentDataServiceImpl {
     }
 
     /// Read point data from HDF5 file within the specified time range
-    #[allow(clippy::type_complexity)]
     fn read_point_data(
         &self,
-        file_path: &Path,
+        file: &hdf5::File,
         device_id: Uuid,
         point_id: Uuid,
         start_time: i64,
         end_time: i64,
-    ) -> Result<(Vec<i64>, Vec<f64>, String, String, String), AppError> {
-        let file = hdf5::File::open(file_path).map_err(|e| {
-            AppError::InternalError(format!("Failed to open HDF5 file: {}", e))
-        })?;
-
+    ) -> Result<PointData, AppError> {
         let group_path = format!("/{}/{}", device_id, point_id);
         let group = file.group(&group_path).map_err(|_| {
             AppError::NotFound(format!(
@@ -112,7 +116,13 @@ impl ExperimentDataServiceImpl {
             .unwrap_or(0);
 
         if start_idx >= end_idx {
-            return Ok((vec![], vec![], String::new(), String::new(), String::new()));
+            return Ok(PointData {
+                timestamps: vec![],
+                values: vec![],
+                name: String::new(),
+                unit: String::new(),
+                data_type: String::new(),
+            });
         }
 
         let timestamps = all_timestamps[start_idx..end_idx].to_vec();
@@ -123,7 +133,13 @@ impl ExperimentDataServiceImpl {
         let unit = Self::read_string_attr(&group, "unit");
         let data_type = Self::read_string_attr(&group, "data_type");
 
-        Ok((timestamps, values, point_name, unit, data_type))
+        Ok(PointData {
+            timestamps,
+            values,
+            name: point_name,
+            unit,
+            data_type,
+        })
     }
 
     /// Attempt to read a string attribute from an HDF5 group
@@ -208,24 +224,25 @@ impl ExperimentDataService for ExperimentDataServiceImpl {
         let mut total_returned_points: usize = 0;
 
         for point_id in &request.point_ids {
-            let (timestamps, values, point_name, unit, data_type) = self.read_point_data(
-                &hdf5_path,
+            let point_data = self.read_point_data(
+                &file,
                 request.device_id,
                 *point_id,
                 start_time,
                 end_time,
             )?;
 
-            let raw_count = timestamps.len();
+            let raw_count = point_data.timestamps.len();
             total_raw_points += raw_count;
 
             let (final_ts, final_vals) = if raw_count > downsample_threshold {
-                lttb_downsample(&timestamps,
-                    &values,
+                lttb_downsample(
+                    &point_data.timestamps,
+                    &point_data.values,
                     downsample_threshold,
                 )
             } else {
-                (timestamps, values)
+                (point_data.timestamps, point_data.values)
             };
 
             let returned_count = final_ts.len();
@@ -233,9 +250,9 @@ impl ExperimentDataService for ExperimentDataServiceImpl {
 
             points.push(ExperimentDataPointResponse {
                 point_id: *point_id,
-                point_name,
-                unit,
-                data_type,
+                point_name: point_data.name,
+                unit: point_data.unit,
+                data_type: point_data.data_type,
                 timestamps: final_ts,
                 values: final_vals,
             });
