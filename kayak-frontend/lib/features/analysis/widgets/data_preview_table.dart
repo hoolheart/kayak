@@ -6,7 +6,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/chart_models.dart';
 import '../providers/chart_data_provider.dart';
 import '../theme/chart_colors.dart';
 

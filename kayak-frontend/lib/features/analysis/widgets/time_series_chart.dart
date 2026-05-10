@@ -14,8 +14,8 @@ import '../providers/chart_data_provider.dart';
 import '../theme/chart_colors.dart';
 import 'chart_empty_state.dart';
 import 'chart_error_state.dart';
-import 'chart_loading_state.dart';
 import 'chart_legend_bar.dart';
+import 'chart_loading_state.dart';
 import 'chart_no_data_state.dart';
 import 'chart_toolbar.dart';
 
@@ -117,7 +117,6 @@ class _ChartContent extends StatelessWidget {
           spots: spots,
           color: curveColors[i % curveColors.length],
           barWidth: hoveredSeriesIndex == i ? 3.0 : 2.0,
-          isCurved: false,
           dotData: FlDotData(
             show: spots.length < 50,
             getDotPainter: (spot, percent, bar, index) {
@@ -129,7 +128,7 @@ class _ChartContent extends StatelessWidget {
               );
             },
           ),
-          belowBarData: BarAreaData(show: false),
+          belowBarData: BarAreaData(),
         ),
       );
     }
@@ -163,9 +162,6 @@ class _ChartContent extends StatelessWidget {
       child: LineChart(
         LineChartData(
           gridData: FlGridData(
-            show: true,
-            drawHorizontalLine: true,
-            drawVerticalLine: true,
             horizontalInterval: _calculateNiceInterval(minY, maxY),
             verticalInterval: _calculateNiceInterval(minX, maxX),
             getDrawingHorizontalLine: (value) {
@@ -182,7 +178,6 @@ class _ChartContent extends StatelessWidget {
             },
           ),
           titlesData: FlTitlesData(
-            show: true,
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
@@ -222,12 +217,8 @@ class _ChartContent extends StatelessWidget {
                 },
               ),
             ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
+            rightTitles: const AxisTitles(),
+            topTitles: const AxisTitles(),
           ),
           borderData: FlBorderData(
             show: true,
@@ -242,7 +233,6 @@ class _ChartContent extends StatelessWidget {
           maxY: maxY + yPadding,
           lineBarsData: lineBarsData,
           lineTouchData: LineTouchData(
-            enabled: true,
             touchTooltipData: LineTouchTooltipData(
               tooltipBgColor: colorScheme.chartTooltipBackground,
               tooltipRoundedRadius: 8,

@@ -162,7 +162,6 @@ class _ExperimentMetadata extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textTheme = Theme.of(context).textTheme;
     final controlState = ref.watch(analysisControllerProvider);
     final experimentsAsync = ref.watch(experimentListForAnalysisProvider);
 
