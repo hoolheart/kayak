@@ -123,7 +123,7 @@ class _ExperimentSelector extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DropdownButtonFormField<String>(
-          value: controlState.selectedExperimentId,
+          initialValue: controlState.selectedExperimentId,
           hint: const Text('请选择试验'),
           isExpanded: true,
           decoration: InputDecoration(
@@ -289,6 +289,9 @@ class _DeviceDropdown extends ConsumerWidget {
       deviceListForAnalysisProvider(controlState.selectedExperimentId!),
     );
 
+    // ignore: deprecated_member_use
+    // `value` is deprecated but kept because selection is controlled
+    // by Riverpod state, not Form state.
     return DropdownButtonFormField<String>(
       value: controlState.selectedDeviceId,
       hint: const Text('请选择设备'),
