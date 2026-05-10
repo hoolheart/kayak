@@ -28,6 +28,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://./data/kayak.db".to_string());
     let pool = init_db(&database_url).await?;
 
+    // 4.5. Run sqlx migrations
+    info!("Running database migrations...");
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .map_err(|e| {
+            tracing::error!("Failed to run database migrations: {}", e);
+            e
+        })?;
+    info!("Database migrations completed successfully");
+
     // 5. 创建路由
     let app = create_router(pool);
 

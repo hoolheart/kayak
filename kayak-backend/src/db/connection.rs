@@ -159,6 +159,93 @@ async fn init_sqlite_tables(pool: &SqlitePool) -> Result<(), sqlx::Error> {
 
     info!("Data files table created successfully");
 
+    // 创建 teams 表
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS teams (
+            id TEXT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            owner_id TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_teams_owner ON teams(owner_id)")
+        .execute(pool)
+        .await?;
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_teams_name ON teams(name)")
+        .execute(pool)
+        .await?;
+
+    info!("Teams table created successfully");
+
+    // 创建 team_members 表
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS team_members (
+            id TEXT PRIMARY KEY NOT NULL,
+            team_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            role TEXT NOT NULL CHECK (role IN ('Owner', 'Admin', 'Member')),
+            joined_at TEXT NOT NULL,
+            FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+            UNIQUE(team_id, user_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_team_members_team ON team_members(team_id)")
+        .execute(pool)
+        .await?;
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_team_members_user ON team_members(user_id)")
+        .execute(pool)
+        .await?;
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_team_members_role ON team_members(team_id, role)")
+        .execute(pool)
+        .await?;
+
+    info!("Team members table created successfully");
+
+    // 创建 team_invitations 表
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS team_invitations (
+            id TEXT PRIMARY KEY NOT NULL,
+            team_id TEXT NOT NULL,
+            email TEXT NOT NULL,
+            code TEXT NOT NULL UNIQUE,
+            role TEXT NOT NULL CHECK (role IN ('Admin', 'Member')),
+            expires_at TEXT NOT NULL,
+            used_at TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_invitations_code ON team_invitations(code)")
+        .execute(pool)
+        .await?;
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_invitations_team ON team_invitations(team_id)")
+        .execute(pool)
+        .await?;
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_invitations_expires ON team_invitations(expires_at)")
+        .execute(pool)
+        .await?;
+
+    info!("Team invitations table created successfully");
+
     // 创建触发器（SQLite）
     sqlx::query(
         r#"
