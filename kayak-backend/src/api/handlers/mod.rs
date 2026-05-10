@@ -12,5 +12,6 @@ pub mod health;
 pub mod method;
 pub mod point;
 pub mod protocol;
+pub mod teams;
 pub mod user;
 pub mod workbench;

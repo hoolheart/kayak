@@ -19,6 +19,7 @@ use crate::api::handlers::health;
 use crate::api::handlers::method;
 use crate::api::handlers::method::MethodServiceAdapter;
 use crate::api::handlers::point;
+use crate::api::handlers::teams;
 use crate::api::handlers::user;
 use crate::api::handlers::workbench;
 use crate::api::middleware::error::not_found_handler;
@@ -42,6 +43,7 @@ use crate::services::experiment_control::ExperimentControlService;
 use crate::services::experiment_data::{ExperimentDataService, ExperimentDataServiceImpl};
 use crate::services::method_service::{MethodService, MethodServiceTrait};
 use crate::services::point::{PointService, PointServiceImpl};
+use crate::services::team::{TeamService, TeamServiceImpl};
 use crate::services::user::{UserService, UserServiceImpl};
 use crate::services::user_repo_adapter::UserServiceRepositoryAdapter;
 use crate::services::workbench::{WorkbenchService, WorkbenchServiceImpl};
@@ -161,6 +163,9 @@ pub fn create_router(pool: DbPool) -> Router<()> {
             data_root,
         ));
 
+    // 创建团队管理服务
+    let team_service: Arc<dyn TeamService> = Arc::new(TeamServiceImpl::new(pool.clone()));
+
     // 静态文件服务目录 (Flutter Web build output)
     let static_dir = std::env::var("KAYAK_SERVE_STATIC")
         .unwrap_or_else(|_| "../kayak-frontend/build/web".to_string());
@@ -183,6 +188,7 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
         .merge(experiment_data_routes(experiment_data_service))
+        .merge(team_routes(team_service))
         // NEW: 协议列表与系统信息
         .merge(protocol_routes())
         .merge(system_routes())
@@ -348,6 +354,25 @@ fn experiment_data_routes(
                 post(experiment_data::query_experiment_data),
             )
             .with_state(experiment_data_service),
+    )
+}
+
+/// Team routes
+fn team_routes(team_service: Arc<dyn TeamService>) -> Router<()> {
+    Router::new().nest(
+        "/api/v1",
+        Router::new()
+            .route("/teams", post(teams::create_team))
+            .route("/teams", get(teams::list_my_teams))
+            .route("/teams/{id}", get(teams::get_team))
+            .route("/teams/{id}", put(teams::update_team))
+            .route("/teams/{id}", delete(teams::delete_team))
+            .route("/teams/{id}/members", get(teams::list_members))
+            .route("/teams/{id}/members/{user_id}", delete(teams::remove_member))
+            .route("/teams/{id}/invitations", post(teams::create_invitation))
+            .route("/teams/{id}/leave", post(teams::leave_team))
+            .route("/invitations/{code}/accept", post(teams::accept_invitation))
+            .with_state(team_service),
     )
 }
 
