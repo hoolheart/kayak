@@ -56,8 +56,9 @@ impl LttbDownsampler {
         let mut sampled_ts = Vec::with_capacity(threshold);
         let mut sampled_vals = Vec::with_capacity(threshold);
 
-        // Bucket size for dividing data (excluding first and last points)
-        let bucket_size = (n - 2) as f64 / (threshold - 2) as f64;
+        // Integer step parameters for dividing data (excluding first and last points)
+        let bucket_step_num = n - 2;
+        let bucket_step_den = threshold - 2;
 
         // First point is always selected
         sampled_ts.push(timestamps[0]);
@@ -67,20 +68,25 @@ impl LttbDownsampler {
         let mut last_selected_original_idx: usize = 0;
 
         for i in 1..(threshold - 1) {
-            // Current bucket boundaries
-            let bucket_start = ((i - 1) as f64 * bucket_size).floor() as usize + 1;
-            let bucket_end = (i as f64 * bucket_size).floor() as usize + 1;
+            // Current bucket boundaries (integer arithmetic avoids repeated float ops)
+            let bucket_start = ((i - 1) * bucket_step_num / bucket_step_den) + 1;
+            let bucket_end = (i * bucket_step_num / bucket_step_den) + 1;
             let bucket_end = bucket_end.min(n - 1);
 
             // Next bucket for calculating average point
             let next_bucket_start = bucket_end;
-            let next_bucket_end = ((i + 1) as f64 * bucket_size).floor() as usize + 1;
+            let next_bucket_end = ((i + 1) * bucket_step_num / bucket_step_den) + 1;
             let next_bucket_end = next_bucket_end.min(n - 1);
 
             // Average point of next bucket (as triangle vertex)
-            let avg_idx = next_bucket_start + (next_bucket_end - next_bucket_start) / 2;
-            let avg_x = timestamps[avg_idx] as f64;
-            let avg_y = values[avg_idx];
+            let count = next_bucket_end.saturating_sub(next_bucket_start);
+            let (avg_x, avg_y) = if count > 0 {
+                let sum_ts: i64 = timestamps[next_bucket_start..next_bucket_end].iter().sum();
+                let sum_val: f64 = values[next_bucket_start..next_bucket_end].iter().sum();
+                (sum_ts as f64 / count as f64, sum_val / count as f64)
+            } else {
+                (timestamps[next_bucket_start] as f64, values[next_bucket_start])
+            };
 
             // Find point in current bucket that forms largest triangle
             let mut max_area = -1.0;
