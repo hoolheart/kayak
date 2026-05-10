@@ -12,7 +12,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::auth::middleware::require_auth::RequireAuth;
-use crate::core::error::{ApiResponse, AppError};
+use crate::core::error::{ApiResponse, AppError, FieldError};
 use crate::models::dto::experiment_data_query::{
     ExperimentDataQueryRequest, ExperimentDataResponse,
 };
@@ -46,8 +46,23 @@ pub async fn query_experiment_data(
         .map_err(|_| AppError::BadRequest("Invalid experiment ID format".to_string()))?;
 
     // Validate request body using validator
-    body.validate()
-        .map_err(|e| AppError::validation_error_single("body", e.to_string()))?;
+    body.validate().map_err(|e: validator::ValidationErrors| {
+        let mut fields: Vec<FieldError> = Vec::new();
+        for (field, kind) in e.errors() {
+            if let validator::ValidationErrorsKind::Field(errors) = kind {
+                for err in errors {
+                    fields.push(FieldError::new(
+                        *field,
+                        err.message
+                            .as_ref()
+                            .map(|m| m.to_string())
+                            .unwrap_or_else(|| "validation failed".to_string()),
+                    ));
+                }
+            }
+        }
+        AppError::validation_error(fields)
+    })?;
 
     // Validate time range if both are provided
     if let (Some(start), Some(end)) = (body.start_time, body.end_time) {
