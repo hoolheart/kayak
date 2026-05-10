@@ -44,6 +44,10 @@ impl LttbDownsampler {
     ) -> (Vec<i64>, Vec<f64>) {
         let n = timestamps.len();
 
+        if timestamps.len() != values.len() {
+            return (timestamps.to_vec(), values.to_vec());
+        }
+
         // Boundary: fewer points than threshold, return all
         if n <= threshold {
             return (timestamps.to_vec(), values.to_vec());
