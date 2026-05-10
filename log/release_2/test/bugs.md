@@ -155,12 +155,16 @@ if n < threshold {
 | **任务来源** | 前端分析模块测试创建 |
 | **严重级别** | Medium |
 | **优先级** | Medium |
-| **状态** | 🆕 OPEN |
+| **状态** | ✅ CLOSED |
 | **指派给** | sw-tom |
 
 ### 问题描述
 
 `AnalysisControllerNotifier.selectExperiment()` 和 `selectDevice()` 方法中 `const []` 类型推断为 `List<dynamic>`，在 `AnalysisControlState.copyWith` 中 cast 到 `List<String>` 时运行时抛出 `TypeError`。
+
+### 修复状态
+
+✅ 已在 commit `de50289` 修复：将 `const []` 改为 `const <String>[]`
 
 ### 受影响文件
 
@@ -209,31 +213,23 @@ selectedPointIds: const <String>[],
 | **任务来源** | 前端分析模块测试创建 |
 | **严重级别** | Low |
 | **优先级** | Low |
-| **状态** | 🆕 OPEN |
+| **状态** | ✅ CLOSED |
 | **指派给** | sw-tom |
 
 ### 问题描述
 
 `ChartViewState.copyWith()` 中 `hoveredSeriesIndex` 参数使用 `??` 操作符，导致无法通过 `copyWith` 将 `hoveredSeriesIndex` 设为 `null`。
 
-### 受影响文件
+### 修复状态
 
-- `kayak-frontend/lib/features/analysis/models/chart_models.dart` 第 175 行
-
-### 当前代码
-
-```dart
-hoveredSeriesIndex: hoveredSeriesIndex ?? this.hoveredSeriesIndex,
-```
-
-### 实际行为
-
-调用 `setHoveredSeriesIndex(null)` 时，`copyWith(hoveredSeriesIndex: null)` 不会更新值，因为 `null ?? this.hoveredSeriesIndex` 保留原值。
-
-### 修复建议
-
-与其他 nullable 字段一样，使用 sentinel value 模式（如 `Object()`）区分"不修改"和"设为 null"。
+✅ 已在 commit `de50289` 修复：使用 sentinel 模式（`Object()`）区分"不修改"和"设为 null"。
 
 ---
 
-*本文档由 sw-mike 维护，修复后请更新状态。*
+## 修复状态更新汇总
+- 2026-05-10: Bug R2-001 已修复（downsample min 改为 2）
+- 2026-05-10: Bug R2-002 关闭（N<=threshold 返回原始数据是设计选择）
+- 2026-05-11: Bug R2-003 已修复（`const <String>[]` 类型推断）
+- 2026-05-11: Bug R2-004 已修复（sentinel 模式处理 null）
+
+*本文档由 sw-mike 维护，所有 bug 已修复。*
