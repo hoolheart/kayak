@@ -17,7 +17,7 @@
 | **任务来源** | R2-S1-001-E HDF5 时序数据查询 API 测试执行 |
 | **严重级别** | High |
 | **优先级** | High |
-| **状态** | 🔴 Open |
+| **状态** | ✅ CLOSED |
 | **指派给** | sw-tom |
 
 ### 问题描述
@@ -98,7 +98,7 @@ pub downsample: Option<usize>,
 | **发现人** | sw-mike |
 | **严重级别** | Low |
 | **优先级** | Low |
-| **状态** | 🟡 Observation |
+| **状态** | ✅ CLOSED (by design) |
 | **指派给** | sw-tom |
 
 ### 问题描述
@@ -134,6 +134,105 @@ if n < threshold {
     return (timestamps.to_vec(), values.to_vec());
 }
 ```
+
+---
+
+## 修复状态更新
+- 2026-05-10: Bug R2-001 已修复（downsample min 改为 2）
+- 2026-05-10: Bug R2-002 关闭（N<=threshold 返回原始数据是设计选择）
+
+---
+
+## Bug #R2-003
+
+### 基本信息
+
+| 项目 | 内容 |
+|------|------|
+| **Bug ID** | R2-003 |
+| **发现日期** | 2026-05-11 |
+| **发现人** | sw-mike |
+| **任务来源** | 前端分析模块测试创建 |
+| **严重级别** | Medium |
+| **优先级** | Medium |
+| **状态** | 🆕 OPEN |
+| **指派给** | sw-tom |
+
+### 问题描述
+
+`AnalysisControllerNotifier.selectExperiment()` 和 `selectDevice()` 方法中 `const []` 类型推断为 `List<dynamic>`，在 `AnalysisControlState.copyWith` 中 cast 到 `List<String>` 时运行时抛出 `TypeError`。
+
+### 受影响文件
+
+- `kayak-frontend/lib/features/analysis/providers/analysis_controller_provider.dart` 第 146、155 行
+
+### 当前代码
+
+```dart
+void selectExperiment(String? experimentId) {
+  state = state.copyWith(
+    selectedExperimentId: experimentId,
+    selectedDeviceId: null,
+    selectedPointIds: const [],   // ← List<dynamic>
+  );
+}
+
+void selectDevice(String? deviceId) {
+  state = state.copyWith(
+    selectedDeviceId: deviceId,
+    selectedPointIds: [],         // ← List<dynamic>
+  );
+}
+```
+
+### 实际行为
+
+运行时异常：`type 'List<dynamic>' is not a subtype of type 'List<String>' in type cast`
+
+### 修复建议
+
+```dart
+selectedPointIds: const <String>[],
+```
+
+---
+
+## Bug #R2-004
+
+### 基本信息
+
+| 项目 | 内容 |
+|------|------|
+| **Bug ID** | R2-004 |
+| **发现日期** | 2026-05-11 |
+| **发现人** | sw-mike |
+| **任务来源** | 前端分析模块测试创建 |
+| **严重级别** | Low |
+| **优先级** | Low |
+| **状态** | 🆕 OPEN |
+| **指派给** | sw-tom |
+
+### 问题描述
+
+`ChartViewState.copyWith()` 中 `hoveredSeriesIndex` 参数使用 `??` 操作符，导致无法通过 `copyWith` 将 `hoveredSeriesIndex` 设为 `null`。
+
+### 受影响文件
+
+- `kayak-frontend/lib/features/analysis/models/chart_models.dart` 第 175 行
+
+### 当前代码
+
+```dart
+hoveredSeriesIndex: hoveredSeriesIndex ?? this.hoveredSeriesIndex,
+```
+
+### 实际行为
+
+调用 `setHoveredSeriesIndex(null)` 时，`copyWith(hoveredSeriesIndex: null)` 不会更新值，因为 `null ?? this.hoveredSeriesIndex` 保留原值。
+
+### 修复建议
+
+与其他 nullable 字段一样，使用 sentinel value 模式（如 `Object()`）区分"不修改"和"设为 null"。
 
 ---
 
