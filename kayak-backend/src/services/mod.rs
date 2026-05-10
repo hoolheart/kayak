@@ -11,6 +11,7 @@ pub mod lttb;
 pub mod method_service;
 pub mod point;
 pub mod point_history;
+pub mod team;
 pub mod timeseries_buffer;
 pub mod user;
 pub mod user_repo_adapter;
@@ -39,6 +40,7 @@ pub use point::{
     PointValueDto, UpdatePointEntity,
 };
 pub use point_history::{Hdf5PointHistoryRepository, PointHistoryRepository, TimeRange};
+pub use team::{TeamService, TeamServiceError, TeamServiceImpl};
 pub use user::{
     ChangePasswordRequest, UpdateUserEntity, UpdateUserRequest, UserDto, UserError, UserService,
     UserServiceImpl,
