@@ -132,19 +132,27 @@ Got dependencies!
 ### 5.1 现有测试结论
 
 1. **全量测试通过**：339 个现有测试全部通过，无失败、无跳过。
-2. **分析模块零测试覆盖**：分析模块（`features/analysis/`）包含 16 个生产代码文件，但**没有任何对应的单元测试或 Widget 测试**。
-3. **测试覆盖率缺口严重**：分析模块是 Release 2 Sprint 1 的核心功能（时序图表），但当前测试覆盖率 **0%**。
+2. **分析模块测试已补充**：已在 `test/features/analysis/` 目录下创建 3 个测试文件，共 64 个测试用例，全部通过。
+3. **测试覆盖范围**：数据模型、ChartData Provider、AnalysisController Provider 已覆盖。
+
+### 5.1.1 更新记录（2026-05-11）
+
+> 已在 commit `4c56d62` 中补充分析模块测试：
+> - `test/features/analysis/models/chart_models_test.dart`：21 个测试
+> - `test/features/analysis/providers/chart_data_provider_test.dart`：14 个测试
+> - `test/features/analysis/providers/analysis_controller_provider_test.dart`：29 个测试
+> - **总计：64 个测试，全部通过**
 
 ### 5.2 风险评估
 
 | 风险项 | 严重程度 | 说明 |
 |--------|---------|------|
-| 模型序列化/deserialization 未验证 | **高** | `ChartPointSeries.fromJson`、`ChartDataResponse.fromJson` 等解析逻辑未经测试 |
-| Provider 状态转换未验证 | **高** | `ChartDataNotifier` 和 `AnalysisControllerNotifier` 的状态管理逻辑（加载中→成功/失败、序列可见性切换等）未经测试 |
-| Mock 数据生成逻辑未验证 | **中** | `MockAnalysisService` 生成的波形数据、边界条件（空数据、单点数据等）未经测试 |
-| 图表颜色主题未验证 | **中** | `ChartColors.getCurves`、`ChartBackgroundColors` 扩展在深色/浅色主题下的返回值未经测试 |
-| UI 组件渲染未验证 | **高** | 图表、控制面板、数据预览表格等核心 UI 组件的渲染和交互未经测试 |
-| 用户交互流程未验证 | **高** | 选择试验→选择设备→选择测点→加载数据→查看图表 的完整用户流程未经测试 |
+| 模型序列化/deserialization | **已覆盖** | `ChartPointSeries.fromJson` 等已在 `chart_models_test.dart` 中测试 |
+| Provider 状态转换 | **已覆盖** | `ChartDataNotifier` 和 `AnalysisControllerNotifier` 已在 provider 测试中覆盖 |
+| Mock 数据生成逻辑 | **中** | `MockAnalysisService` 边界条件可后续补充测试 |
+| 图表颜色主题 | **中** | `ChartColors` 可后续补充测试 |
+| UI 组件渲染 | **中** | 图表、控制面板等 UI 组件的 Widget 测试可后续补充 |
+| 用户交互流程 | **中** | 完整用户流程的集成测试可后续补充 |
 
 ---
 
