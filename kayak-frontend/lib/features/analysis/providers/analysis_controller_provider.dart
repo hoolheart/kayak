@@ -145,6 +145,8 @@ class AnalysisControllerNotifier extends StateNotifier<AnalysisControlState> {
   void selectExperiment(String? experimentId) {
     state = state.copyWith(
       selectedExperimentId: experimentId,
+      selectedDeviceId: null,
+      selectedPointIds: const [],
     );
   }
 
@@ -173,7 +175,11 @@ class AnalysisControllerNotifier extends StateNotifier<AnalysisControlState> {
 
   /// 设置时间范围
   void setTimeRange(DateTime? start, DateTime? end) {
-    state = state.copyWith(startTime: start, endTime: end);
+    state = state.copyWith(
+      startTime: start,
+      endTime: end,
+      activePreset: null,
+    );
   }
 
   /// 设置降采样点数
@@ -207,7 +213,11 @@ class AnalysisControllerNotifier extends StateNotifier<AnalysisControlState> {
         end = null;
     }
 
-    state = state.copyWith(startTime: start, endTime: end);
+    state = state.copyWith(
+      startTime: start,
+      endTime: end,
+      activePreset: preset,
+    );
   }
 
   /// 重置所有选择

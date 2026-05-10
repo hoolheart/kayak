@@ -21,7 +21,6 @@ class ControlPanel extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: 320,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -195,11 +194,9 @@ class _ExperimentMetadata extends ConsumerWidget {
                 : '未开始',
           ),
           _MetadataRow(
-            label: '采样数',
-            value: experiment.updatedAt
-                .difference(experiment.createdAt)
-                .inMinutes
-                .toString(),
+            label: '持续时间',
+            value:
+                '${experiment.updatedAt.difference(experiment.createdAt).inMinutes} 分钟',
           ),
         ],
       ),
@@ -426,7 +423,24 @@ class _PointList extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const Center(child: Text('加载测点失败')),
+      error: (_, __) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('加载测点失败'),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => ref.invalidate(
+                pointListForAnalysisProvider(
+                  controlState.selectedDeviceId!,
+                ),
+              ),
+              icon: const Icon(Icons.refresh, size: 16),
+              label: const Text('重试'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -447,19 +461,19 @@ class _TimeRangeSelector extends ConsumerWidget {
           children: [
             _PresetButton(
               label: '最近1小时',
-              isActive: false,
+              isActive: controlState.activePreset == '1h',
               onPressed: () => controller.applyPresetTimeRange('1h'),
             ),
             const SizedBox(width: 8),
             _PresetButton(
               label: '最近24小时',
-              isActive: false,
+              isActive: controlState.activePreset == '24h',
               onPressed: () => controller.applyPresetTimeRange('24h'),
             ),
             const SizedBox(width: 8),
             _PresetButton(
               label: '全部',
-              isActive: false,
+              isActive: controlState.activePreset == 'all',
               onPressed: () => controller.applyPresetTimeRange('all'),
             ),
           ],
@@ -683,6 +697,8 @@ class _ActionButtons extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controlState = ref.watch(analysisControllerProvider);
     final chartNotifier = ref.read(chartDataProvider.notifier);
+    final analysisControllerNotifier =
+        ref.read(analysisControllerProvider.notifier);
 
     return Column(
       children: [
@@ -712,7 +728,10 @@ class _ActionButtons extends ConsumerWidget {
           width: double.infinity,
           height: 40,
           child: OutlinedButton.icon(
-            onPressed: chartNotifier.reset,
+            onPressed: () {
+              chartNotifier.reset();
+              analysisControllerNotifier.reset();
+            },
             icon: const Icon(Icons.restart_alt, size: 20),
             label: const Text('重置视图'),
           ),

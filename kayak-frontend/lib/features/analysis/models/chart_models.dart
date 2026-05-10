@@ -194,6 +194,7 @@ class AnalysisControlState {
     this.isLoadingExperiments = false,
     this.isLoadingDevices = false,
     this.isLoadingPoints = false,
+    this.activePreset,
   });
 
   final String? selectedExperimentId;
@@ -208,31 +209,60 @@ class AnalysisControlState {
   final bool isLoadingDevices;
   final bool isLoadingPoints;
 
+  /// 当前激活的预设时间范围（如 '1h', '24h', 'all'）
+  final String? activePreset;
+
   AnalysisControlState copyWith({
-    String? selectedExperimentId,
-    String? selectedDeviceId,
-    List<String>? selectedPointIds,
-    DateTime? startTime,
-    DateTime? endTime,
-    int? downsample,
-    bool? showDataTable,
-    bool? autoRefresh,
-    bool? isLoadingExperiments,
-    bool? isLoadingDevices,
-    bool? isLoadingPoints,
+    Object? selectedExperimentId = const Object(),
+    Object? selectedDeviceId = const Object(),
+    Object? selectedPointIds = const Object(),
+    Object? startTime = const Object(),
+    Object? endTime = const Object(),
+    Object? downsample = const Object(),
+    Object? showDataTable = const Object(),
+    Object? autoRefresh = const Object(),
+    Object? isLoadingExperiments = const Object(),
+    Object? isLoadingDevices = const Object(),
+    Object? isLoadingPoints = const Object(),
+    Object? activePreset = const Object(),
   }) {
     return AnalysisControlState(
-      selectedExperimentId: selectedExperimentId ?? this.selectedExperimentId,
-      selectedDeviceId: selectedDeviceId ?? this.selectedDeviceId,
-      selectedPointIds: selectedPointIds ?? this.selectedPointIds,
-      startTime: startTime ?? this.startTime,
-      endTime: endTime ?? this.endTime,
-      downsample: downsample ?? this.downsample,
-      showDataTable: showDataTable ?? this.showDataTable,
-      autoRefresh: autoRefresh ?? this.autoRefresh,
-      isLoadingExperiments: isLoadingExperiments ?? this.isLoadingExperiments,
-      isLoadingDevices: isLoadingDevices ?? this.isLoadingDevices,
-      isLoadingPoints: isLoadingPoints ?? this.isLoadingPoints,
+      selectedExperimentId: selectedExperimentId != const Object()
+          ? selectedExperimentId as String?
+          : this.selectedExperimentId,
+      selectedDeviceId: selectedDeviceId != const Object()
+          ? selectedDeviceId as String?
+          : this.selectedDeviceId,
+      selectedPointIds: selectedPointIds != const Object()
+          ? selectedPointIds as List<String>
+          : this.selectedPointIds,
+      startTime: startTime != const Object()
+          ? startTime as DateTime?
+          : this.startTime,
+      endTime: endTime != const Object()
+          ? endTime as DateTime?
+          : this.endTime,
+      downsample: downsample != const Object()
+          ? downsample as int
+          : this.downsample,
+      showDataTable: showDataTable != const Object()
+          ? showDataTable as bool
+          : this.showDataTable,
+      autoRefresh: autoRefresh != const Object()
+          ? autoRefresh as bool
+          : this.autoRefresh,
+      isLoadingExperiments: isLoadingExperiments != const Object()
+          ? isLoadingExperiments as bool
+          : this.isLoadingExperiments,
+      isLoadingDevices: isLoadingDevices != const Object()
+          ? isLoadingDevices as bool
+          : this.isLoadingDevices,
+      isLoadingPoints: isLoadingPoints != const Object()
+          ? isLoadingPoints as bool
+          : this.isLoadingPoints,
+      activePreset: activePreset != const Object()
+          ? activePreset as String?
+          : this.activePreset,
     );
   }
 
