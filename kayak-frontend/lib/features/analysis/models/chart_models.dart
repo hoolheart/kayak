@@ -165,14 +165,16 @@ class ChartViewState {
     ChartDataResponse? data,
     String? errorMessage,
     Set<String>? visibleSeries,
-    int? hoveredSeriesIndex,
+    Object? hoveredSeriesIndex = const Object(),
   }) {
     return ChartViewState(
       state: state ?? this.state,
       data: data ?? this.data,
       errorMessage: errorMessage ?? this.errorMessage,
       visibleSeries: visibleSeries ?? this.visibleSeries,
-      hoveredSeriesIndex: hoveredSeriesIndex ?? this.hoveredSeriesIndex,
+      hoveredSeriesIndex: hoveredSeriesIndex != const Object()
+          ? hoveredSeriesIndex as int?
+          : this.hoveredSeriesIndex,
     );
   }
 
@@ -185,7 +187,7 @@ class AnalysisControlState {
   const AnalysisControlState({
     this.selectedExperimentId,
     this.selectedDeviceId,
-    this.selectedPointIds = const [],
+    this.selectedPointIds = const <String>[],
     this.startTime,
     this.endTime,
     this.downsample = 1000,

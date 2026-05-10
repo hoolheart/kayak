@@ -146,7 +146,7 @@ class AnalysisControllerNotifier extends StateNotifier<AnalysisControlState> {
     state = state.copyWith(
       selectedExperimentId: experimentId,
       selectedDeviceId: null,
-      selectedPointIds: const [],
+      selectedPointIds: const <String>[],
     );
   }
 
@@ -154,7 +154,7 @@ class AnalysisControllerNotifier extends StateNotifier<AnalysisControlState> {
   void selectDevice(String? deviceId) {
     state = state.copyWith(
       selectedDeviceId: deviceId,
-      selectedPointIds: [],
+      selectedPointIds: const <String>[],
     );
   }
 
