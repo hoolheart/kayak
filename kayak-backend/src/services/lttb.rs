@@ -48,8 +48,8 @@ impl LttbDownsampler {
             return (timestamps.to_vec(), values.to_vec());
         }
 
-        // Boundary: fewer points than threshold, return all
-        if n <= threshold {
+        // Boundary: fewer points than threshold, or threshold too small for LTTB, return all
+        if n <= threshold || threshold < 3 {
             return (timestamps.to_vec(), values.to_vec());
         }
 
@@ -167,14 +167,21 @@ mod tests {
     }
 
     #[test]
-    fn test_lttb_minimum_threshold() {
+    fn test_lttb_threshold_less_than_3_returns_all() {
         let ts = vec![1_i64, 2, 3, 4, 5];
         let vals = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+        // threshold < 3 should return all data without downsampling
         let (sts, svals) = LttbDownsampler::downsample(&ts, &vals, 2);
-        assert_eq!(sts.len(), 2);
-        assert_eq!(svals.len(), 2);
-        assert_eq!(sts[0], 1);
-        assert_eq!(sts[1], 5);
+        assert_eq!(sts.len(), 5);
+        assert_eq!(svals.len(), 5);
+        assert_eq!(sts, ts);
+        assert_eq!(svals, vals);
+
+        let (sts, svals) = LttbDownsampler::downsample(&ts, &vals, 1);
+        assert_eq!(sts.len(), 5);
+        assert_eq!(svals.len(), 5);
+        assert_eq!(sts, ts);
+        assert_eq!(svals, vals);
     }
 
     #[test]
