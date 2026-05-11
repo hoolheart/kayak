@@ -31,7 +31,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| R2-S2-004-A | Sprint 2 启动脚本开发 | sw-tom | in_progress |
+| R2-S2-004-B-FIX | Sprint 2 修复编译验证问题 | sw-tom | in_progress |
 
 ---
 
@@ -85,6 +85,7 @@
 | R2-S2-003-D-FIX | Python SDK - 修复代码审查问题 | 2026-05-11 |
 | R2-S2-002-F | 团队管理前端 - 测试执行 | 2026-05-11 |
 | R2-S2-003-E | Python SDK - 测试执行 | 2026-05-11 |
+| R2-S2-004-A | Sprint 2 启动脚本开发 | 2026-05-11 |
 
 ---
 
@@ -109,7 +110,7 @@
 
 | Task ID | Blocker Description | Blocking Tasks |
 |---------|-------------------|----------------|
-| - | - | - |
+| R2-S2-004-B | Backend migration conflict on fresh DB + 26 Flutter analyzer info issues | Sprint 2 acceptance |
 
 ---
 
