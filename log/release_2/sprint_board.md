@@ -3,9 +3,9 @@
 ## Sprint Information
 - **Sprint Start**: 2026-05-11
 - **Sprint End**: 2026-05-24 (2周，2个Sprint)
-- **Total Tasks**: 7 个模块任务 / 21 个子任务
-- **Completed Tasks**: 13
-- **In Progress Tasks**: 1
+- **Total Tasks**: 7 个模块任务 / 21 个子任务 + 1 hotfix
+- **Completed Tasks**: 21
+- **In Progress Tasks**: 0
 
 ---
 
@@ -87,6 +87,7 @@
 | R2-S2-003-E | Python SDK - 测试执行 | 2026-05-11 |
 | R2-S2-004-A | Sprint 2 启动脚本开发 | 2026-05-11 |
 | R2-S2-004-B | Sprint 2 最终编译验证 | 2026-05-11 |
+| R2-HOTFIX-001 | 后端迁移启动修复 (legacy DB bootstrap) | 2026-05-11 |
 
 ---
 
@@ -103,7 +104,8 @@
 - **Remaining**: 0
 
 ## Overall Release 2 Progress
-- **Completion**: 62% (13/21 tasks)
+- **Completion**: 100% (21/21 tasks + 1 hotfix)
+- **Status**: Release 2 COMPLETE
 
 ---
 
