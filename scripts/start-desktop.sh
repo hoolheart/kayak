@@ -11,6 +11,7 @@ BACKEND_DIR="$PROJECT_ROOT/kayak-backend"
 FRONTEND_DIR="$PROJECT_ROOT/kayak-frontend"
 DATA_DIR="$PROJECT_ROOT/data"
 LOG_DIR="$PROJECT_ROOT/logs"
+PLUGIN_SYMLINKS_DIR="$FRONTEND_DIR/linux/flutter/ephemeral/.plugin_symlinks"
 
 # 颜色定义
 RED='\033[0;31m'
@@ -73,6 +74,51 @@ check_system_deps() {
     fi
     
     echo -e "${GREEN}System dependencies OK${NC}"
+}
+
+# 检查 Flutter 桌面插件符号链接
+check_plugin_symlinks() {
+    echo -e "${YELLOW}Checking Flutter desktop plugin symlinks...${NC}"
+    
+    if [ ! -d "$PLUGIN_SYMLINKS_DIR" ]; then
+        echo -e "${YELLOW}Plugin symlinks directory not found. Run 'flutter pub get' to generate.${NC}"
+        return 1
+    fi
+    
+    local broken_symlinks=()
+    
+    for link in "$PLUGIN_SYMLINKS_DIR"/*; do
+        if [ -L "$link" ]; then
+            local target
+            target=$(readlink "$link")
+            if [ ! -e "$link" ]; then
+                broken_symlinks+=("$(basename "$link") -> $target")
+            fi
+        fi
+    done
+    
+    if [ ${#broken_symlinks[@]} -gt 0 ]; then
+        echo -e "${RED}Found ${#broken_symlinks[@]} broken plugin symlink(s):${NC}"
+        for entry in "${broken_symlinks[@]}"; do
+            echo "  - $entry"
+        done
+        echo ""
+        echo -e "${YELLOW}This usually happens when plugin symlinks are committed from a different machine.${NC}"
+        echo -e "${YELLOW}To fix, run: flutter pub get${NC}"
+        echo -e "${YELLOW}Or use: $0 --fix-symlinks${NC}"
+        return 1
+    fi
+    
+    echo -e "${GREEN}All plugin symlinks are valid${NC}"
+    return 0
+}
+
+# 修复 Flutter 桌面插件符号链接
+fix_plugin_symlinks() {
+    echo -e "${YELLOW}Fixing Flutter desktop plugin symlinks...${NC}"
+    cd "$FRONTEND_DIR"
+    flutter pub get
+    echo -e "${GREEN}Plugin symlinks regenerated${NC}"
 }
 
 # 构建后端
@@ -158,14 +204,16 @@ Kayak Desktop Startup Script
 Usage: $0 [OPTIONS]
 
 Options:
-    --build-only    Build only, don't start
-    --backend-only  Start backend only
-    --help          Show this help message
+    --build-only     Build only, don't start
+    --backend-only   Start backend only
+    --fix-symlinks   Fix broken Flutter desktop plugin symlinks
+    --help           Show this help message
 
 Examples:
-    $0              # Build and start everything
-    $0 --build-only # Build only
-    $0 --backend-only # Start backend only
+    $0                  # Build and start everything
+    $0 --build-only     # Build only
+    $0 --backend-only   # Start backend only
+    $0 --fix-symlinks   # Fix broken plugin symlinks and exit
 EOF
 }
 
@@ -176,8 +224,22 @@ main() {
             show_help
             exit 0
             ;;
+        --fix-symlinks)
+            check_dependencies
+            fix_plugin_symlinks
+            echo -e "${GREEN}Symlinks fixed${NC}"
+            exit 0
+            ;;
         --build-only)
             check_dependencies
+            if ! check_plugin_symlinks; then
+                echo -e "${YELLOW}Attempting to auto-fix symlinks...${NC}"
+                fix_plugin_symlinks
+                check_plugin_symlinks || {
+                    echo -e "${RED}Failed to fix symlinks. Please run 'flutter pub get' manually.${NC}"
+                    exit 1
+                }
+            fi
             build_backend
             echo -e "${GREEN}Build completed${NC}"
             exit 0
@@ -192,6 +254,14 @@ main() {
             ;;
         "")
             check_dependencies
+            if ! check_plugin_symlinks; then
+                echo -e "${YELLOW}Attempting to auto-fix symlinks...${NC}"
+                fix_plugin_symlinks
+                check_plugin_symlinks || {
+                    echo -e "${RED}Failed to fix symlinks. Please run 'flutter pub get' manually.${NC}"
+                    exit 1
+                }
+            fi
             build_backend
             start_backend
             check_system_deps
