@@ -64,7 +64,7 @@ async fn init_sqlite_tables(pool: &SqlitePool) -> Result<(), sqlx::Error> {
             name TEXT NOT NULL,
             description TEXT,
             owner_id TEXT NOT NULL,
-            owner_type TEXT DEFAULT 'user' CHECK (owner_type IN ('user', 'team')),
+            owner_type TEXT DEFAULT 'personal' CHECK (owner_type IN ('personal', 'team')),
             status TEXT DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted')),
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,

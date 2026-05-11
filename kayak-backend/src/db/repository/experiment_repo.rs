@@ -61,8 +61,10 @@ impl ExperimentRow {
         };
 
         Experiment {
-            id: Uuid::parse_str(&self.id).unwrap_or_default(),
-            user_id: Uuid::parse_str(&self.user_id).unwrap_or_default(),
+            id: Uuid::parse_str(&self.id)
+                .unwrap_or_else(|_| Uuid::nil()),
+            user_id: Uuid::parse_str(&self.user_id)
+                .unwrap_or_else(|_| Uuid::nil()),
             method_id: self
                 .method_id
                 .as_ref()
@@ -71,7 +73,8 @@ impl ExperimentRow {
             description: self.description.clone(),
             status,
             owner_type: self.owner_type.clone(),
-            owner_id: Uuid::parse_str(&self.owner_id).unwrap_or_default(),
+            owner_id: Uuid::parse_str(&self.owner_id)
+                .unwrap_or_else(|_| Uuid::nil()),
             started_at: self.started_at.as_ref().and_then(|s| {
                 DateTime::parse_from_rfc3339(s)
                     .ok()
@@ -109,6 +112,8 @@ pub trait ExperimentRepository: Send + Sync {
         &self,
         user_id: Option<Uuid>,
         status: Option<ExperimentStatus>,
+        scope: Option<String>,
+        team_id: Option<Uuid>,
         page: u32,
         size: u32,
     ) -> Result<(Vec<Experiment>, u64), ExperimentRepositoryError>;
@@ -205,118 +210,110 @@ impl ExperimentRepository for SqlxExperimentRepository {
         &self,
         user_id: Option<Uuid>,
         status: Option<ExperimentStatus>,
+        scope: Option<String>,
+        team_id: Option<Uuid>,
         page: u32,
         size: u32,
     ) -> Result<(Vec<Experiment>, u64), ExperimentRepositoryError> {
         let offset = (page - 1) * size;
 
-        // Build the query based on filters
-        let (rows, total) = if let Some(uid) = user_id {
-            let uid_str = uid.to_string();
-            let status_str = status.map(|s| format!("{:?}", s).to_uppercase());
+        // Build WHERE clauses dynamically but safely
+        let mut where_clauses: Vec<&'static str> = Vec::new();
+        let mut params: Vec<String> = Vec::new();
 
-            if let Some(st) = status_str {
-                // Filter by user_id and status
-                let count_row: (i64,) = sqlx::query_as(
-                    "SELECT COUNT(*) FROM experiments WHERE user_id = ? AND status = ?",
-                )
-                .bind(&uid_str)
-                .bind(&st)
-                .fetch_one(&self.pool)
-                .await?;
+        // Status filter
+        let status_str = status.map(|s| format!("{:?}", s).to_uppercase());
+        if status_str.is_some() {
+            where_clauses.push("status = ?");
+        }
 
-                let rows: Vec<ExperimentRow> = sqlx::query_as(
-                    r#"
-                    SELECT id, user_id, method_id, name, description, status,
-                           owner_type, owner_id, started_at, ended_at, created_at, updated_at
-                    FROM experiments
-                    WHERE user_id = ? AND status = ?
-                    ORDER BY created_at DESC
-                    LIMIT ? OFFSET ?
-                    "#,
-                )
-                .bind(&uid_str)
-                .bind(&st)
-                .bind(size as i64)
-                .bind(offset as i64)
-                .fetch_all(&self.pool)
-                .await?;
-
-                (rows, count_row.0 as u64)
-            } else {
-                // Filter by user_id only
-                let count_row: (i64,) =
-                    sqlx::query_as("SELECT COUNT(*) FROM experiments WHERE user_id = ?")
-                        .bind(&uid_str)
-                        .fetch_one(&self.pool)
-                        .await?;
-
-                let rows: Vec<ExperimentRow> = sqlx::query_as(
-                    r#"
-                    SELECT id, user_id, method_id, name, description, status,
-                           owner_type, owner_id, started_at, ended_at, created_at, updated_at
-                    FROM experiments
-                    WHERE user_id = ?
-                    ORDER BY created_at DESC
-                    LIMIT ? OFFSET ?
-                    "#,
-                )
-                .bind(&uid_str)
-                .bind(size as i64)
-                .bind(offset as i64)
-                .fetch_all(&self.pool)
-                .await?;
-
-                (rows, count_row.0 as u64)
+        // Scope-based filtering (ME-005)
+        match scope.as_deref() {
+            Some("personal") => {
+                if let Some(uid) = user_id {
+                    where_clauses.push("owner_type = 'personal' AND owner_id = ?");
+                    params.push(uid.to_string());
+                }
             }
-        } else if let Some(st) = status {
-            let status_str = format!("{:?}", st).to_uppercase();
+            Some("team") => {
+                if let Some(uid) = user_id {
+                    if let Some(tid) = team_id {
+                        // Specific team filter
+                        where_clauses.push("owner_type = 'team' AND owner_id = ?");
+                        params.push(tid.to_string());
+                    } else {
+                        // All teams the user is a member of
+                        where_clauses.push(
+                            "owner_type = 'team' AND owner_id IN (SELECT team_id FROM team_members WHERE user_id = ?)",
+                        );
+                        params.push(uid.to_string());
+                    }
+                }
+            }
+            _ => {
+                // Default: personal + accessible team experiments
+                if let Some(uid) = user_id {
+                    if let Some(tid) = team_id {
+                        where_clauses.push(
+                            "(owner_type = 'personal' AND owner_id = ?) OR (owner_type = 'team' AND owner_id = ?)",
+                        );
+                        params.push(uid.to_string());
+                        params.push(tid.to_string());
+                    } else {
+                        where_clauses.push(
+                            "(owner_type = 'personal' AND owner_id = ?) OR (owner_type = 'team' AND owner_id IN (SELECT team_id FROM team_members WHERE user_id = ?))",
+                        );
+                        params.push(uid.to_string());
+                        params.push(uid.to_string());
+                    }
+                }
+            }
+        }
 
-            let count_row: (i64,) =
-                sqlx::query_as("SELECT COUNT(*) FROM experiments WHERE status = ?")
-                    .bind(&status_str)
-                    .fetch_one(&self.pool)
-                    .await?;
-
-            let rows: Vec<ExperimentRow> = sqlx::query_as(
-                r#"
-                SELECT id, user_id, method_id, name, description, status,
-                       owner_type, owner_id, started_at, ended_at, created_at, updated_at
-                FROM experiments
-                WHERE status = ?
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?
-                "#,
-            )
-            .bind(&status_str)
-            .bind(size as i64)
-            .bind(offset as i64)
-            .fetch_all(&self.pool)
-            .await?;
-
-            (rows, count_row.0 as u64)
+        let where_fragment = if where_clauses.is_empty() {
+            String::new()
         } else {
-            // No filters
-            let count_row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM experiments")
-                .fetch_one(&self.pool)
-                .await?;
+            format!("WHERE {}", where_clauses.join(" AND "))
+        };
 
-            let rows: Vec<ExperimentRow> = sqlx::query_as(
-                r#"
-                SELECT id, user_id, method_id, name, description, status,
-                       owner_type, owner_id, started_at, ended_at, created_at, updated_at
-                FROM experiments
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?
-                "#,
-            )
+        // Build count query
+        let count_query = format!("SELECT COUNT(*) FROM experiments {}", where_fragment);
+
+        let mut count_q = sqlx::query_as::<_, (i64,)>(&count_query);
+        if let Some(ref st) = status_str {
+            count_q = count_q.bind(st);
+        }
+        for p in &params {
+            count_q = count_q.bind(p);
+        }
+        let count_row: (i64,) = count_q.fetch_one(&self.pool).await?;
+        let total = count_row.0 as u64;
+
+        // Build data query
+        let data_query = format!(
+            r#"
+            SELECT id, user_id, method_id, name, description, status,
+                   owner_type, owner_id, started_at, ended_at, created_at, updated_at
+            FROM experiments
+            {}
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+            "#,
+            where_fragment
+        );
+
+        let mut data_q = sqlx::query_as::<_, ExperimentRow>(&data_query);
+        if let Some(ref st) = status_str {
+            data_q = data_q.bind(st);
+        }
+        for p in &params {
+            data_q = data_q.bind(p);
+        }
+        let rows: Vec<ExperimentRow> = data_q
             .bind(size as i64)
             .bind(offset as i64)
             .fetch_all(&self.pool)
             .await?;
-
-            (rows, count_row.0 as u64)
-        };
 
         Ok((rows.into_iter().map(|r| r.to_experiment()).collect(), total))
     }

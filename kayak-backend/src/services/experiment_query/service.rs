@@ -63,13 +63,19 @@ pub trait ExperimentQueryService: Send + Sync {
 pub struct ExperimentQueryServiceImpl {
     experiment_repo: Arc<dyn ExperimentRepository>,
     data_root: PathBuf,
+    pool: crate::db::connection::DbPool,
 }
 
 impl ExperimentQueryServiceImpl {
-    pub fn new(experiment_repo: Arc<dyn ExperimentRepository>, data_root: PathBuf) -> Self {
+    pub fn new(
+        experiment_repo: Arc<dyn ExperimentRepository>,
+        data_root: PathBuf,
+        pool: crate::db::connection::DbPool,
+    ) -> Self {
         Self {
             experiment_repo,
             data_root,
+            pool,
         }
     }
 }
@@ -88,8 +94,25 @@ impl ExperimentQueryService for ExperimentQueryServiceImpl {
             .map_err(|e| ExperimentQueryError::Internal(e.to_string()))?
             .ok_or(ExperimentQueryError::NotFound(id))?;
 
-        // Check ownership
-        if experiment.user_id != user_id {
+        // ME-005: Check ownership based on owner_type/owner_id
+        let has_access = match experiment.owner_type.as_str() {
+            "personal" => experiment.owner_id == user_id,
+            "team" => {
+                // Check if user is member of the owning team
+                let is_member: bool = sqlx::query_scalar(
+                    "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = ? AND user_id = ?)",
+                )
+                .bind(experiment.owner_id.to_string())
+                .bind(user_id.to_string())
+                .fetch_one(&self.pool)
+                .await
+                .map_err(|e| ExperimentQueryError::Internal(e.to_string()))?;
+                is_member
+            }
+            _ => false,
+        };
+
+        if !has_access {
             return Err(ExperimentQueryError::AccessDenied(id));
         }
 
@@ -105,9 +128,18 @@ impl ExperimentQueryService for ExperimentQueryServiceImpl {
         let page = page.max(1);
         let size = size.clamp(1, 100);
 
+        let scope_str = filter.scope.map(|s| format!("{:?}", s).to_lowercase());
+
         let (experiments, total) = self
             .experiment_repo
-            .find_paged(filter.user_id, filter.status, page, size)
+            .find_paged(
+                filter.user_id,
+                filter.status,
+                scope_str,
+                filter.team_id,
+                page,
+                size,
+            )
             .await
             .map_err(|e| ExperimentQueryError::Internal(e.to_string()))?;
 
@@ -139,7 +171,23 @@ impl ExperimentQueryService for ExperimentQueryServiceImpl {
             .map_err(|_| PointHistoryError::ExperimentNotFound(experiment_id))?
             .ok_or(PointHistoryError::ExperimentNotFound(experiment_id))?;
 
-        if experiment.user_id != user_id {
+        let has_access = match experiment.owner_type.as_str() {
+            "personal" => experiment.owner_id == user_id,
+            "team" => {
+                let is_member: bool = sqlx::query_scalar(
+                    "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = ? AND user_id = ?)",
+                )
+                .bind(experiment.owner_id.to_string())
+                .bind(user_id.to_string())
+                .fetch_one(&self.pool)
+                .await
+                .unwrap_or(false);
+                is_member
+            }
+            _ => false,
+        };
+
+        if !has_access {
             return Err(PointHistoryError::ExperimentNotFound(experiment_id));
         }
 
@@ -185,7 +233,23 @@ impl ExperimentQueryService for ExperimentQueryServiceImpl {
             .map_err(|_e| DataFileError::ExperimentNotFound(experiment_id))?
             .ok_or(DataFileError::ExperimentNotFound(experiment_id))?;
 
-        if experiment.user_id != user_id {
+        let has_access = match experiment.owner_type.as_str() {
+            "personal" => experiment.owner_id == user_id,
+            "team" => {
+                let is_member: bool = sqlx::query_scalar(
+                    "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = ? AND user_id = ?)",
+                )
+                .bind(experiment.owner_id.to_string())
+                .bind(user_id.to_string())
+                .fetch_one(&self.pool)
+                .await
+                .unwrap_or(false);
+                is_member
+            }
+            _ => false,
+        };
+
+        if !has_access {
             return Err(DataFileError::AccessDenied(experiment_id));
         }
 
