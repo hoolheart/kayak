@@ -198,3 +198,128 @@ impl std::str::FromStr for OwnerType {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Duration;
+
+    #[test]
+    fn test_team_role_satisfies() {
+        // Owner satisfies everything
+        assert!(TeamRole::Owner.satisfies(TeamRole::Owner));
+        assert!(TeamRole::Owner.satisfies(TeamRole::Admin));
+        assert!(TeamRole::Owner.satisfies(TeamRole::Member));
+
+        // Admin satisfies Admin and Member
+        assert!(TeamRole::Admin.satisfies(TeamRole::Admin));
+        assert!(TeamRole::Admin.satisfies(TeamRole::Member));
+        assert!(!TeamRole::Admin.satisfies(TeamRole::Owner));
+
+        // Member satisfies only Member
+        assert!(TeamRole::Member.satisfies(TeamRole::Member));
+        assert!(!TeamRole::Member.satisfies(TeamRole::Admin));
+        assert!(!TeamRole::Member.satisfies(TeamRole::Owner));
+    }
+
+    #[test]
+    fn test_team_role_display() {
+        assert_eq!(format!("{}", TeamRole::Owner), "Owner");
+        assert_eq!(format!("{}", TeamRole::Admin), "Admin");
+        assert_eq!(format!("{}", TeamRole::Member), "Member");
+    }
+
+    #[test]
+    fn test_team_role_from_str() {
+        assert_eq!("Owner".parse::<TeamRole>().unwrap(), TeamRole::Owner);
+        assert_eq!("Admin".parse::<TeamRole>().unwrap(), TeamRole::Admin);
+        assert_eq!("Member".parse::<TeamRole>().unwrap(), TeamRole::Member);
+        assert!("Invalid".parse::<TeamRole>().is_err());
+    }
+
+    #[test]
+    fn test_team_new() {
+        let owner_id = Uuid::new_v4();
+        let team = Team::new("Test Team".to_string(), Some("Description".to_string()), owner_id);
+
+        assert_eq!(team.name, "Test Team");
+        assert_eq!(team.description, Some("Description".to_string()));
+        assert_eq!(team.owner_id, owner_id);
+    }
+
+    #[test]
+    fn test_team_member_new() {
+        let team_id = Uuid::new_v4();
+        let user_id = Uuid::new_v4();
+        let member = TeamMember::new(team_id, user_id, TeamRole::Admin);
+
+        assert_eq!(member.team_id, team_id);
+        assert_eq!(member.user_id, user_id);
+        assert_eq!(member.role, TeamRole::Admin);
+    }
+
+    #[test]
+    fn test_team_invitation_new() {
+        let team_id = Uuid::new_v4();
+        let expires_at = Utc::now() + Duration::days(7);
+        let invitation = TeamInvitation::new(
+            team_id,
+            "test@example.com".to_string(),
+            "code123".to_string(),
+            TeamRole::Member,
+            expires_at,
+        );
+
+        assert_eq!(invitation.team_id, team_id);
+        assert_eq!(invitation.email, "test@example.com");
+        assert_eq!(invitation.code, "code123");
+        assert_eq!(invitation.role, TeamRole::Member);
+        assert_eq!(invitation.used_at, None);
+    }
+
+    #[test]
+    fn test_team_invitation_is_expired() {
+        let team_id = Uuid::new_v4();
+        let past = Utc::now() - Duration::days(1);
+        let future = Utc::now() + Duration::days(1);
+
+        let expired = TeamInvitation::new(
+            team_id, "a@b.com".to_string(), "code1".to_string(),
+            TeamRole::Member, past,
+        );
+        assert!(expired.is_expired());
+
+        let valid = TeamInvitation::new(
+            team_id, "a@b.com".to_string(), "code2".to_string(),
+            TeamRole::Member, future,
+        );
+        assert!(!valid.is_expired());
+    }
+
+    #[test]
+    fn test_team_invitation_is_used() {
+        let team_id = Uuid::new_v4();
+        let invitation = TeamInvitation::new(
+            team_id, "a@b.com".to_string(), "code".to_string(),
+            TeamRole::Member, Utc::now() + Duration::days(7),
+        );
+        assert!(!invitation.is_used());
+
+        let mut used = invitation.clone();
+        used.used_at = Some(Utc::now());
+        assert!(used.is_used());
+    }
+
+    #[test]
+    fn test_owner_type_display() {
+        assert_eq!(format!("{}", OwnerType::Personal), "personal");
+        assert_eq!(format!("{}", OwnerType::Team), "team");
+    }
+
+    #[test]
+    fn test_owner_type_from_str() {
+        assert_eq!("personal".parse::<OwnerType>().unwrap(), OwnerType::Personal);
+        assert_eq!("team".parse::<OwnerType>().unwrap(), OwnerType::Team);
+        assert!("invalid".parse::<OwnerType>().is_err());
+    }
+}

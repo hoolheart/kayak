@@ -89,3 +89,107 @@ impl From<TeamServiceError> for crate::core::error::AppError {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::error::AppError;
+
+    #[test]
+    fn test_error_display() {
+        assert_eq!(
+            format!("{}", TeamServiceError::NotFound),
+            "Team not found"
+        );
+        assert_eq!(
+            format!("{}", TeamServiceError::Forbidden("test".to_string())),
+            "Insufficient permissions: test"
+        );
+        assert_eq!(
+            format!("{}", TeamServiceError::ValidationError("bad".to_string())),
+            "Validation error: bad"
+        );
+    }
+
+    #[test]
+    fn test_from_sqlx_error() {
+        let sqlx_err = sqlx::Error::RowNotFound;
+        let team_err: TeamServiceError = sqlx_err.into();
+        assert!(matches!(team_err, TeamServiceError::Internal(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_not_found() {
+        let app_err: AppError = TeamServiceError::NotFound.into();
+        assert!(matches!(app_err, AppError::NotFound(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_forbidden() {
+        let app_err: AppError = TeamServiceError::Forbidden("no access".to_string()).into();
+        assert!(matches!(app_err, AppError::Forbidden(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_conflict() {
+        let app_err: AppError = TeamServiceError::DuplicateName.into();
+        assert!(matches!(app_err, AppError::Conflict(_)));
+
+        let app_err: AppError = TeamServiceError::AlreadyMember.into();
+        assert!(matches!(app_err, AppError::Conflict(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_bad_request() {
+        let app_err: AppError = TeamServiceError::ValidationError("invalid".to_string()).into();
+        assert!(matches!(app_err, AppError::BadRequest(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_owner_cannot_leave() {
+        let app_err: AppError = TeamServiceError::OwnerCannotLeave.into();
+        assert!(matches!(app_err, AppError::Forbidden(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_team_has_resources() {
+        let app_err: AppError = TeamServiceError::TeamHasResources.into();
+        assert!(matches!(app_err, AppError::Conflict(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_invitation_not_found() {
+        let app_err: AppError = TeamServiceError::InvitationNotFound.into();
+        assert!(matches!(app_err, AppError::NotFound(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_member_not_found() {
+        let app_err: AppError = TeamServiceError::MemberNotFound.into();
+        assert!(matches!(app_err, AppError::NotFound(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_not_member() {
+        let app_err: AppError = TeamServiceError::NotMember.into();
+        assert!(matches!(app_err, AppError::Forbidden(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_invitation_expired() {
+        let app_err: AppError = TeamServiceError::InvitationExpired.into();
+        assert!(matches!(app_err, AppError::BadRequest(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_invitation_used() {
+        let app_err: AppError = TeamServiceError::InvitationUsed.into();
+        assert!(matches!(app_err, AppError::Conflict(_)));
+    }
+
+    #[test]
+    fn test_into_app_error_internal() {
+        let app_err: AppError = TeamServiceError::Internal("db error".to_string()).into();
+        assert!(matches!(app_err, AppError::InternalError(_)));
+    }
+}
