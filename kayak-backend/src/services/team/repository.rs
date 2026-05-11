@@ -201,7 +201,7 @@ impl TeamRepository for SqlxTeamRepository {
             .fetch_optional(&self.pool)
             .await?;
 
-        Ok(row.map(|r| r.into_team()))
+        Ok(row.map(TeamRow::into_team).transpose()?)
     }
 
     async fn exists_by_name_for_user(
@@ -541,16 +541,19 @@ impl InvitationRepository for SqlxInvitationRepository {
         .fetch_optional(&self.pool)
         .await?;
 
-        Ok(row.map(|r| TeamInvitation {
-            id: parse_uuid(&r.id).unwrap_or_else(|_| Uuid::nil()),
-            team_id: parse_uuid(&r.team_id).unwrap_or_else(|_| Uuid::nil()),
-            email: r.email,
-            code: r.code,
-            role: parse_role(&r.role),
-            expires_at: parse_datetime(&r.expires_at),
-            used_at: r.used_at.as_ref().map(|s| parse_datetime(s)),
-            created_at: parse_datetime(&r.created_at),
-        }))
+        match row {
+            Some(r) => Ok(Some(TeamInvitation {
+                id: parse_uuid(&r.id)?,
+                team_id: parse_uuid(&r.team_id)?,
+                email: r.email,
+                code: r.code,
+                role: parse_role(&r.role),
+                expires_at: parse_datetime(&r.expires_at),
+                used_at: r.used_at.as_ref().map(|s| parse_datetime(s)),
+                created_at: parse_datetime(&r.created_at),
+            })),
+            None => Ok(None),
+        }
     }
 
     async fn mark_used(
@@ -617,15 +620,15 @@ struct TeamRow {
 }
 
 impl TeamRow {
-    fn into_team(self) -> Team {
-        Team {
-            id: parse_uuid(&self.id).unwrap_or_else(|_| Uuid::nil()),
+    fn into_team(self) -> Result<Team, TeamServiceError> {
+        Ok(Team {
+            id: parse_uuid(&self.id)?,
             name: self.name,
             description: self.description,
-            owner_id: parse_uuid(&self.owner_id).unwrap_or_else(|_| Uuid::nil()),
+            owner_id: parse_uuid(&self.owner_id)?,
             created_at: parse_datetime(&self.created_at),
             updated_at: parse_datetime(&self.updated_at),
-        }
+        })
     }
 }
 
