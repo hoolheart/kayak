@@ -250,9 +250,9 @@ fn workbench_routes(workbench_service: Arc<dyn WorkbenchService>) -> Router<()> 
         Router::new()
             .route("/", post(workbench::create_workbench))
             .route("/", get(workbench::list_workbenches))
-            .route("/{id}", get(workbench::get_workbench))
-            .route("/{id}", put(workbench::update_workbench))
-            .route("/{id}", delete(workbench::delete_workbench))
+            .route("/:id", get(workbench::get_workbench))
+            .route("/:id", put(workbench::update_workbench))
+            .route("/:id", delete(workbench::delete_workbench))
             .with_state(workbench_service),
     )
 }
@@ -264,26 +264,26 @@ fn device_routes(device_service: Arc<dyn DeviceService>) -> Router<()> {
         Router::new()
             // 设备路由（嵌套在工作台下）
             .route(
-                "/workbenches/{workbench_id}/devices",
+                "/workbenches/:workbench_id/devices",
                 post(device::create_device),
             )
             .route(
-                "/workbenches/{workbench_id}/devices",
+                "/workbenches/:workbench_id/devices",
                 get(device::list_devices),
             )
             // 独立设备路由
-            .route("/devices/{id}", get(device::get_device))
-            .route("/devices/{id}", put(device::update_device))
-            .route("/devices/{id}", delete(device::delete_device))
+            .route("/devices/:id", get(device::get_device))
+            .route("/devices/:id", put(device::update_device))
+            .route("/devices/:id", delete(device::delete_device))
             // NEW: R1-S2-005 设备连接测试
             .route(
-                "/devices/{id}/test-connection",
+                "/devices/:id/test-connection",
                 post(device::test_connection),
             )
             // NEW: R1-S2-011 设备连接/断开/状态
-            .route("/devices/{id}/connect", post(device::connect_device))
-            .route("/devices/{id}/disconnect", post(device::disconnect_device))
-            .route("/devices/{id}/status", get(device::get_device_status))
+            .route("/devices/:id/connect", post(device::connect_device))
+            .route("/devices/:id/disconnect", post(device::disconnect_device))
+            .route("/devices/:id/status", get(device::get_device_status))
             .with_state(device_service),
     )
 }
@@ -294,15 +294,15 @@ fn point_routes(point_service: Arc<dyn PointService>) -> Router<()> {
         "/api/v1",
         Router::new()
             // 测点路由（嵌套在设备下）
-            .route("/devices/{device_id}/points", post(point::create_point))
-            .route("/devices/{device_id}/points", get(point::list_points))
+            .route("/devices/:device_id/points", post(point::create_point))
+            .route("/devices/:device_id/points", get(point::list_points))
             // 独立测点路由
-            .route("/points/{id}", get(point::get_point))
-            .route("/points/{id}", put(point::update_point))
-            .route("/points/{id}", delete(point::delete_point))
+            .route("/points/:id", get(point::get_point))
+            .route("/points/:id", put(point::update_point))
+            .route("/points/:id", delete(point::delete_point))
             // 测点值路由
-            .route("/points/{id}/value", get(point::read_point_value))
-            .route("/points/{id}/value", put(point::write_point_value))
+            .route("/points/:id/value", get(point::read_point_value))
+            .route("/points/:id/value", put(point::write_point_value))
             .with_state(point_service),
     )
 }
@@ -317,7 +317,7 @@ pub use workbench::{
     create_workbench, delete_workbench, get_workbench, list_workbenches, update_workbench,
 };
 
-/// 方法路由组 (C2 fix: /validate路由放在/{id}路由之前，避免路径匹配冲突)
+/// 方法路由组 (C2 fix: /validate路由放在/:id路由之前，避免路径匹配冲突)
 fn method_routes(method_service: Arc<dyn MethodServiceTrait>) -> Router<()> {
     Router::new().nest(
         "/api/v1/methods",
@@ -325,9 +325,9 @@ fn method_routes(method_service: Arc<dyn MethodServiceTrait>) -> Router<()> {
             .route("/", post(method::create_method))
             .route("/", get(method::list_methods))
             .route("/validate", post(method::validate_method))
-            .route("/{id}", get(method::get_method))
-            .route("/{id}", put(method::update_method))
-            .route("/{id}", delete(method::delete_method))
+            .route("/:id", get(method::get_method))
+            .route("/:id", put(method::update_method))
+            .route("/:id", delete(method::delete_method))
             .with_state(method_service),
     )
 }
@@ -345,13 +345,13 @@ fn experiment_control_routes(
     Router::new().nest(
         "/api/v1/experiments",
         Router::new()
-            .route("/{id}/load", post(load_experiment))
-            .route("/{id}/start", post(start_experiment))
-            .route("/{id}/pause", post(pause_experiment))
-            .route("/{id}/resume", post(resume_experiment))
-            .route("/{id}/stop", post(stop_experiment))
-            .route("/{id}/status", get(get_experiment_status))
-            .route("/{id}/history", get(get_experiment_history))
+            .route("/:id/load", post(load_experiment))
+            .route("/:id/start", post(start_experiment))
+            .route("/:id/pause", post(pause_experiment))
+            .route("/:id/resume", post(resume_experiment))
+            .route("/:id/stop", post(stop_experiment))
+            .route("/:id/status", get(get_experiment_status))
+            .route("/:id/history", get(get_experiment_history))
             .with_state(experiment_control_service),
     )
 }
@@ -364,7 +364,7 @@ fn experiment_data_routes(
         "/api/v1/experiments",
         Router::new()
             .route(
-                "/{id}/data/query",
+                "/:id/data/query",
                 post(experiment_data::query_experiment_data),
             )
             .with_state(experiment_data_service),
@@ -379,13 +379,13 @@ fn experiment_query_routes(
         "/api/v1/experiments",
         Router::new()
             .route("/", get(crate::api::handlers::experiment::list_experiments))
-            .route("/{id}", get(crate::api::handlers::experiment::get_experiment))
+            .route("/:id", get(crate::api::handlers::experiment::get_experiment))
             .route(
-                "/{id}/points/{channel}/history",
+                "/:id/points/:channel/history",
                 get(crate::api::handlers::experiment::get_point_history),
             )
             .route(
-                "/{id}/data-file",
+                "/:id/data-file",
                 get(crate::api::handlers::experiment::download_data_file),
             )
             .with_state(experiment_query_service),
@@ -399,14 +399,14 @@ fn team_routes(team_service: Arc<dyn TeamService>) -> Router<()> {
         Router::new()
             .route("/teams", post(teams::create_team))
             .route("/teams", get(teams::list_my_teams))
-            .route("/teams/{id}", get(teams::get_team))
-            .route("/teams/{id}", put(teams::update_team))
-            .route("/teams/{id}", delete(teams::delete_team))
-            .route("/teams/{id}/members", get(teams::list_members))
-            .route("/teams/{id}/members/{user_id}", delete(teams::remove_member))
-            .route("/teams/{id}/invitations", post(teams::create_invitation))
-            .route("/teams/{id}/leave", post(teams::leave_team))
-            .route("/invitations/{code}/accept", post(teams::accept_invitation))
+            .route("/teams/:id", get(teams::get_team))
+            .route("/teams/:id", put(teams::update_team))
+            .route("/teams/:id", delete(teams::delete_team))
+            .route("/teams/:id/members", get(teams::list_members))
+            .route("/teams/:id/members/:user_id", delete(teams::remove_member))
+            .route("/teams/:id/invitations", post(teams::create_invitation))
+            .route("/teams/:id/leave", post(teams::leave_team))
+            .route("/invitations/:code/accept", post(teams::accept_invitation))
             .with_state(team_service),
     )
 }
@@ -414,7 +414,7 @@ fn team_routes(team_service: Arc<dyn TeamService>) -> Router<()> {
 /// WebSocket路由组
 fn ws_routes(ws_state: experiment_ws::AppState) -> Router<()> {
     Router::new()
-        .route("/ws/experiments/{id}", get(experiment_ws::ws_handler))
+        .route("/ws/experiments/:id", get(experiment_ws::ws_handler))
         .with_state(ws_state)
 }
 

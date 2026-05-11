@@ -313,6 +313,23 @@ impl TeamService for TeamServiceImpl {
         let name_opt = req.name.as_deref();
         let desc_opt = req.description.as_deref();
 
+        // If no fields provided, return existing team without updating (no-op)
+        if name_opt.is_none() && desc_opt.is_none() {
+            let team = self
+                .team_repo
+                .find_by_id(team_id)
+                .await?
+                .ok_or(TeamServiceError::NotFound)?;
+            return Ok(TeamResponse {
+                id: team.id,
+                name: team.name,
+                description: team.description,
+                owner_id: team.owner_id,
+                created_at: team.created_at,
+                updated_at: team.updated_at,
+            });
+        }
+
         let rows_affected = self
             .team_repo
             .update(team_id, name_opt, desc_opt)
