@@ -1,8 +1,8 @@
 # Kayak 科学研究支持软件 - 架构设计文档
 
-**版本**: 1.2  
-**日期**: 2026-05-03  
-**状态**: Active (Release 1 实时架构)
+**版本**: 1.3  
+**日期**: 2026-05-11  
+**状态**: Active (Release 2 实时架构)
 
 ---
 
@@ -29,7 +29,7 @@
 当前版本反映 Release 1 已实现的实时架构。
 
 ### 1.2 适用范围
-本文档适用于Release 0及Release 1的已实现架构，并为后续Release提供演进基线。
+本文档适用于Release 0、Release 1及Release 2的已实现架构，并为后续Release提供演进基线。
 
 ### 1.3 术语定义
 - **Workbench**: 工作台，仪器的逻辑分组
@@ -52,6 +52,16 @@
 - ✅ 数据采集与HDF5存储
 - ✅ Material Design 3 全新UI（深色/浅色主题，#1976D2主色）
 - ✅ Web模式部署（Flutter Web + 单端口服务）
+
+### 1.5 Release 2 已实现特性
+- ✅ 团队管理模块（Team CRUD、成员管理、角色权限）
+- ✅ 团队邀请系统（32字符 Base64URL 安全邀请码，7天过期）
+- ✅ 资源隔离（`scope`/`team_id` 查询参数，`owner_type`/`owner_id` 所有权列）
+- ✅ `RequireTeamRole` Axum 提取器（DB角色验证，Owner/Admin/Member层级）
+- ✅ 前端团队功能（团队列表/详情页、AppBar团队选择器、所有权选择器）
+- ✅ Python SDK（`KayakClient` 上下文管理器、`AuthManager` 自动Token刷新、资源API）
+- ✅ 试验数据查询与下载API（数据点历史、HDF5数据文件下载）
+- ✅ 团队路由与面包屑导航支持
 
 ---
 
@@ -77,11 +87,11 @@
 
 ## 3. 系统架构
 
-### 3.1 总体架构图（Release 1 实时）
+### 3.1 总体架构图（Release 2 实时）
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              Kayak Platform (R1)                             │
+│                              Kayak Platform (R2)                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -103,9 +113,10 @@
 │  │  │   REST API   │  │  WebSocket   │  │  Static File │               │   │
 │  │  │   (Axum)     │  │  (Real-time) │  │  (Flutter)   │               │   │
 │  │  └──────────────┘  └──────────────┘  └──────────────┘               │   │
-│  │  ┌──────────────┐                                                    │   │
-│  │  │  Auth (JWT)  │  ← RequireAuth提取器 + JwtAuthMiddleware           │   │
-│  │  └──────────────┘                                                    │   │
+│  │  ┌──────────────┐  ┌────────────────────────────────┐              │   │
+│  │  │  Auth (JWT)  │  │  Team Auth (RequireTeamRole)   │              │   │
+│  │  │  RequireAuth │  │  Owner/Admin/Member DB verify  │              │   │
+│  │  └──────────────┘  └────────────────────────────────┘              │   │
 │  └─────────────────────────┬────────────────────────────────────────────┘   │
 │                            │                                                │
 │  ┌─────────────────────────▼────────────────────────────────────────────┐   │
@@ -114,10 +125,10 @@
 │  │  │ Instrument │ │  Method    │ │ Experiment │ │   Data     │        │   │
 │  │  │  Service   │ │  Service   │ │  Service   │ │  Service   │        │   │
 │  │  └────────────┘ └────────────┘ └────────────┘ └────────────┘        │   │
-│  │  ┌────────────┐ ┌────────────┐                                      │   │
-│  │  │    Auth    │ │   Point    │                                      │   │
-│  │  │  Service   │ │  Service   │                                      │   │
-│  │  └────────────┘ └────────────┘                                      │   │
+│  │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐        │   │
+│  │  │    Auth    │ │   Point    │ │   Team     │ │ Experiment │        │   │
+│  │  │  Service   │ │  Service   │ │  Service   │ │   Query    │        │   │
+│  │  └────────────┘ └────────────┘ └────────────┘ └────────────┘        │   │
 │  └─────────────────────────┬────────────────────────────────────────────┘   │
 │                            │                                                │
 │  ┌─────────────────────────▼────────────────────────────────────────────┐   │
@@ -150,10 +161,10 @@
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
 │  │                       External Tools                                 │   │
-│  │  ┌──────────────────────┐                                            │   │
-│  │  │  modbus-simulator    │  ← CLI binary, FC01/FC03, TOML config     │   │
-│  │  │  (bin/modbus-sim)    │                                            │   │
-│  │  └──────────────────────┘                                            │   │
+│  │  ┌──────────────────────┐  ┌──────────────────────┐                │   │
+│  │  │  modbus-simulator    │  │  Python SDK Client   │                │   │
+│  │  │  (bin/modbus-sim)    │  │  (kayak-python-cli)  │                │   │
+│  │  └──────────────────────┘  └──────────────────────┘                │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 │  ┌─────────────────────────────────────────────────────────────────────┐   │
@@ -161,13 +172,14 @@
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │   │
 │  │  │   SQLite     │  │    HDF5      │  │   Config     │               │   │
 │  │  │  (Metadata)  │  │   (Data)     │  │   (Files)    │               │   │
+│  │  │  + Teams     │  │              │  │              │               │   │
 │  │  └──────────────┘  └──────────────┘  └──────────────┘               │   │
 │  └─────────────────────────────────────────────────────────────────────┘   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-★ = Release 1 默认部署目标（Web）
-* = 已规划但Release 1未实现
+★ = Release 2 默认部署目标（Web）
+* = 已规划但Release 2未实现
 ```
 
 ### 3.2 分层架构说明
@@ -187,12 +199,15 @@
 #### 3.2.3 服务层 (Service Layer)
 核心业务逻辑，按领域划分为独立服务（全部通过trait抽象）：
 - **Device Service**: 设备的CRUD、连接/断开管理、连接测试
-- **Workbench Service**: 工作台CRUD
+- **Workbench Service**: 工作台CRUD（支持 `owner_type`/`owner_id` 资源隔离）
 - **Point Service**: 测点CRUD与值读写
-- **Method Service**: 试验方法定义和存储
+- **Method Service**: 试验方法定义和存储（支持团队所有权）
 - **Experiment Control Service**: 试验执行和状态机管理
+- **Experiment Query Service**: 试验列表查询（支持 `scope`/`team_id` 过滤）
+- **Experiment Data Service**: 试验数据查询与HDF5文件下载
 - **Auth Service**: 用户注册、登录、Token刷新、用户查询
 - **User Service**: 用户资料管理
+- **Team Service**: 团队CRUD、成员管理、邀请管理、角色权限控制
 
 #### 3.2.4 设备驱动层 (Device Driver Layer)
 采用**枚举类型擦除**模式统一管理异构驱动：
@@ -224,7 +239,7 @@ DeviceManager: HashMap<Uuid, Arc<Mutex<DriverWrapper>>>
 
 ## 4. 模块设计
 
-### 4.1 模块依赖关系（Release 1 实时）
+### 4.1 模块依赖关系（Release 2 实时）
 
 ```
 kayak-backend/src/
@@ -237,13 +252,15 @@ kayak-backend/src/
 │   │   ├── mod.rs
 │   │   ├── auth.rs
 │   │   ├── device.rs           # 设备CRUD + connect/disconnect/status
-│   │   ├── experiment.rs
+│   │   ├── experiment.rs       # 试验查询（scope/team_id过滤）
 │   │   ├── experiment_control.rs
-│   │   ├── experiment_ws.rs     # WebSocket handler
+│   │   ├── experiment_data.rs  # NEW R2: 试验数据查询与下载
+│   │   ├── experiment_ws.rs    # WebSocket handler
 │   │   ├── health.rs
 │   │   ├── method.rs
 │   │   ├── point.rs
-│   │   ├── protocol.rs         # NEW: 协议列表 + 串口扫描
+│   │   ├── protocol.rs         # 协议列表 + 串口扫描
+│   │   ├── teams.rs            # NEW R2: 团队管理API (10端点)
 │   │   ├── user.rs
 │   │   └── workbench.rs
 │   └── middleware/
@@ -254,6 +271,7 @@ kayak-backend/src/
 ├── auth/
 │   ├── handlers.rs
 │   ├── middleware.rs            # JwtAuthMiddleware + AuthLayer
+│   │   └── require_team_role.rs # NEW R2: RequireTeamRole/Admin/Owner提取器
 │   ├── services.rs              # AuthServiceImpl
 │   ├── traits.rs
 │   └── user_repo_adapter.rs
@@ -263,7 +281,14 @@ kayak-backend/src/
 │   │   ├── device_service.rs    # DeviceServiceImpl
 │   │   └── point_service.rs
 │   ├── experiment_control.rs
+│   ├── experiment_data.rs       # NEW R2: ExperimentDataService
+│   ├── experiment_query.rs      # NEW R2: ExperimentQueryService (scope过滤)
 │   ├── method_service.rs
+│   ├── team/                    # NEW R2: 团队管理模块
+│   │   ├── mod.rs               # TeamService trait
+│   │   ├── service.rs           # TeamServiceImpl
+│   │   ├── repository.rs        # Team/Member/Invitation/Resource Repository traits
+│   │   └── error.rs             # TeamServiceError
 │   ├── user/
 │   └── workbench/
 ├── drivers/
@@ -287,10 +312,12 @@ kayak-backend/src/
 │       └── types.rs             # 数据类型定义
 ├── models/
 │   ├── entities/                # 数据库实体（sqlx::FromRow）
+│   │   └── team.rs              # NEW R2: Team, TeamMember, TeamInvitation, TeamRole
 │   ├── dto/                     # API数据传输对象
+│   │   └── team_dto.rs          # NEW R2: Team request/response DTOs
 │   └── domain/                  # 领域模型
 ├── db/
-│   ├── connection.rs
+│   ├── connection.rs            # 表初始化（含teams/team_members/team_invitations）
 │   ├── migrations/
 │   └── repository/              # 数据访问层（Sqlx*Repository）
 ├── engine/                      # 试验执行引擎
@@ -664,6 +691,193 @@ classDiagram
     StateMachine --> ExperimentStatus
 ```
 
+#### 4.2.6 团队管理模块 (Team Service) — Release 2 新增
+
+团队管理模块采用**接口驱动设计**，定义了4个仓储trait和1个服务trait，支持团队CRUD、成员管理、邀请系统和基于角色的资源隔离。
+
+```mermaid
+classDiagram
+    class TeamService {
+        <<trait>>
+        +create_team(req, user_id) Result~TeamResponse~
+        +list_my_teams(user_id, page, size) Result~TeamListResponse~
+        +get_team(team_id, user_id) Result~TeamDetailResponse~
+        +update_team(team_id, req, user_id) Result~TeamResponse~
+        +delete_team(team_id, user_id) Result~
+        +list_members(team_id, user_id, page, size) Result~MemberListResponse~
+        +remove_member(team_id, target_id, actor_id) Result~
+        +create_invitation(team_id, req, user_id) Result~InvitationResponse~
+        +accept_invitation(code, user_id) Result~AcceptInvitationResponse~
+        +leave_team(team_id, user_id) Result~
+    }
+
+    class TeamServiceImpl {
+        -pool: DbPool
+        -team_repo: Arc~dyn TeamRepository~
+        -member_repo: Arc~dyn TeamMemberRepository~
+        -invitation_repo: Arc~dyn InvitationRepository~
+        -resource_repo: Arc~dyn ResourceRepository~
+    }
+
+    class TeamRepository {
+        <<trait>>
+        +create(team) Result~Team~
+        +find_by_id(id) Option~Team~
+        +find_by_user(user_id, page, size) Vec~TeamWithRole~
+        +update(team) Result~
+        +delete(id) Result~
+    }
+
+    class TeamMemberRepository {
+        <<trait>>
+        +add_member(team_id, user_id, role) Result~
+        +remove_member(team_id, user_id) Result~
+        +find_by_team(team_id, page, size) Vec~TeamMember~
+        +get_role(team_id, user_id) Option~TeamRole~
+    }
+
+    class InvitationRepository {
+        <<trait>>
+        +create(invitation) Result~TeamInvitation~
+        +find_by_code(code) Option~TeamInvitation~
+        +mark_used(id) Result~
+        +list_by_team(team_id) Vec~TeamInvitation~
+    }
+
+    class ResourceRepository {
+        <<trait>>
+        +has_resources(team_id) bool
+    }
+
+    class RequireTeamRole {
+        +team_ctx TeamContext
+        +from_request_parts(parts, state) Result~Self~
+    }
+
+    class RequireTeamAdmin {
+        +team_ctx TeamContext
+    }
+
+    class RequireTeamOwner {
+        +team_ctx TeamContext
+    }
+
+    class TeamRole {
+        <<enum>>
+        Owner
+        Admin
+        Member
+        +satisfies(required) bool
+    }
+
+    TeamService <|.. TeamServiceImpl
+    TeamServiceImpl --> TeamRepository
+    TeamServiceImpl --> TeamMemberRepository
+    TeamServiceImpl --> InvitationRepository
+    TeamServiceImpl --> ResourceRepository
+    RequireTeamAdmin --|> RequireTeamRole
+    RequireTeamOwner --|> RequireTeamAdmin
+    TeamContext --> TeamRole
+```
+
+**团队角色层级**:
+- **Owner**: 创建者，拥有所有权限（删除团队、移除任何成员）
+- **Admin**: 管理员，可更新团队信息、创建邀请、移除Member
+- **Member**: 普通成员，可查看团队、接受邀请、离开团队
+
+**角色满足关系**: `Owner ≥ Admin ≥ Member`。提取器使用数据库查询验证成员身份，而非仅依赖JWT Claims。
+
+**邀请码安全设计**:
+- 32字符 Base64URL 编码随机字符串
+- 7天过期时间（`expires_at`）
+- 一次性使用（`used_at` 标记）
+- 数据库唯一索引防止碰撞
+
+**资源隔离检查**:
+- 删除团队前检查是否存在关联资源（experiments, workbenches, methods）
+- 通过 `ResourceRepository::has_resources()` 统一查询
+
+---
+
+### 4.3 Python SDK 架构 — Release 2 新增
+
+Python SDK (`kayak-python-client/`) 提供对 Kayak REST API 的编程访问，支持自动认证、Token刷新和资源操作。
+
+```mermaid
+classDiagram
+    class KayakClient {
+        +base_url str
+        +auth AuthManager
+        +workbenches WorkbenchesAPI
+        +devices DevicesAPI
+        +methods MethodsAPI
+        +experiments ExperimentsAPI
+        +data DataAPI
+        +login(email, password) bool
+        +logout()
+        +close()
+        +__enter__() Self
+        +__exit__(exc_type, exc_val, exc_tb)
+    }
+
+    class AuthManager {
+        -_http _HTTPClient
+        -_state_lock RLock
+        -_refresh_lock Lock
+        +access_token Optional~str~
+        +refresh_token Optional~str~
+        +token_expires_at Optional~datetime~
+        +login(email, password) bool
+        +logout()
+        +is_authenticated() bool
+        +ensure_token_valid()
+        -_refresh_access_token()
+    }
+
+    class _HTTPClient {
+        -_session Session
+        -_base_url str
+        -_timeout float
+        +auth Optional~AuthManager~
+        +request(method, path, **kwargs) dict
+        +close()
+    }
+
+    class BaseAPI {
+        -_http _HTTPClient
+        #_request(method, path, **kwargs) dict
+    }
+
+    class WorkbenchesAPI {
+        +list() list
+        +create(data) dict
+        +get(id) dict
+    }
+
+    class DataAPI {
+        +download_experiment_data(exp_id, output_path)
+        +convert_to_csv(input_path, output_path)
+        +convert_to_json(input_path, output_path)
+    }
+
+    KayakClient --> AuthManager
+    KayakClient --> _HTTPClient
+    KayakClient --> WorkbenchesAPI
+    KayakClient --> DataAPI
+    AuthManager --> _HTTPClient
+    BaseAPI --> _HTTPClient
+    WorkbenchesAPI --|> BaseAPI
+    DataAPI --|> BaseAPI
+```
+
+**SDK设计要点**:
+1. **上下文管理器**: `with KayakClient(...) as client:` 自动处理登录/登出和资源释放
+2. **自动Token刷新**: `AuthManager` 在Token过期前5分钟自动调用 `/auth/refresh` 端点
+3. **线程安全**: 使用 `RLock` 保护认证状态，`Lock` 防止并发刷新请求
+4. **懒加载Token验证**: 每次HTTP请求前检查Token有效性，仅在需要时刷新
+5. **数据转换**: `DataAPI` 支持HDF5文件下载并转换为CSV/JSON格式
+6. **测试覆盖**: 56个测试用例，89%代码覆盖率
+
 ---
 
 ## 5. 数据架构
@@ -677,6 +891,7 @@ erDiagram
     USERS ||--o{ WORKBENCHES : owns
     USERS ||--o{ METHODS : owns
     USERS ||--o{ EXPERIMENTS : runs
+    USERS ||--o{ TEAMS : creates
     
     WORKBENCHES ||--o{ DEVICES : contains
     DEVICES ||--o{ POINTS : has
@@ -687,6 +902,7 @@ erDiagram
     EXPERIMENTS ||--o{ STATE_CHANGE_LOGS : records
     
     TEAMS ||--o{ TEAM_MEMBERS : has
+    TEAMS ||--o{ TEAM_INVITATIONS : issues
     USERS ||--o{ TEAM_MEMBERS : member_of
     
     USERS {
@@ -695,6 +911,7 @@ erDiagram
         string username
         string password_hash
         string avatar_url
+        string status
         timestamp created_at
         timestamp updated_at
     }
@@ -703,23 +920,37 @@ erDiagram
         uuid id PK
         string name
         string description
-        uuid created_by FK
+        uuid owner_id FK
         timestamp created_at
+        timestamp updated_at
     }
     
     TEAM_MEMBERS {
+        uuid id PK
         uuid team_id FK
         uuid user_id FK
         string role
         timestamp joined_at
     }
     
+    TEAM_INVITATIONS {
+        uuid id PK
+        uuid team_id FK
+        string email
+        string code UK
+        string role
+        timestamp expires_at
+        timestamp used_at
+        timestamp created_at
+    }
+    
     WORKBENCHES {
         uuid id PK
         string name
         string description
-        uuid owner_id FK
         string owner_type
+        uuid owner_id FK
+        string status
         timestamp created_at
         timestamp updated_at
     }
@@ -730,22 +961,27 @@ erDiagram
         uuid parent_id FK
         string name
         string protocol_type
-        json protocol_params
-        string manufacturer
-        string model
-        string sn
+        string address
+        integer port
+        string virtual_parameters
+        string status
         timestamp created_at
+        timestamp updated_at
     }
     
     POINTS {
         uuid id PK
         uuid device_id FK
         string name
-        string data_type
+        string address
         string access_type
+        string data_type
         string unit
-        json metadata
+        real min_value
+        real max_value
+        string description
         timestamp created_at
+        timestamp updated_at
     }
     
     METHODS {
@@ -754,8 +990,8 @@ erDiagram
         string description
         json definition
         json parameter_schema
-        uuid owner_id FK
         string owner_type
+        uuid owner_id FK
         timestamp created_at
         timestamp updated_at
     }
@@ -764,6 +1000,8 @@ erDiagram
         uuid id PK
         uuid method_id FK
         uuid user_id FK
+        string owner_type
+        uuid owner_id FK
         json parameters
         string status
         timestamp started_at
@@ -784,14 +1022,11 @@ erDiagram
     DATA_FILES {
         uuid id PK
         uuid experiment_id FK
+        string channel
         string file_path
-        string file_hash
-        string source_type
-        string owner_type
-        uuid owner_id FK
-        integer size_bytes
-        integer record_count
-        string status
+        integer point_count
+        timestamp start_time
+        timestamp end_time
         timestamp created_at
     }
 ```
@@ -801,113 +1036,163 @@ erDiagram
 ```sql
 -- 用户表
 CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    username VARCHAR(100) NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    username TEXT,
     avatar_url TEXT,
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'banned')),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
+CREATE INDEX idx_users_email ON users(email);
+
+-- 团队表
+CREATE TABLE teams (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    owner_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT
+);
+CREATE INDEX idx_teams_owner ON teams(owner_id);
+CREATE INDEX idx_teams_name ON teams(name);
+
+-- 团队成员表
+CREATE TABLE team_members (
+    id TEXT PRIMARY KEY NOT NULL,
+    team_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('Owner', 'Admin', 'Member')),
+    joined_at TEXT NOT NULL,
+    FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(team_id, user_id)
+);
+CREATE INDEX idx_team_members_team ON team_members(team_id);
+CREATE INDEX idx_team_members_user ON team_members(user_id);
+CREATE INDEX idx_team_members_role ON team_members(team_id, role);
+
+-- 团队邀请表
+CREATE TABLE team_invitations (
+    id TEXT PRIMARY KEY NOT NULL,
+    team_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    role TEXT NOT NULL CHECK (role IN ('Admin', 'Member')),
+    expires_at TEXT NOT NULL,
+    used_at TEXT,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
+);
+CREATE INDEX idx_invitations_code ON team_invitations(code);
+CREATE INDEX idx_invitations_team ON team_invitations(team_id);
+CREATE INDEX idx_invitations_expires ON team_invitations(expires_at);
 
 -- 工作台表
 CREATE TABLE workbenches (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
     description TEXT,
-    owner_type VARCHAR(20) NOT NULL CHECK (owner_type IN ('user', 'team')),
-    owner_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    owner_id TEXT NOT NULL,
+    owner_type TEXT DEFAULT 'personal' CHECK (owner_type IN ('personal', 'team')),
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted')),
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE INDEX idx_workbenches_owner ON workbenches(owner_id, owner_type);
+CREATE INDEX idx_workbenches_status ON workbenches(status);
 
 -- 设备表（支持嵌套）
 CREATE TABLE devices (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    workbench_id UUID NOT NULL REFERENCES workbenches(id) ON DELETE CASCADE,
-    parent_id UUID REFERENCES devices(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    protocol_type VARCHAR(50) NOT NULL,
-    protocol_params JSONB,
-    manufacturer VARCHAR(255),
-    model VARCHAR(255),
-    sn VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id TEXT PRIMARY KEY,
+    workbench_id TEXT NOT NULL,
+    parent_id TEXT,
+    name TEXT NOT NULL,
+    protocol_type TEXT NOT NULL,
+    address TEXT,
+    port INTEGER,
+    virtual_parameters TEXT,
+    status TEXT DEFAULT 'offline',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (workbench_id) REFERENCES workbenches(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES devices(id) ON DELETE SET NULL
 );
 
 -- 测点表
 CREATE TABLE points (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    device_id UUID NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
-    name VARCHAR(255) NOT NULL,
-    data_type VARCHAR(50) NOT NULL CHECK (data_type IN ('integer', 'float', 'string', 'boolean')),
-    access_type VARCHAR(20) NOT NULL CHECK (access_type IN ('ro', 'wo', 'rw')),
-    unit VARCHAR(50),
-    metadata JSONB DEFAULT '{}',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id TEXT PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    access_type TEXT NOT NULL CHECK (access_type IN ('RO', 'WO', 'RW')),
+    data_type TEXT NOT NULL CHECK (data_type IN ('BOOLEAN', 'INTEGER', 'NUMBER', 'STRING')),
+    unit TEXT,
+    min_value REAL,
+    max_value REAL,
+    description TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (device_id) REFERENCES devices(id) ON DELETE CASCADE
 );
 
 -- 试验方法表
 CREATE TABLE methods (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
     description TEXT,
-    definition JSONB NOT NULL,
-    parameter_schema JSONB NOT NULL DEFAULT '{}',
-    owner_type VARCHAR(20) NOT NULL,
-    owner_id UUID NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    definition TEXT NOT NULL,
+    parameter_schema TEXT NOT NULL DEFAULT '{}',
+    owner_type TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
 );
 
 -- 试验记录表
 CREATE TABLE experiments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    method_id UUID REFERENCES methods(id),
-    user_id UUID NOT NULL REFERENCES users(id),
-    parameters JSONB NOT NULL DEFAULT '{}',
-    status VARCHAR(20) NOT NULL CHECK (status IN ('idle', 'loaded', 'running', 'paused', 'completed', 'error')),
-    started_at TIMESTAMP,
-    ended_at TIMESTAMP,
+    id TEXT PRIMARY KEY,
+    method_id TEXT REFERENCES methods(id),
+    user_id TEXT NOT NULL REFERENCES users(id),
+    owner_type TEXT NOT NULL,
+    owner_id TEXT NOT NULL,
+    parameters TEXT NOT NULL DEFAULT '{}',
+    status TEXT NOT NULL CHECK (status IN ('idle', 'loaded', 'running', 'paused', 'completed', 'error')),
+    started_at TEXT,
+    ended_at TEXT,
     error_message TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL
 );
+CREATE INDEX idx_experiments_user ON experiments(user_id);
+CREATE INDEX idx_experiments_status ON experiments(status);
 
 -- 状态变更日志表
 CREATE TABLE state_change_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    experiment_id UUID NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id),
-    from_state VARCHAR(20) NOT NULL,
-    to_state VARCHAR(20) NOT NULL,
+    id TEXT PRIMARY KEY,
+    experiment_id TEXT NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    from_state TEXT NOT NULL,
+    to_state TEXT NOT NULL,
     reason TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL
 );
+CREATE INDEX idx_state_change_logs_experiment ON state_change_logs(experiment_id);
 
 -- 数据文件元信息表
 CREATE TABLE data_files (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    experiment_id UUID REFERENCES experiments(id),
+    id TEXT PRIMARY KEY,
+    experiment_id TEXT NOT NULL REFERENCES experiments(id) ON DELETE CASCADE,
+    channel TEXT NOT NULL,
     file_path TEXT NOT NULL,
-    file_hash VARCHAR(64) NOT NULL,
-    source_type VARCHAR(20) NOT NULL CHECK (source_type IN ('experiment', 'analysis', 'import')),
-    owner_type VARCHAR(20) NOT NULL,
-    owner_id UUID NOT NULL,
-    size_bytes BIGINT,
-    record_count INTEGER,
-    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    point_count INTEGER NOT NULL,
+    start_time TEXT,
+    end_time TEXT,
+    created_at TEXT NOT NULL
 );
-
--- 索引
-CREATE INDEX idx_workbenches_owner ON workbenches(owner_type, owner_id);
-CREATE INDEX idx_devices_workbench ON devices(workbench_id);
-CREATE INDEX idx_points_device ON points(device_id);
-CREATE INDEX idx_experiments_user ON experiments(user_id);
-CREATE INDEX idx_experiments_status ON experiments(status);
-CREATE INDEX idx_data_files_experiment ON data_files(experiment_id);
-CREATE INDEX idx_state_change_logs_experiment ON state_change_logs(experiment_id);
 ```
 
 ### 5.2 HDF5文件结构
@@ -970,7 +1255,7 @@ experiment_{id}.h5
 }
 ```
 
-### 6.2 API端点概览（Release 1 实时）
+### 6.2 API端点概览（Release 2 实时）
 
 #### 认证 API
 ```
@@ -985,6 +1270,20 @@ GET    /api/v1/auth/me
 GET    /api/v1/users/me
 PUT    /api/v1/users/me
 POST   /api/v1/users/me/password
+```
+
+#### 团队 API ← NEW R2
+```
+GET    /api/v1/teams                    ← 列出我参与的团队
+POST   /api/v1/teams                    ← 创建团队（自动成为Owner）
+GET    /api/v1/teams/:id                ← 获取团队详情（需成员）
+PUT    /api/v1/teams/:id                ← 更新团队（需Admin+）
+DELETE /api/v1/teams/:id                ← 删除团队（需Owner）
+GET    /api/v1/teams/:id/members        ← 列出成员（需成员）
+DELETE /api/v1/teams/:id/members/:user_id  ← 移除成员（需Admin+）
+POST   /api/v1/teams/:id/invitations    ← 创建邀请（需Admin+）
+POST   /api/v1/teams/:id/leave          ← 离开团队
+POST   /api/v1/invitations/:code/accept ← 接受邀请
 ```
 
 #### 工作台 API
@@ -1030,15 +1329,28 @@ PUT    /api/v1/methods/{id}
 DELETE /api/v1/methods/{id}
 ```
 
+#### 试验查询 API ← NEW/UPDATED R2
+```
+GET    /api/v1/experiments              ← 列表（支持 ?scope=personal|team|all & ?team_id=）
+GET    /api/v1/experiments/:id          ← 详情（含所有权校验）
+GET    /api/v1/experiments/:id/points/:channel/history  ← 测点历史数据
+GET    /api/v1/experiments/:id/data-file                ← 下载HDF5数据文件
+```
+
 #### 试验控制 API
 ```
-POST   /api/v1/experiments/{id}/load
-POST   /api/v1/experiments/{id}/start
-POST   /api/v1/experiments/{id}/pause
-POST   /api/v1/experiments/{id}/resume
-POST   /api/v1/experiments/{id}/stop
-GET    /api/v1/experiments/{id}/status
-GET    /api/v1/experiments/{id}/history
+POST   /api/v1/experiments/:id/load
+POST   /api/v1/experiments/:id/start
+POST   /api/v1/experiments/:id/pause
+POST   /api/v1/experiments/:id/resume
+POST   /api/v1/experiments/:id/stop
+GET    /api/v1/experiments/:id/status
+GET    /api/v1/experiments/:id/history
+```
+
+#### 试验数据 API ← NEW R2
+```
+POST   /api/v1/experiments/:id/data/query  ← 查询试验数据（时间范围、聚合）
 ```
 
 #### 数据文件 API
@@ -1095,7 +1407,7 @@ interface LogMessage {
 
 ## 7. 部署架构
 
-### 7.1 单容器Web部署（Release 1 默认）
+### 7.1 单容器Web部署（Release 2 默认）
 
 ```
 ┌─────────────────────────────────────────────┐
