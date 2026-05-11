@@ -23,7 +23,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| R2-S2-002-C | 团队管理前端 - 详细设计 | sw-jerry | in_progress |
+| - | - | - | - |
 
 ---
 
@@ -31,7 +31,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| R2-S2-003-C | Python SDK - 开发实现 | sw-tom | in_progress |
+| R2-S2-002-D | 团队管理前端 - 开发实现 | sw-tom | in_progress |
 
 ---
 
@@ -39,7 +39,7 @@
 
 | Task ID | Description | Reviewer | Status |
 |---------|-------------|----------|--------|
-| - | - | - | - |
+| R2-S2-003-D | Python SDK - 代码审查 | sw-jerry | in_progress |
 
 ---
 
@@ -77,6 +77,8 @@
 | R2-S2-002-B | 团队管理前端 - 测试用例设计 | 2026-05-11 |
 | R2-S2-003-A | Python SDK - 测试用例设计 | 2026-05-11 |
 | R2-S2-003-B | Python SDK - 详细设计 | 2026-05-11 |
+| R2-S2-002-C | 团队管理前端 - 详细设计 | 2026-05-11 |
+| R2-S2-003-C | Python SDK - 开发实现 | 2026-05-11 |
 
 ---
 
@@ -88,7 +90,7 @@
 
 ## Sprint 2 Progress
 - **Total**: 8 个子任务 (4 个模块任务)
-- **Completed**: 9
+- **Completed**: 11
 - **In Progress**: 2
 - **Remaining**: 0
 

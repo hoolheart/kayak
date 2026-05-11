@@ -241,6 +241,8 @@ class Sidebar extends StatelessWidget {
         return Icons.settings;
       case 'analytics':
         return Icons.analytics;
+      case 'groups':
+        return Icons.groups;
       default:
         return Icons.circle;
     }

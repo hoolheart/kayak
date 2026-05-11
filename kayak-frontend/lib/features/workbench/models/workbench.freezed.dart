@@ -23,7 +23,8 @@ mixin _$Workbench {
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  String get ownerId => throw _privateConstructorUsedError;
+  String get ownerId =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @JsonKey(name: 'ownerType')
   String get ownerType => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
@@ -219,6 +220,7 @@ class _$WorkbenchImpl implements _Workbench {
   final String? description;
   @override
   final String ownerId;
+// ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @override
   @JsonKey(name: 'ownerType')
   final String ownerType;
@@ -295,7 +297,8 @@ abstract class _Workbench implements Workbench {
   @override
   String? get description;
   @override
-  String get ownerId;
+  String
+      get ownerId; // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @override
   @JsonKey(name: 'ownerType')
   String get ownerType;
@@ -541,7 +544,8 @@ CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
 /// @nodoc
 mixin _$CreateWorkbenchRequest {
   String get name => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
+  String? get description =>
+      throw _privateConstructorUsedError; // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @JsonKey(name: 'ownerType')
   String? get ownerType => throw _privateConstructorUsedError;
 
@@ -670,6 +674,7 @@ class _$CreateWorkbenchRequestImpl implements _CreateWorkbenchRequest {
   final String name;
   @override
   final String? description;
+// ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @override
   @JsonKey(name: 'ownerType')
   final String? ownerType;
@@ -725,7 +730,8 @@ abstract class _CreateWorkbenchRequest implements CreateWorkbenchRequest {
   @override
   String get name;
   @override
-  String? get description;
+  String?
+      get description; // ignore: invalid_annotation_target (JsonKey on freezed factory constructor is valid)
   @override
   @JsonKey(name: 'ownerType')
   String? get ownerType;

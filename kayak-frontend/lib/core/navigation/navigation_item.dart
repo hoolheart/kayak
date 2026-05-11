@@ -39,6 +39,11 @@ class NavigationItem {
       route: '/analysis',
     ),
     NavigationItem(
+      label: '团队',
+      icon: 'groups',
+      route: '/teams',
+    ),
+    NavigationItem(
       label: '设置',
       icon: 'settings',
       route: '/settings',
@@ -88,6 +93,8 @@ class BreadcrumbItem {
         label = '试验详情';
       } else if (segments[i] == 'methods' && segments.length > 1 && i > 0) {
         label = '方法编辑';
+      } else if (segments[i] == 'teams' && segments.length > 1) {
+        label = '团队详情';
       }
 
       items.add(
@@ -116,6 +123,8 @@ class BreadcrumbItem {
         return '方法';
       case 'analysis':
         return '分析';
+      case 'teams':
+        return '团队';
       case 'settings':
         return '设置';
       case 'edit':

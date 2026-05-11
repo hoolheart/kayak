@@ -18,6 +18,8 @@ import '../../features/experiments/screens/experiment_console_page.dart';
 import '../../features/experiments/screens/experiment_list_page.dart';
 import '../../features/methods/screens/method_edit_page.dart';
 import '../../features/methods/screens/method_list_page.dart';
+import '../../features/team/screens/team_detail_page.dart';
+import '../../features/team/screens/team_list_page.dart';
 import '../../features/workbench/screens/detail/workbench_detail_page.dart';
 import '../../features/workbench/screens/workbench_list_page.dart';
 import '../../screens/settings/settings_page.dart';
@@ -243,6 +245,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/analysis',
             builder: (context, state) => const AnalysisPage(),
+          ),
+          // 团队
+          GoRoute(
+            path: '/teams',
+            builder: (context, state) => const TeamListPage(),
+          ),
+          GoRoute(
+            path: '/teams/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return TeamDetailPage(teamId: id);
+            },
           ),
           // 设置
           GoRoute(
