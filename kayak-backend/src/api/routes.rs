@@ -41,6 +41,7 @@ use crate::drivers::DeviceManager;
 use crate::services::device::{DeviceService, DeviceServiceImpl};
 use crate::services::experiment_control::ExperimentControlService;
 use crate::services::experiment_data::{ExperimentDataService, ExperimentDataServiceImpl};
+use crate::services::experiment_query::{ExperimentQueryService, ExperimentQueryServiceImpl};
 use crate::services::method_service::{MethodService, MethodServiceTrait};
 use crate::services::point::{PointService, PointServiceImpl};
 use crate::services::team::{TeamService, TeamServiceImpl};
@@ -160,6 +161,14 @@ pub fn create_router(pool: DbPool) -> Router<()> {
     let experiment_data_service: Arc<dyn ExperimentDataService> =
         Arc::new(ExperimentDataServiceImpl::new(
             Arc::new(experiment_repo_for_data),
+            data_root.clone(),
+        ));
+
+    // 创建试验查询服务
+    let experiment_repo_for_query = SqlxExperimentRepository::new(pool.clone());
+    let experiment_query_service: Arc<dyn ExperimentQueryService> =
+        Arc::new(ExperimentQueryServiceImpl::new(
+            Arc::new(experiment_repo_for_query),
             data_root,
         ));
 
@@ -188,6 +197,7 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(method_routes(method_service))
         .merge(experiment_control_routes(experiment_control_service))
         .merge(experiment_data_routes(experiment_data_service))
+        .merge(experiment_query_routes(experiment_query_service))
         .merge(team_routes(team_service))
         // NEW: 协议列表与系统信息
         .merge(protocol_routes())
@@ -354,6 +364,27 @@ fn experiment_data_routes(
                 post(experiment_data::query_experiment_data),
             )
             .with_state(experiment_data_service),
+    )
+}
+
+/// 试验查询路由组
+fn experiment_query_routes(
+    experiment_query_service: Arc<dyn ExperimentQueryService>,
+) -> Router<()> {
+    Router::new().nest(
+        "/api/v1/experiments",
+        Router::new()
+            .route("/", get(crate::api::handlers::experiment::list_experiments))
+            .route("/{id}", get(crate::api::handlers::experiment::get_experiment))
+            .route(
+                "/{id}/points/{channel}/history",
+                get(crate::api::handlers::experiment::get_point_history),
+            )
+            .route(
+                "/{id}/data-file",
+                get(crate::api::handlers::experiment::download_data_file),
+            )
+            .with_state(experiment_query_service),
     )
 }
 

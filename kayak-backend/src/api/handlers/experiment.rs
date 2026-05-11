@@ -38,6 +38,8 @@ pub async fn list_experiments(
         user_id: Some(user_ctx.user_id),
         status: params.status,
         method_id: None, // ListExperimentsRequest doesn't have method_id
+        scope: params.scope,
+        team_id: params.team_id,
         created_after: params.created_after,
         created_before: params.created_before,
     };

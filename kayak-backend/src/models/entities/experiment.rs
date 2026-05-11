@@ -176,6 +176,8 @@ pub struct ListExperimentsRequest {
     pub user_id: Option<Uuid>,
     pub status: Option<ExperimentStatus>,
     pub method_id: Option<Uuid>,
+    pub scope: Option<ResourceScope>,
+    pub team_id: Option<Uuid>,
     pub started_after: Option<DateTime<Utc>>,
     pub started_before: Option<DateTime<Utc>>,
     pub page: Option<u32>,

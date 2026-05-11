@@ -5,12 +5,24 @@ use uuid::Uuid;
 
 use crate::models::entities::experiment::ExperimentStatus;
 
+/// Resource scope for filtering
+#[derive(Debug, Clone, Copy, Default, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Scope {
+    #[default]
+    All,
+    Personal,
+    Team,
+}
+
 /// Experiment query filter
 #[derive(Debug, Clone, Default)]
 pub struct ExperimentFilter {
     pub user_id: Option<Uuid>,
     pub status: Option<ExperimentStatus>,
     pub method_id: Option<Uuid>,
+    pub scope: Option<Scope>,
+    pub team_id: Option<Uuid>,
     pub created_after: Option<DateTime<Utc>>,
     pub created_before: Option<DateTime<Utc>>,
 }

@@ -34,6 +34,8 @@ pub struct ListExperimentsRequest {
     #[serde(deserialize_with = "deserialize_pagination")]
     pub size: Option<u32>,
     pub status: Option<crate::models::entities::experiment::ExperimentStatus>,
+    pub scope: Option<crate::services::experiment_query::Scope>,
+    pub team_id: Option<Uuid>,
     pub created_after: Option<DateTime<Utc>>,
     pub created_before: Option<DateTime<Utc>>,
 }
