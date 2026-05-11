@@ -267,7 +267,7 @@ void main() {
     });
 
     test('canLoadData 当所有条件满足时返回 true', () {
-      final state = AnalysisControlState(
+      const state = AnalysisControlState(
         selectedExperimentId: 'exp-001',
         selectedDeviceId: 'dev-001',
         selectedPointIds: ['pt-001'],

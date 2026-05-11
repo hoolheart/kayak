@@ -4,7 +4,7 @@
 
 use kayak_backend::{
     api::middleware::MiddlewareStack, api::routes::create_router, core::config::AppConfig,
-    db::connection::init_db,
+    db::connection::init_db_without_migrations,
 };
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -23,10 +23,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Starting Kayak Backend v{}", env!("CARGO_PKG_VERSION"));
 
-    // 4. 初始化数据库
+    // 4. 初始化数据库连接池（不运行表初始化，完全依赖 sqlx 迁移）
     let database_url =
         std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://./data/kayak.db".to_string());
-    let pool = init_db(&database_url).await?;
+    let pool = init_db_without_migrations(&database_url).await?;
 
     // 4.5. Run sqlx migrations
     info!("Running database migrations...");

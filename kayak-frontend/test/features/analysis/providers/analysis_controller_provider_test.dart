@@ -65,10 +65,10 @@ void main() {
       });
 
       test('更换设备时应级联清除 pointIds', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-old',
-          selectedPointIds: const <String>['pt-001', 'pt-002'],
+          selectedPointIds: <String>['pt-001', 'pt-002'],
         );
 
         // 模拟选择新设备后级联清除的效果
@@ -83,10 +83,10 @@ void main() {
       });
 
       test('选择 null 试验清除所有选择', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001'],
+          selectedPointIds: <String>['pt-001'],
         );
 
         notifier.state = notifier.state.copyWith(
@@ -103,10 +103,9 @@ void main() {
 
     group('togglePointSelection', () {
       test('选择未选中的测点', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>[],
         );
 
         notifier.togglePointSelection('pt-001');
@@ -116,10 +115,10 @@ void main() {
       });
 
       test('取消已选中的测点', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001', 'pt-002'],
+          selectedPointIds: <String>['pt-001', 'pt-002'],
         );
 
         notifier.togglePointSelection('pt-001');
@@ -129,10 +128,10 @@ void main() {
       });
 
       test('最多只能选择 4 个测点', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>[
+          selectedPointIds: <String>[
             'pt-001',
             'pt-002',
             'pt-003',
@@ -147,10 +146,10 @@ void main() {
       });
 
       test('选择第 4 个测点成功', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001', 'pt-002', 'pt-003'],
+          selectedPointIds: <String>['pt-001', 'pt-002', 'pt-003'],
         );
 
         notifier.togglePointSelection('pt-004');
@@ -162,35 +161,35 @@ void main() {
 
     group('canLoadData', () {
       test('所有条件满足时 canLoadData 为 true', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001'],
+          selectedPointIds: <String>['pt-001'],
         );
 
         expect(notifier.state.canLoadData, isTrue);
       });
 
       test('缺少 experimentId 时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001'],
+          selectedPointIds: <String>['pt-001'],
         );
 
         expect(notifier.state.canLoadData, isFalse);
       });
 
       test('缺少 deviceId 时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
-          selectedPointIds: const <String>['pt-001'],
+          selectedPointIds: <String>['pt-001'],
         );
 
         expect(notifier.state.canLoadData, isFalse);
       });
 
       test('没有选中测点时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
         );
@@ -199,10 +198,9 @@ void main() {
       });
 
       test('选中测点为空列表时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>[],
         );
 
         expect(notifier.state.canLoadData, isFalse);
@@ -213,7 +211,7 @@ void main() {
       });
 
       test('仅有试验时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
         );
 
@@ -221,7 +219,7 @@ void main() {
       });
 
       test('有试验和设备但无测点时 canLoadData 为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
         );
@@ -230,7 +228,7 @@ void main() {
       });
 
       test('选择测点后 canLoadData 变为 true', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
         );
@@ -240,10 +238,10 @@ void main() {
       });
 
       test('取消最后一个测点后 canLoadData 变为 false', () {
-        notifier.state = AnalysisControlState(
+        notifier.state = const AnalysisControlState(
           selectedExperimentId: 'exp-001',
           selectedDeviceId: 'dev-001',
-          selectedPointIds: const <String>['pt-001'],
+          selectedPointIds: <String>['pt-001'],
         );
 
         notifier.togglePointSelection('pt-001');
@@ -254,7 +252,7 @@ void main() {
 
     group('setTimeRange', () {
       test('设置时间范围', () {
-        final start = DateTime(2026, 5, 1);
+        final start = DateTime(2026, 5);
         final end = DateTime(2026, 5, 2);
 
         notifier.setTimeRange(start, end);

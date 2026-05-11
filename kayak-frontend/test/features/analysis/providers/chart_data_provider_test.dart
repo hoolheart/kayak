@@ -90,7 +90,7 @@ void main() {
           state: ChartState.loaded,
           data: createTestResponse(
             points: [
-              createTestSeries(pointId: 'pt-001'),
+              createTestSeries(),
               createTestSeries(pointId: 'pt-002'),
             ],
           ),
@@ -108,7 +108,7 @@ void main() {
           state: ChartState.loaded,
           data: createTestResponse(
             points: [
-              createTestSeries(pointId: 'pt-001'),
+              createTestSeries(),
               createTestSeries(pointId: 'pt-002'),
             ],
           ),
@@ -126,7 +126,7 @@ void main() {
           state: ChartState.loaded,
           data: createTestResponse(
             points: [
-              createTestSeries(pointId: 'pt-001'),
+              createTestSeries(),
               createTestSeries(pointId: 'pt-002'),
               createTestSeries(pointId: 'pt-003'),
             ],
@@ -164,9 +164,9 @@ void main() {
       });
 
       test('reset 后 toggleSeriesVisibility 不影响空状态', () {
-        notifier.state = ChartViewState(
+        notifier.state = const ChartViewState(
           state: ChartState.loaded,
-          visibleSeries: const {'pt-001'},
+          visibleSeries: {'pt-001'},
         );
 
         notifier.reset();
@@ -182,7 +182,7 @@ void main() {
           state: ChartState.loaded,
           data: createTestResponse(
             points: [
-              createTestSeries(pointId: 'pt-001'),
+              createTestSeries(),
               createTestSeries(pointId: 'pt-002'),
               createTestSeries(pointId: 'pt-003'),
             ],
@@ -202,7 +202,7 @@ void main() {
           state: ChartState.loaded,
           data: createTestResponse(
             points: [
-              createTestSeries(pointId: 'pt-001'),
+              createTestSeries(),
               createTestSeries(pointId: 'pt-002'),
             ],
           ),
@@ -217,7 +217,6 @@ void main() {
 
       test('showAllSeries 在 data 为 null 时清空可见序列', () {
         notifier.state = const ChartViewState(
-          state: ChartState.empty,
           visibleSeries: {'pt-001'},
         );
 
