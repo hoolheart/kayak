@@ -7,6 +7,29 @@
 
 Kayak 是一款面向科学研究活动的综合支持平台，提供试验仪器管理、实验过程设计、数据采集与分析的一站式解决方案。
 
+## Release 2 功能特性
+
+### 时序数据可视化分析
+- **交互式时序图表**（基于 fl_chart）
+- 支持单/多曲线同时显示，独立图例控制
+- 缩放、平移、光标测量等交互功能
+- 深色/浅色主题自适应
+- LTTB 降采样算法，高效处理大数据量
+
+### 团队管理
+- **团队 CRUD** 管理（创建、编辑、删除）
+- **成员邀请机制**：邮件邀请 + 32 字符安全邀请码
+- **RBAC 权限控制**：Owner / Admin / Member 三级角色
+- **资源隔离**：团队资源与个人资源分离，支持 `scope` 过滤
+- AppBar 团队选择器，快速切换工作上下文
+
+### Python SDK
+- **程序化访问**：完整的 REST API 封装
+- **自动认证**：Token 自动刷新（过期前 5 分钟）
+- **数据下载**：试验数据 HDF5 文件下载
+- **数据转换**：HDF5 → pandas DataFrame / numpy ndarray
+- **线程安全**：支持并发使用
+
 ## Release 1 功能特性
 
 ### Modbus 协议驱动
@@ -77,6 +100,28 @@ docker-compose up -d
 ./scripts/stop.sh
 ```
 
+## Python SDK 使用
+
+```python
+from kayak import KayakClient
+
+# 使用上下文管理器
+with KayakClient('http://localhost:8080', 'admin@kayak.local', 'Admin123') as client:
+    # 列出试验
+    experiments = client.experiments.list()
+    print(f"Found {len(experiments)} experiments")
+
+    # 下载试验数据
+    data = client.experiments.download_data(experiments[0].id)
+    data.save('/tmp/experiment_data.h5')
+
+    # 转换为 pandas DataFrame
+    df = data.to_dataframe()
+    print(df.head())
+```
+
+更多示例见 `kayak-python-client/examples/basic_usage.py`。
+
 ## 默认管理员账户
 
 首次启动时会自动创建默认管理员账户：
@@ -113,6 +158,8 @@ kayak/
 ├── Dockerfile.single               # 单容器 Dockerfile
 ├── scripts/                        # 启动/停止脚本
 │   ├── start-web.sh                # Web 部署启动脚本 (推荐)
+│   ├── start-r2s2.sh               # Sprint 2 开发环境启动
+│   ├── stop-r2s2.sh                # Sprint 2 开发环境停止
 │   ├── start-desktop.sh            # 桌面部署启动脚本
 │   ├── stop.sh                     # 停止脚本
 │   ├── ci-check.sh                 # CI 本地检查
@@ -166,6 +213,13 @@ kayak/
 - `GET /api/v1/devices/{id}/points` - 获取设备测点
 - `GET /api/v1/points/{id}/value` - 读取测点实时值
 - `POST /api/v1/experiments` - 创建试验
+- `POST /api/v1/experiments/{id}/data/query` - 查询试验时序数据
+- `GET /api/v1/teams` - 获取团队列表
+- `POST /api/v1/teams` - 创建团队
+- `GET /api/v1/teams/{id}` - 获取团队详情
+- `GET /api/v1/teams/{id}/members` - 获取团队成员
+- `POST /api/v1/teams/{id}/invitations` - 邀请成员
+- `POST /api/v1/invitations/{code}/accept` - 接受邀请
 - `WS /ws` - WebSocket 实时通信
 
 详细 API 文档请参考 [docs/api.md](docs/api.md)。
