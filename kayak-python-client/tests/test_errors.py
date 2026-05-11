@@ -1,5 +1,7 @@
 """Tests for error handling (TC-SDK-038 ~ 043)."""
 
+from unittest.mock import patch
+
 import httpx
 import pytest
 
@@ -60,7 +62,8 @@ class TestErrorHandling:
 
         assert exc_info.value.status_code == 404
 
-    def test_5xx_raises_server_error(self, client: KayakClient, auth_response, httpx_mock):
+    @patch("kayak.http_client.time.sleep")
+    def test_5xx_raises_server_error(self, mock_sleep, client: KayakClient, auth_response, httpx_mock):
         """TC-SDK-040: ServerError — 5xx Responses"""
         for _ in range(3):
             httpx_mock.add_response(
@@ -70,11 +73,12 @@ class TestErrorHandling:
             )
 
         for status in [500, 502, 503]:
-            httpx_mock.add_response(
-                url="http://localhost:8080/api/v1/experiments",
-                json={"code": status, "message": "Server error"},
-                status_code=status,
-            )
+            for _ in range(4):
+                httpx_mock.add_response(
+                    url="http://localhost:8080/api/v1/experiments",
+                    json={"code": status, "message": "Server error"},
+                    status_code=status,
+                )
 
             client.login("admin@kayak.local", "Admin123")
             with pytest.raises(ServerError) as exc_info:
@@ -82,7 +86,8 @@ class TestErrorHandling:
 
             assert exc_info.value.status_code == status
 
-    def test_network_error_raises_connection_error(self, client: KayakClient, auth_response, httpx_mock):
+    @patch("kayak.http_client.time.sleep")
+    def test_network_error_raises_connection_error(self, mock_sleep, client: KayakClient, auth_response, httpx_mock):
         """TC-SDK-041: ConnectionError — Network Failure"""
         httpx_mock.add_response(
             url="http://localhost:8080/api/v1/auth/login",
@@ -92,8 +97,13 @@ class TestErrorHandling:
 
         client.login("admin@kayak.local", "Admin123")
 
-        for exc in [httpx.ConnectTimeout("timeout"), httpx.NetworkError("network")]:
-            httpx_mock.add_exception(exc)
+        for exc in [
+            httpx.ConnectTimeout("timeout"),
+            httpx.ReadTimeout("read timeout"),
+            httpx.NetworkError("network"),
+        ]:
+            for _ in range(4):
+                httpx_mock.add_exception(exc)
 
             with pytest.raises(ConnectionError) as exc_info:
                 client.workbenches.list()
@@ -127,14 +137,14 @@ class TestErrorHandling:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/exp-123/data/download",
+            url="http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abc/data/download",
             json={"code": 409, "message": "Conflict"},
             status_code=409,
         )
 
         client.login("admin@kayak.local", "Admin123")
         with pytest.raises(KayakError) as exc_info:
-            client.data.download("exp-123")
+            client.data.download("12345678-1234-1234-1234-123456789abc")
 
         assert exc_info.value.status_code == 409
         assert type(exc_info.value) is KayakError

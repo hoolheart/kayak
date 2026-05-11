@@ -20,18 +20,26 @@ class TestInputValidation:
 
     def test_invalid_uuid(self, client: KayakClient):
         """TC-SDK-046: Invalid UUID Format in Resource APIs"""
+        # Empty strings
         with pytest.raises(ValidationError):
             client.experiments.get("")
         with pytest.raises(ValidationError):
             client.devices.get("")
         with pytest.raises(ValidationError):
             client.data.download("")
+        # Malformed non-empty UUIDs
+        with pytest.raises(ValidationError):
+            client.experiments.get("not-a-uuid")
+        with pytest.raises(ValidationError):
+            client.devices.get("12345")
+        with pytest.raises(ValidationError):
+            client.data.download("invalid-uuid-string")
 
     def test_invalid_time_range(self, client: KayakClient):
         """TC-SDK-047: Invalid Time Range — End Before Start"""
         with pytest.raises(ValidationError, match="start_time must be before"):
             client.data.download(
-                "exp-123",
+                "12345678-1234-1234-1234-123456789abc",
                 start_time="2026-05-02T00:00:00Z",
                 end_time="2026-05-01T00:00:00Z",
             )

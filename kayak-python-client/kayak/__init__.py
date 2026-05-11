@@ -1,5 +1,6 @@
 """Kayak Python SDK - Python client for the Kayak scientific research platform."""
 
+from kayak.auth import AuthManager
 from kayak.client import KayakClient
 from kayak.exceptions import (
     AuthenticationError,
@@ -13,6 +14,7 @@ from kayak.models import Device, Experiment, Method, Workbench
 from kayak.resources.data import DataDownload
 
 __all__ = [
+    "AuthManager",
     "KayakClient",
     "KayakError",
     "AuthenticationError",

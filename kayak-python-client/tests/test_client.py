@@ -1,5 +1,7 @@
 """Tests for client and context manager (TC-SDK-013 ~ 016)."""
 
+import pytest
+
 from kayak import KayakClient
 
 
@@ -73,6 +75,3 @@ class TestContextManager:
         assert len(workbenches) == 2
         assert workbenches[0].id == "wb-1"
         assert workbenches[1].id == "wb-2"
-
-
-import pytest

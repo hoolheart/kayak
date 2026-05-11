@@ -76,10 +76,14 @@ def validate_uuid(value: str, field_name: str = "id") -> None:
         field_name: Name of the field for error messages.
 
     Raises:
-        ValidationError: If the value is empty.
+        ValidationError: If the value is empty or not a valid UUID format.
     """
     if not value or not value.strip():
         raise ValidationError(f"{field_name} must not be empty")
+    if not _UUID_RE.match(value):
+        raise ValidationError(
+            f"Invalid UUID format for {field_name}: {value}"
+        )
 
 
 def validate_time_range(start_time: str, end_time: str) -> None:
