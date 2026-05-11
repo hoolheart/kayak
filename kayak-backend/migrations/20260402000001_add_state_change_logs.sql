@@ -28,8 +28,6 @@ CREATE INDEX IF NOT EXISTS idx_state_change_logs_timestamp
 -- 2. Update experiments table to include 'LOADED' in status CHECK constraint
 -- SQLite doesn't support ALTER TABLE for CHECK constraints, so we recreate the table.
 
-BEGIN TRANSACTION;
-
 -- Create new table with updated constraint
 CREATE TABLE experiments_new (
     id TEXT PRIMARY KEY NOT NULL,
@@ -62,5 +60,3 @@ CREATE INDEX IF NOT EXISTS idx_experiments_user_id ON experiments(user_id);
 CREATE INDEX IF NOT EXISTS idx_experiments_status ON experiments(status);
 CREATE INDEX IF NOT EXISTS idx_experiments_started_at ON experiments(started_at);
 CREATE INDEX IF NOT EXISTS idx_experiments_method_id ON experiments(method_id);
-
-COMMIT;
