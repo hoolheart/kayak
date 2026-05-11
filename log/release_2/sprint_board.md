@@ -31,7 +31,7 @@
 
 | Task ID | Description | Assigned | Status |
 |---------|-------------|----------|--------|
-| R2-S2-002-D | 团队管理前端 - 开发实现 | sw-tom | in_progress |
+| - | - | - | - |
 
 ---
 
@@ -39,7 +39,7 @@
 
 | Task ID | Description | Reviewer | Status |
 |---------|-------------|----------|--------|
-| R2-S2-003-D | Python SDK - 代码审查 | sw-jerry | in_progress |
+| - | - | - | - |
 
 ---
 
@@ -47,7 +47,8 @@
 
 | Task ID | Description | Tester | Status |
 |---------|-------------|--------|--------|
-| - | - | - | - |
+| R2-S2-002-F | 团队管理前端 - 测试执行 | sw-mike | in_progress |
+| R2-S2-003-E | Python SDK - 测试执行 | sw-mike | in_progress |
 
 ---
 
@@ -79,6 +80,10 @@
 | R2-S2-003-B | Python SDK - 详细设计 | 2026-05-11 |
 | R2-S2-002-C | 团队管理前端 - 详细设计 | 2026-05-11 |
 | R2-S2-003-C | Python SDK - 开发实现 | 2026-05-11 |
+| R2-S2-002-D | 团队管理前端 - 开发实现 | 2026-05-11 |
+| R2-S2-003-D | Python SDK - 代码审查 | 2026-05-11 |
+| R2-S2-002-D-FIX | 团队管理前端 - 修复代码审查问题 | 2026-05-11 |
+| R2-S2-003-D-FIX | Python SDK - 修复代码审查问题 | 2026-05-11 |
 
 ---
 
@@ -90,7 +95,7 @@
 
 ## Sprint 2 Progress
 - **Total**: 8 个子任务 (4 个模块任务)
-- **Completed**: 11
+- **Completed**: 16
 - **In Progress**: 2
 - **Remaining**: 0
 
