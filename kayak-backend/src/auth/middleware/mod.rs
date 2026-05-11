@@ -34,5 +34,7 @@ pub use context::UserContext;
 pub use extractor::{BearerTokenExtractor, CompositeTokenExtractor};
 pub use layer::{AuthLayer, AuthMiddlewareService, JwtAuthMiddleware};
 pub use require_auth::{OptionalAuth, RequireAuth};
-pub use require_team_role::{TeamContext, TeamPath};
+pub use require_team_role::{
+    RequireTeamAdmin, RequireTeamOwner, RequireTeamRole, TeamContext, TeamPath,
+};
 pub use traits::{AuthConfig, AuthMiddleware, TokenExtractor};

@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use axum::{
+    extract::Extension,
     routing::{delete, get, post, put},
     Router,
 };
@@ -170,10 +171,11 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         Arc::new(ExperimentQueryServiceImpl::new(
             Arc::new(experiment_repo_for_query),
             data_root,
+            pool.clone(),
         ));
 
     // 创建团队管理服务
-    let team_service: Arc<dyn TeamService> = Arc::new(TeamServiceImpl::new(pool.clone()));
+    let team_service: Arc<dyn TeamService> = Arc::new(TeamServiceImpl::from_pool(pool.clone()));
 
     // 静态文件服务目录 (Flutter Web build output)
     let static_dir = std::env::var("KAYAK_SERVE_STATIC")
@@ -204,6 +206,8 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         .merge(system_routes())
         // 应用认证中间件（JWT验证 + UserContext注入）
         .layer(auth_layer)
+        // 注入数据库连接池到请求extensions（供RequireTeamRole等提取器使用）
+        .layer(Extension(pool))
         // API 404处理
         .fallback(not_found_handler);
 
