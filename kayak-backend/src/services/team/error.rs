@@ -8,6 +8,12 @@ pub enum TeamServiceError {
     #[error("Team not found")]
     NotFound,
 
+    #[error("Team member not found")]
+    MemberNotFound,
+
+    #[error("Invitation not found")]
+    InvitationNotFound,
+
     #[error("Not a team member")]
     NotMember,
 
@@ -50,6 +56,12 @@ impl From<TeamServiceError> for crate::core::error::AppError {
         use crate::core::error::AppError;
         match err {
             TeamServiceError::NotFound => AppError::NotFound("Team not found".to_string()),
+            TeamServiceError::MemberNotFound => {
+                AppError::NotFound("Team member not found".to_string())
+            }
+            TeamServiceError::InvitationNotFound => {
+                AppError::NotFound("Invitation not found".to_string())
+            }
             TeamServiceError::NotMember => {
                 AppError::Forbidden("Not a team member".to_string())
             }

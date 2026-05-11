@@ -3,28 +3,32 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::models::entities::team::TeamRole;
 
 // ==================== Request DTOs ====================
 
 /// Create team request
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct CreateTeamRequest {
+    #[validate(length(min = 1, max = 255, message = "Name must be 1-255 characters"))]
     pub name: String,
     pub description: Option<String>,
 }
 
 /// Update team request
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct UpdateTeamRequest {
+    #[validate(length(min = 1, max = 255, message = "Name must be 1-255 characters"))]
     pub name: Option<String>,
     pub description: Option<String>,
 }
 
 /// Create invitation request
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct CreateInvitationRequest {
+    #[validate(email(message = "Invalid email format"))]
     pub email: String,
     pub role: TeamRole,
 }
