@@ -51,22 +51,20 @@ class AuthManager:
         validate_email(email)
         validate_password(password)
 
-        try:
-            response = self._http.request(
-                "POST",
-                "/auth/login",
-                json={"email": email, "password": password},
-                include_auth=False,
-            )
-        except Exception:
-            raise
+        response = self._http.request(
+            "POST",
+            "/auth/login",
+            json={"email": email, "password": password},
+            include_auth=False,
+        )
 
         token_response = TokenResponse(**response.json()["data"])
-        self._update_tokens(
-            token_response.access_token,
-            token_response.refresh_token,
-            token_response.expires_in,
-        )
+        with self._state_lock:
+            self._update_tokens(
+                token_response.access_token,
+                token_response.refresh_token,
+                token_response.expires_in,
+            )
         return True
 
     def logout(self) -> None:
@@ -87,8 +85,12 @@ class AuthManager:
         with self._state_lock:
             self._clear_tokens()
 
-    def refresh(self) -> bool:
+    def refresh(self, force: bool = False) -> bool:
         """Manually refresh the access token using the refresh token.
+
+        Args:
+            force: If True, always perform the refresh request even if the
+                token appears fresh locally. Used by the HTTP client 401 handler.
 
         Returns:
             True on success.
@@ -98,6 +100,8 @@ class AuthManager:
         """
         with self._refresh_lock:
             with self._state_lock:
+                if not force and not self._should_refresh() and self.access_token is not None:
+                    return True  # Another thread refreshed already
                 refresh_token = self.refresh_token
                 if not refresh_token:
                     raise AuthenticationError("No refresh token available")

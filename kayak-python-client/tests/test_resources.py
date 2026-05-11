@@ -182,11 +182,11 @@ class TestExperiments:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/exp-123",
+            url="http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abc",
             json={
                 "code": 200,
                 "data": {
-                    "id": "exp-123",
+                    "id": "12345678-1234-1234-1234-123456789abc",
                     "name": "Temperature Test",
                     "status": "completed",
                     "workbench_id": "wb-1",
@@ -199,9 +199,9 @@ class TestExperiments:
         )
 
         client.login("admin@kayak.local", "Admin123")
-        exp = client.experiments.get("exp-123")
+        exp = client.experiments.get("12345678-1234-1234-1234-123456789abc")
 
-        assert exp.id == "exp-123"
+        assert exp.id == "12345678-1234-1234-1234-123456789abc"
         assert exp.name == "Temperature Test"
 
     def test_get_experiment_not_found(self, client: KayakClient, auth_response: dict, httpx_mock):
@@ -214,14 +214,14 @@ class TestExperiments:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/does-not-exist",
+            url="http://localhost:8080/api/v1/experiments/00000000-0000-0000-0000-000000000000",
             json={"code": 404, "message": "Not found"},
             status_code=404,
         )
 
         client.login("admin@kayak.local", "Admin123")
         with pytest.raises(NotFoundError):
-            client.experiments.get("does-not-exist")
+            client.experiments.get("00000000-0000-0000-0000-000000000000")
 
 
 class TestUnauthenticated:

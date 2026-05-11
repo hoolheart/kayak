@@ -31,16 +31,16 @@ class TestDataDownload:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/exp-123/data/download",
+            url="http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abc/data/download",
             content=hdf5_bytes,
             status_code=200,
             headers={"Content-Type": "application/octet-stream"},
         )
 
         client.login("admin@kayak.local", "Admin123")
-        data = client.data.download("exp-123")
+        data = client.data.download("12345678-1234-1234-1234-123456789abc")
 
-        assert data.experiment_id == "exp-123"
+        assert data.experiment_id == "12345678-1234-1234-1234-123456789abc"
         points = data.list_points()
         assert "device-1/temperature" in points
 
@@ -55,7 +55,7 @@ class TestDataDownload:
         )
         httpx_mock.add_response(
             url=(
-                "http://localhost:8080/api/v1/experiments/exp-123/data/download"
+                "http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abc/data/download"
                 "?start_time=2026-05-01T00%3A00%3A00Z&end_time=2026-05-01T23%3A59%3A59Z"
             ),
             content=hdf5_bytes,
@@ -64,12 +64,12 @@ class TestDataDownload:
 
         client.login("admin@kayak.local", "Admin123")
         data = client.data.download(
-            "exp-123",
+            "12345678-1234-1234-1234-123456789abc",
             start_time="2026-05-01T00:00:00Z",
             end_time="2026-05-01T23:59:59Z",
         )
 
-        assert data.experiment_id == "exp-123"
+        assert data.experiment_id == "12345678-1234-1234-1234-123456789abc"
 
     def test_download_save(self, client: KayakClient, auth_response: dict, httpx_mock, tmp_path):
         """TC-SDK-029: Download Experiment Data — Save to Local Path"""
@@ -81,13 +81,13 @@ class TestDataDownload:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/exp-123/data/download",
+            url="http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abc/data/download",
             content=hdf5_bytes,
             status_code=200,
         )
 
         client.login("admin@kayak.local", "Admin123")
-        data = client.data.download("exp-123")
+        data = client.data.download("12345678-1234-1234-1234-123456789abc")
 
         output_path = tmp_path / "exp-123.h5"
         data.save(str(output_path))
@@ -104,14 +104,14 @@ class TestDataDownload:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/does-not-exist/data/download",
+            url="http://localhost:8080/api/v1/experiments/00000000-0000-0000-0000-000000000000/data/download",
             json={"code": 404, "message": "Not found"},
             status_code=404,
         )
 
         client.login("admin@kayak.local", "Admin123")
         with pytest.raises(NotFoundError):
-            client.data.download("does-not-exist")
+            client.data.download("00000000-0000-0000-0000-000000000000")
 
     def test_download_running_experiment(self, client: KayakClient, auth_response: dict, httpx_mock):
         """TC-SDK-031: Download Experiment Data — Experiment Still Running"""
@@ -121,14 +121,14 @@ class TestDataDownload:
             status_code=200,
         )
         httpx_mock.add_response(
-            url="http://localhost:8080/api/v1/experiments/exp-running/data/download",
+            url="http://localhost:8080/api/v1/experiments/12345678-1234-1234-1234-123456789abd/data/download",
             json={"code": 409, "message": "Experiment is still running"},
             status_code=409,
         )
 
         client.login("admin@kayak.local", "Admin123")
         with pytest.raises(Exception) as exc_info:
-            client.data.download("exp-running")
+            client.data.download("12345678-1234-1234-1234-123456789abd")
 
         # 409 maps to base KayakError
         assert exc_info.value.status_code == 409

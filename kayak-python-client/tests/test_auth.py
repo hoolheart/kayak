@@ -3,6 +3,7 @@
 import json
 from datetime import datetime, timedelta, timezone
 
+import httpx
 import pytest
 from freezegun import freeze_time
 
@@ -42,9 +43,10 @@ class TestLogin:
 
     def test_login_server_unavailable(self, client: KayakClient, httpx_mock):
         """TC-SDK-003: Login — Server Unavailable"""
-        httpx_mock.add_exception(
-            httpx.ConnectError("Connection refused"),
-        )
+        for _ in range(4):
+            httpx_mock.add_exception(
+                httpx.ConnectError("Connection refused"),
+            )
 
         with pytest.raises(Exception) as exc_info:
             client.login("admin@kayak.local", "Admin123")
@@ -217,8 +219,11 @@ class TestTokenRefresh:
         with pytest.raises(AuthenticationError):
             client.workbenches.list()
 
+    @freeze_time("2026-05-11T10:00:00")
     def test_manual_refresh_success(self, client: KayakClient, auth_response: dict, httpx_mock):
         """TC-SDK-011: Manual Token Refresh — Success"""
+        # Login with token expiring in 180s (below 5 min threshold)
+        auth_response["data"]["expires_in"] = 180
         httpx_mock.add_response(
             url="http://localhost:8080/api/v1/auth/login",
             json=auth_response,
@@ -343,6 +348,3 @@ class TestSessionPersistence:
         """TC-SDK-056: Session Persistence — Missing Session File"""
         with pytest.raises(FileNotFoundError):
             client.auth.load_session("/tmp/nonexistent_session_12345.json")
-
-
-import httpx
