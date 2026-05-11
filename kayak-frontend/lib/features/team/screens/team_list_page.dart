@@ -8,10 +8,10 @@ import 'package:go_router/go_router.dart';
 import '../models/team_models.dart';
 import '../providers/team_providers.dart';
 import '../widgets/create_team_dialog.dart';
-import 'team_routes.dart';
 import '../widgets/empty_team_list_state.dart';
 import '../widgets/team_card.dart';
 import '../widgets/team_error_state.dart';
+import 'team_routes.dart';
 
 /// Team list page
 class TeamListPage extends ConsumerStatefulWidget {

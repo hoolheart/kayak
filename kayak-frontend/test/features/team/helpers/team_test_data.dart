@@ -76,25 +76,24 @@ final mockMembers = [
 ];
 
 /// Mock contexts
-final mockPersonalContext = const TeamContext.personal();
-final mockTeamContext =
-    TeamContext.team(id: 'team-001', name: '研发团队');
+const mockPersonalContext = TeamContext.personal();
+const mockTeamContext = TeamContext.team(id: 'team-001', name: '研发团队');
 
 /// Async state helpers
 final mockTeamListLoaded = AsyncData<List<Team>>(mockTeams);
-final mockTeamListEmpty = AsyncData<List<Team>>([]);
-final mockTeamListLoading = const AsyncLoading<List<Team>>();
-final mockTeamListError = AsyncError<List<Team>>(
+const mockTeamListEmpty = AsyncData<List<Team>>([]);
+const mockTeamListLoading = AsyncLoading<List<Team>>();
+const mockTeamListError = AsyncError<List<Team>>(
   '网络连接失败',
   StackTrace.empty,
 );
 
 final mockTeamDetailLoaded = AsyncData<TeamDetail>(mockTeamDetail);
-final mockTeamDetailError403 = AsyncError<TeamDetail>(
+const mockTeamDetailError403 = AsyncError<TeamDetail>(
   '没有权限访问该团队',
   StackTrace.empty,
 );
-final mockTeamDetailError404 = AsyncError<TeamDetail>(
+const mockTeamDetailError404 = AsyncError<TeamDetail>(
   '团队不存在',
   StackTrace.empty,
 );

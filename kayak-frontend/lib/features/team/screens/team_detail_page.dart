@@ -27,34 +27,64 @@ class TeamDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(teamDetailProvider(teamId));
 
-    return detailAsync.when(
-      data: (detail) => _TeamDetailContent(teamId: teamId, detail: detail),
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+    return Scaffold(
+      appBar: AppBar(
+        title: detailAsync.when(
+          data: (detail) => Text(detail.name),
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
+        actions: [
+          if (ref.watch(currentUserRoleProvider(teamId))?.canEditTeam ??
+              false)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _handleEdit(context, ref, detailAsync),
+            ),
+        ],
       ),
-      error: (error, _) {
-        if (error.toString().contains('403')) {
-          return Scaffold(
-            body: TeamAccessDenied(
+      body: detailAsync.when(
+        data: (detail) => _TeamDetailContent(
+          teamId: teamId,
+          detail: detail,
+          onEdit: () => _handleEdit(context, ref, detailAsync),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) {
+          if (error is TeamApiException && error.isForbidden) {
+            return TeamAccessDenied(
               onBack: () => context.go('/teams'),
-            ),
-          );
-        }
-        if (error.toString().contains('404')) {
-          return Scaffold(
-            body: TeamNotFound(
+            );
+          }
+          if (error is TeamApiException && error.isNotFound) {
+            return TeamNotFound(
               onBack: () => context.go('/teams'),
-            ),
-          );
-        }
-        return Scaffold(
-          body: TeamErrorState(
+            );
+          }
+          return TeamErrorState(
             error: error,
             onRetry: () => ref.invalidate(teamDetailProvider(teamId)),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
+  }
+
+  Future<void> _handleEdit(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<TeamDetail> detailAsync,
+  ) async {
+    final detail = detailAsync.valueOrNull;
+    if (detail == null) return;
+
+    final result = await showEditTeamDialog(context, detail);
+    if (result == true && context.mounted) {
+      ref.invalidate(teamDetailProvider(teamId));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('团队信息更新成功')),
+      );
+    }
   }
 }
 
@@ -62,54 +92,44 @@ class _TeamDetailContent extends ConsumerWidget {
   const _TeamDetailContent({
     required this.teamId,
     required this.detail,
+    required this.onEdit,
   });
   final String teamId;
   final TeamDetail detail;
+  final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(currentUserRoleProvider(teamId));
     final membersAsync = ref.watch(membersProvider(teamId));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(detail.name),
-        actions: [
-          if (role?.canEditTeam ?? false)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _showEditDialog(context, ref),
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(
+        MediaQuery.of(context).size.width >= 1280 ? 24 : 16,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Team header card
+          _buildHeaderCard(context, ref, role),
+          const SizedBox(height: 24),
+          // Members section
+          _buildMembersSection(context, ref, role, membersAsync),
+          const SizedBox(height: 24),
+          // Danger zone
+          if (role != null)
+            DangerZoneCard(
+              showDeleteTeam: role.canDeleteTeam,
+              showLeaveTeam: role.canLeaveTeam,
+              onDeleteTeam: () => _showDeleteDialog(context, ref),
+              onLeaveTeam: () => _showLeaveDialog(context, ref),
             ),
         ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(
-          MediaQuery.of(context).size.width >= 1280 ? 24 : 16,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Team header card
-            _buildHeaderCard(context, role),
-            const SizedBox(height: 24),
-            // Members section
-            _buildMembersSection(context, ref, role, membersAsync),
-            const SizedBox(height: 24),
-            // Danger zone
-            if (role != null)
-              DangerZoneCard(
-                showDeleteTeam: role.canDeleteTeam,
-                showLeaveTeam: role.canLeaveTeam,
-                onDeleteTeam: () => _showDeleteDialog(context, ref),
-                onLeaveTeam: () => _showLeaveDialog(context, ref),
-              ),
-          ],
-        ),
       ),
     );
   }
 
-  Widget _buildHeaderCard(BuildContext context, TeamRole? role) {
+  Widget _buildHeaderCard(BuildContext context, WidgetRef ref, TeamRole? role) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -171,7 +191,7 @@ class _TeamDetailContent extends ConsumerWidget {
                 if (role?.canEditTeam ?? false)
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => _showEditDialog(context, null),
+                    onPressed: onEdit,
                   ),
               ],
             ),
@@ -307,16 +327,6 @@ class _TeamDetailContent extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  Future<void> _showEditDialog(BuildContext context, WidgetRef? ref) async {
-    final result = await showEditTeamDialog(context, detail);
-    if (result == true && ref != null && context.mounted) {
-      ref.invalidate(teamDetailProvider(teamId));
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('团队信息更新成功')),
-      );
-    }
   }
 
   Future<void> _showInviteDialog(BuildContext context, WidgetRef ref) async {

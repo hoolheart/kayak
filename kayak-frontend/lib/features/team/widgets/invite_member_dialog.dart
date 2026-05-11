@@ -73,7 +73,7 @@ class _InviteMemberDialogState extends ConsumerState<InviteMemberDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<TeamRole>(
-                value: _selectedRole,
+                initialValue: _selectedRole,
                 decoration: const InputDecoration(
                   labelText: '角色',
                   prefixIcon: Icon(Icons.admin_panel_settings),

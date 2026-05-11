@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kayak_frontend/features/team/models/team_models.dart';
 import 'package:kayak_frontend/features/team/models/team_role.dart';
 import 'package:kayak_frontend/features/team/providers/team_providers.dart';
 import 'package:kayak_frontend/features/team/screens/team_detail_page.dart';
@@ -107,7 +108,10 @@ void main() {
         ProviderScope(
           overrides: [
             teamDetailProvider('team-001').overrideWith(
-              (ref) async => throw Exception('403 Forbidden'),
+              (ref) async => throw TeamApiException(
+                'Forbidden',
+                statusCode: 403,
+              ),
             ),
             membersProvider('team-001')
                 .overrideWith((ref) async => mockMembers),
@@ -131,7 +135,10 @@ void main() {
         ProviderScope(
           overrides: [
             teamDetailProvider('team-001').overrideWith(
-              (ref) async => throw Exception('404 Not Found'),
+              (ref) async => throw TeamApiException(
+                'Not Found',
+                statusCode: 404,
+              ),
             ),
             membersProvider('team-001')
                 .overrideWith((ref) async => mockMembers),

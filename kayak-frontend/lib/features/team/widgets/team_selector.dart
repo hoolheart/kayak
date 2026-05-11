@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../experiments/providers/experiment_list_provider.dart';
+import '../../methods/providers/method_list_provider.dart';
+import '../../workbench/providers/workbench_list_provider.dart';
 import '../models/team_context.dart';
 import '../models/team_models.dart';
 import '../providers/team_providers.dart';
@@ -297,6 +300,9 @@ class _TeamSelectorButtonState extends ConsumerState<_TeamSelectorButton> {
 
     // Invalidate resource providers to reload with new context
     ref.invalidate(teamsProvider);
+    ref.invalidate(workbenchListProvider);
+    ref.invalidate(methodListProvider);
+    ref.invalidate(experimentListProvider);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

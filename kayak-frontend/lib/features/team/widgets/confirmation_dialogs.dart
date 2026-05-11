@@ -70,7 +70,7 @@ class LeaveTeamDialog extends StatelessWidget {
       icon: Icon(
         Icons.logout,
         size: 48,
-        color: colorScheme.error,
+        color: colorScheme.errorContainer,
       ),
       title: const Text('确认离开团队'),
       content: Text(

@@ -4,10 +4,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/features/team/models/team_role.dart';
+import 'package:kayak_frontend/features/team/widgets/create_team_dialog.dart';
+import 'package:kayak_frontend/features/team/widgets/member_list_item.dart';
 import 'package:kayak_frontend/features/team/widgets/role_badge.dart';
 import 'package:kayak_frontend/features/team/widgets/team_card.dart';
-import 'package:kayak_frontend/features/team/widgets/member_list_item.dart';
-import 'package:kayak_frontend/features/team/widgets/create_team_dialog.dart';
 
 import 'helpers/team_test_data.dart';
 
@@ -141,7 +141,6 @@ void main() {
           home: Scaffold(
             body: MemberListItem(
               member: mockMembers[2],
-              showActions: false,
             ),
           ),
         ),

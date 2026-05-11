@@ -7,8 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/features/team/models/team_models.dart';
 import 'package:kayak_frontend/features/team/providers/team_providers.dart';
 import 'package:kayak_frontend/features/team/screens/team_list_page.dart';
-import 'package:kayak_frontend/features/team/widgets/team_card.dart';
 import 'package:kayak_frontend/features/team/widgets/empty_team_list_state.dart';
+import 'package:kayak_frontend/features/team/widgets/team_card.dart';
 import 'package:kayak_frontend/features/team/widgets/team_error_state.dart';
 
 import 'helpers/team_test_data.dart';
