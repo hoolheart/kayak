@@ -4,7 +4,7 @@
 - **Reviewer**: sw-jerry
 - **Date**: 2026-05-30
 - **Branch**: `feature/R3-T1-fix-login`
-- **Commit**: `78813f7` (initial), `74d0abc` (fixes)
+- **Commit**: `78813f7` (initial), `88dea42` (fixes)
 - **Design Doc**: `log/release_3/design/R3-T1-design.md` v1.1
 
 ## Summary
