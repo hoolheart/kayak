@@ -87,19 +87,6 @@ class AppRoutes {
   static const String dashboard = '/dashboard';
 }
 
-/// Auth State Change Notifier
-///
-/// 用于通知路由刷新认证状态变化
-class AuthStateChangeNotifier extends ChangeNotifier {
-  AuthStateChangeNotifier(this._ref) {
-    _ref.listen(authStateProvider, (_, __) {
-      notifyListeners();
-    });
-  }
-
-  final Ref _ref;
-}
-
 /// 路由Provider
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -107,7 +94,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
-    refreshListenable: AuthStateChangeNotifier(ref),
     redirect: (context, state) {
       final isLoggedIn = authState.isAuthenticated;
       final isInitialized = authState.isInitialized;
