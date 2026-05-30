@@ -7,6 +7,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/auth/providers.dart';
 import '../../../validators/validators.dart';
 import '../providers/login_provider.dart';
 import 'email_field.dart';
@@ -68,9 +69,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     );
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     // 验证表单
-    final emailError = Validators.validateEmail(_emailController.text);
+    final emailError = Validators.validateEmail(_emailController.text.trim());
     final passwordError = Validators.validatePassword(_passwordController.text);
 
     if (emailError != null) {
@@ -86,14 +87,59 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     ref.read(emailValidationProvider.notifier).state = null;
     ref.read(passwordValidationProvider.notifier).state = null;
 
-    // 提交登录
+    // 提交登录 — 调用真实认证 API
     ref.read(loginProvider.notifier).setLoading();
-    // TODO: 调用后端API进行登录
-    // 模拟登录成功，直接跳转
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
+    try {
+      final authNotifier = ref.read(authStateNotifierProvider);
+      final success = await authNotifier.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
+
+      if (success && mounted) {
         ref.read(loginProvider.notifier).setSuccess();
+      } else if (!success && mounted) {
+        final authState = ref.read(authStateProvider);
+        final errorType = _mapErrorToLoginErrorType(authState.error);
+        ref.read(loginProvider.notifier).setError(errorType);
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        final errorType = _mapErrorToLoginErrorType(e.toString());
+        ref.read(loginProvider.notifier).setError(errorType);
+      }
+    }
+  }
+
+  /// 将登录错误映射为用户可读的错误类型
+  LoginErrorType _mapErrorToLoginErrorType(String? errorMessage) {
+    if (errorMessage == null) return LoginErrorType.unknown;
+
+    final message = errorMessage.toLowerCase();
+    if (message.contains('401') ||
+        message.contains('unauthorized') ||
+        message.contains('invalid credential') ||
+        message.contains('邮箱或密码错误')) {
+      return LoginErrorType.invalidCredentials;
+    }
+    if (message.contains('connection refused') ||
+        message.contains('socketerror') ||
+        message.contains('sockettimeout') ||
+        message.contains('failed host lookup') ||
+        message.contains('network is unreachable') ||
+        message.contains('连接被拒绝') ||
+        message.contains('网络')) {
+      return LoginErrorType.networkError;
+    }
+    if (message.contains('500') ||
+        message.contains('502') ||
+        message.contains('503') ||
+        message.contains('bad gateway') ||
+        message.contains('service unavailable') ||
+        message.contains('server error') ||
+        message.contains('internal server')) {
+      return LoginErrorType.serverError;
+    }
+    return LoginErrorType.unknown;
   }
 }

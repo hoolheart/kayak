@@ -153,7 +153,7 @@ sequenceDiagram
 1. **`login_form` 负责发起认证**：将 `_submitForm()` 改为 `async`，调用 `authStateNotifier.login()`
 2. **`loginProvider` 负责 UI 反馈**：在 `_submitForm()` 中根据 login 结果更新 UI 状态
 3. **`authStateProvider` 负责全局状态**：登录成功后自动更新，触发路由守卫
-4. **`login_view` 作为导航安全网**：监听 `loginProvider.success` 显式导航，防止路由守卫偶发未触发
+4. **导航完全由 GoRouter 处理**：`login_view` 不添加显式导航监听，避免与 GoRouter redirect 的竞态条件
 
 ### 3.3 为什么只依赖路由守卫？
 
@@ -712,7 +712,7 @@ final success = await authNotifier.login(
 | `login_form` 新增的 import 导致循环依赖 | 极低 | `core/auth/providers.dart` 不依赖 `features/auth/` |
 | 错误消息关键词不匹配 | 中 | 使用宽松的 `_containsAny` + 不区分大小写 |
 | TokenStorage Web 端持久化失败 | 中 | 由 R3-T3 修复，本任务不涉及 |
-| 路由守卫 redirectPath 被忽略 | 低 | `login_view` 显式使用 `redirectPath` 作为安全网 |
+| 路由守卫 redirectPath 被忽略 | 低 | `GoRouter` redirect 是唯一导航路径，已通过 `AuthStateChangeNotifier` 验证可靠 |
 
 ### 10.3 自测清单
 
