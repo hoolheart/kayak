@@ -288,55 +288,49 @@ Future<void> _submitForm() async {
 #### 4.1.3 新增错误处理方法
 
 ```dart
-/// 处理登录错误，将原始错误映射为用户可读的错误类型
-void _handleLoginError(String? errorMessage) {
-  if (errorMessage == null) {
-    ref.read(loginProvider.notifier).setError(LoginErrorType.unknown);
-    return;
-  }
+/// 将错误消息映射为 LoginErrorType 枚举值
+LoginErrorType _mapErrorToLoginErrorType(String? errorMessage) {
+  if (errorMessage == null) return LoginErrorType.unknown;
 
-  // 根据错误消息内容判断错误类型
-  if (_containsAny(errorMessage, [
-    '401',
-    'Invalid credentials',
-    'Unauthorized',
-    'email or password',
-    '邮箱或密码',
-  ])) {
-    ref.read(loginProvider.notifier).setError(LoginErrorType.invalidCredentials);
-  } else if (_containsAny(errorMessage, [
-    'Connection refused',
-    'SocketException',
-    'Network is unreachable',
-    'Failed host lookup',
-    '连接被拒绝',
-    '网络',
-  ])) {
-    ref.read(loginProvider.notifier).setError(LoginErrorType.networkError);
-  } else if (_containsAny(errorMessage, [
-    '500',
-    '502',
-    '503',
-    'bad gateway',
-    'service unavailable',
-    'server error',
-    'internal server',
-    '服务器错误',
-  ])) {
-    ref.read(loginProvider.notifier).setError(LoginErrorType.serverError);
-  } else {
-    ref.read(loginProvider.notifier).setError(LoginErrorType.unknown);
+  final message = errorMessage.toLowerCase();
+  if (message.contains('401') ||
+      message.contains('unauthorized') ||
+      message.contains('invalid credential') ||
+      message.contains('422') ||
+      message.contains('unprocessable') ||
+      message.contains('邮箱或密码错误')) {
+    return LoginErrorType.invalidCredentials;
   }
-}
-
-/// 检查 errorMessage 是否包含列表中的任一字符串
-bool _containsAny(String message, List<String> keywords) {
-  final lower = message.toLowerCase();
-  return keywords.any((k) => lower.contains(k.toLowerCase()));
+  if (message.contains('connection refused') ||
+      message.contains('socketerror') ||
+      message.contains('sockettimeout') ||
+      message.contains('timeout') ||
+      message.contains('failed host lookup') ||
+      message.contains('network is unreachable') ||
+      message.contains('429') ||
+      message.contains('too many requests') ||
+      message.contains('连接被拒绝') ||
+      message.contains('网络')) {
+    return LoginErrorType.networkError;
+  }
+  if (message.contains('500') ||
+      message.contains('502') ||
+      message.contains('503') ||
+      message.contains('bad gateway') ||
+      message.contains('service unavailable') ||
+      message.contains('server error') ||
+      message.contains('internal server')) {
+    return LoginErrorType.serverError;
+  }
+  // 注意：sessionExpired 不由本方法返回，
+  // 因为它由 LoginView.sessionExpired 参数单独处理（路由守卫检测到 token 过期时传入）
+  return LoginErrorType.unknown;
 }
 ```
 
 > **设计理由**：错误消息字符串来自 DioException，在不同平台上格式可能不同。使用不区分大小写的关键词匹配比精确匹配更鲁棒。这些关键词覆盖了最常见的错误场景。
+>
+> 采用单一 `_mapErrorToLoginErrorType` 方法而非分离的 `_handleLoginError` + `_containsAny`，是因为纯函数形式的错误映射（入参 error → 出参 LoginErrorType）更易于测试和理解。调用方自行决定如何处理返回的枚举值，符合单一职责原则。
 
 <!-- 4.2 已移除：不再在 login_view 中添加导航监听 -->
 <!-- GoRouter redirect 是唯一导航路径，避免与 ref.listen 的竞态条件 -->
@@ -422,7 +416,7 @@ sequenceDiagram
     Note over ASN: isAuthenticated = false
     ASN-->>Form: return false
 
-    Form->>Form: _handleLoginError("401 Unauthorized: ...")
+    Form->>Form: _mapErrorToLoginErrorType("401 Unauthorized: ...")
     Note over Form: 匹配到 "401" → invalidCredentials
     Form->>LP: setError(LoginErrorType.invalidCredentials)
     Note over LP: errorMessage = "邮箱或密码错误"
@@ -459,7 +453,7 @@ sequenceDiagram
     ASN->>ASN: AuthState.error("Connection refused: ...")
     ASN-->>Form: return false
 
-    Form->>Form: _handleLoginError("Connection refused")
+    Form->>Form: _mapErrorToLoginErrorType("Connection refused")
     Note over Form: 匹配到 "Connection refused" → networkError
     Form->>LP: setError(LoginErrorType.networkError)
     Note over LP: errorMessage = "网络错误，请检查网络连接"
@@ -478,9 +472,12 @@ sequenceDiagram
 | 后端响应 / 异常类型 | 检测方式 | `LoginErrorType` | 用户提示 |
 |---------------------|----------|------------------|----------|
 | HTTP 401 Unauthorized | 错误消息含 `401` / `Unauthorized` | `invalidCredentials` | "邮箱或密码错误" |
+| HTTP 422 Unprocessable | 含 `422` / `Unprocessable` | `invalidCredentials` | "邮箱或密码错误" |
 | 连接被拒绝 (后端未启动) | 含 `Connection refused` | `networkError` | "网络错误，请检查网络连接" |
 | Socket 异常 (网络断开) | 含 `SocketException` | `networkError` | "网络错误，请检查网络连接" |
 | DNS 解析失败 | 含 `Failed host lookup` | `networkError` | "网络错误，请检查网络连接" |
+| 超时错误 (Dio timeout) | 含 `timeout` | `networkError` | "网络错误，请检查网络连接" |
+| HTTP 429 Too Many Requests | 含 `429` / `too many requests` | `networkError` | "网络错误，请检查网络连接" |
 | HTTP 500 服务器错误 | 含 `500` / `Internal server error` | `serverError` | "服务器错误，请稍后重试" |
 | HTTP 502 Bad Gateway | 含 `502` / `Bad Gateway` | `serverError` | "服务器错误，请稍后重试" |
 | HTTP 503 Service Unavailable | 含 `503` / `Service Unavailable` | `serverError` | "服务器错误，请稍后重试" |
@@ -493,9 +490,9 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[收到登录错误] --> B{检查错误消息}
-    B --> C["包含 '401' 或<br/>'Invalid credentials' 等?"]
+    B --> C["包含 '401','422' 或<br/>'Invalid credentials' 等?"]
     C -->|是| D[invalidCredentials<br/>"邮箱或密码错误"]
-    C -->|否| E["包含 'Connection refused'<br/>'SocketException' 等?"]
+    C -->|否| E["包含 'Connection refused',<br/>'SocketException','timeout',<br/>'429' 等?"]
     E -->|是| F[networkError<br/>"网络错误，请检查网络连接"]
     E -->|否| G["包含 '500','502','503',<br/>'Bad Gateway','Server Error' 等?"]
     G -->|是| H[serverError<br/>"服务器错误，请稍后重试"]
@@ -537,7 +534,7 @@ classDiagram
     
     class LoginForm {
         +_submitForm() Future~void~
-        +_handleLoginError(String?)
+        +_mapErrorToLoginErrorType(String?) LoginErrorType
     }
     
     class LoginView {
@@ -597,7 +594,7 @@ GoRouter:          无动作     无动作         重定向到 /dashboard
 |--------|--------|--------|
 | 返回值 | `void` | `Future<void>` |
 | 第 91-97 行 | `Future.delayed(...)` 模拟 | `await authNotifier.login(email, password)` |
-| 新增方法 | 无 | `_handleLoginError(String?)` + `_containsAny(String, List)` |
+| 新增方法 | 无 | `_mapErrorToLoginErrorType(String?)` |
 | 新增导入 | 无 | `import '../../../core/auth/providers.dart'` |
 | 状态流转 | `loading` → `success` 固定 | `loading` → `success` (API成功) 或 `error` (API失败) |
 

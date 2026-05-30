@@ -96,22 +96,22 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         _passwordController.text,
       );
 
-      if (success && mounted) {
+      if (success) {
         ref.read(loginProvider.notifier).setSuccess();
-      } else if (!success && mounted) {
+      } else {
         final authState = ref.read(authStateProvider);
-        final errorType = _mapErrorToLoginErrorType(authState.error);
-        ref.read(loginProvider.notifier).setError(errorType);
+        ref.read(loginProvider.notifier).setError(
+          _mapErrorToLoginErrorType(authState.error),
+        );
       }
     } catch (e) {
-      if (mounted) {
-        final errorType = _mapErrorToLoginErrorType(e.toString());
-        ref.read(loginProvider.notifier).setError(errorType);
-      }
+      ref.read(loginProvider.notifier).setError(
+        _mapErrorToLoginErrorType(e.toString()),
+      );
     }
   }
 
-  /// 将登录错误映射为用户可读的错误类型
+  /// 将错误消息映射为 LoginErrorType 枚举值
   LoginErrorType _mapErrorToLoginErrorType(String? errorMessage) {
     if (errorMessage == null) return LoginErrorType.unknown;
 
@@ -119,14 +119,19 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     if (message.contains('401') ||
         message.contains('unauthorized') ||
         message.contains('invalid credential') ||
+        message.contains('422') ||
+        message.contains('unprocessable') ||
         message.contains('邮箱或密码错误')) {
       return LoginErrorType.invalidCredentials;
     }
     if (message.contains('connection refused') ||
         message.contains('socketerror') ||
         message.contains('sockettimeout') ||
+        message.contains('timeout') ||
         message.contains('failed host lookup') ||
         message.contains('network is unreachable') ||
+        message.contains('429') ||
+        message.contains('too many requests') ||
         message.contains('连接被拒绝') ||
         message.contains('网络')) {
       return LoginErrorType.networkError;
@@ -140,6 +145,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         message.contains('internal server')) {
       return LoginErrorType.serverError;
     }
+    // 注意：sessionExpired 不由本方法返回，
+    // 因为它由 LoginView.sessionExpired 参数单独处理（路由守卫检测到 token 过期时传入）
     return LoginErrorType.unknown;
   }
 }
