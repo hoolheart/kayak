@@ -733,6 +733,426 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Details'**
   String get workbenchDetailShort;
+
+  /// Device tree panel title
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get deviceTreeTitle;
+
+  /// Device tree empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No devices yet'**
+  String get noDevices;
+
+  /// Add device dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Device'**
+  String get addDeviceDialogTitle;
+
+  /// Edit device dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Device'**
+  String get editDeviceDialogTitle;
+
+  /// Device name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Device Name'**
+  String get deviceName;
+
+  /// Device name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter device name'**
+  String get deviceNameHint;
+
+  /// Device name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Device name is required'**
+  String get deviceNameRequired;
+
+  /// Device name max length validation
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot exceed 255 characters'**
+  String get deviceNameMaxLength;
+
+  /// Protocol type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol Type'**
+  String get protocolType;
+
+  /// Protocol type selection hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a protocol type'**
+  String get protocolTypeHint;
+
+  /// Protocol type validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol type is required'**
+  String get protocolTypeRequired;
+
+  /// Virtual device protocol option
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual Device'**
+  String get virtualDevice;
+
+  /// Modbus TCP protocol option
+  ///
+  /// In en, this message translates to:
+  /// **'Modbus TCP'**
+  String get modbusTcp;
+
+  /// Modbus RTU protocol option
+  ///
+  /// In en, this message translates to:
+  /// **'Modbus RTU'**
+  String get modbusRtu;
+
+  /// Virtual mode field label
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual Mode'**
+  String get virtualMode;
+
+  /// Virtual mode selection hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a virtual mode'**
+  String get virtualModeHint;
+
+  /// Virtual mode validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Virtual mode is required'**
+  String get virtualModeRequired;
+
+  /// Random mode
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get random;
+
+  /// Sine wave mode
+  ///
+  /// In en, this message translates to:
+  /// **'Sine Wave'**
+  String get sineWave;
+
+  /// Fixed value mode
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Value'**
+  String get fixedValue;
+
+  /// Increment mode
+  ///
+  /// In en, this message translates to:
+  /// **'Increment'**
+  String get increment;
+
+  /// Data type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Data Type'**
+  String get dataType;
+
+  /// Data type selection hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a data type'**
+  String get dataTypeHint;
+
+  /// Data type validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Data type is required'**
+  String get dataTypeRequired;
+
+  /// Value range field label
+  ///
+  /// In en, this message translates to:
+  /// **'Value Range'**
+  String get valueRange;
+
+  /// Minimum value field label
+  ///
+  /// In en, this message translates to:
+  /// **'Min Value'**
+  String get minValue;
+
+  /// Maximum value field label
+  ///
+  /// In en, this message translates to:
+  /// **'Max Value'**
+  String get maxValue;
+
+  /// Update interval field label
+  ///
+  /// In en, this message translates to:
+  /// **'Update Interval'**
+  String get updateInterval;
+
+  /// Milliseconds unit
+  ///
+  /// In en, this message translates to:
+  /// **'ms'**
+  String get ms;
+
+  /// Host address field label
+  ///
+  /// In en, this message translates to:
+  /// **'Host Address'**
+  String get hostAddress;
+
+  /// Host address field hint
+  ///
+  /// In en, this message translates to:
+  /// **'192.168.1.100'**
+  String get hostAddressHint;
+
+  /// Host address validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Host address is required'**
+  String get hostAddressRequired;
+
+  /// Host address format validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid IPv4 address'**
+  String get hostAddressInvalid;
+
+  /// Port field label
+  ///
+  /// In en, this message translates to:
+  /// **'Port'**
+  String get port;
+
+  /// Port field hint
+  ///
+  /// In en, this message translates to:
+  /// **'502'**
+  String get portHint;
+
+  /// Port validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Port is required'**
+  String get portRequired;
+
+  /// Port range validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Port must be an integer between 1-65535'**
+  String get portInvalid;
+
+  /// Slave ID field label
+  ///
+  /// In en, this message translates to:
+  /// **'Slave ID'**
+  String get slaveId;
+
+  /// Slave ID field hint
+  ///
+  /// In en, this message translates to:
+  /// **'1'**
+  String get slaveIdHint;
+
+  /// Slave ID validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Slave ID must be an integer between 1-247'**
+  String get slaveIdInvalid;
+
+  /// Timeout field label
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout'**
+  String get timeout;
+
+  /// Timeout field hint
+  ///
+  /// In en, this message translates to:
+  /// **'5000'**
+  String get timeoutHint;
+
+  /// Serial port field label
+  ///
+  /// In en, this message translates to:
+  /// **'Serial Port'**
+  String get serialPort;
+
+  /// Serial port selection hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a serial port'**
+  String get serialPortHint;
+
+  /// Serial port validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Serial port is required'**
+  String get serialPortRequired;
+
+  /// Baud rate field label
+  ///
+  /// In en, this message translates to:
+  /// **'Baud Rate'**
+  String get baudRate;
+
+  /// Baud rate selection hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a baud rate'**
+  String get baudRateHint;
+
+  /// Data bits field label
+  ///
+  /// In en, this message translates to:
+  /// **'Data Bits'**
+  String get dataBits;
+
+  /// Stop bits field label
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Bits'**
+  String get stopBits;
+
+  /// Parity field label
+  ///
+  /// In en, this message translates to:
+  /// **'Parity'**
+  String get parity;
+
+  /// None option
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// Odd parity option
+  ///
+  /// In en, this message translates to:
+  /// **'Odd'**
+  String get oddParity;
+
+  /// Even parity option
+  ///
+  /// In en, this message translates to:
+  /// **'Even'**
+  String get evenParity;
+
+  /// Advanced information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Information'**
+  String get advancedInfo;
+
+  /// Manufacturer field label
+  ///
+  /// In en, this message translates to:
+  /// **'Manufacturer'**
+  String get manufacturer;
+
+  /// Manufacturer field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Siemens'**
+  String get manufacturerHint;
+
+  /// Model field label
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get modelName;
+
+  /// Model field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. S7-1200'**
+  String get modelHint;
+
+  /// Serial number field label
+  ///
+  /// In en, this message translates to:
+  /// **'Serial Number'**
+  String get serialNumber;
+
+  /// Serial number field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. SN123456'**
+  String get serialNumberHint;
+
+  /// Device save success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Device saved successfully'**
+  String get deviceSaveSuccess;
+
+  /// Delete device confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Device?'**
+  String get deviceDeleteTitle;
+
+  /// Delete device confirmation dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete device \"{name}\"?'**
+  String deviceDeleteDescription(String name);
+
+  /// Device delete success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Device deleted successfully'**
+  String get deviceDeleteSuccess;
+
+  /// Edit device action button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Device'**
+  String get editDevice;
+
+  /// Add sub-device action button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Sub-Device'**
+  String get addSubDevice;
+
+  /// Delete device action button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Device'**
+  String get deleteDevice;
+
+  /// Confirm delete device button
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get confirmDeleteDevice;
+
+  /// Basic information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Information'**
+  String get basicInfo;
+
+  /// Protocol configuration section title
+  ///
+  /// In en, this message translates to:
+  /// **'Protocol Configuration'**
+  String get protocolConfig;
 }
 
 class _AppLocalizationsDelegate

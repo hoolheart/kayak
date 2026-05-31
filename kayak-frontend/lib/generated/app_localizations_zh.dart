@@ -329,4 +329,216 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get workbenchDetailShort => '详情';
+
+  @override
+  String get deviceTreeTitle => '设备';
+
+  @override
+  String get noDevices => '暂无设备';
+
+  @override
+  String get addDeviceDialogTitle => '添加设备';
+
+  @override
+  String get editDeviceDialogTitle => '编辑设备';
+
+  @override
+  String get deviceName => '设备名称';
+
+  @override
+  String get deviceNameHint => '请输入设备名称';
+
+  @override
+  String get deviceNameRequired => '请输入设备名称';
+
+  @override
+  String get deviceNameMaxLength => '名称不能超过255个字符';
+
+  @override
+  String get protocolType => '协议类型';
+
+  @override
+  String get protocolTypeHint => '请选择协议类型';
+
+  @override
+  String get protocolTypeRequired => '请选择协议类型';
+
+  @override
+  String get virtualDevice => '虚拟设备';
+
+  @override
+  String get modbusTcp => 'Modbus TCP';
+
+  @override
+  String get modbusRtu => 'Modbus RTU';
+
+  @override
+  String get virtualMode => '虚拟模式';
+
+  @override
+  String get virtualModeHint => '请选择虚拟模式';
+
+  @override
+  String get virtualModeRequired => '请选择虚拟模式';
+
+  @override
+  String get random => '随机';
+
+  @override
+  String get sineWave => '正弦波';
+
+  @override
+  String get fixedValue => '固定值';
+
+  @override
+  String get increment => '递增';
+
+  @override
+  String get dataType => '数据类型';
+
+  @override
+  String get dataTypeHint => '请选择数据类型';
+
+  @override
+  String get dataTypeRequired => '请选择数据类型';
+
+  @override
+  String get valueRange => '取值范围';
+
+  @override
+  String get minValue => '最小值';
+
+  @override
+  String get maxValue => '最大值';
+
+  @override
+  String get updateInterval => '更新间隔';
+
+  @override
+  String get ms => '毫秒';
+
+  @override
+  String get hostAddress => '主机地址';
+
+  @override
+  String get hostAddressHint => '192.168.1.100';
+
+  @override
+  String get hostAddressRequired => '请输入主机地址';
+
+  @override
+  String get hostAddressInvalid => '请输入有效的 IPv4 地址';
+
+  @override
+  String get port => '端口';
+
+  @override
+  String get portHint => '502';
+
+  @override
+  String get portRequired => '请输入端口';
+
+  @override
+  String get portInvalid => '端口必须为 1-65535 之间的整数';
+
+  @override
+  String get slaveId => '从站 ID';
+
+  @override
+  String get slaveIdHint => '1';
+
+  @override
+  String get slaveIdInvalid => '从站 ID 必须为 1-247 之间的整数';
+
+  @override
+  String get timeout => '超时';
+
+  @override
+  String get timeoutHint => '5000';
+
+  @override
+  String get serialPort => '串口';
+
+  @override
+  String get serialPortHint => '请选择串口';
+
+  @override
+  String get serialPortRequired => '请选择串口';
+
+  @override
+  String get baudRate => '波特率';
+
+  @override
+  String get baudRateHint => '请选择波特率';
+
+  @override
+  String get dataBits => '数据位';
+
+  @override
+  String get stopBits => '停止位';
+
+  @override
+  String get parity => '校验位';
+
+  @override
+  String get none => '无';
+
+  @override
+  String get oddParity => '奇校验';
+
+  @override
+  String get evenParity => '偶校验';
+
+  @override
+  String get advancedInfo => '高级信息';
+
+  @override
+  String get manufacturer => '制造商';
+
+  @override
+  String get manufacturerHint => '例如: Siemens';
+
+  @override
+  String get modelName => '型号';
+
+  @override
+  String get modelHint => '例如: S7-1200';
+
+  @override
+  String get serialNumber => '序列号';
+
+  @override
+  String get serialNumberHint => '例如: SN123456';
+
+  @override
+  String get deviceSaveSuccess => '设备保存成功';
+
+  @override
+  String get deviceDeleteTitle => '删除设备？';
+
+  @override
+  String deviceDeleteDescription(String name) {
+    return '确定要删除设备「$name」吗？';
+  }
+
+  @override
+  String get deviceDeleteSuccess => '设备已删除';
+
+  @override
+  String get editDevice => '编辑设备';
+
+  @override
+  String get addSubDevice => '添加子设备';
+
+  @override
+  String get deleteDevice => '删除设备';
+
+  @override
+  String get confirmDeleteDevice => '确认删除';
+
+  @override
+  String get basicInfo => '基础信息';
+
+  @override
+  String get protocolConfig => '协议配置';
 }

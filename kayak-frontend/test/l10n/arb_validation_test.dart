@@ -113,7 +113,15 @@ void main() {
       final zhJson = _parseArbFile('app_zh.arb');
 
       // 允许相同的专有名词 key
-      const properNounKeys = <String>{'appTitle'};
+      const properNounKeys = <String>{
+        'appTitle',
+        'modbusTcp',
+        'modbusRtu',
+        'hostAddressHint',
+        'portHint',
+        'slaveIdHint',
+        'timeoutHint',
+      };
 
       final enKeys = enJson.keys.where((k) => !k.startsWith('@')).toSet();
       for (final key in enKeys) {

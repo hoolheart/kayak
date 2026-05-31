@@ -4,9 +4,14 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../generated/app_localizations.dart';
+import '../../models/device.dart';
+import '../../models/point.dart';
 import '../../models/workbench.dart';
+import '../../providers/device_provider.dart';
+import '../../providers/point_provider.dart';
 import '../../providers/workbench_provider.dart';
 import '../../widgets/confirm_dialog.dart';
+import '../../widgets/device_tree.dart';
 import '../../widgets/toast.dart';
 import 'workbench_create_dialog.dart';
 
@@ -41,6 +46,9 @@ class WorkbenchDetailPage extends ConsumerStatefulWidget {
 class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
   /// 设备树面板是否展开（仅 Tablet 和 Mobile 使用）
   bool _treeExpanded = false;
+
+  /// 当前选中的设备 ID
+  String? _selectedDeviceId;
 
   @override
   Widget build(BuildContext context) {
@@ -599,6 +607,102 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
     );
   }
 
+  /// 构建设备树面板
+  Widget _buildDeviceTreePanel(AppLocalizations l10n) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 400),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          right: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DeviceTree(
+        workbenchId: widget.id,
+        selectedDeviceId: _selectedDeviceId,
+        onDeviceSelected: (deviceId) {
+          setState(() {
+            _selectedDeviceId = deviceId;
+          });
+        },
+      ),
+    );
+  }
+
+  /// 构建设备详情面板
+  Widget _buildDeviceDetailPanel(AppLocalizations l10n) {
+    if (_selectedDeviceId == null) {
+      return _buildDetailPlaceholder(l10n);
+    }
+    return _DeviceDetailView(
+      deviceId: _selectedDeviceId!,
+      l10n: l10n,
+    );
+  }
+
+  /// 设备详情占位（未选中设备时显示）
+  Widget _buildDetailPlaceholder(AppLocalizations l10n) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 400),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              l10n.deviceDetail,
+              style: textTheme.titleMedium,
+            ),
+          ),
+          const Divider(height: 1),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.memory,
+                      size: 48,
+                      color: colorScheme.onSurfaceVariant.withAlpha(153),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.deviceDetail,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.deviceDetailPlaceholder,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// 移动/平板端主内容区（上下堆叠）
   Widget _buildMobileContent(
     Workbench workbench,
@@ -678,7 +782,18 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
           // 展开的内容
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
-            secondChild: _buildDeviceTreeContent(l10n),
+            secondChild: SizedBox(
+              height: 400,
+              child: DeviceTree(
+                workbenchId: widget.id,
+                selectedDeviceId: _selectedDeviceId,
+                onDeviceSelected: (deviceId) {
+                  setState(() {
+                    _selectedDeviceId = deviceId;
+                  });
+                },
+              ),
+            ),
             crossFadeState: _treeExpanded
                 ? CrossFadeState.showSecond
                 : CrossFadeState.showFirst,
@@ -689,147 +804,7 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
     );
   }
 
-  /// 设备树占位面板（桌面端）
-  Widget _buildDeviceTreePanel(AppLocalizations l10n) {
-    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      constraints: const BoxConstraints(minHeight: 400),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          right: BorderSide(color: colorScheme.outlineVariant),
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: _buildDeviceTreeContent(l10n),
-    );
-  }
-
-  /// 设备树占位内容
-  Widget _buildDeviceTreeContent(AppLocalizations l10n) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 标题行
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Row(
-            children: [
-              Text(
-                l10n.deviceTree,
-                style: textTheme.titleMedium,
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: null, // disabled
-                child: Text(l10n.addDevice),
-              ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-        // 占位内容（居中）
-        Expanded(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.account_tree_outlined,
-                    size: 48,
-                    color: colorScheme.onSurfaceVariant.withAlpha(153),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    l10n.deviceTree,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.deviceTreePlaceholder,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// 设备详情占位面板
-  Widget _buildDeviceDetailPanel(AppLocalizations l10n) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      constraints: const BoxConstraints(minHeight: 400),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border.all(color: colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 标题行
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text(
-              l10n.deviceDetail,
-              style: textTheme.titleMedium,
-            ),
-          ),
-          const Divider(height: 1),
-          // 占位内容（居中）
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.memory,
-                      size: 48,
-                      color: colorScheme.onSurfaceVariant.withAlpha(153),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.deviceDetail,
-                      style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.deviceDetailPlaceholder,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   /// 显示编辑对话框
   void _showEditDialog(Workbench workbench, AppLocalizations l10n) {
@@ -881,6 +856,409 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
         type: ToastType.error,
       );
     }
+  }
+}
+
+// ============================================================
+// _DeviceDetailView — 设备详情视图
+// ============================================================
+
+/// 设备详情视图，显示设备信息及测点列表。
+class _DeviceDetailView extends ConsumerWidget {
+  const _DeviceDetailView({
+    required this.deviceId,
+    required this.l10n,
+  });
+
+  final String deviceId;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailState = ref.watch(deviceDetailProvider(deviceId));
+
+    return detailState.when(
+      // ignore: unnecessary_lambdas
+      loading: () => _buildDetailSkeleton(context),
+      // ignore: unnecessary_lambdas
+      error: (error, _) => _buildDetailError(context, error),
+      // ignore: unnecessary_lambdas
+      data: (device) => _buildDetailContent(context, device),
+    );
+  }
+
+  Widget _buildDetailSkeleton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 400),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              l10n.deviceDetail,
+              style: textTheme.titleMedium,
+            ),
+          ),
+          const Divider(height: 1),
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailError(BuildContext context, Object error) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 400),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          'Error: $error',
+          style: textTheme.bodyMedium,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailContent(BuildContext context, Device device) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 400),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 设备信息头部
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Row(
+              children: [
+                // 协议图标
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    _protocolIcon(device.protocolType),
+                    color: colorScheme.onPrimaryContainer,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        device.name,
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          _DeviceStatusChip(status: device.status),
+                          const SizedBox(width: 8),
+                          Text(
+                            _protocolLabel(device.protocolType),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // 设备参数信息
+          if (device.protocolParams != null &&
+              device.protocolParams!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: _buildProtocolParams(context, device.protocolParams!),
+            ),
+          const Divider(height: 1),
+          // 测点列表标题
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: Text(
+              '测点列表',
+              style: textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ),
+          // 测点列表
+          Expanded(
+            child: _PointListSection(deviceId: deviceId),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProtocolParams(
+    BuildContext context,
+    Map<String, dynamic> params,
+  ) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final entries = <Widget>[];
+    var index = 0;
+    for (final entry in params.entries) {
+      entries.add(
+        Padding(
+          padding: EdgeInsets.only(top: index > 0 ? 8.0 : 0),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 120,
+                child: Text(
+                  entry.key,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  '${entry.value ?? '-'}',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      index++;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: entries,
+    );
+  }
+
+  IconData _protocolIcon(ProtocolType type) {
+    switch (type) {
+      case ProtocolType.virtual:
+        return Icons.memory;
+      case ProtocolType.modbusTcp:
+        return Icons.lan;
+      case ProtocolType.modbusRtu:
+        return Icons.cable;
+      case ProtocolType.can:
+        return Icons.cable;
+      case ProtocolType.visa:
+        return Icons.usb;
+      case ProtocolType.mqtt:
+        return Icons.hub;
+    }
+  }
+
+  String _protocolLabel(ProtocolType type) {
+    switch (type) {
+      case ProtocolType.virtual:
+        return 'Virtual';
+      case ProtocolType.modbusTcp:
+        return 'Modbus TCP';
+      case ProtocolType.modbusRtu:
+        return 'Modbus RTU';
+      case ProtocolType.can:
+        return 'CAN';
+      case ProtocolType.visa:
+        return 'VISA';
+      case ProtocolType.mqtt:
+        return 'MQTT';
+    }
+  }
+}
+
+// ============================================================
+// _DeviceStatusChip — 设备状态标签
+// ============================================================
+
+class _DeviceStatusChip extends StatelessWidget {
+  const _DeviceStatusChip({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    Color bgColor;
+    Color textColor;
+    switch (status.toLowerCase()) {
+      case 'online':
+      case 'active':
+      case 'running':
+        bgColor = colorScheme.primaryContainer;
+        textColor = colorScheme.onPrimaryContainer;
+        break;
+      case 'offline':
+      case 'inactive':
+      case 'stopped':
+        bgColor = colorScheme.surfaceContainerHighest;
+        textColor = colorScheme.onSurfaceVariant;
+        break;
+      case 'error':
+      case 'failed':
+        bgColor = colorScheme.errorContainer;
+        textColor = colorScheme.onErrorContainer;
+        break;
+      default:
+        bgColor = colorScheme.surfaceContainerHighest;
+        textColor = colorScheme.onSurfaceVariant;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        status,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 11,
+            ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// _PointListSection — 测点列表区域
+// ============================================================
+
+class _PointListSection extends ConsumerWidget {
+  const _PointListSection({required this.deviceId});
+
+  final String deviceId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pointsState = ref.watch(pointListProvider(deviceId));
+
+    return pointsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(
+        child: Text('Error: $error'),
+      ),
+      data: (points) {
+        if (points.isEmpty) {
+          return const Center(
+            child: Text('暂无测点'),
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: points.length,
+          separatorBuilder: (_, __) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final point = points[index];
+            return _PointListItem(point: point);
+          },
+        );
+      },
+    );
+  }
+}
+
+// ============================================================
+// _PointListItem — 测点列表项
+// ============================================================
+
+class _PointListItem extends StatelessWidget {
+  const _PointListItem({required this.point});
+
+  final Point point;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          // 测点名称
+          Expanded(
+            child: Text(
+              point.name,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // 数据类型标签
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              point.dataType.name,
+              style: textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // 访问类型标签
+          Icon(
+            point.accessType == AccessType.ro
+                ? Icons.visibility_outlined
+                : point.accessType == AccessType.wo
+                    ? Icons.edit_outlined
+                    : Icons.sync_alt,
+            size: 16,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -435,5 +435,292 @@
   "workbenchDetailShort": "详情",
   "@workbenchDetailShort": {
     "description": "移动端短标题"
+  },
+
+  "deviceTreeTitle": "设备",
+  "@deviceTreeTitle": {
+    "description": "设备树面板标题"
+  },
+  "noDevices": "暂无设备",
+  "@noDevices": {
+    "description": "设备树空状态提示"
+  },
+  "addDeviceDialogTitle": "添加设备",
+  "@addDeviceDialogTitle": {
+    "description": "添加设备对话框标题"
+  },
+  "editDeviceDialogTitle": "编辑设备",
+  "@editDeviceDialogTitle": {
+    "description": "编辑设备对话框标题"
+  },
+  "deviceName": "设备名称",
+  "@deviceName": {
+    "description": "设备名称字段标签"
+  },
+  "deviceNameHint": "请输入设备名称",
+  "@deviceNameHint": {
+    "description": "设备名称输入框提示"
+  },
+  "deviceNameRequired": "请输入设备名称",
+  "@deviceNameRequired": {
+    "description": "设备名称验证错误"
+  },
+  "deviceNameMaxLength": "名称不能超过255个字符",
+  "@deviceNameMaxLength": {
+    "description": "设备名称最大长度验证错误"
+  },
+  "protocolType": "协议类型",
+  "@protocolType": {
+    "description": "协议类型字段标签"
+  },
+  "protocolTypeHint": "请选择协议类型",
+  "@protocolTypeHint": {
+    "description": "协议类型选择提示"
+  },
+  "protocolTypeRequired": "请选择协议类型",
+  "@protocolTypeRequired": {
+    "description": "协议类型验证错误"
+  },
+  "virtualDevice": "虚拟设备",
+  "@virtualDevice": {
+    "description": "虚拟设备协议选项"
+  },
+  "modbusTcp": "Modbus TCP",
+  "@modbusTcp": {
+    "description": "Modbus TCP 协议选项"
+  },
+  "modbusRtu": "Modbus RTU",
+  "@modbusRtu": {
+    "description": "Modbus RTU 协议选项"
+  },
+  "virtualMode": "虚拟模式",
+  "@virtualMode": {
+    "description": "虚拟模式字段标签"
+  },
+  "virtualModeHint": "请选择虚拟模式",
+  "@virtualModeHint": {
+    "description": "虚拟模式选择提示"
+  },
+  "virtualModeRequired": "请选择虚拟模式",
+  "@virtualModeRequired": {
+    "description": "虚拟模式验证错误"
+  },
+  "random": "随机",
+  "@random": {
+    "description": "随机模式"
+  },
+  "sineWave": "正弦波",
+  "@sineWave": {
+    "description": "正弦波模式"
+  },
+  "fixedValue": "固定值",
+  "@fixedValue": {
+    "description": "固定值模式"
+  },
+  "increment": "递增",
+  "@increment": {
+    "description": "递增模式"
+  },
+  "dataType": "数据类型",
+  "@dataType": {
+    "description": "数据类型字段标签"
+  },
+  "dataTypeHint": "请选择数据类型",
+  "@dataTypeHint": {
+    "description": "数据类型选择提示"
+  },
+  "dataTypeRequired": "请选择数据类型",
+  "@dataTypeRequired": {
+    "description": "数据类型验证错误"
+  },
+  "valueRange": "取值范围",
+  "@valueRange": {
+    "description": "取值范围字段标签"
+  },
+  "minValue": "最小值",
+  "@minValue": {
+    "description": "最小值字段标签"
+  },
+  "maxValue": "最大值",
+  "@maxValue": {
+    "description": "最大值字段标签"
+  },
+  "updateInterval": "更新间隔",
+  "@updateInterval": {
+    "description": "更新间隔字段标签"
+  },
+  "ms": "毫秒",
+  "@ms": {
+    "description": "毫秒单位"
+  },
+  "hostAddress": "主机地址",
+  "@hostAddress": {
+    "description": "主机地址字段标签"
+  },
+  "hostAddressHint": "192.168.1.100",
+  "@hostAddressHint": {
+    "description": "主机地址输入框提示"
+  },
+  "hostAddressRequired": "请输入主机地址",
+  "@hostAddressRequired": {
+    "description": "主机地址验证错误"
+  },
+  "hostAddressInvalid": "请输入有效的 IPv4 地址",
+  "@hostAddressInvalid": {
+    "description": "主机地址格式验证错误"
+  },
+  "port": "端口",
+  "@port": {
+    "description": "端口字段标签"
+  },
+  "portHint": "502",
+  "@portHint": {
+    "description": "端口输入框提示"
+  },
+  "portRequired": "请输入端口",
+  "@portRequired": {
+    "description": "端口验证错误"
+  },
+  "portInvalid": "端口必须为 1-65535 之间的整数",
+  "@portInvalid": {
+    "description": "端口范围验证错误"
+  },
+  "slaveId": "从站 ID",
+  "@slaveId": {
+    "description": "从站 ID 字段标签"
+  },
+  "slaveIdHint": "1",
+  "@slaveIdHint": {
+    "description": "从站 ID 输入框提示"
+  },
+  "slaveIdInvalid": "从站 ID 必须为 1-247 之间的整数",
+  "@slaveIdInvalid": {
+    "description": "从站 ID 验证错误"
+  },
+  "timeout": "超时",
+  "@timeout": {
+    "description": "超时字段标签"
+  },
+  "timeoutHint": "5000",
+  "@timeoutHint": {
+    "description": "超时输入框提示"
+  },
+  "serialPort": "串口",
+  "@serialPort": {
+    "description": "串口字段标签"
+  },
+  "serialPortHint": "请选择串口",
+  "@serialPortHint": {
+    "description": "串口选择提示"
+  },
+  "serialPortRequired": "请选择串口",
+  "@serialPortRequired": {
+    "description": "串口验证错误"
+  },
+  "baudRate": "波特率",
+  "@baudRate": {
+    "description": "波特率字段标签"
+  },
+  "baudRateHint": "请选择波特率",
+  "@baudRateHint": {
+    "description": "波特率选择提示"
+  },
+  "dataBits": "数据位",
+  "@dataBits": {
+    "description": "数据位字段标签"
+  },
+  "stopBits": "停止位",
+  "@stopBits": {
+    "description": "停止位字段标签"
+  },
+  "parity": "校验位",
+  "@parity": {
+    "description": "校验位字段标签"
+  },
+  "none": "无",
+  "@none": {
+    "description": "无/无校验"
+  },
+  "oddParity": "奇校验",
+  "@oddParity": {
+    "description": "奇校验"
+  },
+  "evenParity": "偶校验",
+  "@evenParity": {
+    "description": "偶校验"
+  },
+  "advancedInfo": "高级信息",
+  "@advancedInfo": {
+    "description": "高级信息区域标题"
+  },
+  "manufacturer": "制造商",
+  "@manufacturer": {
+    "description": "制造商字段标签"
+  },
+  "manufacturerHint": "例如: Siemens",
+  "@manufacturerHint": {
+    "description": "制造商输入框提示"
+  },
+  "modelName": "型号",
+  "@modelName": {
+    "description": "型号字段标签"
+  },
+  "modelHint": "例如: S7-1200",
+  "@modelHint": {
+    "description": "型号输入框提示"
+  },
+  "serialNumber": "序列号",
+  "@serialNumber": {
+    "description": "序列号字段标签"
+  },
+  "serialNumberHint": "例如: SN123456",
+  "@serialNumberHint": {
+    "description": "序列号输入框提示"
+  },
+  "deviceSaveSuccess": "设备保存成功",
+  "@deviceSaveSuccess": {
+    "description": "设备保存成功提示"
+  },
+  "deviceDeleteTitle": "删除设备？",
+  "@deviceDeleteTitle": {
+    "description": "删除设备确认对话框标题"
+  },
+  "deviceDeleteDescription": "确定要删除设备「{name}」吗？",
+  "@deviceDeleteDescription": {
+    "description": "删除设备确认对话框描述",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "传感器1"
+      }
+    }
+  },
+  "deviceDeleteSuccess": "设备已删除",
+  "@deviceDeleteSuccess": {
+    "description": "设备删除成功提示"
+  },
+  "editDevice": "编辑设备",
+  "@editDevice": {
+    "description": "编辑设备操作按钮"
+  },
+  "addSubDevice": "添加子设备",
+  "@addSubDevice": {
+    "description": "添加子设备操作按钮"
+  },
+  "deleteDevice": "删除设备",
+  "@deleteDevice": {
+    "description": "删除设备操作按钮"
+  },
+  "confirmDeleteDevice": "确认删除",
+  "@confirmDeleteDevice": {
+    "description": "确认删除设备按钮"
+  },
+  "basicInfo": "基础信息",
+  "@basicInfo": {
+    "description": "基础信息区域标题"
+  },
+  "protocolConfig": "协议配置",
+  "@protocolConfig": {
+    "description": "协议配置区域标题"
   }
 }
