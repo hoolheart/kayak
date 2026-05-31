@@ -114,7 +114,7 @@ AuthInterceptor → ErrorInterceptor → LogInterceptor
 
 ## Issues Found
 
-### [High] Issue 1: `async void` pattern in `AuthInterceptor.onError`
+### [High] Issue 1: `async void` pattern in `AuthInterceptor.onError` [✅ 已修复 - 见复审]
 
 - **Location**: `auth_interceptor.dart`, Line 48
 - **Description**: `onError` 方法签名是 `void onError(...)` 但实现使用了 `async`。`async void` 是 Dart 中已知的反模式——如果 `await` 之前有同步异常未被 catch，会传播到 Dio 内部，且 async void 中的未处理异常会触发全局错误处理（zone error），而非被 Dio 的拦截器链捕获。
@@ -136,7 +136,7 @@ Future<void> _handleError(DioException err, ErrorInterceptorHandler handler) asy
 
 ---
 
-### [High] Issue 2: 每次 retry 创建新 `Dio()` 实例
+### [High] Issue 2: 每次 retry 创建新 `Dio()` 实例 [✅ 已修复 - 见复审]
 
 - **Location**: `auth_interceptor.dart`, Lines 98, 115
 - **Description**: `_retryWithNewToken` 方法中，原请求和每个 pending 请求都通过 `Dio().fetch(...)` 创建全新的 Dio 实例。N 个 pending 请求 = N+1 个 Dio 实例，每个实例包含独立的 `HttpClient`、拦截器链等资源。
@@ -162,7 +162,7 @@ Future<void> _retryWithNewToken(...) async {
 
 ---
 
-### [High] Issue 3: 重试失败时使用原始 401 错误信息构造 `DioException`
+### [High] Issue 3: 重试失败时使用原始 401 错误信息构造 `DioException` [✅ 已修复 - 见复审]
 
 - **Location**: `auth_interceptor.dart`, Lines 100-108, 117-125
 - **Description**: 当重试请求失败时（`catch (e)`），代码使用原始的 `err.type` 和 `err.response`（均为 401 错误的信息）构造新的 `DioException`，而非重试失败的实际错误信息。
@@ -187,7 +187,7 @@ Future<void> _retryWithNewToken(...) async {
 
 ---
 
-### [Medium] Issue 4: `badResponse` 未映射状态码的兜底消息不准确
+### [Medium] Issue 4: `badResponse` 未映射状态码的兜底消息不准确 [✅ 已修复 - 见复审]
 
 - **Location**: `error_interceptor.dart`, Lines 33-41
 - **Description**: 当 `DioExceptionType.badResponse` 的状态码不在映射表中时（如 418、429、451），switch 兜底分支返回 `'网络错误，请检查连接'`。但这不是网络错误——服务器已成功响应，只是状态码未被识别。
@@ -203,7 +203,7 @@ if (err.type == DioExceptionType.badResponse) {
 
 ---
 
-### [Medium] Issue 5: `_retryWithNewToken` 存在重复代码（DRY 违规）
+### [Medium] Issue 5: `_retryWithNewToken` 存在重复代码（DRY 违规） [✅ 已修复 - 见复审]
 
 - **Location**: `auth_interceptor.dart`, Lines 96-127
 - **Description**: 原请求重试逻辑（lines 96-109）和 pending 请求重试逻辑（lines 112-127）是相同的代码块，仅 `handler` 引用不同。
@@ -228,7 +228,7 @@ Future<void> _retrySingle(
 
 ---
 
-### [Medium] Issue 6: `tryRefresh()` 使用 `catch (_)` 吞掉异常
+### [Medium] Issue 6: `tryRefresh()` 使用 `catch (_)` 吞掉异常 [✅ 已修复 - 见复审]
 
 - **Location**: `auth_service.dart`, Line 129
 - **Description**: `catch (_)` 完全丢弃了异常信息。虽然方法语义是"成功或失败"的布尔返回值，但丢失异常细节使问题诊断困难。
