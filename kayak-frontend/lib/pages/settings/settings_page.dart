@@ -296,7 +296,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 context,
                 icon: Icons.calendar_today_outlined,
                 label: _l10n.memberSince,
-                value: DateFormat.yMMMd().format(user.createdAt),
+                value: user.createdAt != null
+                    ? DateFormat.yMMMd().format(user.createdAt!)
+                    : '--',
               ),
               const Divider(height: 24),
 
