@@ -88,13 +88,20 @@ class AppRoutes {
 }
 
 /// 路由Provider
+///
+/// 使用refreshListenable模式确保GoRouter实例稳定：
+/// - GoRouter实例只在Provider创建时初始化一次，不会被重建
+/// - refreshListenable在auth state变化时通知GoRouter重新评估redirect
+/// - redirect闭包中通过ref.read读取最新认证状态，避免闭包捕获过期值
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  final refreshNotifier = ref.watch(routerRefreshProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
+    refreshListenable: refreshNotifier,
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
       final isLoggedIn = authState.isAuthenticated;
       final isInitialized = authState.isInitialized;
       final path = state.uri.path;

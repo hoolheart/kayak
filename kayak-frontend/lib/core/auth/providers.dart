@@ -111,6 +111,29 @@ final apiClientProvider = Provider<ApiClientInterface>((ref) {
   );
 });
 
+/// Router Refresh Notifier
+///
+/// 自定义ChangeNotifier子类，用作GoRouter的refreshListenable
+/// 当认证状态变化时调用refresh()通知GoRouter重新评估redirect
+class RouterRefreshNotifier extends ChangeNotifier {
+  void refresh() {
+    notifyListeners();
+  }
+}
+
+/// Router Refresh Provider
+///
+/// 当认证状态变化时通知GoRouter重新评估redirect
+/// 使用RouterRefreshNotifier作为refreshListenable，避免重建GoRouter实例
+final routerRefreshProvider = Provider<RouterRefreshNotifier>((ref) {
+  final notifier = RouterRefreshNotifier();
+  ref.listen(authStateProvider, (_, __) {
+    notifier.refresh();
+  });
+  ref.onDispose(notifier.dispose);
+  return notifier;
+});
+
 /// Auth Route Guard Provider
 ///
 /// 提供路由守卫实例
