@@ -231,5 +231,57 @@
   "usernameOptional": "用户名（选填）",
   "@usernameOptional": {
     "description": "用户名字段标签带选填标记"
+  },
+  "profile": "个人资料",
+  "@profile": {
+    "description": "个人资料页面标题"
+  },
+  "editProfile": "编辑资料",
+  "@editProfile": {
+    "description": "编辑资料区域标题"
+  },
+  "profileInfo": "个人信息",
+  "@profileInfo": {
+    "description": "个人信息区域标题"
+  },
+  "memberSince": "注册于",
+  "@memberSince": {
+    "description": "账户注册时间标签"
+  },
+  "changePassword": "修改密码",
+  "@changePassword": {
+    "description": "修改密码区域标题"
+  },
+  "currentPassword": "当前密码",
+  "@currentPassword": {
+    "description": "当前密码字段标签"
+  },
+  "newPassword": "新密码",
+  "@newPassword": {
+    "description": "新密码字段标签"
+  },
+  "profileUpdateSuccess": "资料更新成功",
+  "@profileUpdateSuccess": {
+    "description": "资料更新成功提示"
+  },
+  "passwordChangeSuccess": "密码修改成功",
+  "@passwordChangeSuccess": {
+    "description": "密码修改成功提示"
+  },
+  "currentPasswordRequired": "请输入当前密码",
+  "@currentPasswordRequired": {
+    "description": "当前密码字段验证错误"
+  },
+  "newPasswordRequired": "请输入新密码",
+  "@newPasswordRequired": {
+    "description": "新密码字段验证错误"
+  },
+  "newPasswordMinLength": "新密码至少需要 8 个字符",
+  "@newPasswordMinLength": {
+    "description": "新密码最小长度验证错误"
+  },
+  "passwordInfo": "密码设置",
+  "@passwordInfo": {
+    "description": "密码设置区域标题"
   }
 }

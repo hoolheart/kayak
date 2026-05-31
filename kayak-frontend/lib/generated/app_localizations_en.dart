@@ -183,4 +183,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get usernameOptional => 'Username (optional)';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get profileInfo => 'Profile Information';
+
+  @override
+  String get memberSince => 'Member since';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get profileUpdateSuccess => 'Profile updated successfully';
+
+  @override
+  String get passwordChangeSuccess => 'Password changed successfully';
+
+  @override
+  String get currentPasswordRequired => 'Current password is required';
+
+  @override
+  String get newPasswordRequired => 'New password is required';
+
+  @override
+  String get newPasswordMinLength =>
+      'New password must be at least 8 characters';
+
+  @override
+  String get passwordInfo => 'Password Settings';
 }

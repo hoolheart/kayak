@@ -227,4 +227,31 @@ class FakeAuthService implements AuthService {
     tokensCleared = true;
     refreshTimerActive = false;
   }
+
+  // ========== Profile update & password change ==========
+  String? lastUpdatedUsername;
+  bool updateProfileFails = false;
+  bool passwordChangeFails = false;
+
+  @override
+  Future<User> updateProfile({required String username}) async {
+    if (updateProfileFails) throw Exception('Update failed');
+    lastUpdatedUsername = username;
+    return User(
+      id: 'test-user-id',
+      email: 'admin@kayak.local',
+      username: username,
+      status: 'active',
+      createdAt: DateTime(2026, 5, 31),
+      updatedAt: DateTime(2026, 5, 31),
+    );
+  }
+
+  @override
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    if (passwordChangeFails) throw Exception('Password change failed');
+  }
 }
