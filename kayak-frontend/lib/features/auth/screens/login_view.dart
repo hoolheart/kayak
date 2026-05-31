@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_state.dart';
+import '../../../core/auth/providers.dart';
 import '../../auth/providers/login_provider.dart';
 import '../../auth/widgets/error_banner.dart';
 import '../../auth/widgets/login_card.dart';
@@ -30,6 +32,13 @@ class LoginView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // 监听认证状态变化，登录成功后导航
+    ref.listen<AuthState>(authStateProvider, (previous, next) {
+      if (previous?.isAuthenticated != true && next.isAuthenticated) {
+        context.go(redirectPath ?? '/dashboard');
+      }
+    });
+
     final loginState = ref.watch(loginProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
