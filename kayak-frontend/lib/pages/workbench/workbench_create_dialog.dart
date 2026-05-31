@@ -146,14 +146,16 @@ class _WorkbenchFormDialogState extends State<WorkbenchFormDialog> {
         });
 
         if (!mounted) return;
+        // 刷新详情页数据（确保编辑后详情页显示最新数据）
+        widget.ref.invalidate(workbenchDetailProvider(workbench.id));
+        // 刷新列表
+        widget.ref.read(workbenchListProvider.notifier).refresh();
         Toast.show(
           context: context,
           message: l10n.updateWorkbenchSuccess,
           type: ToastType.success,
         );
         Navigator.of(context).pop();
-        // 刷新列表
-        widget.ref.read(workbenchListProvider.notifier).refresh();
       } else {
         // 创建模式
         final user = authState.asData?.value;
