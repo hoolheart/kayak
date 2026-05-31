@@ -108,19 +108,21 @@ class AuthStateNotifier extends StateNotifier<AuthState>
   /// 登录
   @override
   Future<bool> login(String email, String password) async {
+    debugPrint('[LoginFlow] AuthStateNotifier.login() called with email=$email');
     state = AuthState.loading();
-    debugPrint('Login: Starting login for $email');
 
     try {
+      debugPrint('[LoginFlow] Calling authApiService.login()');
       final response = await _authApiService.login(email, password);
-      debugPrint('Login: API response received');
+      debugPrint('[LoginFlow] API login successful, userId=${response.userId}');
 
+      debugPrint('[LoginFlow] Saving tokens to storage');
       await _tokenStorage.saveTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         expiresIn: response.expiresIn,
       );
-      debugPrint('Login: Tokens saved');
+      debugPrint('[LoginFlow] Tokens saved');
 
       final user = User(
         id: response.userId,
@@ -128,12 +130,13 @@ class AuthStateNotifier extends StateNotifier<AuthState>
         username: response.username,
       );
 
+      debugPrint('[LoginFlow] Setting state to AUTHENTICATED');
       state = AuthState.authenticated(user, response.accessToken);
-      debugPrint('Login: Auth state set to authenticated, userId=${user.id}');
+      debugPrint('[LoginFlow] State set to authenticated, isAuthenticated=${state.isAuthenticated}');
       return true;
     } catch (e, st) {
-      debugPrint('Login: FAILED - $e');
-      debugPrint('Login: Stack - $st');
+      debugPrint('[LoginFlow] login() FAILED: $e');
+      debugPrint('[LoginFlow] Stack: $st');
       state = AuthState.error(e.toString());
       return false;
     }

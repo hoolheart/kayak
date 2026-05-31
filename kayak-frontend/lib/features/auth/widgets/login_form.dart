@@ -70,19 +70,23 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   }
 
   Future<void> _submitForm() async {
+    debugPrint('[LoginFlow] _submitForm() called');
     // 验证表单
     final emailError = Validators.validateEmail(_emailController.text.trim());
     final passwordError = Validators.validatePassword(_passwordController.text);
 
     if (emailError != null) {
+      debugPrint('[LoginFlow] Validation failed: emailError=$emailError');
       ref.read(emailValidationProvider.notifier).state = emailError;
       return;
     }
     if (passwordError != null) {
+      debugPrint('[LoginFlow] Validation failed: passwordError=$passwordError');
       ref.read(passwordValidationProvider.notifier).state = passwordError;
       return;
     }
 
+    debugPrint('[LoginFlow] Validation passed, calling authStateNotifier.login()');
     // 清除错误
     ref.read(emailValidationProvider.notifier).state = null;
     ref.read(passwordValidationProvider.notifier).state = null;
@@ -95,16 +99,21 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         _emailController.text.trim(),
         _passwordController.text,
       );
+      debugPrint('[LoginFlow] login() returned success=$success');
 
       if (success) {
+        debugPrint('[LoginFlow] Setting login state to success');
         ref.read(loginProvider.notifier).setSuccess();
       } else {
         final authState = ref.read(authStateProvider);
+        final errorMsg = authState.error;
+        debugPrint('[LoginFlow] login() failed, state error=$errorMsg');
         ref.read(loginProvider.notifier).setError(
-          _mapErrorToLoginErrorType(authState.error),
+          _mapErrorToLoginErrorType(errorMsg),
         );
       }
     } catch (e) {
+      debugPrint('[LoginFlow] login() threw exception: $e');
       ref.read(loginProvider.notifier).setError(
         _mapErrorToLoginErrorType(e.toString()),
       );

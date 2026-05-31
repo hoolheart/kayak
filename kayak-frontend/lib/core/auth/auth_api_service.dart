@@ -36,22 +36,23 @@ class AuthApiService implements AuthApiServiceInterface {
   @override
   Future<LoginResponse> login(String email, String password) async {
     final url = '$_baseUrl/api/v1/auth/login';
-    debugPrint('AuthApiService: Attempting login to $url with email: $email');
+    debugPrint('[LoginFlow] AuthApiService.login() - POST $url');
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         url,
         data: {'email': email, 'password': password},
       );
-      debugPrint(
-        'AuthApiService: Login successful, response: ${response.data}',
-      );
+      debugPrint('[LoginFlow] AuthApiService - Response status=${response.statusCode}');
       final responseData = response.data as Map<String, dynamic>;
-      return LoginResponse.fromJson(
+      debugPrint('[LoginFlow] AuthApiService - Response data keys=${responseData.keys}');
+      final loginResponse = LoginResponse.fromJson(
         responseData['data'] as Map<String, dynamic>,
       );
+      debugPrint('[LoginFlow] AuthApiService - Parsed LoginResponse OK, userId=${loginResponse.userId}');
+      return loginResponse;
     } catch (e, st) {
-      debugPrint('AuthApiService: Login failed with error: $e');
-      debugPrint('AuthApiService: Stack trace: $st');
+      debugPrint('[LoginFlow] AuthApiService - FAILED: $e');
+      debugPrint('[LoginFlow] AuthApiService - Stack: $st');
       rethrow;
     }
   }

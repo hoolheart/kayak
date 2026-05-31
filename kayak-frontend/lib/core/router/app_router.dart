@@ -102,19 +102,19 @@ class AuthStateChangeNotifier extends ChangeNotifier {
 
 /// 路由Provider
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  // Watch to trigger GoRouter rebuild when auth state changes (re-evaluates redirect)
+  ref.watch(authStateProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     refreshListenable: AuthStateChangeNotifier(ref),
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
       final isLoggedIn = authState.isAuthenticated;
       final isInitialized = authState.isInitialized;
       final path = state.uri.path;
-      debugPrint(
-        'Router redirect: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path',
-      );
+      debugPrint('[RouterRedirect] Evaluating: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path');
 
       // 公共路由 - 登录和注册页面始终可访问
       const publicRoutes = ['/login', '/register'];
@@ -123,7 +123,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 未初始化 -> 留在 splash 页面等待
       if (!isInitialized) {
         debugPrint(
-          'Router redirect: -> / (not initialized, waiting on splash)',
+          '[RouterRedirect] -> / (not initialized, waiting on splash)',
         );
         return null;
       }
@@ -131,20 +131,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 未登录访问受保护路由 -> 重定向到登录
       if (!isLoggedIn && !isPublicRoute) {
         final redirect = Uri.encodeComponent(path);
-        debugPrint('Router redirect: -> /login (unauthenticated)');
+        debugPrint('[RouterRedirect] -> /login (unauthenticated, redirect=$redirect)');
         return '/login?redirect=$redirect';
       }
 
       // 已登录访问登录页 -> 重定向到首页
       if (isLoggedIn && path == '/login') {
-        debugPrint('Router redirect: -> /dashboard (already logged in)');
+        debugPrint('[RouterRedirect] -> /dashboard (already logged in, skipping login)');
         return AppRoutes.dashboard;
       }
 
       // 已登录访问启动页 -> 直接跳转到首页
       if (isLoggedIn && path == '/') {
         debugPrint(
-          'Router redirect: -> /dashboard (authenticated, skip splash)',
+          '[RouterRedirect] -> /dashboard (authenticated, skip splash)',
         );
         return AppRoutes.dashboard;
       }
