@@ -6,7 +6,7 @@ part of 'device.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Device _$DeviceFromJson(Map<String, dynamic> json) => _Device(
+Device _$DeviceFromJson(Map<String, dynamic> json) => Device(
   id: json['id'] as String,
   workbenchId: json['workbench_id'] as String,
   parentId: json['parent_id'] as String?,
@@ -21,7 +21,7 @@ _Device _$DeviceFromJson(Map<String, dynamic> json) => _Device(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$DeviceToJson(_Device instance) => <String, dynamic>{
+Map<String, dynamic> _$DeviceToJson(Device instance) => <String, dynamic>{
   'id': instance.id,
   'workbench_id': instance.workbenchId,
   'parent_id': instance.parentId,
@@ -45,8 +45,8 @@ const _$ProtocolTypeEnumMap = {
   ProtocolType.mqtt: 'mqtt',
 };
 
-_DeviceTreeNode _$DeviceTreeNodeFromJson(Map<String, dynamic> json) =>
-    _DeviceTreeNode(
+DeviceTreeNode _$DeviceTreeNodeFromJson(Map<String, dynamic> json) =>
+    DeviceTreeNode(
       id: json['id'] as String,
       workbenchId: json['workbench_id'] as String,
       parentId: json['parent_id'] as String?,
@@ -61,12 +61,12 @@ _DeviceTreeNode _$DeviceTreeNodeFromJson(Map<String, dynamic> json) =>
           (json['children'] as List<dynamic>?)
               ?.map((e) => DeviceTreeNode.fromJson(e as Map<String, dynamic>))
               .toList() ??
-          const [],
+          [],
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
 
-Map<String, dynamic> _$DeviceTreeNodeToJson(_DeviceTreeNode instance) =>
+Map<String, dynamic> _$DeviceTreeNodeToJson(DeviceTreeNode instance) =>
     <String, dynamic>{
       'id': instance.id,
       'workbench_id': instance.workbenchId,

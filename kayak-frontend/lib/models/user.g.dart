@@ -6,7 +6,7 @@ part of 'user.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_User _$UserFromJson(Map<String, dynamic> json) => _User(
+User _$UserFromJson(Map<String, dynamic> json) => User(
   id: json['id'] as String,
   email: json['email'] as String,
   username: json['username'] as String?,
@@ -16,7 +16,7 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
+Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'id': instance.id,
   'email': instance.email,
   'username': instance.username,
@@ -26,23 +26,22 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'updated_at': instance.updatedAt.toIso8601String(),
 };
 
-_LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) =>
-    _LoginRequest(
-      email: json['email'] as String,
-      password: json['password'] as String,
-    );
+LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) => LoginRequest(
+  email: json['email'] as String,
+  password: json['password'] as String,
+);
 
-Map<String, dynamic> _$LoginRequestToJson(_LoginRequest instance) =>
+Map<String, dynamic> _$LoginRequestToJson(LoginRequest instance) =>
     <String, dynamic>{'email': instance.email, 'password': instance.password};
 
-_RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
-    _RegisterRequest(
+RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
+    RegisterRequest(
       email: json['email'] as String,
       password: json['password'] as String,
       username: json['username'] as String?,
     );
 
-Map<String, dynamic> _$RegisterRequestToJson(_RegisterRequest instance) =>
+Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
     <String, dynamic>{
       'email': instance.email,
       'password': instance.password,

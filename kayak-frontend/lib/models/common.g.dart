@@ -6,10 +6,10 @@ part of 'common.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_ApiResponse<T> _$ApiResponseFromJson<T>(
+ApiResponse<T> _$ApiResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => _ApiResponse<T>(
+) => ApiResponse<T>(
   code: (json['code'] as num).toInt(),
   message: json['message'] as String,
   data: fromJsonT(json['data']),
@@ -17,7 +17,7 @@ _ApiResponse<T> _$ApiResponseFromJson<T>(
 );
 
 Map<String, dynamic> _$ApiResponseToJson<T>(
-  _ApiResponse<T> instance,
+  ApiResponse<T> instance,
   Object? Function(T value) toJsonT,
 ) => <String, dynamic>{
   'code': instance.code,
@@ -26,10 +26,10 @@ Map<String, dynamic> _$ApiResponseToJson<T>(
   'timestamp': instance.timestamp,
 };
 
-_PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
+PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => _PaginatedResponse<T>(
+) => PaginatedResponse<T>(
   page: (json['page'] as num).toInt(),
   size: (json['size'] as num).toInt(),
   total: (json['total'] as num).toInt(),
@@ -39,7 +39,7 @@ _PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
 );
 
 Map<String, dynamic> _$PaginatedResponseToJson<T>(
-  _PaginatedResponse<T> instance,
+  PaginatedResponse<T> instance,
   Object? Function(T value) toJsonT,
 ) => <String, dynamic>{
   'page': instance.page,
@@ -50,7 +50,7 @@ Map<String, dynamic> _$PaginatedResponseToJson<T>(
   'has_prev': instance.hasPrev,
 };
 
-_AuthTokens _$AuthTokensFromJson(Map<String, dynamic> json) => _AuthTokens(
+AuthTokens _$AuthTokensFromJson(Map<String, dynamic> json) => AuthTokens(
   accessToken: json['access_token'] as String,
   refreshToken: json['refresh_token'] as String,
   tokenType: json['token_type'] as String?,
@@ -58,7 +58,7 @@ _AuthTokens _$AuthTokensFromJson(Map<String, dynamic> json) => _AuthTokens(
   user: User.fromJson(json['user'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$AuthTokensToJson(_AuthTokens instance) =>
+Map<String, dynamic> _$AuthTokensToJson(AuthTokens instance) =>
     <String, dynamic>{
       'access_token': instance.accessToken,
       'refresh_token': instance.refreshToken,

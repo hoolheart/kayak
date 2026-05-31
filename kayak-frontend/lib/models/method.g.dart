@@ -6,7 +6,7 @@ part of 'method.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Method _$MethodFromJson(Map<String, dynamic> json) => _Method(
+Method _$MethodFromJson(Map<String, dynamic> json) => Method(
   id: json['id'] as String,
   name: json['name'] as String,
   description: json['description'] as String?,
@@ -18,7 +18,7 @@ _Method _$MethodFromJson(Map<String, dynamic> json) => _Method(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$MethodToJson(_Method instance) => <String, dynamic>{
+Map<String, dynamic> _$MethodToJson(Method instance) => <String, dynamic>{
   'id': instance.id,
   'name': instance.name,
   'description': instance.description,
@@ -30,8 +30,8 @@ Map<String, dynamic> _$MethodToJson(_Method instance) => <String, dynamic>{
   'updated_at': instance.updatedAt.toIso8601String(),
 };
 
-_MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
-    _MethodParameter(
+MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
+    MethodParameter(
       key: json['key'] as String,
       type: json['type'] as String,
       label: json['label'] as String?,
@@ -39,7 +39,7 @@ _MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
       isRequired: json['required'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$MethodParameterToJson(_MethodParameter instance) =>
+Map<String, dynamic> _$MethodParameterToJson(MethodParameter instance) =>
     <String, dynamic>{
       'key': instance.key,
       'type': instance.type,

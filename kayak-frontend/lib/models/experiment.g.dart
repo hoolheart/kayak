@@ -6,7 +6,7 @@ part of 'experiment.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Experiment _$ExperimentFromJson(Map<String, dynamic> json) => _Experiment(
+Experiment _$ExperimentFromJson(Map<String, dynamic> json) => Experiment(
   id: json['id'] as String,
   userId: json['user_id'] as String,
   methodId: json['method_id'] as String?,
@@ -25,7 +25,7 @@ _Experiment _$ExperimentFromJson(Map<String, dynamic> json) => _Experiment(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$ExperimentToJson(_Experiment instance) =>
+Map<String, dynamic> _$ExperimentToJson(Experiment instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,

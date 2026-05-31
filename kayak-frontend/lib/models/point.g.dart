@@ -6,7 +6,7 @@ part of 'point.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Point _$PointFromJson(Map<String, dynamic> json) => _Point(
+Point _$PointFromJson(Map<String, dynamic> json) => Point(
   id: json['id'] as String,
   deviceId: json['device_id'] as String,
   name: json['name'] as String,
@@ -21,7 +21,7 @@ _Point _$PointFromJson(Map<String, dynamic> json) => _Point(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$PointToJson(_Point instance) => <String, dynamic>{
+Map<String, dynamic> _$PointToJson(Point instance) => <String, dynamic>{
   'id': instance.id,
   'device_id': instance.deviceId,
   'name': instance.name,
@@ -49,13 +49,13 @@ const _$AccessTypeEnumMap = {
   AccessType.rw: 'rw',
 };
 
-_PointValue _$PointValueFromJson(Map<String, dynamic> json) => _PointValue(
+PointValue _$PointValueFromJson(Map<String, dynamic> json) => PointValue(
   pointId: json['point_id'] as String,
   value: json['value'],
   timestamp: json['timestamp'] as String?,
 );
 
-Map<String, dynamic> _$PointValueToJson(_PointValue instance) =>
+Map<String, dynamic> _$PointValueToJson(PointValue instance) =>
     <String, dynamic>{
       'point_id': instance.pointId,
       'value': instance.value,

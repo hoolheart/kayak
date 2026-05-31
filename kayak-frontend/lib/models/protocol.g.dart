@@ -13,7 +13,7 @@ VirtualConfig _$VirtualConfigFromJson(Map<String, dynamic> json) =>
       min: (json['min'] as num?)?.toDouble(),
       max: (json['max'] as num?)?.toDouble(),
       intervalMs: (json['interval_ms'] as num?)?.toInt(),
-      $type: json['runtimeType'] as String?,
+      $type: json['runtimeType'] as String? ?? 'virtual',
     );
 
 Map<String, dynamic> _$VirtualConfigToJson(VirtualConfig instance) =>
@@ -32,7 +32,7 @@ ModbusTcpConfig _$ModbusTcpConfigFromJson(Map<String, dynamic> json) =>
       port: (json['port'] as num).toInt(),
       slaveId: (json['slave_id'] as num?)?.toInt(),
       timeoutMs: (json['timeout_ms'] as num?)?.toInt(),
-      $type: json['runtimeType'] as String?,
+      $type: json['runtimeType'] as String? ?? 'modbusTcp',
     );
 
 Map<String, dynamic> _$ModbusTcpConfigToJson(ModbusTcpConfig instance) =>
@@ -53,7 +53,7 @@ ModbusRtuConfig _$ModbusRtuConfigFromJson(Map<String, dynamic> json) =>
       parity: json['parity'] as String?,
       slaveId: (json['slave_id'] as num?)?.toInt(),
       timeoutMs: (json['timeout_ms'] as num?)?.toInt(),
-      $type: json['runtimeType'] as String?,
+      $type: json['runtimeType'] as String? ?? 'modbusRtu',
     );
 
 Map<String, dynamic> _$ModbusRtuConfigToJson(ModbusRtuConfig instance) =>

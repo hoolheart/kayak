@@ -1,6 +1,5 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-part 'experiment.freezed.dart';
 part 'experiment.g.dart';
 
 // ============================================================
@@ -24,23 +23,75 @@ enum ExperimentStatus {
 // ============================================================
 // Experiment — 试验实体
 // ============================================================
-@freezed
-class Experiment with _$Experiment {
-  const factory Experiment({
-    required String id,
-    @JsonKey(name: 'user_id') required String userId,
-    @JsonKey(name: 'method_id') String? methodId,
-    required String name,
-    String? description,
-    required ExperimentStatus status,
-    @JsonKey(name: 'owner_type') required String ownerType,
-    @JsonKey(name: 'owner_id') required String ownerId,
-    @JsonKey(name: 'started_at') DateTime? startedAt,
-    @JsonKey(name: 'ended_at') DateTime? endedAt,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
-  }) = _Experiment;
+@JsonSerializable()
+class Experiment {
+
+  const Experiment({
+    required this.id,
+    required this.userId,
+    this.methodId,
+    required this.name,
+    this.description,
+    required this.status,
+    required this.ownerType,
+    required this.ownerId,
+    this.startedAt,
+    this.endedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
 
   factory Experiment.fromJson(Map<String, dynamic> json) =>
       _$ExperimentFromJson(json);
+  final String id;
+  @JsonKey(name: 'user_id')
+  final String userId;
+  @JsonKey(name: 'method_id')
+  final String? methodId;
+  final String name;
+  final String? description;
+  final ExperimentStatus status;
+  @JsonKey(name: 'owner_type')
+  final String ownerType;
+  @JsonKey(name: 'owner_id')
+  final String ownerId;
+  @JsonKey(name: 'started_at')
+  final DateTime? startedAt;
+  @JsonKey(name: 'ended_at')
+  final DateTime? endedAt;
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+  Map<String, dynamic> toJson() => _$ExperimentToJson(this);
+
+  Experiment copyWith({
+    String? id,
+    String? userId,
+    String? methodId,
+    String? name,
+    String? description,
+    ExperimentStatus? status,
+    String? ownerType,
+    String? ownerId,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return Experiment(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      methodId: methodId ?? this.methodId,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      status: status ?? this.status,
+      ownerType: ownerType ?? this.ownerType,
+      ownerId: ownerId ?? this.ownerId,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

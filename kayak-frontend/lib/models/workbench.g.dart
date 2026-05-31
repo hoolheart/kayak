@@ -6,7 +6,7 @@ part of 'workbench.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Workbench _$WorkbenchFromJson(Map<String, dynamic> json) => _Workbench(
+Workbench _$WorkbenchFromJson(Map<String, dynamic> json) => Workbench(
   id: json['id'] as String,
   name: json['name'] as String,
   description: json['description'] as String?,
@@ -17,21 +17,20 @@ _Workbench _$WorkbenchFromJson(Map<String, dynamic> json) => _Workbench(
   updatedAt: DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$WorkbenchToJson(_Workbench instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'description': instance.description,
-      'owner_type': instance.ownerType,
-      'owner_id': instance.ownerId,
-      'status': instance.status,
-      'created_at': instance.createdAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
-    };
+Map<String, dynamic> _$WorkbenchToJson(Workbench instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'owner_type': instance.ownerType,
+  'owner_id': instance.ownerId,
+  'status': instance.status,
+  'created_at': instance.createdAt.toIso8601String(),
+  'updated_at': instance.updatedAt.toIso8601String(),
+};
 
-_CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
+CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
   Map<String, dynamic> json,
-) => _CreateWorkbenchRequest(
+) => CreateWorkbenchRequest(
   name: json['name'] as String,
   description: json['description'] as String?,
   ownerType: json['owner_type'] as String,
@@ -39,7 +38,7 @@ _CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
 );
 
 Map<String, dynamic> _$CreateWorkbenchRequestToJson(
-  _CreateWorkbenchRequest instance,
+  CreateWorkbenchRequest instance,
 ) => <String, dynamic>{
   'name': instance.name,
   'description': instance.description,
