@@ -296,4 +296,37 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get emptyWorkbenchAction => '创建第一个工作台';
+
+  @override
+  String get workbenchDetail => '工作台详情';
+
+  @override
+  String get deviceTree => '设备树';
+
+  @override
+  String get deviceDetail => '设备详情';
+
+  @override
+  String get deviceTreePlaceholder => '将在下一个 Sprint 实现';
+
+  @override
+  String get deviceDetailPlaceholder => '选择左侧设备查看详情';
+
+  @override
+  String get workbenchNotFound => '工作台不存在或已被删除';
+
+  @override
+  String get addDevice => '添加设备';
+
+  @override
+  String get createdAt => '创建于';
+
+  @override
+  String get lastModified => '最后修改';
+
+  @override
+  String get deleteWorkbenchConfirm => '确认删除';
+
+  @override
+  String get workbenchDetailShort => '详情';
 }

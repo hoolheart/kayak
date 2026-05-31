@@ -667,6 +667,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create your first workbench'**
   String get emptyWorkbenchAction;
+
+  /// Workbench detail page title
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench Details'**
+  String get workbenchDetail;
+
+  /// Device tree panel title
+  ///
+  /// In en, this message translates to:
+  /// **'Device Tree'**
+  String get deviceTree;
+
+  /// Device detail panel title
+  ///
+  /// In en, this message translates to:
+  /// **'Device Details'**
+  String get deviceDetail;
+
+  /// Device tree placeholder description
+  ///
+  /// In en, this message translates to:
+  /// **'Will be implemented in the next Sprint'**
+  String get deviceTreePlaceholder;
+
+  /// Device detail placeholder description
+  ///
+  /// In en, this message translates to:
+  /// **'Select a device to view details'**
+  String get deviceDetailPlaceholder;
+
+  /// Workbench not found error message
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench not found or has been deleted'**
+  String get workbenchNotFound;
+
+  /// Add device button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Device'**
+  String get addDevice;
+
+  /// Created at label
+  ///
+  /// In en, this message translates to:
+  /// **'Created at'**
+  String get createdAt;
+
+  /// Last modified label
+  ///
+  /// In en, this message translates to:
+  /// **'Last modified'**
+  String get lastModified;
+
+  /// Delete confirmation button label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get deleteWorkbenchConfirm;
+
+  /// Mobile short title
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get workbenchDetailShort;
 }
 
 class _AppLocalizationsDelegate
