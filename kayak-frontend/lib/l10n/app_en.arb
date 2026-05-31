@@ -3,5 +3,121 @@
   "appTitle": "Kayak",
   "@appTitle": {
     "description": "Application title"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button/label"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Register button/label"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button/label"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "username": "Username",
+  "@username": {
+    "description": "Username field label"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard navigation label"
+  },
+  "workbenches": "Workbenches",
+  "@workbenches": {
+    "description": "Workbenches navigation label"
+  },
+  "methods": "Methods",
+  "@methods": {
+    "description": "Methods navigation label"
+  },
+  "experiments": "Experiments",
+  "@experiments": {
+    "description": "Experiments navigation label"
+  },
+  "analysis": "Analysis",
+  "@analysis": {
+    "description": "Analysis navigation label"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings navigation label"
+  },
+  "workbenchList": "Workbench List",
+  "@workbenchList": {
+    "description": "Workbench list page title"
+  },
+  "methodList": "Method List",
+  "@methodList": {
+    "description": "Method list page title"
+  },
+  "experimentList": "Experiment List",
+  "@experimentList": {
+    "description": "Experiment list page title"
+  },
+  "loginError": "Invalid email or password",
+  "@loginError": {
+    "description": "Login error message"
+  },
+  "networkError": "Network error, please check connection",
+  "@networkError": {
+    "description": "Network error message"
+  },
+  "sessionExpired": "Session expired, please login again",
+  "@sessionExpired": {
+    "description": "Session expired message"
+  },
+  "noData": "No data available",
+  "@noData": {
+    "description": "Empty state message"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action button"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm action button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel action button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete action button"
+  },
+  "create": "Create",
+  "@create": {
+    "description": "Create action button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit action button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save action button"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search action button"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Submit action button"
   }
 }
