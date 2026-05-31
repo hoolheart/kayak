@@ -62,7 +62,7 @@ class _DeviceTreeState extends ConsumerState<DeviceTree> {
 
   /// 设备树数据加载后自动展开所有一级节点
   void _autoExpandRootNodes() {
-    ref.listen(deviceTreeProvider(widget.workbenchId), (prev, next) {
+    ref.listenManual(deviceTreeProvider(widget.workbenchId), (prev, next) {
       if (next is AsyncData<List<DeviceTreeNode>> && next.hasValue) {
         final rootNodeIds = next.value.map((n) => n.id).toSet();
         final newIds = rootNodeIds.difference(_expandedIds);
