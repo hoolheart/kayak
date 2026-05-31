@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kayak_frontend/pages/auth/login_page.dart';
 import 'package:kayak_frontend/pages/auth/register_page.dart';
 import 'package:kayak_frontend/pages/dashboard/dashboard_page.dart';
+import 'package:kayak_frontend/pages/experiment/experiment_list_page.dart';
 import 'package:kayak_frontend/pages/settings/settings_page.dart';
 import 'package:kayak_frontend/pages/workbench/workbench_list_page.dart';
-import 'package:kayak_frontend/pages/experiment/experiment_list_page.dart';
-import 'package:kayak_frontend/pages/method/method_list_page.dart';
-import 'package:kayak_frontend/pages/analysis/analysis_page.dart';
 
 void main() {
   testWidgets('LoginPage screenshot', (tester) async {
