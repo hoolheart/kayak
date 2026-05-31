@@ -102,7 +102,9 @@ class _PasswordFieldState extends State<PasswordField> {
             _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
           ),
           onPressed: () => setState(() => _obscureText = !_obscureText),
-          tooltip: _obscureText ? 'Show password' : 'Hide password',
+          tooltip: _obscureText
+              ? localizations.showPassword
+              : localizations.hidePassword,
         ),
       ),
       validator: widget.validator,
@@ -268,7 +270,7 @@ class PasswordStrengthIndicator extends StatelessWidget {
     } else if (strength > 0.60) {
       return (localizations.passwordStrengthGood, colorScheme.primary, 3);
     } else if (strength > 0.25) {
-      return (localizations.passwordStrengthMedium, colorScheme.error, 2);
+      return (localizations.passwordStrengthMedium, Colors.orange, 2);
     } else {
       return (localizations.passwordStrengthWeak, colorScheme.error, 1);
     }

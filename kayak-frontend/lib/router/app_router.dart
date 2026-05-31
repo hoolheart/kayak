@@ -32,11 +32,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       final onLogin = state.matchedLocation == '/login';
       final onRegister = state.matchedLocation == '/register';
 
-      // 未登录 + 非公共页面 → 跳转登录页
-      if (!loggedIn && !onLogin && !onRegister) return '/login';
+      // 未登录 + 非公共页面 → 跳转登录页，保存原始 URL
+      if (!loggedIn && !onLogin && !onRegister) {
+        final redirect = Uri.encodeComponent(state.uri.toString());
+        return '/login?redirect=$redirect';
+      }
 
-      // 已登录 + 在登录/注册页 → 跳转首页
-      if (loggedIn && (onLogin || onRegister)) return '/dashboard';
+      // 已登录 + 在登录/注册页 → 跳转回原始 URL 或首页
+      if (loggedIn && (onLogin || onRegister)) {
+        final redirectParam = state.uri.queryParameters['redirect'];
+        if (redirectParam != null && redirectParam.isNotEmpty) {
+          final decoded = Uri.decodeComponent(redirectParam);
+          if (decoded.isNotEmpty && decoded != '/login' && decoded != '/register') {
+            return decoded;
+          }
+        }
+        return '/dashboard';
+      }
 
       // 其他情况 → 不重定向
       return null;

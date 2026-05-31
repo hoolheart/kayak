@@ -220,9 +220,17 @@
   "@emailFormatError": {
     "description": "Email format validation error"
   },
-  "passwordMinLengthError": "Password must be at least 6 characters",
+  "passwordMinLengthError": "Password must be at least 8 characters",
   "@passwordMinLengthError": {
     "description": "Password minimum length validation error"
+  },
+  "showPassword": "Show password",
+  "@showPassword": {
+    "description": "Tooltip for password visibility toggle to show password"
+  },
+  "hidePassword": "Hide password",
+  "@hidePassword": {
+    "description": "Tooltip for password visibility toggle to hide password"
   },
   "noAccountRegister": "Don't have an account? Register",
   "@noAccountRegister": {
@@ -231,5 +239,57 @@
   "usernameOptional": "Username (optional)",
   "@usernameOptional": {
     "description": "Username field label with optional indicator"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile page title"
+  },
+  "editProfile": "Edit Profile",
+  "@editProfile": {
+    "description": "Edit profile section title"
+  },
+  "profileInfo": "Profile Information",
+  "@profileInfo": {
+    "description": "Profile information section title"
+  },
+  "memberSince": "Member since",
+  "@memberSince": {
+    "description": "Label for account registration date"
+  },
+  "changePassword": "Change Password",
+  "@changePassword": {
+    "description": "Change password section title"
+  },
+  "currentPassword": "Current Password",
+  "@currentPassword": {
+    "description": "Current password field label"
+  },
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "New password field label"
+  },
+  "profileUpdateSuccess": "Profile updated successfully",
+  "@profileUpdateSuccess": {
+    "description": "Profile update success message"
+  },
+  "passwordChangeSuccess": "Password changed successfully",
+  "@passwordChangeSuccess": {
+    "description": "Password change success message"
+  },
+  "currentPasswordRequired": "Current password is required",
+  "@currentPasswordRequired": {
+    "description": "Current password field validation error"
+  },
+  "newPasswordRequired": "New password is required",
+  "@newPasswordRequired": {
+    "description": "New password field validation error"
+  },
+  "newPasswordMinLength": "New password must be at least 8 characters",
+  "@newPasswordMinLength": {
+    "description": "New password minimum length validation error"
+  },
+  "passwordInfo": "Password Settings",
+  "@passwordInfo": {
+    "description": "Password settings section title"
   }
 }

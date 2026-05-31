@@ -431,8 +431,20 @@ abstract class AppLocalizations {
   /// Password minimum length validation error
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
+  /// **'Password must be at least 8 characters'**
   String get passwordMinLengthError;
+
+  /// Tooltip for password visibility toggle to show password
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// Tooltip for password visibility toggle to hide password
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
 
   /// Link text to navigate to register page from login
   ///
@@ -445,6 +457,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Username (optional)'**
   String get usernameOptional;
+
+  /// Profile page title
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// Edit profile section title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// Profile information section title
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Information'**
+  String get profileInfo;
+
+  /// Label for account registration date
+  ///
+  /// In en, this message translates to:
+  /// **'Member since'**
+  String get memberSince;
+
+  /// Change password section title
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// Current password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get currentPassword;
+
+  /// New password field label
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// Profile update success message
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdateSuccess;
+
+  /// Password change success message
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangeSuccess;
+
+  /// Current password field validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is required'**
+  String get currentPasswordRequired;
+
+  /// New password field validation error
+  ///
+  /// In en, this message translates to:
+  /// **'New password is required'**
+  String get newPasswordRequired;
+
+  /// New password minimum length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'New password must be at least 8 characters'**
+  String get newPasswordMinLength;
+
+  /// Password settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'Password Settings'**
+  String get passwordInfo;
 }
 
 class _AppLocalizationsDelegate

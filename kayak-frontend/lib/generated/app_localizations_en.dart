@@ -176,11 +176,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailFormatError => 'Please enter a valid email address';
 
   @override
-  String get passwordMinLengthError => 'Password must be at least 6 characters';
+  String get passwordMinLengthError => 'Password must be at least 8 characters';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
 
   @override
   String get noAccountRegister => 'Don\'t have an account? Register';
 
   @override
   String get usernameOptional => 'Username (optional)';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get profileInfo => 'Profile Information';
+
+  @override
+  String get memberSince => 'Member since';
+
+  @override
+  String get changePassword => 'Change Password';
+
+  @override
+  String get currentPassword => 'Current Password';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get profileUpdateSuccess => 'Profile updated successfully';
+
+  @override
+  String get passwordChangeSuccess => 'Password changed successfully';
+
+  @override
+  String get currentPasswordRequired => 'Current password is required';
+
+  @override
+  String get newPasswordRequired => 'New password is required';
+
+  @override
+  String get newPasswordMinLength =>
+      'New password must be at least 8 characters';
+
+  @override
+  String get passwordInfo => 'Password Settings';
 }

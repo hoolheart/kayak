@@ -174,11 +174,56 @@ class AppLocalizationsZh extends AppLocalizations {
   String get emailFormatError => '请输入有效的邮箱地址';
 
   @override
-  String get passwordMinLengthError => '密码至少需要 6 个字符';
+  String get passwordMinLengthError => '密码至少需要 8 个字符';
+
+  @override
+  String get showPassword => '显示密码';
+
+  @override
+  String get hidePassword => '隐藏密码';
 
   @override
   String get noAccountRegister => '还没有账号？立即注册';
 
   @override
   String get usernameOptional => '用户名（选填）';
+
+  @override
+  String get profile => '个人资料';
+
+  @override
+  String get editProfile => '编辑资料';
+
+  @override
+  String get profileInfo => '个人信息';
+
+  @override
+  String get memberSince => '注册于';
+
+  @override
+  String get changePassword => '修改密码';
+
+  @override
+  String get currentPassword => '当前密码';
+
+  @override
+  String get newPassword => '新密码';
+
+  @override
+  String get profileUpdateSuccess => '资料更新成功';
+
+  @override
+  String get passwordChangeSuccess => '密码修改成功';
+
+  @override
+  String get currentPasswordRequired => '请输入当前密码';
+
+  @override
+  String get newPasswordRequired => '请输入新密码';
+
+  @override
+  String get newPasswordMinLength => '新密码至少需要 8 个字符';
+
+  @override
+  String get passwordInfo => '密码设置';
 }

@@ -152,6 +152,44 @@ class AuthService {
     return apiResponse.data;
   }
 
+  /// 更新用户资料
+  ///
+  /// 调用 `PUT /api/v1/users/me` 更新用户信息（如用户名）。
+  ///
+  /// [username] 新的用户名
+  /// 返回更新后的 [User] 对象
+  Future<User> updateProfile({required String username}) async {
+    final response = await _authDio.put(
+      '/api/v1/users/me',
+      data: {'username': username},
+      options: Options(headers: {'Authorization': 'Bearer $_accessToken'}),
+    );
+
+    final apiResponse = ApiResponse<User>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => User.fromJson(json as Map<String, dynamic>),
+    );
+
+    return apiResponse.data;
+  }
+
+  /// 修改密码
+  ///
+  /// 调用 `POST /api/v1/users/me/password` 修改用户密码。
+  ///
+  /// [oldPassword] 当前密码
+  /// [newPassword] 新密码
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    await _authDio.post(
+      '/api/v1/users/me/password',
+      data: {'old_password': oldPassword, 'new_password': newPassword},
+      options: Options(headers: {'Authorization': 'Bearer $_accessToken'}),
+    );
+  }
+
   /// 登出
   ///
   /// 清除内存中的 Token 和持久化存储中的 Token。
