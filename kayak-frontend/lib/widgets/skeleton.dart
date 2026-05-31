@@ -299,6 +299,9 @@ class _ShimmerContainer extends StatelessWidget {
 }
 
 /// Shimmer 占位块。
+///
+/// 当提供了 [widthFraction] 时，使用 [FractionallySizedBox] 按比例约束宽度，
+/// 避免 `double.infinity * widthFraction` 产生无穷大值的问题。
 class _ShimmerPlaceholder extends StatelessWidget {
   const _ShimmerPlaceholder({
     required this.width,
@@ -316,13 +319,26 @@ class _ShimmerPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      width: widthFraction != null ? width * widthFraction! : width,
+    final placeholder = Container(
       height: height,
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withAlpha(128),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
+    );
+
+    if (widthFraction != null) {
+      // 使用 FractionallySizedBox 确保 widthFraction 相对于父约束生效，
+      // 而非直接乘以 width（当 width 为 double.infinity 时结果仍为 infinity）。
+      return FractionallySizedBox(
+        widthFactor: widthFraction,
+        child: placeholder,
+      );
+    }
+
+    return SizedBox(
+      width: width,
+      child: placeholder,
     );
   }
 }

@@ -7,7 +7,8 @@ import 'package:kayak_frontend/widgets/skeleton.dart';
 
 /// 统一异步数据状态分发组件。
 ///
-/// 封装异步数据加载的三种状态（Loading / Data / Error）和空数据状态，
+/// 封装异步数据加载的四种状态（Loading / Data / Error / Empty），
+/// 其中 Empty 在 Data 状态下根据 [emptyCondition]（默认空列表或空字符串）触发。
 /// 消除页面中重复的状态判断逻辑，保证用户体验一致性。
 ///
 /// 用法：
@@ -61,7 +62,8 @@ class AsyncValueWidget<T> extends StatelessWidget {
   /// 自定义空数据判断条件。
   ///
   /// 如果返回 true，则渲染 [emptyBuilder]。
-  /// 未提供时，仅对空列表 (List.isEmpty) 触发空状态。
+  /// 未提供时，默认对空列表 (`data is List && data.isEmpty`) 和空字符串
+  /// (`data is String && data.isEmpty`) 触发空状态。
   final bool Function(T data)? emptyCondition;
 
   /// 重试回调，传给 ErrorView。

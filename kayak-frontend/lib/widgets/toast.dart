@@ -319,7 +319,9 @@ class _ToastEntryState extends State<_ToastEntry>
       case ToastType.info:
         return const Duration(seconds: 3);
       case ToastType.loading:
-        return const Duration(days: 365);
+        // Loading 类型不自动消失（由外部调用 dismiss），
+        // 此处返回默认值以满足枚举穷尽性检查，实际不会被使用。
+        return const Duration(seconds: 3);
     }
   }
 
