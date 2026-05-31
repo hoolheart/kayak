@@ -7,20 +7,12 @@ on:
       - 'kayak-backend/**'
       - 'kayak-frontend/**'
       - '.github/workflows/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
   pull_request:
     branches: [main]
     paths:
       - 'kayak-backend/**'
       - 'kayak-frontend/**'
       - '.github/workflows/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
 
 # Cancel redundant workflow runs
 concurrency:

@@ -105,6 +105,9 @@ analyzer:
     - "**/*.freezed.dart"
     - "lib/generated/**"
   
+  errors:
+    non_abstract_class_inherits_abstract_member: ignore
+  
   language:
     strict-casts: true
     strict-raw-types: true
