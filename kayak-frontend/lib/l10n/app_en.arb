@@ -391,5 +391,49 @@
   "emptyWorkbenchAction": "Create your first workbench",
   "@emptyWorkbenchAction": {
     "description": "Empty state action button"
+  },
+  "workbenchDetail": "Workbench Details",
+  "@workbenchDetail": {
+    "description": "Workbench detail page title"
+  },
+  "deviceTree": "Device Tree",
+  "@deviceTree": {
+    "description": "Device tree panel title"
+  },
+  "deviceDetail": "Device Details",
+  "@deviceDetail": {
+    "description": "Device detail panel title"
+  },
+  "deviceTreePlaceholder": "Will be implemented in the next Sprint",
+  "@deviceTreePlaceholder": {
+    "description": "Device tree placeholder description"
+  },
+  "deviceDetailPlaceholder": "Select a device to view details",
+  "@deviceDetailPlaceholder": {
+    "description": "Device detail placeholder description"
+  },
+  "workbenchNotFound": "Workbench not found or has been deleted",
+  "@workbenchNotFound": {
+    "description": "Workbench not found error message"
+  },
+  "addDevice": "Add Device",
+  "@addDevice": {
+    "description": "Add device button"
+  },
+  "createdAt": "Created at",
+  "@createdAt": {
+    "description": "Created at label"
+  },
+  "lastModified": "Last modified",
+  "@lastModified": {
+    "description": "Last modified label"
+  },
+  "deleteWorkbenchConfirm": "Confirm Delete",
+  "@deleteWorkbenchConfirm": {
+    "description": "Delete confirmation button label"
+  },
+  "workbenchDetailShort": "Details",
+  "@workbenchDetailShort": {
+    "description": "Mobile short title"
   }
 }

@@ -300,4 +300,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyWorkbenchAction => 'Create your first workbench';
+
+  @override
+  String get workbenchDetail => 'Workbench Details';
+
+  @override
+  String get deviceTree => 'Device Tree';
+
+  @override
+  String get deviceDetail => 'Device Details';
+
+  @override
+  String get deviceTreePlaceholder => 'Will be implemented in the next Sprint';
+
+  @override
+  String get deviceDetailPlaceholder => 'Select a device to view details';
+
+  @override
+  String get workbenchNotFound => 'Workbench not found or has been deleted';
+
+  @override
+  String get addDevice => 'Add Device';
+
+  @override
+  String get createdAt => 'Created at';
+
+  @override
+  String get lastModified => 'Last modified';
+
+  @override
+  String get deleteWorkbenchConfirm => 'Confirm Delete';
+
+  @override
+  String get workbenchDetailShort => 'Details';
 }

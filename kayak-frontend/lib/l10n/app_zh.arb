@@ -391,5 +391,49 @@
   "emptyWorkbenchAction": "创建第一个工作台",
   "@emptyWorkbenchAction": {
     "description": "空状态操作按钮"
+  },
+  "workbenchDetail": "工作台详情",
+  "@workbenchDetail": {
+    "description": "工作台详情页面标题"
+  },
+  "deviceTree": "设备树",
+  "@deviceTree": {
+    "description": "设备树面板标题"
+  },
+  "deviceDetail": "设备详情",
+  "@deviceDetail": {
+    "description": "设备详情面板标题"
+  },
+  "deviceTreePlaceholder": "将在下一个 Sprint 实现",
+  "@deviceTreePlaceholder": {
+    "description": "设备树占位区域描述"
+  },
+  "deviceDetailPlaceholder": "选择左侧设备查看详情",
+  "@deviceDetailPlaceholder": {
+    "description": "设备详情占位区域描述"
+  },
+  "workbenchNotFound": "工作台不存在或已被删除",
+  "@workbenchNotFound": {
+    "description": "工作台未找到错误消息"
+  },
+  "addDevice": "添加设备",
+  "@addDevice": {
+    "description": "添加设备按钮"
+  },
+  "createdAt": "创建于",
+  "@createdAt": {
+    "description": "创建时间标签"
+  },
+  "lastModified": "最后修改",
+  "@lastModified": {
+    "description": "最后修改时间标签"
+  },
+  "deleteWorkbenchConfirm": "确认删除",
+  "@deleteWorkbenchConfirm": {
+    "description": "删除确认按钮"
+  },
+  "workbenchDetailShort": "详情",
+  "@workbenchDetailShort": {
+    "description": "移动端短标题"
   }
 }
