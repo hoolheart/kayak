@@ -83,3 +83,53 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
 final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );
+
+/// 语言偏好 Notifier。
+///
+/// 使用 Riverpod 3.x [Notifier] API，纯同步操作。
+/// 管理 [Locale] 状态并通过 [SharedPreferences] 持久化。
+class LocaleNotifier extends Notifier<Locale> {
+  /// SharedPreferences 中存储语言代码的 Key
+  static const String _localeKey = 'locale_language_code';
+
+  @override
+  Locale build() {
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      final storedValue = prefs.getString(_localeKey);
+      if (storedValue == null) return const Locale('en');
+      return Locale(storedValue);
+    } catch (_) {
+      // SharedPreferences 不可用时回退到默认值
+      return const Locale('en');
+    }
+  }
+
+  /// 设置语言偏好并持久化到 SharedPreferences。
+  ///
+  /// [locale] 支持 [Locale('en')]、[Locale('zh')]。
+  /// 状态变更立即生效，同步更新 [state] 和存储。
+  void setLocale(Locale locale) {
+    state = locale;
+    try {
+      final prefs = ref.read(sharedPreferencesProvider);
+      prefs.setString(_localeKey, locale.languageCode);
+    } catch (_) {
+      // 持久化失败时静默处理，状态已更新到内存中
+    }
+  }
+}
+
+/// 语言偏好的 Provider。
+///
+/// 通过 [NotifierProvider] 暴露 [LocaleNotifier]，
+/// 支持读写访问：
+/// ```dart
+/// // 读取
+/// final locale = ref.watch(localeProvider);
+/// // 写入
+/// ref.read(localeProvider.notifier).setLocale(const Locale('zh'));
+/// ```
+final localeProvider = NotifierProvider<LocaleNotifier, Locale>(
+  LocaleNotifier.new,
+);

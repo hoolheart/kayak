@@ -10,4 +10,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appTitle => 'Kayak';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get register => 'Register';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get dashboard => 'Dashboard';
+
+  @override
+  String get workbenches => 'Workbenches';
+
+  @override
+  String get methods => 'Methods';
+
+  @override
+  String get experiments => 'Experiments';
+
+  @override
+  String get analysis => 'Analysis';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get workbenchList => 'Workbench List';
+
+  @override
+  String get methodList => 'Method List';
+
+  @override
+  String get experimentList => 'Experiment List';
+
+  @override
+  String get loginError => 'Invalid email or password';
+
+  @override
+  String get networkError => 'Network error, please check connection';
+
+  @override
+  String get sessionExpired => 'Session expired, please login again';
+
+  @override
+  String get noData => 'No data available';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get submit => 'Submit';
 }
