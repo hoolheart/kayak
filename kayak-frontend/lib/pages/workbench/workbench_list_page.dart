@@ -7,13 +7,13 @@ import 'package:intl/intl.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/workbench.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/services.dart';
 import '../../providers/workbench_provider.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_view.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/toast.dart';
+import 'workbench_create_dialog.dart';
 
 // ============================================================
 // WorkbenchListPage — 工作台列表页面
@@ -61,7 +61,7 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
   /// 显示创建工作台对话框
   void _showCreateDialog() {
     final l10n = AppLocalizations.of(context)!;
-    _WorkbenchFormDialog.show(
+    WorkbenchFormDialog.show(
       context: context,
       ref: ref,
       title: l10n.workbenchCreate,
@@ -73,7 +73,7 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
   /// 显示编辑工作台对话框
   void _showEditDialog(Workbench workbench) {
     final l10n = AppLocalizations.of(context)!;
-    _WorkbenchFormDialog.show(
+    WorkbenchFormDialog.show(
       context: context,
       ref: ref,
       title: l10n.workbenchEdit,
@@ -192,9 +192,62 @@ class _WorkbenchListPageState extends ConsumerState<WorkbenchListPage> {
   }
 
   /// 骨架屏加载指示器
+  ///
+  /// 显示与数据视图相同布局的骨架卡片网格，
+  /// 让用户提前感知内容的布局结构。
   Widget _buildSkeletonGrid() {
-    return const Center(
-      child: CircularProgressIndicator(),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final columnCount = _getColumnCount(screenWidth);
+    const padding = 16.0;
+    const spacing = 16.0;
+
+    return Padding(
+      padding: const EdgeInsets.all(padding),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final cardWidth =
+              (constraints.maxWidth - spacing * (columnCount - 1)) /
+                  columnCount;
+
+          return Column(
+            children: [
+              // 第一行骨架卡片
+              Expanded(
+                child: Row(
+                  children: [
+                    for (var col = 0; col < columnCount; col++)
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: col > 0 ? spacing : 0),
+                        child: SizedBox(
+                          width: cardWidth,
+                          child: const _StaticSkeletonCard(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: spacing),
+              // 第二行骨架卡片
+              Expanded(
+                child: Row(
+                  children: [
+                    for (var col = 0; col < columnCount; col++)
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: col > 0 ? spacing : 0),
+                        child: SizedBox(
+                          width: cardWidth,
+                          child: const _StaticSkeletonCard(),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -617,13 +670,6 @@ class _WorkbenchCardState extends State<_WorkbenchCard> {
 
   /// 格式化日期
   String _formatDate(DateTime dateTime) {
-    final now = DateTime.now();
-    final diff = now.difference(dateTime);
-
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-    if (diff.inDays < 1) return '${diff.inHours}h ago';
-    if (diff.inDays < 7) return '${diff.inDays}d ago';
     return DateFormat('yyyy-MM-dd').format(dateTime);
   }
 }
@@ -711,6 +757,120 @@ class _CardActionButton extends StatelessWidget {
           minWidth: 32,
           minHeight: 32,
         ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// _StaticSkeletonCard — 静态骨架屏卡片（无动画）
+//
+// 用于加载状态的骨架屏显示。与 _WorkbenchCardSkeleton 不同，
+// 此组件不包含 shimmer 动画，布局更稳定，适用于测试环境。
+// ============================================================
+
+class _StaticSkeletonCard extends StatelessWidget {
+  const _StaticSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final baseColor = colorScheme.surfaceContainerHighest.withAlpha(128);
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 180),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 状态标签占位
+          Align(
+            alignment: Alignment.topRight,
+            child: Container(
+              width: 60,
+              height: 20,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // 名称占位
+          Container(
+            height: 16,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 描述行 1 占位
+          Container(
+            height: 14,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: baseColor,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 4),
+          // 描述行 2 占位
+          FractionallySizedBox(
+            widthFactor: 0.7,
+            child: Container(
+              height: 14,
+              decoration: BoxDecoration(
+                color: baseColor,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+          const Spacer(),
+          // 分隔线占位
+          Container(
+            height: 1,
+            color: colorScheme.outlineVariant,
+          ),
+          const SizedBox(height: 8),
+          // 底部行占位
+          Row(
+            children: [
+              Container(
+                height: 12,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const Spacer(),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: baseColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -890,332 +1050,3 @@ class _WorkbenchCardSkeletonState extends State<_WorkbenchCardSkeleton>
   }
 }
 
-// ============================================================
-// _WorkbenchFormDialog — 创建工作台/编辑工作台 对话框
-//
-// 支持创建和编辑两种模式。响应式适配：
-// - 桌面：居中 Dialog，宽度 480px
-// - 移动端：BottomSheet，宽度 100%
-// ============================================================
-
-class _WorkbenchFormDialog extends StatefulWidget {
-  const _WorkbenchFormDialog({
-    required this.ref,
-    required this.title,
-    required this.submitLabel,
-    required this.isEdit,
-    this.workbench,
-  });
-
-  /// 父组件的 ref（用于读取 provider）
-  final WidgetRef ref;
-
-  /// 对话框标题
-  final String title;
-
-  /// 提交按钮标签（"创建" 或 "保存"）
-  final String submitLabel;
-
-  /// 是否为编辑模式
-  final bool isEdit;
-
-  /// 编辑模式时的工作台数据
-  final Workbench? workbench;
-
-  /// 显示对话框
-  static Future<void> show({
-    required BuildContext context,
-    required WidgetRef ref,
-    required String title,
-    required String submitLabel,
-    required bool isEdit,
-    Workbench? workbench,
-  }) async {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    if (screenWidth < 600) {
-      // 移动端：BottomSheet
-      return showModalBottomSheet(
-        context: context,
-        isDismissible: false,
-        enableDrag: false,
-        useSafeArea: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-        ),
-        builder: (_) => _WorkbenchFormDialog(
-          ref: ref,
-          title: title,
-          submitLabel: submitLabel,
-          isEdit: isEdit,
-          workbench: workbench,
-        ),
-      );
-    }
-
-    // 桌面端：居中 Dialog
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-        child: SizedBox(
-          width: 480,
-          child: _WorkbenchFormDialog(
-            ref: ref,
-            title: title,
-            submitLabel: submitLabel,
-            isEdit: isEdit,
-            workbench: workbench,
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  State<_WorkbenchFormDialog> createState() => _WorkbenchFormDialogState();
-}
-
-class _WorkbenchFormDialogState extends State<_WorkbenchFormDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  bool _isSubmitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // 编辑模式：预填现有值
-    if (widget.isEdit && widget.workbench != null) {
-      _nameController.text = widget.workbench!.name;
-      _descriptionController.text = widget.workbench!.description ?? '';
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
-  /// 提交表单
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_isSubmitting) return;
-
-    setState(() => _isSubmitting = true);
-
-    final l10n = AppLocalizations.of(context)!;
-    final authState = widget.ref.read(authProvider);
-
-    try {
-      if (widget.isEdit) {
-        // 编辑模式
-        final workbench = widget.workbench!;
-        final service = widget.ref.read(workbenchServiceProvider);
-        await service.update(workbench.id, {
-          'name': _nameController.text.trim(),
-          'description': _descriptionController.text.trim().isEmpty
-              ? null
-              : _descriptionController.text.trim(),
-        });
-
-        if (!mounted) return;
-        Toast.show(
-          context: context,
-          message: l10n.updateWorkbenchSuccess,
-          type: ToastType.success,
-        );
-        Navigator.of(context).pop();
-        // 刷新列表
-        widget.ref.read(workbenchListProvider.notifier).refresh();
-      } else {
-        // 创建模式
-        final user = authState.asData?.value;
-        await widget.ref.read(workbenchListProvider.notifier).createWorkbench(
-              name: _nameController.text.trim(),
-              description: _descriptionController.text.trim().isEmpty
-                  ? null
-                  : _descriptionController.text.trim(),
-              ownerType: 'user',
-              ownerId: user?.id ?? 'unknown',
-            );
-
-        if (!mounted) return;
-
-        // 检查创建结果
-        final currentState = widget.ref.read(workbenchListProvider);
-        if (currentState is AsyncData) {
-          Toast.show(
-            context: context,
-            message: l10n.createWorkbenchSuccess,
-            type: ToastType.success,
-          );
-          Navigator.of(context).pop();
-        } else {
-          // 创建失败（状态为 AsyncError）
-          setState(() => _isSubmitting = false);
-          final error = currentState is AsyncError ? currentState.error : null;
-          Toast.show(
-            context: context,
-            message: error?.toString() ?? '创建失败',
-            type: ToastType.error,
-          );
-        }
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isSubmitting = false);
-      Toast.show(
-        context: context,
-        message: e.toString(),
-        type: ToastType.error,
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final l10n = AppLocalizations.of(context)!;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
-
-    final horizontalPadding = isMobile ? 24.0 : 32.0;
-
-    return Padding(
-      padding: EdgeInsets.only(
-        top: 32,
-        left: horizontalPadding,
-        right: horizontalPadding,
-        bottom: 24,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 标题行
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.title,
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                if (!isMobile)
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed:
-                        _isSubmitting ? null : () => Navigator.of(context).pop(),
-                    tooltip: l10n.cancel,
-                    visualDensity: VisualDensity.compact,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            // 名称字段
-            TextFormField(
-              controller: _nameController,
-              enabled: !_isSubmitting,
-              decoration: InputDecoration(
-                labelText: l10n.workbenchName,
-                hintText: l10n.workbenchNameHint,
-              ),
-              maxLength: 255,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.workbenchNameRequired;
-                }
-                if (value.length > 255) {
-                  return l10n.workbenchNameMaxLength;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            // 描述字段
-            TextFormField(
-              controller: _descriptionController,
-              enabled: !_isSubmitting,
-              decoration: InputDecoration(
-                labelText: l10n.workbenchDescription,
-                hintText: l10n.workbenchDescriptionHint,
-                alignLabelWithHint: true,
-              ),
-              maxLines: 3,
-              maxLength: 1000,
-              buildCounter: (context, {required currentLength, required isFocused, maxLength}) {
-                return null; // 不显示字数统计
-              },
-            ),
-            const SizedBox(height: 32),
-            // 操作按钮
-            Align(
-              alignment: isMobile ? Alignment.center : Alignment.centerRight,
-              child: isMobile
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        FilledButton(
-                          onPressed: _isSubmitting ? null : _submit,
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(widget.submitLabel),
-                        ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed:
-                              _isSubmitting ? null : () => Navigator.of(context).pop(),
-                          child: Text(l10n.cancel),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextButton(
-                          onPressed:
-                              _isSubmitting ? null : () => Navigator.of(context).pop(),
-                          child: Text(l10n.cancel),
-                        ),
-                        const SizedBox(width: 8),
-                        FilledButton(
-                          onPressed: _isSubmitting ? null : _submit,
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(widget.submitLabel),
-                        ),
-                      ],
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
