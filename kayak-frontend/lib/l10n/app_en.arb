@@ -435,5 +435,292 @@
   "workbenchDetailShort": "Details",
   "@workbenchDetailShort": {
     "description": "Mobile short title"
+  },
+
+  "deviceTreeTitle": "Devices",
+  "@deviceTreeTitle": {
+    "description": "Device tree panel title"
+  },
+  "noDevices": "No devices yet",
+  "@noDevices": {
+    "description": "Device tree empty state"
+  },
+  "addDeviceDialogTitle": "Add Device",
+  "@addDeviceDialogTitle": {
+    "description": "Add device dialog title"
+  },
+  "editDeviceDialogTitle": "Edit Device",
+  "@editDeviceDialogTitle": {
+    "description": "Edit device dialog title"
+  },
+  "deviceName": "Device Name",
+  "@deviceName": {
+    "description": "Device name field label"
+  },
+  "deviceNameHint": "Please enter device name",
+  "@deviceNameHint": {
+    "description": "Device name field hint"
+  },
+  "deviceNameRequired": "Device name is required",
+  "@deviceNameRequired": {
+    "description": "Device name validation error"
+  },
+  "deviceNameMaxLength": "Name cannot exceed 255 characters",
+  "@deviceNameMaxLength": {
+    "description": "Device name max length validation"
+  },
+  "protocolType": "Protocol Type",
+  "@protocolType": {
+    "description": "Protocol type field label"
+  },
+  "protocolTypeHint": "Please select a protocol type",
+  "@protocolTypeHint": {
+    "description": "Protocol type selection hint"
+  },
+  "protocolTypeRequired": "Protocol type is required",
+  "@protocolTypeRequired": {
+    "description": "Protocol type validation error"
+  },
+  "virtualDevice": "Virtual Device",
+  "@virtualDevice": {
+    "description": "Virtual device protocol option"
+  },
+  "modbusTcp": "Modbus TCP",
+  "@modbusTcp": {
+    "description": "Modbus TCP protocol option"
+  },
+  "modbusRtu": "Modbus RTU",
+  "@modbusRtu": {
+    "description": "Modbus RTU protocol option"
+  },
+  "virtualMode": "Virtual Mode",
+  "@virtualMode": {
+    "description": "Virtual mode field label"
+  },
+  "virtualModeHint": "Please select a virtual mode",
+  "@virtualModeHint": {
+    "description": "Virtual mode selection hint"
+  },
+  "virtualModeRequired": "Virtual mode is required",
+  "@virtualModeRequired": {
+    "description": "Virtual mode validation error"
+  },
+  "random": "Random",
+  "@random": {
+    "description": "Random mode"
+  },
+  "sineWave": "Sine Wave",
+  "@sineWave": {
+    "description": "Sine wave mode"
+  },
+  "fixedValue": "Fixed Value",
+  "@fixedValue": {
+    "description": "Fixed value mode"
+  },
+  "increment": "Increment",
+  "@increment": {
+    "description": "Increment mode"
+  },
+  "dataType": "Data Type",
+  "@dataType": {
+    "description": "Data type field label"
+  },
+  "dataTypeHint": "Please select a data type",
+  "@dataTypeHint": {
+    "description": "Data type selection hint"
+  },
+  "dataTypeRequired": "Data type is required",
+  "@dataTypeRequired": {
+    "description": "Data type validation error"
+  },
+  "valueRange": "Value Range",
+  "@valueRange": {
+    "description": "Value range field label"
+  },
+  "minValue": "Min Value",
+  "@minValue": {
+    "description": "Minimum value field label"
+  },
+  "maxValue": "Max Value",
+  "@maxValue": {
+    "description": "Maximum value field label"
+  },
+  "updateInterval": "Update Interval",
+  "@updateInterval": {
+    "description": "Update interval field label"
+  },
+  "ms": "ms",
+  "@ms": {
+    "description": "Milliseconds unit"
+  },
+  "hostAddress": "Host Address",
+  "@hostAddress": {
+    "description": "Host address field label"
+  },
+  "hostAddressHint": "192.168.1.100",
+  "@hostAddressHint": {
+    "description": "Host address field hint"
+  },
+  "hostAddressRequired": "Host address is required",
+  "@hostAddressRequired": {
+    "description": "Host address validation error"
+  },
+  "hostAddressInvalid": "Please enter a valid IPv4 address",
+  "@hostAddressInvalid": {
+    "description": "Host address format validation error"
+  },
+  "port": "Port",
+  "@port": {
+    "description": "Port field label"
+  },
+  "portHint": "502",
+  "@portHint": {
+    "description": "Port field hint"
+  },
+  "portRequired": "Port is required",
+  "@portRequired": {
+    "description": "Port validation error"
+  },
+  "portInvalid": "Port must be an integer between 1-65535",
+  "@portInvalid": {
+    "description": "Port range validation error"
+  },
+  "slaveId": "Slave ID",
+  "@slaveId": {
+    "description": "Slave ID field label"
+  },
+  "slaveIdHint": "1",
+  "@slaveIdHint": {
+    "description": "Slave ID field hint"
+  },
+  "slaveIdInvalid": "Slave ID must be an integer between 1-247",
+  "@slaveIdInvalid": {
+    "description": "Slave ID validation error"
+  },
+  "timeout": "Timeout",
+  "@timeout": {
+    "description": "Timeout field label"
+  },
+  "timeoutHint": "5000",
+  "@timeoutHint": {
+    "description": "Timeout field hint"
+  },
+  "serialPort": "Serial Port",
+  "@serialPort": {
+    "description": "Serial port field label"
+  },
+  "serialPortHint": "Please select a serial port",
+  "@serialPortHint": {
+    "description": "Serial port selection hint"
+  },
+  "serialPortRequired": "Serial port is required",
+  "@serialPortRequired": {
+    "description": "Serial port validation error"
+  },
+  "baudRate": "Baud Rate",
+  "@baudRate": {
+    "description": "Baud rate field label"
+  },
+  "baudRateHint": "Please select a baud rate",
+  "@baudRateHint": {
+    "description": "Baud rate selection hint"
+  },
+  "dataBits": "Data Bits",
+  "@dataBits": {
+    "description": "Data bits field label"
+  },
+  "stopBits": "Stop Bits",
+  "@stopBits": {
+    "description": "Stop bits field label"
+  },
+  "parity": "Parity",
+  "@parity": {
+    "description": "Parity field label"
+  },
+  "none": "None",
+  "@none": {
+    "description": "None option"
+  },
+  "oddParity": "Odd",
+  "@oddParity": {
+    "description": "Odd parity option"
+  },
+  "evenParity": "Even",
+  "@evenParity": {
+    "description": "Even parity option"
+  },
+  "advancedInfo": "Advanced Information",
+  "@advancedInfo": {
+    "description": "Advanced information section title"
+  },
+  "manufacturer": "Manufacturer",
+  "@manufacturer": {
+    "description": "Manufacturer field label"
+  },
+  "manufacturerHint": "e.g. Siemens",
+  "@manufacturerHint": {
+    "description": "Manufacturer field hint"
+  },
+  "modelName": "Model",
+  "@modelName": {
+    "description": "Model field label"
+  },
+  "modelHint": "e.g. S7-1200",
+  "@modelHint": {
+    "description": "Model field hint"
+  },
+  "serialNumber": "Serial Number",
+  "@serialNumber": {
+    "description": "Serial number field label"
+  },
+  "serialNumberHint": "e.g. SN123456",
+  "@serialNumberHint": {
+    "description": "Serial number field hint"
+  },
+  "deviceSaveSuccess": "Device saved successfully",
+  "@deviceSaveSuccess": {
+    "description": "Device save success toast"
+  },
+  "deviceDeleteTitle": "Delete Device?",
+  "@deviceDeleteTitle": {
+    "description": "Delete device confirmation dialog title"
+  },
+  "deviceDeleteDescription": "Are you sure you want to delete device \"{name}\"?",
+  "@deviceDeleteDescription": {
+    "description": "Delete device confirmation dialog description",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Sensor1"
+      }
+    }
+  },
+  "deviceDeleteSuccess": "Device deleted successfully",
+  "@deviceDeleteSuccess": {
+    "description": "Device delete success toast"
+  },
+  "editDevice": "Edit Device",
+  "@editDevice": {
+    "description": "Edit device action button"
+  },
+  "addSubDevice": "Add Sub-Device",
+  "@addSubDevice": {
+    "description": "Add sub-device action button"
+  },
+  "deleteDevice": "Delete Device",
+  "@deleteDevice": {
+    "description": "Delete device action button"
+  },
+  "confirmDeleteDevice": "Confirm Delete",
+  "@confirmDeleteDevice": {
+    "description": "Confirm delete device button"
+  },
+  "basicInfo": "Basic Information",
+  "@basicInfo": {
+    "description": "Basic information section title"
+  },
+  "protocolConfig": "Protocol Configuration",
+  "@protocolConfig": {
+    "description": "Protocol configuration section title"
   }
 }

@@ -333,4 +333,216 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workbenchDetailShort => 'Details';
+
+  @override
+  String get deviceTreeTitle => 'Devices';
+
+  @override
+  String get noDevices => 'No devices yet';
+
+  @override
+  String get addDeviceDialogTitle => 'Add Device';
+
+  @override
+  String get editDeviceDialogTitle => 'Edit Device';
+
+  @override
+  String get deviceName => 'Device Name';
+
+  @override
+  String get deviceNameHint => 'Please enter device name';
+
+  @override
+  String get deviceNameRequired => 'Device name is required';
+
+  @override
+  String get deviceNameMaxLength => 'Name cannot exceed 255 characters';
+
+  @override
+  String get protocolType => 'Protocol Type';
+
+  @override
+  String get protocolTypeHint => 'Please select a protocol type';
+
+  @override
+  String get protocolTypeRequired => 'Protocol type is required';
+
+  @override
+  String get virtualDevice => 'Virtual Device';
+
+  @override
+  String get modbusTcp => 'Modbus TCP';
+
+  @override
+  String get modbusRtu => 'Modbus RTU';
+
+  @override
+  String get virtualMode => 'Virtual Mode';
+
+  @override
+  String get virtualModeHint => 'Please select a virtual mode';
+
+  @override
+  String get virtualModeRequired => 'Virtual mode is required';
+
+  @override
+  String get random => 'Random';
+
+  @override
+  String get sineWave => 'Sine Wave';
+
+  @override
+  String get fixedValue => 'Fixed Value';
+
+  @override
+  String get increment => 'Increment';
+
+  @override
+  String get dataType => 'Data Type';
+
+  @override
+  String get dataTypeHint => 'Please select a data type';
+
+  @override
+  String get dataTypeRequired => 'Data type is required';
+
+  @override
+  String get valueRange => 'Value Range';
+
+  @override
+  String get minValue => 'Min Value';
+
+  @override
+  String get maxValue => 'Max Value';
+
+  @override
+  String get updateInterval => 'Update Interval';
+
+  @override
+  String get ms => 'ms';
+
+  @override
+  String get hostAddress => 'Host Address';
+
+  @override
+  String get hostAddressHint => '192.168.1.100';
+
+  @override
+  String get hostAddressRequired => 'Host address is required';
+
+  @override
+  String get hostAddressInvalid => 'Please enter a valid IPv4 address';
+
+  @override
+  String get port => 'Port';
+
+  @override
+  String get portHint => '502';
+
+  @override
+  String get portRequired => 'Port is required';
+
+  @override
+  String get portInvalid => 'Port must be an integer between 1-65535';
+
+  @override
+  String get slaveId => 'Slave ID';
+
+  @override
+  String get slaveIdHint => '1';
+
+  @override
+  String get slaveIdInvalid => 'Slave ID must be an integer between 1-247';
+
+  @override
+  String get timeout => 'Timeout';
+
+  @override
+  String get timeoutHint => '5000';
+
+  @override
+  String get serialPort => 'Serial Port';
+
+  @override
+  String get serialPortHint => 'Please select a serial port';
+
+  @override
+  String get serialPortRequired => 'Serial port is required';
+
+  @override
+  String get baudRate => 'Baud Rate';
+
+  @override
+  String get baudRateHint => 'Please select a baud rate';
+
+  @override
+  String get dataBits => 'Data Bits';
+
+  @override
+  String get stopBits => 'Stop Bits';
+
+  @override
+  String get parity => 'Parity';
+
+  @override
+  String get none => 'None';
+
+  @override
+  String get oddParity => 'Odd';
+
+  @override
+  String get evenParity => 'Even';
+
+  @override
+  String get advancedInfo => 'Advanced Information';
+
+  @override
+  String get manufacturer => 'Manufacturer';
+
+  @override
+  String get manufacturerHint => 'e.g. Siemens';
+
+  @override
+  String get modelName => 'Model';
+
+  @override
+  String get modelHint => 'e.g. S7-1200';
+
+  @override
+  String get serialNumber => 'Serial Number';
+
+  @override
+  String get serialNumberHint => 'e.g. SN123456';
+
+  @override
+  String get deviceSaveSuccess => 'Device saved successfully';
+
+  @override
+  String get deviceDeleteTitle => 'Delete Device?';
+
+  @override
+  String deviceDeleteDescription(String name) {
+    return 'Are you sure you want to delete device \"$name\"?';
+  }
+
+  @override
+  String get deviceDeleteSuccess => 'Device deleted successfully';
+
+  @override
+  String get editDevice => 'Edit Device';
+
+  @override
+  String get addSubDevice => 'Add Sub-Device';
+
+  @override
+  String get deleteDevice => 'Delete Device';
+
+  @override
+  String get confirmDeleteDevice => 'Confirm Delete';
+
+  @override
+  String get basicInfo => 'Basic Information';
+
+  @override
+  String get protocolConfig => 'Protocol Configuration';
 }
