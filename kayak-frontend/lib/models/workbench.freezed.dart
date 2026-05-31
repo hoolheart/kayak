@@ -299,7 +299,7 @@ as DateTime,
 /// @nodoc
 mixin _$CreateWorkbenchRequest {
 
- String get name; String? get description;@JsonKey(name: 'owner_type') String get ownerType;
+ String get name; String? get description;@JsonKey(name: 'owner_type') String get ownerType;@JsonKey(name: 'owner_id') String get ownerId;
 /// Create a copy of CreateWorkbenchRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -312,16 +312,16 @@ $CreateWorkbenchRequestCopyWith<CreateWorkbenchRequest> get copyWith => _$Create
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateWorkbenchRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerType, ownerType) || other.ownerType == ownerType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateWorkbenchRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerType, ownerType) || other.ownerType == ownerType)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,ownerType);
+int get hashCode => Object.hash(runtimeType,name,description,ownerType,ownerId);
 
 @override
 String toString() {
-  return 'CreateWorkbenchRequest(name: $name, description: $description, ownerType: $ownerType)';
+  return 'CreateWorkbenchRequest(name: $name, description: $description, ownerType: $ownerType, ownerId: $ownerId)';
 }
 
 
@@ -332,7 +332,7 @@ abstract mixin class $CreateWorkbenchRequestCopyWith<$Res>  {
   factory $CreateWorkbenchRequestCopyWith(CreateWorkbenchRequest value, $Res Function(CreateWorkbenchRequest) _then) = _$CreateWorkbenchRequestCopyWithImpl;
 @useResult
 $Res call({
- String name, String? description,@JsonKey(name: 'owner_type') String ownerType
+ String name, String? description,@JsonKey(name: 'owner_type') String ownerType,@JsonKey(name: 'owner_id') String ownerId
 });
 
 
@@ -349,11 +349,12 @@ class _$CreateWorkbenchRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateWorkbenchRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,Object? ownerType = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? description = freezed,Object? ownerType = null,Object? ownerId = null,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,ownerType: null == ownerType ? _self.ownerType : ownerType // ignore: cast_nullable_to_non_nullable
+as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -439,10 +440,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType, @JsonKey(name: 'owner_id')  String ownerId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateWorkbenchRequest() when $default != null:
-return $default(_that.name,_that.description,_that.ownerType);case _:
+return $default(_that.name,_that.description,_that.ownerType,_that.ownerId);case _:
   return orElse();
 
 }
@@ -460,10 +461,10 @@ return $default(_that.name,_that.description,_that.ownerType);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType, @JsonKey(name: 'owner_id')  String ownerId)  $default,) {final _that = this;
 switch (_that) {
 case _CreateWorkbenchRequest():
-return $default(_that.name,_that.description,_that.ownerType);case _:
+return $default(_that.name,_that.description,_that.ownerType,_that.ownerId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -480,10 +481,10 @@ return $default(_that.name,_that.description,_that.ownerType);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? description, @JsonKey(name: 'owner_type')  String ownerType, @JsonKey(name: 'owner_id')  String ownerId)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateWorkbenchRequest() when $default != null:
-return $default(_that.name,_that.description,_that.ownerType);case _:
+return $default(_that.name,_that.description,_that.ownerType,_that.ownerId);case _:
   return null;
 
 }
@@ -495,12 +496,13 @@ return $default(_that.name,_that.description,_that.ownerType);case _:
 @JsonSerializable()
 
 class _CreateWorkbenchRequest implements CreateWorkbenchRequest {
-  const _CreateWorkbenchRequest({required this.name, this.description, @JsonKey(name: 'owner_type') required this.ownerType});
+  const _CreateWorkbenchRequest({required this.name, this.description, @JsonKey(name: 'owner_type') required this.ownerType, @JsonKey(name: 'owner_id') required this.ownerId});
   factory _CreateWorkbenchRequest.fromJson(Map<String, dynamic> json) => _$CreateWorkbenchRequestFromJson(json);
 
 @override final  String name;
 @override final  String? description;
 @override@JsonKey(name: 'owner_type') final  String ownerType;
+@override@JsonKey(name: 'owner_id') final  String ownerId;
 
 /// Create a copy of CreateWorkbenchRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -515,16 +517,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateWorkbenchRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerType, ownerType) || other.ownerType == ownerType));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateWorkbenchRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.ownerType, ownerType) || other.ownerType == ownerType)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,description,ownerType);
+int get hashCode => Object.hash(runtimeType,name,description,ownerType,ownerId);
 
 @override
 String toString() {
-  return 'CreateWorkbenchRequest(name: $name, description: $description, ownerType: $ownerType)';
+  return 'CreateWorkbenchRequest(name: $name, description: $description, ownerType: $ownerType, ownerId: $ownerId)';
 }
 
 
@@ -535,7 +537,7 @@ abstract mixin class _$CreateWorkbenchRequestCopyWith<$Res> implements $CreateWo
   factory _$CreateWorkbenchRequestCopyWith(_CreateWorkbenchRequest value, $Res Function(_CreateWorkbenchRequest) _then) = __$CreateWorkbenchRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String? description,@JsonKey(name: 'owner_type') String ownerType
+ String name, String? description,@JsonKey(name: 'owner_type') String ownerType,@JsonKey(name: 'owner_id') String ownerId
 });
 
 
@@ -552,11 +554,12 @@ class __$CreateWorkbenchRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateWorkbenchRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? description = freezed,Object? ownerType = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? description = freezed,Object? ownerType = null,Object? ownerId = null,}) {
   return _then(_CreateWorkbenchRequest(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,ownerType: null == ownerType ? _self.ownerType : ownerType // ignore: cast_nullable_to_non_nullable
+as String,ownerId: null == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

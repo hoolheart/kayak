@@ -11,7 +11,7 @@ _Device _$DeviceFromJson(Map<String, dynamic> json) => _Device(
   workbenchId: json['workbench_id'] as String,
   parentId: json['parent_id'] as String?,
   name: json['name'] as String,
-  protocolType: json['protocol_type'] as String,
+  protocolType: $enumDecode(_$ProtocolTypeEnumMap, json['protocol_type']),
   protocolParams: json['protocol_params'] as Map<String, dynamic>?,
   manufacturer: json['manufacturer'] as String?,
   model: json['model'] as String?,
@@ -26,7 +26,7 @@ Map<String, dynamic> _$DeviceToJson(_Device instance) => <String, dynamic>{
   'workbench_id': instance.workbenchId,
   'parent_id': instance.parentId,
   'name': instance.name,
-  'protocol_type': instance.protocolType,
+  'protocol_type': _$ProtocolTypeEnumMap[instance.protocolType]!,
   'protocol_params': instance.protocolParams,
   'manufacturer': instance.manufacturer,
   'model': instance.model,
@@ -36,13 +36,22 @@ Map<String, dynamic> _$DeviceToJson(_Device instance) => <String, dynamic>{
   'updated_at': instance.updatedAt.toIso8601String(),
 };
 
+const _$ProtocolTypeEnumMap = {
+  ProtocolType.virtual: 'virtual',
+  ProtocolType.modbusTcp: 'modbus_tcp',
+  ProtocolType.modbusRtu: 'modbus_rtu',
+  ProtocolType.can: 'can',
+  ProtocolType.visa: 'visa',
+  ProtocolType.mqtt: 'mqtt',
+};
+
 _DeviceTreeNode _$DeviceTreeNodeFromJson(Map<String, dynamic> json) =>
     _DeviceTreeNode(
       id: json['id'] as String,
       workbenchId: json['workbench_id'] as String,
       parentId: json['parent_id'] as String?,
       name: json['name'] as String,
-      protocolType: json['protocol_type'] as String,
+      protocolType: $enumDecode(_$ProtocolTypeEnumMap, json['protocol_type']),
       protocolParams: json['protocol_params'] as Map<String, dynamic>?,
       manufacturer: json['manufacturer'] as String?,
       model: json['model'] as String?,
@@ -63,7 +72,7 @@ Map<String, dynamic> _$DeviceTreeNodeToJson(_DeviceTreeNode instance) =>
       'workbench_id': instance.workbenchId,
       'parent_id': instance.parentId,
       'name': instance.name,
-      'protocol_type': instance.protocolType,
+      'protocol_type': _$ProtocolTypeEnumMap[instance.protocolType]!,
       'protocol_params': instance.protocolParams,
       'manufacturer': instance.manufacturer,
       'model': instance.model,

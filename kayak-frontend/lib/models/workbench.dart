@@ -32,6 +32,7 @@ class CreateWorkbenchRequest with _$CreateWorkbenchRequest {
     required String name,
     String? description,
     @JsonKey(name: 'owner_type') required String ownerType,
+    @JsonKey(name: 'owner_id') required String ownerId,
   }) = _CreateWorkbenchRequest;
 
   factory CreateWorkbenchRequest.fromJson(Map<String, dynamic> json) =>

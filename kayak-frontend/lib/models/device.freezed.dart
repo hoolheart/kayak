@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Device {
 
- String get id;@JsonKey(name: 'workbench_id') String get workbenchId;@JsonKey(name: 'parent_id') String? get parentId; String get name;@JsonKey(name: 'protocol_type') String get protocolType;@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams; String? get manufacturer; String? get model; String? get sn; String get status;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
+ String get id;@JsonKey(name: 'workbench_id') String get workbenchId;@JsonKey(name: 'parent_id') String? get parentId; String get name;@JsonKey(name: 'protocol_type') ProtocolType get protocolType;@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams; String? get manufacturer; String? get model; String? get sn; String get status;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
 /// Create a copy of Device
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $DeviceCopyWith<$Res>  {
   factory $DeviceCopyWith(Device value, $Res Function(Device) _then) = _$DeviceCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') String protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') ProtocolType protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -72,7 +72,7 @@ as String,workbenchId: null == workbenchId ? _self.workbenchId : workbenchId // 
 as String,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,protocolType: null == protocolType ? _self.protocolType : protocolType // ignore: cast_nullable_to_non_nullable
-as String,protocolParams: freezed == protocolParams ? _self.protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
+as ProtocolType,protocolParams: freezed == protocolParams ? _self.protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>?,manufacturer: freezed == manufacturer ? _self.manufacturer : manufacturer // ignore: cast_nullable_to_non_nullable
 as String?,model: freezed == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String?,sn: freezed == sn ? _self.sn : sn // ignore: cast_nullable_to_non_nullable
@@ -164,7 +164,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Device() when $default != null:
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -185,7 +185,7 @@ return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.proto
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Device():
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -205,7 +205,7 @@ return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.proto
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Device() when $default != null:
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -227,7 +227,7 @@ class _Device implements Device {
 @override@JsonKey(name: 'workbench_id') final  String workbenchId;
 @override@JsonKey(name: 'parent_id') final  String? parentId;
 @override final  String name;
-@override@JsonKey(name: 'protocol_type') final  String protocolType;
+@override@JsonKey(name: 'protocol_type') final  ProtocolType protocolType;
  final  Map<String, dynamic>? _protocolParams;
 @override@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams {
   final value = _protocolParams;
@@ -277,7 +277,7 @@ abstract mixin class _$DeviceCopyWith<$Res> implements $DeviceCopyWith<$Res> {
   factory _$DeviceCopyWith(_Device value, $Res Function(_Device) _then) = __$DeviceCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') String protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') ProtocolType protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -301,7 +301,7 @@ as String,workbenchId: null == workbenchId ? _self.workbenchId : workbenchId // 
 as String,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,protocolType: null == protocolType ? _self.protocolType : protocolType // ignore: cast_nullable_to_non_nullable
-as String,protocolParams: freezed == protocolParams ? _self._protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
+as ProtocolType,protocolParams: freezed == protocolParams ? _self._protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>?,manufacturer: freezed == manufacturer ? _self.manufacturer : manufacturer // ignore: cast_nullable_to_non_nullable
 as String?,model: freezed == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String?,sn: freezed == sn ? _self.sn : sn // ignore: cast_nullable_to_non_nullable
@@ -319,7 +319,7 @@ as DateTime,
 /// @nodoc
 mixin _$DeviceTreeNode {
 
- String get id;@JsonKey(name: 'workbench_id') String get workbenchId;@JsonKey(name: 'parent_id') String? get parentId; String get name;@JsonKey(name: 'protocol_type') String get protocolType;@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams; String? get manufacturer; String? get model; String? get sn; String get status; List<DeviceTreeNode> get children;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
+ String get id;@JsonKey(name: 'workbench_id') String get workbenchId;@JsonKey(name: 'parent_id') String? get parentId; String get name;@JsonKey(name: 'protocol_type') ProtocolType get protocolType;@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams; String? get manufacturer; String? get model; String? get sn; String get status; List<DeviceTreeNode> get children;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
 /// Create a copy of DeviceTreeNode
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -352,7 +352,7 @@ abstract mixin class $DeviceTreeNodeCopyWith<$Res>  {
   factory $DeviceTreeNodeCopyWith(DeviceTreeNode value, $Res Function(DeviceTreeNode) _then) = _$DeviceTreeNodeCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') String protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status, List<DeviceTreeNode> children,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') ProtocolType protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status, List<DeviceTreeNode> children,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -376,7 +376,7 @@ as String,workbenchId: null == workbenchId ? _self.workbenchId : workbenchId // 
 as String,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,protocolType: null == protocolType ? _self.protocolType : protocolType // ignore: cast_nullable_to_non_nullable
-as String,protocolParams: freezed == protocolParams ? _self.protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
+as ProtocolType,protocolParams: freezed == protocolParams ? _self.protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>?,manufacturer: freezed == manufacturer ? _self.manufacturer : manufacturer // ignore: cast_nullable_to_non_nullable
 as String?,model: freezed == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String?,sn: freezed == sn ? _self.sn : sn // ignore: cast_nullable_to_non_nullable
@@ -469,7 +469,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DeviceTreeNode() when $default != null:
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.children,_that.createdAt,_that.updatedAt);case _:
@@ -490,7 +490,7 @@ return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.proto
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _DeviceTreeNode():
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.children,_that.createdAt,_that.updatedAt);case _:
@@ -510,7 +510,7 @@ return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.proto
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  String protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'workbench_id')  String workbenchId, @JsonKey(name: 'parent_id')  String? parentId,  String name, @JsonKey(name: 'protocol_type')  ProtocolType protocolType, @JsonKey(name: 'protocol_params')  Map<String, dynamic>? protocolParams,  String? manufacturer,  String? model,  String? sn,  String status,  List<DeviceTreeNode> children, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _DeviceTreeNode() when $default != null:
 return $default(_that.id,_that.workbenchId,_that.parentId,_that.name,_that.protocolType,_that.protocolParams,_that.manufacturer,_that.model,_that.sn,_that.status,_that.children,_that.createdAt,_that.updatedAt);case _:
@@ -532,7 +532,7 @@ class _DeviceTreeNode implements DeviceTreeNode {
 @override@JsonKey(name: 'workbench_id') final  String workbenchId;
 @override@JsonKey(name: 'parent_id') final  String? parentId;
 @override final  String name;
-@override@JsonKey(name: 'protocol_type') final  String protocolType;
+@override@JsonKey(name: 'protocol_type') final  ProtocolType protocolType;
  final  Map<String, dynamic>? _protocolParams;
 @override@JsonKey(name: 'protocol_params') Map<String, dynamic>? get protocolParams {
   final value = _protocolParams;
@@ -589,7 +589,7 @@ abstract mixin class _$DeviceTreeNodeCopyWith<$Res> implements $DeviceTreeNodeCo
   factory _$DeviceTreeNodeCopyWith(_DeviceTreeNode value, $Res Function(_DeviceTreeNode) _then) = __$DeviceTreeNodeCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') String protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status, List<DeviceTreeNode> children,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'workbench_id') String workbenchId,@JsonKey(name: 'parent_id') String? parentId, String name,@JsonKey(name: 'protocol_type') ProtocolType protocolType,@JsonKey(name: 'protocol_params') Map<String, dynamic>? protocolParams, String? manufacturer, String? model, String? sn, String status, List<DeviceTreeNode> children,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -613,7 +613,7 @@ as String,workbenchId: null == workbenchId ? _self.workbenchId : workbenchId // 
 as String,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
 as String?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,protocolType: null == protocolType ? _self.protocolType : protocolType // ignore: cast_nullable_to_non_nullable
-as String,protocolParams: freezed == protocolParams ? _self._protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
+as ProtocolType,protocolParams: freezed == protocolParams ? _self._protocolParams : protocolParams // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>?,manufacturer: freezed == manufacturer ? _self.manufacturer : manufacturer // ignore: cast_nullable_to_non_nullable
 as String?,model: freezed == model ? _self.model : model // ignore: cast_nullable_to_non_nullable
 as String?,sn: freezed == sn ? _self.sn : sn // ignore: cast_nullable_to_non_nullable

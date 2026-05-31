@@ -10,8 +10,8 @@ _Point _$PointFromJson(Map<String, dynamic> json) => _Point(
   id: json['id'] as String,
   deviceId: json['device_id'] as String,
   name: json['name'] as String,
-  dataType: json['data_type'] as String,
-  accessType: json['access_type'] as String,
+  dataType: $enumDecode(_$DataTypeEnumMap, json['data_type']),
+  accessType: $enumDecode(_$AccessTypeEnumMap, json['access_type']),
   unit: json['unit'] as String?,
   minValue: (json['min_value'] as num?)?.toDouble(),
   maxValue: (json['max_value'] as num?)?.toDouble(),
@@ -25,8 +25,8 @@ Map<String, dynamic> _$PointToJson(_Point instance) => <String, dynamic>{
   'id': instance.id,
   'device_id': instance.deviceId,
   'name': instance.name,
-  'data_type': instance.dataType,
-  'access_type': instance.accessType,
+  'data_type': _$DataTypeEnumMap[instance.dataType]!,
+  'access_type': _$AccessTypeEnumMap[instance.accessType]!,
   'unit': instance.unit,
   'min_value': instance.minValue,
   'max_value': instance.maxValue,
@@ -34,6 +34,19 @@ Map<String, dynamic> _$PointToJson(_Point instance) => <String, dynamic>{
   'status': instance.status,
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
+};
+
+const _$DataTypeEnumMap = {
+  DataType.number: 'number',
+  DataType.integer: 'integer',
+  DataType.string: 'string',
+  DataType.boolean: 'boolean',
+};
+
+const _$AccessTypeEnumMap = {
+  AccessType.ro: 'ro',
+  AccessType.wo: 'wo',
+  AccessType.rw: 'rw',
 };
 
 _PointValue _$PointValueFromJson(Map<String, dynamic> json) => _PointValue(

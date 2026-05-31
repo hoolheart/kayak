@@ -35,6 +35,7 @@ _CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
   name: json['name'] as String,
   description: json['description'] as String?,
   ownerType: json['owner_type'] as String,
+  ownerId: json['owner_id'] as String,
 );
 
 Map<String, dynamic> _$CreateWorkbenchRequestToJson(
@@ -43,4 +44,5 @@ Map<String, dynamic> _$CreateWorkbenchRequestToJson(
   'name': instance.name,
   'description': instance.description,
   'owner_type': instance.ownerType,
+  'owner_id': instance.ownerId,
 };

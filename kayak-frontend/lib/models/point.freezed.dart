@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Point {
 
- String get id;@JsonKey(name: 'device_id') String get deviceId; String get name;@JsonKey(name: 'data_type') String get dataType;@JsonKey(name: 'access_type') String get accessType; String? get unit;@JsonKey(name: 'min_value') double? get minValue;@JsonKey(name: 'max_value') double? get maxValue;@JsonKey(name: 'default_value') String? get defaultValue; String get status;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
+ String get id;@JsonKey(name: 'device_id') String get deviceId; String get name;@JsonKey(name: 'data_type') DataType get dataType;@JsonKey(name: 'access_type') AccessType get accessType; String? get unit;@JsonKey(name: 'min_value') double? get minValue;@JsonKey(name: 'max_value') double? get maxValue;@JsonKey(name: 'default_value') String? get defaultValue; String get status;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
 /// Create a copy of Point
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $PointCopyWith<$Res>  {
   factory $PointCopyWith(Point value, $Res Function(Point) _then) = _$PointCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'device_id') String deviceId, String name,@JsonKey(name: 'data_type') String dataType,@JsonKey(name: 'access_type') String accessType, String? unit,@JsonKey(name: 'min_value') double? minValue,@JsonKey(name: 'max_value') double? maxValue,@JsonKey(name: 'default_value') String? defaultValue, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'device_id') String deviceId, String name,@JsonKey(name: 'data_type') DataType dataType,@JsonKey(name: 'access_type') AccessType accessType, String? unit,@JsonKey(name: 'min_value') double? minValue,@JsonKey(name: 'max_value') double? maxValue,@JsonKey(name: 'default_value') String? defaultValue, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -71,8 +71,8 @@ id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,deviceId: null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,dataType: null == dataType ? _self.dataType : dataType // ignore: cast_nullable_to_non_nullable
-as String,accessType: null == accessType ? _self.accessType : accessType // ignore: cast_nullable_to_non_nullable
-as String,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
+as DataType,accessType: null == accessType ? _self.accessType : accessType // ignore: cast_nullable_to_non_nullable
+as AccessType,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
 as String?,minValue: freezed == minValue ? _self.minValue : minValue // ignore: cast_nullable_to_non_nullable
 as double?,maxValue: freezed == maxValue ? _self.maxValue : maxValue // ignore: cast_nullable_to_non_nullable
 as double?,defaultValue: freezed == defaultValue ? _self.defaultValue : defaultValue // ignore: cast_nullable_to_non_nullable
@@ -164,7 +164,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  String dataType, @JsonKey(name: 'access_type')  String accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  DataType dataType, @JsonKey(name: 'access_type')  AccessType accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Point() when $default != null:
 return $default(_that.id,_that.deviceId,_that.name,_that.dataType,_that.accessType,_that.unit,_that.minValue,_that.maxValue,_that.defaultValue,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -185,7 +185,7 @@ return $default(_that.id,_that.deviceId,_that.name,_that.dataType,_that.accessTy
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  String dataType, @JsonKey(name: 'access_type')  String accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  DataType dataType, @JsonKey(name: 'access_type')  AccessType accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Point():
 return $default(_that.id,_that.deviceId,_that.name,_that.dataType,_that.accessType,_that.unit,_that.minValue,_that.maxValue,_that.defaultValue,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -205,7 +205,7 @@ return $default(_that.id,_that.deviceId,_that.name,_that.dataType,_that.accessTy
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  String dataType, @JsonKey(name: 'access_type')  String accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'device_id')  String deviceId,  String name, @JsonKey(name: 'data_type')  DataType dataType, @JsonKey(name: 'access_type')  AccessType accessType,  String? unit, @JsonKey(name: 'min_value')  double? minValue, @JsonKey(name: 'max_value')  double? maxValue, @JsonKey(name: 'default_value')  String? defaultValue,  String status, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Point() when $default != null:
 return $default(_that.id,_that.deviceId,_that.name,_that.dataType,_that.accessType,_that.unit,_that.minValue,_that.maxValue,_that.defaultValue,_that.status,_that.createdAt,_that.updatedAt);case _:
@@ -226,8 +226,8 @@ class _Point implements Point {
 @override final  String id;
 @override@JsonKey(name: 'device_id') final  String deviceId;
 @override final  String name;
-@override@JsonKey(name: 'data_type') final  String dataType;
-@override@JsonKey(name: 'access_type') final  String accessType;
+@override@JsonKey(name: 'data_type') final  DataType dataType;
+@override@JsonKey(name: 'access_type') final  AccessType accessType;
 @override final  String? unit;
 @override@JsonKey(name: 'min_value') final  double? minValue;
 @override@JsonKey(name: 'max_value') final  double? maxValue;
@@ -269,7 +269,7 @@ abstract mixin class _$PointCopyWith<$Res> implements $PointCopyWith<$Res> {
   factory _$PointCopyWith(_Point value, $Res Function(_Point) _then) = __$PointCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'device_id') String deviceId, String name,@JsonKey(name: 'data_type') String dataType,@JsonKey(name: 'access_type') String accessType, String? unit,@JsonKey(name: 'min_value') double? minValue,@JsonKey(name: 'max_value') double? maxValue,@JsonKey(name: 'default_value') String? defaultValue, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String id,@JsonKey(name: 'device_id') String deviceId, String name,@JsonKey(name: 'data_type') DataType dataType,@JsonKey(name: 'access_type') AccessType accessType, String? unit,@JsonKey(name: 'min_value') double? minValue,@JsonKey(name: 'max_value') double? maxValue,@JsonKey(name: 'default_value') String? defaultValue, String status,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
 });
 
 
@@ -292,8 +292,8 @@ id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,deviceId: null == deviceId ? _self.deviceId : deviceId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,dataType: null == dataType ? _self.dataType : dataType // ignore: cast_nullable_to_non_nullable
-as String,accessType: null == accessType ? _self.accessType : accessType // ignore: cast_nullable_to_non_nullable
-as String,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
+as DataType,accessType: null == accessType ? _self.accessType : accessType // ignore: cast_nullable_to_non_nullable
+as AccessType,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
 as String?,minValue: freezed == minValue ? _self.minValue : minValue // ignore: cast_nullable_to_non_nullable
 as double?,maxValue: freezed == maxValue ? _self.maxValue : maxValue // ignore: cast_nullable_to_non_nullable
 as double?,defaultValue: freezed == defaultValue ? _self.defaultValue : defaultValue // ignore: cast_nullable_to_non_nullable

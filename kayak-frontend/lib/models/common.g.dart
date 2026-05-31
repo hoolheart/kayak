@@ -12,7 +12,7 @@ _ApiResponse<T> _$ApiResponseFromJson<T>(
 ) => _ApiResponse<T>(
   code: (json['code'] as num).toInt(),
   message: json['message'] as String,
-  data: _$nullableGenericFromJson(json['data'], fromJsonT),
+  data: fromJsonT(json['data']),
   timestamp: json['timestamp'] as String?,
 );
 
@@ -22,19 +22,9 @@ Map<String, dynamic> _$ApiResponseToJson<T>(
 ) => <String, dynamic>{
   'code': instance.code,
   'message': instance.message,
-  'data': _$nullableGenericToJson(instance.data, toJsonT),
+  'data': toJsonT(instance.data),
   'timestamp': instance.timestamp,
 };
-
-T? _$nullableGenericFromJson<T>(
-  Object? input,
-  T Function(Object? json) fromJson,
-) => input == null ? null : fromJson(input);
-
-Object? _$nullableGenericToJson<T>(
-  T? input,
-  Object? Function(T value) toJson,
-) => input == null ? null : toJson(input);
 
 _PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
   Map<String, dynamic> json,
@@ -44,8 +34,8 @@ _PaginatedResponse<T> _$PaginatedResponseFromJson<T>(
   size: (json['size'] as num).toInt(),
   total: (json['total'] as num).toInt(),
   items: (json['items'] as List<dynamic>).map(fromJsonT).toList(),
-  hasNext: json['has_next'] as bool,
-  hasPrev: json['has_prev'] as bool,
+  hasNext: json['has_next'] as bool?,
+  hasPrev: json['has_prev'] as bool?,
 );
 
 Map<String, dynamic> _$PaginatedResponseToJson<T>(
@@ -63,8 +53,9 @@ Map<String, dynamic> _$PaginatedResponseToJson<T>(
 _AuthTokens _$AuthTokensFromJson(Map<String, dynamic> json) => _AuthTokens(
   accessToken: json['access_token'] as String,
   refreshToken: json['refresh_token'] as String,
-  tokenType: json['token_type'] as String,
-  expiresIn: (json['expires_in'] as num).toInt(),
+  tokenType: json['token_type'] as String?,
+  expiresIn: (json['expires_in'] as num?)?.toInt(),
+  user: User.fromJson(json['user'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$AuthTokensToJson(_AuthTokens instance) =>
@@ -73,4 +64,5 @@ Map<String, dynamic> _$AuthTokensToJson(_AuthTokens instance) =>
       'refresh_token': instance.refreshToken,
       'token_type': instance.tokenType,
       'expires_in': instance.expiresIn,
+      'user': instance.user,
     };
