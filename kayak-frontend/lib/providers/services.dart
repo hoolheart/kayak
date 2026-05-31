@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_client.dart';
 import '../services/auth_interceptor.dart';
 import '../services/auth_service.dart';
+import '../services/device_service.dart';
 import '../services/error_interceptor.dart';
+import '../services/point_service.dart';
 import '../services/token_storage.dart';
 import '../services/workbench_service.dart';
 
@@ -59,4 +61,34 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 /// ```
 final workbenchServiceProvider = Provider<WorkbenchService>((ref) {
   return WorkbenchService(ref.read(apiClientProvider));
+});
+
+/// DeviceService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [DeviceService] 实例。
+/// 依赖 [apiClientProvider] 用于 HTTP 请求。
+///
+/// 在测试中通过 `overrideWithValue` 注入 FakeDeviceService：
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   deviceServiceProvider.overrideWithValue(fakeService),
+/// ]);
+/// ```
+final deviceServiceProvider = Provider<DeviceService>((ref) {
+  return DeviceService(ref.read(apiClientProvider));
+});
+
+/// PointService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [PointService] 实例。
+/// 依赖 [apiClientProvider] 用于 HTTP 请求。
+///
+/// 在测试中通过 `overrideWithValue` 注入 FakePointService：
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   pointServiceProvider.overrideWithValue(fakeService),
+/// ]);
+/// ```
+final pointServiceProvider = Provider<PointService>((ref) {
+  return PointService(ref.read(apiClientProvider));
 });
