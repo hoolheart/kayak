@@ -13,9 +13,9 @@ class User {
     required this.email,
     this.username,
     this.avatarUrl,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
+    this.status,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -24,11 +24,11 @@ class User {
   final String? username;
   @JsonKey(name: 'avatar_url')
   final String? avatarUrl;
-  final String status;
+  final String? status;
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
   User copyWith({
