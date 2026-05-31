@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../generated/app_localizations.dart';
 import '../models/device.dart';
 import '../providers/device_provider.dart';
-import '../providers/services.dart';
 import 'toast.dart';
 
 // ============================================================
@@ -124,6 +123,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
   late final TextEditingController _tcpTimeoutController;
 
   // Modbus RTU 控制器
+  late final TextEditingController _serialPortController;
   late final TextEditingController _rtuSlaveIdController;
   late final TextEditingController _rtuTimeoutController;
 
@@ -177,15 +177,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
   // 校验位选项
   static const _parityOptions = ['none', 'odd', 'even'];
 
-  // 串口选项（模拟）
-  static const _serialPortOptions = [
-    '/dev/ttyUSB0',
-    '/dev/ttyUSB1',
-    '/dev/ttyS0',
-    '/dev/ttyS1',
-    'COM1',
-    'COM2',
-  ];
+  // 串口选项（将由后端 API 提供，目前保留为自由输入）
 
   // 是否为编辑模式
   bool get _isEditMode => widget.device != null;
@@ -210,6 +202,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     _tcpSlaveIdController = TextEditingController(text: '1');
     _tcpTimeoutController = TextEditingController(text: '5000');
 
+    _serialPortController = TextEditingController(text: device != null ? (device.protocolParams?['serial_port'] as String? ?? '') : '');
     _rtuSlaveIdController = TextEditingController(text: '1');
     _rtuTimeoutController = TextEditingController(text: '5000');
 
@@ -242,6 +235,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
         break;
       case ProtocolType.modbusRtu:
         _serialPort = params['serial_port'] as String?;
+        _serialPortController.text = _serialPort ?? '';
         _baudRate = params['baud_rate'] as int?;
         _dataBits = params['data_bits'] as int?;
         _stopBits = params['stop_bits'] as int?;
@@ -273,6 +267,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     _portController.dispose();
     _tcpSlaveIdController.dispose();
     _tcpTimeoutController.dispose();
+    _serialPortController.dispose();
     _rtuSlaveIdController.dispose();
     _rtuTimeoutController.dispose();
     super.dispose();
@@ -555,7 +550,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
                     if (double.tryParse(value) == null) {
-                      return '请输入有效数字';
+                      return l10n.validNumberRequired;
                     }
                   }
                   return null;
@@ -577,13 +572,13 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
                     if (double.tryParse(value) == null) {
-                      return '请输入有效数字';
+                      return l10n.validNumberRequired;
                     }
                     // 检查最小值 < 最大值
                     final minVal = double.tryParse(_minController.text);
                     final maxVal = double.tryParse(value);
                     if (minVal != null && maxVal != null && minVal >= maxVal) {
-                      return '最大值必须大于最小值';
+                      return l10n.maxGreaterThanMin;
                     }
                   }
                   return null;
@@ -609,7 +604,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                   if (value != null && value.isNotEmpty) {
                     final interval = int.tryParse(value);
                     if (interval == null || interval < 100) {
-                      return '更新间隔不能小于 100ms';
+                      return l10n.minIntervalMs;
                     }
                   }
                   return null;
@@ -705,7 +700,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
             if (value != null && value.isNotEmpty) {
               final timeout = int.tryParse(value);
               if (timeout == null || timeout < 100) {
-                return '超时时间不能小于 100ms';
+                return l10n.minTimeoutMs;
               }
             }
             return null;
@@ -720,22 +715,15 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 串口
-        DropdownButtonFormField<String>(
-          key: ValueKey('serial_$_serialPort'),
-          initialValue: _serialPort,
+        // 串口（自由输入，待后端 API 提供可用串口列表）
+        TextFormField(
+          controller: _serialPortController,
           decoration: InputDecoration(
             labelText: l10n.serialPort,
-            hintText: l10n.serialPortHint,
+            hintText: '/dev/ttyUSB0',
           ),
-          items: _serialPortOptions.map((port) {
-            return DropdownMenuItem(
-              value: port,
-              child: Text(port),
-            );
-          }).toList(),
           onChanged: (value) {
-            setState(() => _serialPort = value);
+            _serialPort = value;
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -763,7 +751,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
           },
           validator: (value) {
             if (value == null) {
-              return '请选择波特率';
+              return l10n.baudRateRequired;
             }
             return null;
           },
@@ -855,7 +843,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
             if (value != null && value.isNotEmpty) {
               final timeout = int.tryParse(value);
               if (timeout == null || timeout < 100) {
-                return '超时时间不能小于 100ms';
+                return l10n.minTimeoutMs;
               }
             }
             return null;
@@ -901,7 +889,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                   ),
                   validator: (value) {
                     if (value != null && value.length > 255) {
-                      return '最多 255 个字符';
+                      return l10n.max255Chars;
                     }
                     return null;
                   },
@@ -916,7 +904,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                   ),
                   validator: (value) {
                     if (value != null && value.length > 255) {
-                      return '最多 255 个字符';
+                      return l10n.max255Chars;
                     }
                     return null;
                   },
@@ -931,7 +919,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
                   ),
                   validator: (value) {
                     if (value != null && value.length > 255) {
-                      return '最多 255 个字符';
+                      return l10n.max255Chars;
                     }
                     return null;
                   },
@@ -1005,7 +993,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     );
   }
 
-  /// 保存设备
+  /// 保存设备（通过 Provider）
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -1016,24 +1004,29 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      final service = ref.read(deviceServiceProvider);
+      final treeNotifier = ref.read(
+        deviceTreeProvider(widget.workbenchId).notifier,
+      );
+
+      // 将枚举 name (camelCase) 转为 snake_case
+      final protocolStr = _protocolTypeToSnakeCase(_selectedProtocol!);
 
       if (_isEditMode) {
         // 编辑模式
-        await service.update(widget.device!.id, _buildUpdateData());
+        await treeNotifier.updateDevice(
+          widget.device!.id,
+          _buildUpdateData(),
+        );
       } else {
         // 创建模式
-        await service.create(
-          workbenchId: widget.workbenchId,
+        await treeNotifier.createDevice(
+          wbId: widget.workbenchId,
           name: _nameController.text.trim(),
-          protocolType: _selectedProtocol!.name,
+          protocolType: protocolStr,
           protocolParams: _buildProtocolParams(),
           parentId: widget.parentId,
         );
       }
-
-      // 刷新设备树
-      ref.invalidate(deviceTreeProvider(widget.workbenchId));
 
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -1056,11 +1049,21 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     }
   }
 
+  /// 将 ProtocolType 枚举名称转为 snake_case
+  ///
+  /// ProtocolType.modbusTcp.name → "modbusTcp" → "modbus_tcp"
+  String _protocolTypeToSnakeCase(ProtocolType type) {
+    return type.name.replaceAllMapped(
+      RegExp(r'[A-Z]'),
+      (m) => '_${m.group(0)!.toLowerCase()}',
+    );
+  }
+
   /// 构建更新数据
   Map<String, dynamic> _buildUpdateData() {
     final data = <String, dynamic>{
       'name': _nameController.text.trim(),
-      'protocol_type': _selectedProtocol!.name,
+      'protocol_type': _protocolTypeToSnakeCase(_selectedProtocol!),
       'protocol_params': _buildProtocolParams(),
     };
 
@@ -1102,7 +1105,9 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
         };
       case ProtocolType.modbusRtu:
         return {
-          'serial_port': _serialPort,
+          'serial_port': _serialPortController.text.isNotEmpty
+              ? _serialPortController.text.trim()
+              : null,
           'baud_rate': _baudRate,
           'data_bits': _dataBits,
           'stop_bits': _stopBits,
@@ -1133,6 +1138,7 @@ class _DeviceConfigDialogState extends ConsumerState<DeviceConfigDialog> {
     _tcpSlaveIdController.text = '1';
     _tcpTimeoutController.text = '5000';
     _serialPort = null;
+    _serialPortController.clear();
     _baudRate = null;
     _dataBits = null;
     _stopBits = null;

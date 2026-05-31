@@ -545,4 +545,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get protocolConfig => 'Protocol Configuration';
+
+  @override
+  String get validNumberRequired => 'Please enter a valid number';
+
+  @override
+  String get maxGreaterThanMin => 'Maximum must be greater than minimum';
+
+  @override
+  String get minIntervalMs => 'Interval cannot be less than 100ms';
+
+  @override
+  String get minTimeoutMs => 'Timeout cannot be less than 100ms';
+
+  @override
+  String get baudRateRequired => 'Baud rate is required';
+
+  @override
+  String get max255Chars => 'Cannot exceed 255 characters';
 }

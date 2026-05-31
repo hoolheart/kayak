@@ -1153,6 +1153,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Protocol Configuration'**
   String get protocolConfig;
+
+  /// Valid number validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid number'**
+  String get validNumberRequired;
+
+  /// Max must be greater than min validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum must be greater than minimum'**
+  String get maxGreaterThanMin;
+
+  /// Min interval validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Interval cannot be less than 100ms'**
+  String get minIntervalMs;
+
+  /// Min timeout validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout cannot be less than 100ms'**
+  String get minTimeoutMs;
+
+  /// Baud rate required validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Baud rate is required'**
+  String get baudRateRequired;
+
+  /// Max 255 characters validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot exceed 255 characters'**
+  String get max255Chars;
 }
 
 class _AppLocalizationsDelegate

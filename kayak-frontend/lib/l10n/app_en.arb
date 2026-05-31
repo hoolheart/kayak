@@ -722,5 +722,30 @@
   "protocolConfig": "Protocol Configuration",
   "@protocolConfig": {
     "description": "Protocol configuration section title"
+  },
+
+  "validNumberRequired": "Please enter a valid number",
+  "@validNumberRequired": {
+    "description": "Valid number validation error"
+  },
+  "maxGreaterThanMin": "Maximum must be greater than minimum",
+  "@maxGreaterThanMin": {
+    "description": "Max must be greater than min validation error"
+  },
+  "minIntervalMs": "Interval cannot be less than 100ms",
+  "@minIntervalMs": {
+    "description": "Min interval validation error"
+  },
+  "minTimeoutMs": "Timeout cannot be less than 100ms",
+  "@minTimeoutMs": {
+    "description": "Min timeout validation error"
+  },
+  "baudRateRequired": "Baud rate is required",
+  "@baudRateRequired": {
+    "description": "Baud rate required validation error"
+  },
+  "max255Chars": "Cannot exceed 255 characters",
+  "@max255Chars": {
+    "description": "Max 255 characters validation error"
   }
 }

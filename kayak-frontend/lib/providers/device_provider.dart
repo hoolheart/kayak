@@ -46,6 +46,52 @@ class DeviceTreeNotifier extends AsyncNotifier<List<DeviceTreeNode>> {
     state = await AsyncValue.guard(build);
   }
 
+  /// 创建设备
+  ///
+  /// [wbId] 所属工作台 ID
+  /// [name] 设备名称
+  /// [protocolType] 协议类型字符串（snake_case）
+  /// [protocolParams] 协议参数（可选）
+  /// [parentId] 父设备 ID（可选）
+  Future<Device> createDevice({
+    required String wbId,
+    required String name,
+    required String protocolType,
+    Map<String, dynamic>? protocolParams,
+    String? parentId,
+  }) async {
+    final service = ref.read(deviceServiceProvider);
+    final device = await service.create(
+      workbenchId: wbId,
+      name: name,
+      protocolType: protocolType,
+      protocolParams: protocolParams,
+      parentId: parentId,
+    );
+    await refresh();
+    return device;
+  }
+
+  /// 更新设备
+  ///
+  /// [deviceId] 设备 ID
+  /// [data] 需要更新的字段
+  Future<Device> updateDevice(String deviceId, Map<String, dynamic> data) async {
+    final service = ref.read(deviceServiceProvider);
+    final device = await service.update(deviceId, data);
+    await refresh();
+    return device;
+  }
+
+  /// 删除设备
+  ///
+  /// [deviceId] 设备 ID
+  Future<void> deleteDevice(String deviceId) async {
+    final service = ref.read(deviceServiceProvider);
+    await service.delete(deviceId);
+    await refresh();
+  }
+
   /// 将平铺设备列表转换为嵌套树结构
   ///
   /// 按 parentId 分组，递归构建设备树。

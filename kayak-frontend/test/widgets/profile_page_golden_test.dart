@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/pages/settings/settings_page.dart';
 import 'package:kayak_frontend/providers/services.dart';
 import 'package:kayak_frontend/providers/settings_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/fake_auth_service.dart';
 

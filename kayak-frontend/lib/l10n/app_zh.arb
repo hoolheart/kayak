@@ -722,5 +722,30 @@
   "protocolConfig": "协议配置",
   "@protocolConfig": {
     "description": "协议配置区域标题"
+  },
+
+  "validNumberRequired": "请输入有效数字",
+  "@validNumberRequired": {
+    "description": "有效数字验证错误"
+  },
+  "maxGreaterThanMin": "最大值必须大于最小值",
+  "@maxGreaterThanMin": {
+    "description": "最大值必须大于最小值的验证错误"
+  },
+  "minIntervalMs": "更新间隔不能小于 100ms",
+  "@minIntervalMs": {
+    "description": "最小更新间隔验证错误"
+  },
+  "minTimeoutMs": "超时时间不能小于 100ms",
+  "@minTimeoutMs": {
+    "description": "最小超时时间验证错误"
+  },
+  "baudRateRequired": "请选择波特率",
+  "@baudRateRequired": {
+    "description": "波特率必须选择验证错误"
+  },
+  "max255Chars": "最多 255 个字符",
+  "@max255Chars": {
+    "description": "最多 255 个字符验证错误"
   }
 }

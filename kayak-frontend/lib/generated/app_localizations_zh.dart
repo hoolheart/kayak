@@ -541,4 +541,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get protocolConfig => '协议配置';
+
+  @override
+  String get validNumberRequired => '请输入有效数字';
+
+  @override
+  String get maxGreaterThanMin => '最大值必须大于最小值';
+
+  @override
+  String get minIntervalMs => '更新间隔不能小于 100ms';
+
+  @override
+  String get minTimeoutMs => '超时时间不能小于 100ms';
+
+  @override
+  String get baudRateRequired => '请选择波特率';
+
+  @override
+  String get max255Chars => '最多 255 个字符';
 }

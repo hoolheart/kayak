@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../generated/app_localizations.dart';
 import '../models/device.dart';
 import '../providers/device_provider.dart';
-import '../providers/services.dart';
 import 'async_value_widget.dart';
 import 'confirm_dialog.dart';
 import 'device_config_dialog.dart';
@@ -57,7 +56,23 @@ class _DeviceTreeState extends ConsumerState<DeviceTree> {
   @override
   void initState() {
     super.initState();
-    // 默认展开第一层节点（根节点第一次 build 时无子节点，后续 state 刷新时展开）
+    // 默认展开第一层节点（根节点 parentId 为 null）
+    _autoExpandRootNodes();
+  }
+
+  /// 设备树数据加载后自动展开所有一级节点
+  void _autoExpandRootNodes() {
+    ref.listen(deviceTreeProvider(widget.workbenchId), (prev, next) {
+      if (next is AsyncData<List<DeviceTreeNode>> && next.hasValue) {
+        final rootNodeIds = next.value.map((n) => n.id).toSet();
+        final newIds = rootNodeIds.difference(_expandedIds);
+        if (newIds.isNotEmpty) {
+          setState(() {
+            _expandedIds.addAll(newIds);
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -321,11 +336,21 @@ class _DeviceTreeState extends ConsumerState<DeviceTree> {
             ),
           ),
         ),
-        // 子节点（展开时）
-        if (hasChildren && isExpanded)
-          ...node.children.map((child) {
-            return _buildTreeNode(child, depth + 1, l10n);
-          }),
+        // 子节点（展开时，带动画）
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          alignment: Alignment.topCenter,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hasChildren && isExpanded)
+                ...node.children.map((child) {
+                  return _buildTreeNode(child, depth + 1, l10n);
+                }),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -403,16 +428,14 @@ class _DeviceTreeState extends ConsumerState<DeviceTree> {
     );
   }
 
-  /// 执行删除操作
+  /// 执行删除操作（通过 Provider）
   Future<void> _handleDelete(
     DeviceTreeNode node,
     AppLocalizations l10n,
   ) async {
     try {
-      final service = ref.read(deviceServiceProvider);
-      await service.delete(node.id);
-      // 刷新设备树
-      ref.invalidate(deviceTreeProvider(widget.workbenchId));
+      await ref.read(deviceTreeProvider(widget.workbenchId).notifier)
+          .deleteDevice(node.id);
 
       if (!mounted) return;
       Toast.show(
@@ -429,6 +452,7 @@ class _DeviceTreeState extends ConsumerState<DeviceTree> {
       );
     }
   }
+
 }
 
 // ============================================================
