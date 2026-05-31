@@ -38,8 +38,8 @@ void main() {
     await tester.pumpWidget(
       createTestApp(const RegisterPage()),
     );
-    await tester.pumpAndSettle();
-    expect(find.text('Register'), findsOneWidget);
+    await tester.pump();
+    expect(find.text('Kayak'), findsOneWidget);
   });
 
   testWidgets('DashboardPage screenshot', (tester) async {

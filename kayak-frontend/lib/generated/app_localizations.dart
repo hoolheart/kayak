@@ -313,6 +313,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign In'**
   String get signIn;
+
+  /// Confirm password field label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// Confirm password field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password'**
+  String get confirmPasswordHint;
+
+  /// Passwords do not match validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// Username field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Set a display name'**
+  String get usernameHint;
+
+  /// Username field helper text
+  ///
+  /// In en, this message translates to:
+  /// **'Leave blank to use email prefix'**
+  String get usernameHelper;
+
+  /// Link text to navigate to login page
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Login'**
+  String get hasAccount;
+
+  /// Registration success toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Registration successful!'**
+  String get registrationSuccess;
+
+  /// Password strength indicator label
+  ///
+  /// In en, this message translates to:
+  /// **'Password strength'**
+  String get passwordStrength;
+
+  /// Password strength level: weak
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get passwordStrengthWeak;
+
+  /// Password strength level: medium
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get passwordStrengthMedium;
+
+  /// Password strength level: good
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get passwordStrengthGood;
+
+  /// Password strength level: strong
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get passwordStrengthStrong;
+
+  /// Password requirement: minimum length
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get passwordMinLength;
+
+  /// Password requirement: uppercase and lowercase
+  ///
+  /// In en, this message translates to:
+  /// **'Contains uppercase & lowercase letters'**
+  String get passwordUppercaseLowercase;
+
+  /// Password requirement: contains a number
+  ///
+  /// In en, this message translates to:
+  /// **'Contains a number'**
+  String get passwordNumber;
+
+  /// Password requirement: special character
+  ///
+  /// In en, this message translates to:
+  /// **'Contains a special character'**
+  String get passwordSpecial;
+
+  /// Username length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Username must be 3-30 characters'**
+  String get usernameLengthError;
+
+  /// Username invalid characters error
+  ///
+  /// In en, this message translates to:
+  /// **'Only letters, numbers, underscores and hyphens allowed'**
+  String get usernameInvalidChars;
+
+  /// Email format validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get emailFormatError;
+
+  /// Password minimum length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordMinLengthError;
+
+  /// Link text to navigate to register page from login
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Register'**
+  String get noAccountRegister;
+
+  /// Username field label with optional indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Username (optional)'**
+  String get usernameOptional;
 }
 
 class _AppLocalizationsDelegate

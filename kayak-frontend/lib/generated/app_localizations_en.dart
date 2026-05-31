@@ -115,4 +115,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signIn => 'Sign In';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get confirmPasswordHint => 'Please confirm your password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get usernameHint => 'Set a display name';
+
+  @override
+  String get usernameHelper => 'Leave blank to use email prefix';
+
+  @override
+  String get hasAccount => 'Already have an account? Login';
+
+  @override
+  String get registrationSuccess => 'Registration successful!';
+
+  @override
+  String get passwordStrength => 'Password strength';
+
+  @override
+  String get passwordStrengthWeak => 'Weak';
+
+  @override
+  String get passwordStrengthMedium => 'Medium';
+
+  @override
+  String get passwordStrengthGood => 'Good';
+
+  @override
+  String get passwordStrengthStrong => 'Strong';
+
+  @override
+  String get passwordMinLength => 'At least 8 characters';
+
+  @override
+  String get passwordUppercaseLowercase =>
+      'Contains uppercase & lowercase letters';
+
+  @override
+  String get passwordNumber => 'Contains a number';
+
+  @override
+  String get passwordSpecial => 'Contains a special character';
+
+  @override
+  String get usernameLengthError => 'Username must be 3-30 characters';
+
+  @override
+  String get usernameInvalidChars =>
+      'Only letters, numbers, underscores and hyphens allowed';
+
+  @override
+  String get emailFormatError => 'Please enter a valid email address';
+
+  @override
+  String get passwordMinLengthError => 'Password must be at least 6 characters';
+
+  @override
+  String get noAccountRegister => 'Don\'t have an account? Register';
+
+  @override
+  String get usernameOptional => 'Username (optional)';
 }
