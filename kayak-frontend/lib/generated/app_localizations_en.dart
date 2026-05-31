@@ -153,6 +153,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordStrengthStrong => 'Strong';
 
   @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
   String get passwordMinLength => 'At least 8 characters';
 
   @override

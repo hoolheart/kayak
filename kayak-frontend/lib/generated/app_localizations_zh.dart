@@ -153,6 +153,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordStrengthStrong => '强';
 
   @override
+  String get showPassword => '显示密码';
+
+  @override
+  String get hidePassword => '隐藏密码';
+
+  @override
   String get passwordMinLength => '至少 8 个字符';
 
   @override

@@ -22,11 +22,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _passwordFocusNode = FocusNode();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -43,6 +45,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final password = _passwordController.text;
 
     await ref.read(authProvider.notifier).login(email, password);
+
+    // H2: 登录失败后清空密码框（设计规格要求）
+    if (ref.read(authProvider).hasError) {
+      _passwordController.clear();
+    }
   }
 
   @override
@@ -100,12 +107,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       }
                       return null;
                     },
+                    // H3: Enter 键自动聚焦密码框
+                    onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
                   ),
                   const SizedBox(height: 16),
 
                   // ── 密码输入 ──
                   PasswordField(
                     controller: _passwordController,
+                    focusNode: _passwordFocusNode,
                     enabled: !isLoading,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -113,6 +123,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       }
                       return null;
                     },
+                    // H3: Enter 键触发登录提交
+                    onFieldSubmitted: _handleLogin,
                   ),
                   const SizedBox(height: 24),
 

@@ -13,6 +13,8 @@ class EmailField extends StatelessWidget {
     this.validator,
     this.labelText,
     this.hintText,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   /// 文本控制器。
@@ -30,12 +32,19 @@ class EmailField extends StatelessWidget {
   /// 提示文本，默认使用 AppLocalizations 的 emailHint。
   final String? hintText;
 
+  /// 焦点节点。
+  final FocusNode? focusNode;
+
+  /// 提交回调，按 Enter 时触发。
+  final void Function(String?)? onFieldSubmitted;
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       enabled: enabled,
       keyboardType: TextInputType.emailAddress,
       autofillHints: const [AutofillHints.email],
@@ -45,6 +54,7 @@ class EmailField extends StatelessWidget {
         prefixIcon: const Icon(Icons.email_outlined),
       ),
       validator: validator,
+      onFieldSubmitted: onFieldSubmitted,
     );
   }
 }
@@ -60,6 +70,8 @@ class PasswordField extends StatefulWidget {
     this.validator,
     this.labelText,
     this.hintText,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   /// 文本控制器。
@@ -77,6 +89,12 @@ class PasswordField extends StatefulWidget {
   /// 提示文本，默认使用 AppLocalizations 的 passwordHint。
   final String? hintText;
 
+  /// 焦点节点。
+  final FocusNode? focusNode;
+
+  /// 提交回调，按 Enter 时触发。
+  final VoidCallback? onFieldSubmitted;
+
   @override
   State<PasswordField> createState() => _PasswordFieldState();
 }
@@ -90,6 +108,7 @@ class _PasswordFieldState extends State<PasswordField> {
 
     return TextFormField(
       controller: widget.controller,
+      focusNode: widget.focusNode,
       enabled: widget.enabled,
       obscureText: _obscureText,
       autofillHints: const [AutofillHints.password],
@@ -102,10 +121,11 @@ class _PasswordFieldState extends State<PasswordField> {
             _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
           ),
           onPressed: () => setState(() => _obscureText = !_obscureText),
-          tooltip: _obscureText ? 'Show password' : 'Hide password',
+          tooltip: _obscureText ? localizations.showPassword : localizations.hidePassword,
         ),
       ),
       validator: widget.validator,
+      onFieldSubmitted: (_) => widget.onFieldSubmitted?.call(),
     );
   }
 }
