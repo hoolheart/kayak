@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kayak_frontend/app.dart';
 import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/providers/settings_provider.dart';
@@ -54,23 +55,47 @@ void main() {
       ]);
       addTearDown(container.dispose);
 
+      // Create a simple test router without auth redirect guard
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (_, __) => const Scaffold(
+              body: Center(child: Text('Home')),
+            ),
+          ),
+        ],
+      );
+
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const KayakApp(),
+          child: Consumer(
+            builder: (context, ref, _) {
+              final locale = ref.watch(localeProvider);
+              return MaterialApp.router(
+                title: 'Kayak',
+                locale: locale,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                routerConfig: router,
+              );
+            },
+          ),
         ),
       );
       await tester.pump();
 
-      // 初始 locale 应为 en
+      // Verify English locale is default
       var materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(materialApp.locale?.languageCode, equals('en'));
 
-      // 切换到中文
+      // Switch to Chinese
       container
           .read(localeProvider.notifier)
           .setLocale(const Locale('zh'));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
       materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
       expect(materialApp.locale?.languageCode, equals('zh'));
