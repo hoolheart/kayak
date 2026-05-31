@@ -220,9 +220,17 @@
   "@emailFormatError": {
     "description": "邮箱格式验证错误"
   },
-  "passwordMinLengthError": "密码至少需要 6 个字符",
+  "passwordMinLengthError": "密码至少需要 8 个字符",
   "@passwordMinLengthError": {
     "description": "密码最小长度验证错误"
+  },
+  "showPassword": "显示密码",
+  "@showPassword": {
+    "description": "密码可见性切换按钮工具提示：显示密码"
+  },
+  "hidePassword": "隐藏密码",
+  "@hidePassword": {
+    "description": "密码可见性切换按钮工具提示：隐藏密码"
   },
   "noAccountRegister": "还没有账号？立即注册",
   "@noAccountRegister": {

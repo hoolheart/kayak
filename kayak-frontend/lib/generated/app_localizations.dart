@@ -431,8 +431,20 @@ abstract class AppLocalizations {
   /// Password minimum length validation error
   ///
   /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
+  /// **'Password must be at least 8 characters'**
   String get passwordMinLengthError;
+
+  /// Tooltip for password visibility toggle to show password
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// Tooltip for password visibility toggle to hide password
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
 
   /// Link text to navigate to register page from login
   ///

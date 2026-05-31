@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -53,16 +54,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     super.dispose();
   }
 
-  /// 从 AuthNotifier 同步用户名到编辑器。
-  /// 使用 ref.listen 在 auth 状态变更时自动更新控制器。
-  void _onAuthChange(User? prevUser, User? nextUser) {
-    if (nextUser != null && nextUser.username != null) {
-      if (_usernameController.text != nextUser.username) {
-        _usernameController.text = nextUser.username!;
-      }
-    }
-  }
-
   /// 本地化
   AppLocalizations get _l10n => AppLocalizations.of(context)!;
 
@@ -76,20 +67,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.updateProfile(
+      final updatedUser = await authService.updateProfile(
         username: _usernameController.text.trim(),
       );
 
-      // 更新 AuthNotifier 中的用户信息
-      // 注意：AuthNotifier 会从 Token 刷新或 getMe 重新获取，
-      // 这里我们直接更新状态以立即反映变更
+      // 使用 AuthNotifier.updateUser 局部更新状态，避免全量重建
       if (mounted) {
-        ref.invalidate(authProvider);
+        ref.read(authProvider.notifier).updateUser(updatedUser);
         _showSnackBar(_l10n.profileUpdateSuccess);
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar(e.toString(), isError: true);
+        _showSnackBar(_mapProfileError(e), isError: true);
       }
     } finally {
       if (mounted) {
@@ -118,11 +107,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         _oldPasswordController.clear();
         _newPasswordController.clear();
         _confirmPasswordController.clear();
+        // 自动收起密码修改区域
+        setState(() => _passwordSectionExpanded = false);
         _showSnackBar(_l10n.passwordChangeSuccess);
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar(e.toString(), isError: true);
+        _showSnackBar(_mapProfileError(e), isError: true);
       }
     } finally {
       if (mounted) {
@@ -146,17 +137,62 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
+  /// 将资料/密码操作中的异常映射为用户可读的错误消息。
+  String _mapProfileError(Object error) {
+    if (error is DioException) {
+      switch (error.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+        case DioExceptionType.connectionError:
+          return _l10n.networkError;
+
+        case DioExceptionType.badResponse:
+          switch (error.response?.statusCode) {
+            case 400:
+              return '请求格式不正确，请检查输入';
+            case 401:
+              return '登录已过期，请重新登录';
+            case 422:
+              return '输入数据格式不正确';
+            case 500:
+            case 502:
+            case 503:
+              return '服务暂时不可用，请稍后重试';
+            default:
+              return '操作失败，请重试';
+          }
+
+        default:
+          return _l10n.networkError;
+      }
+    }
+    return _l10n.networkError;
+  }
+
   // ============================================================
   // Build
   // ============================================================
   @override
   Widget build(BuildContext context) {
     // 监听 auth 状态变更，自动更新用户名编辑器
-    ref.listen<User?>(authProvider.select((state) => state.asData?.value),
-        _onAuthChange);
+    ref.listen<AsyncValue<User?>>(authProvider, (prev, next) {
+      final nextUser = next.asData?.value;
+      if (nextUser?.username != null) {
+        if (_usernameController.text != nextUser!.username) {
+          _usernameController.text = nextUser.username!;
+        }
+      }
+    });
 
     final authState = ref.watch(authProvider);
     final user = authState.asData?.value;
+
+    // 同步用户名字段：初始加载时 ref.listen 不触发初始回调，
+    // 因此在 build 中直接读取 authState 的初始值同步到编辑器
+    if (user?.username != null && _usernameController.text.isEmpty) {
+      _usernameController.text = user!.username!;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -305,12 +341,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 child: FilledButton.icon(
                   onPressed: _isSavingProfile ? null : _saveProfile,
                   icon: _isSavingProfile
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         )
                       : const Icon(Icons.save_outlined),
@@ -458,12 +494,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onPressed:
                             _isChangingPassword ? null : _changePassword,
                         icon: _isChangingPassword
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               )
                             : const Icon(Icons.check),

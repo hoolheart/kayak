@@ -174,7 +174,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get emailFormatError => '请输入有效的邮箱地址';
 
   @override
-  String get passwordMinLengthError => '密码至少需要 6 个字符';
+  String get passwordMinLengthError => '密码至少需要 8 个字符';
+
+  @override
+  String get showPassword => '显示密码';
+
+  @override
+  String get hidePassword => '隐藏密码';
 
   @override
   String get noAccountRegister => '还没有账号？立即注册';

@@ -176,7 +176,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailFormatError => 'Please enter a valid email address';
 
   @override
-  String get passwordMinLengthError => 'Password must be at least 6 characters';
+  String get passwordMinLengthError => 'Password must be at least 8 characters';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
 
   @override
   String get noAccountRegister => 'Don\'t have an account? Register';

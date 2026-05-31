@@ -25,8 +25,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _obscureConfirm = true;
-
   @override
   void dispose() {
     _usernameController.dispose();
@@ -56,7 +54,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       final localizations = AppLocalizations.of(context)!;
       return localizations.passwordRequired;
     }
-    if (value.length < 6) {
+    if (value.length < 8) {
       final localizations = AppLocalizations.of(context)!;
       return localizations.passwordMinLengthError;
     }
@@ -100,17 +98,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   /// 4. 成功则自动登录并跳转仪表盘
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
-
-    if (_passwordController.text != _confirmPasswordController.text) {
-      final localizations = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(localizations.passwordsDoNotMatch),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
-    }
 
     await ref.read(authProvider.notifier).register(
       _emailController.text.trim(),
@@ -201,7 +188,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   const SizedBox(height: 16),
 
                   // ── 确认密码输入 ──
-                  _buildConfirmPasswordField(localizations, colorScheme, isLoading),
+                  PasswordField(
+                    controller: _confirmPasswordController,
+                    enabled: !isLoading,
+                    labelText: localizations.confirmPassword,
+                    hintText: localizations.confirmPasswordHint,
+                    validator: _validateConfirmPassword,
+                  ),
                   const SizedBox(height: 16),
 
                   // ── 用户名输入（选填） ──
@@ -229,37 +222,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           ),
         ),
       ),
-    );
-  }
-
-  /// 确认密码输入框。
-  Widget _buildConfirmPasswordField(
-    AppLocalizations localizations,
-    ColorScheme colorScheme,
-    bool isLoading,
-  ) {
-    return TextFormField(
-      controller: _confirmPasswordController,
-      enabled: !isLoading,
-      obscureText: _obscureConfirm,
-      autofillHints: const [AutofillHints.password],
-      decoration: InputDecoration(
-        labelText: localizations.confirmPassword,
-        hintText: localizations.confirmPasswordHint,
-        prefixIcon: const Icon(Icons.lock_outlined),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _obscureConfirm
-                ? Icons.visibility_off_outlined
-                : Icons.visibility_outlined,
-          ),
-          onPressed: () => setState(
-            () => _obscureConfirm = !_obscureConfirm,
-          ),
-          tooltip: _obscureConfirm ? 'Show password' : 'Hide password',
-        ),
-      ),
-      validator: _validateConfirmPassword,
     );
   }
 

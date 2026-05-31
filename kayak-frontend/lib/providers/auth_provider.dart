@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/user.dart';
@@ -45,9 +46,13 @@ class AuthNotifier extends AsyncNotifier<User?> {
     // Step 1: Initialize — load tokens from storage
     try {
       await authService.initialize();
-    } catch (_) {
+    } catch (e) {
       // initialize() failed (e.g., TokenStorage unavailable)
-      // Gracefully fall back to unauthenticated state
+      // Log the error for debugging; gracefully fall back to unauthenticated.
+      // Note: We cannot set state = AsyncError() here because build()
+      // return value would override it. Instead we log and return null,
+      // which redirects the user to the login page.
+      debugPrint('AuthNotifier: initialize() failed: $e');
       return null;
     }
 
@@ -86,7 +91,17 @@ class AuthNotifier extends AsyncNotifier<User?> {
   /// 调用 [AuthService.login] 进行登录认证。
   /// 成功后将状态更新为已认证用户，并启动 Token 刷新定时器。
   /// 失败时将状态更新为错误，包含可读的错误消息。
+  bool _isLoading = false;
+
+  /// 用户登录
+  ///
+  /// 调用 [AuthService.login] 进行登录认证。
+  /// 成功后将状态更新为已认证用户，并启动 Token 刷新定时器。
+  /// 失败时将状态更新为错误，包含可读的错误消息。
+  /// 包含 [_isLoading] 标志防止并发调用。
   Future<void> login(String email, String password) async {
+    if (_isLoading) return;
+    _isLoading = true;
     state = const AsyncLoading();
 
     try {
@@ -96,6 +111,8 @@ class AuthNotifier extends AsyncNotifier<User?> {
       state = AsyncData(tokens.user);
     } catch (e, st) {
       state = AsyncError(_mapError(e), st);
+    } finally {
+      _isLoading = false;
     }
   }
 
@@ -109,6 +126,8 @@ class AuthNotifier extends AsyncNotifier<User?> {
     String password, [
     String? username,
   ]) async {
+    if (_isLoading) return;
+    _isLoading = true;
     state = const AsyncLoading();
 
     try {
@@ -122,6 +141,8 @@ class AuthNotifier extends AsyncNotifier<User?> {
       state = AsyncData(tokens.user);
     } catch (e, st) {
       state = AsyncError(_mapError(e), st);
+    } finally {
+      _isLoading = false;
     }
   }
 
@@ -139,6 +160,28 @@ class AuthNotifier extends AsyncNotifier<User?> {
     await authService.logout();
     state = const AsyncData(null);
   }
+
+  /// 本地更新用户信息（不触发网络请求）
+  ///
+  /// 用于用户编辑个人资料后直接更新 UI，
+  /// 避免不必要的 token refresh 和 getMe 请求。
+  void updateUser(User updatedUser) {
+    final current = state.asData?.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(
+        username: updatedUser.username,
+        email: updatedUser.email,
+        avatarUrl: updatedUser.avatarUrl,
+      ));
+    }
+  }
+
+  /// 注册成功通知（供 UI 层监听使用）
+  ///
+  /// 当 authProvider 状态从 AsyncLoading 变为带 user 的 AsyncData 时，
+  /// 表示注册/登录成功。此方法包装状态以供 UI 层方便地监听。
+  bool get isRegistrationSuccess =>
+      state is AsyncData && state.asData?.value != null;
 
   // ==========================================================
   // Private: Token 刷新定时器

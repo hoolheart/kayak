@@ -220,9 +220,17 @@
   "@emailFormatError": {
     "description": "Email format validation error"
   },
-  "passwordMinLengthError": "Password must be at least 6 characters",
+  "passwordMinLengthError": "Password must be at least 8 characters",
   "@passwordMinLengthError": {
     "description": "Password minimum length validation error"
+  },
+  "showPassword": "Show password",
+  "@showPassword": {
+    "description": "Tooltip for password visibility toggle to show password"
+  },
+  "hidePassword": "Hide password",
+  "@hidePassword": {
+    "description": "Tooltip for password visibility toggle to hide password"
   },
   "noAccountRegister": "Don't have an account? Register",
   "@noAccountRegister": {
