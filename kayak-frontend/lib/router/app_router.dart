@@ -14,28 +14,29 @@ import '../pages/not_found_page.dart';
 import '../pages/settings/settings_page.dart';
 import '../pages/workbench/workbench_detail_page.dart';
 import '../pages/workbench/workbench_list_page.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/app_shell.dart';
 
 /// GoRouter 实例提供者
 ///
-/// 路由守卫需要从 authProvider 获取认证状态（TASK-008 实现）。
-/// 当前使用 TODO 占位，待 TASK-008 完成后整合。
+/// 路由守卫监听 [authProvider] 状态，根据认证状态决定页面跳转。
+/// - 未认证访问受保护页面 → 重定向到 `/login`
+/// - 已认证访问 `/login` 或 `/register` → 重定向到 `/dashboard`
 final routerProvider = Provider<GoRouter>((ref) {
-  // TODO: 从 authProvider 获取认证状态
-  // final authState = ref.watch(authProvider);
+  final authState = ref.watch(authProvider);
 
   return GoRouter(
     initialLocation: '/login',
     redirect: (context, state) {
-      // TODO: 根据认证状态重定向。
-      // 待 TASK-008 authProvider 就绪后，使用:
-      //   final loggedIn = authState.isLoggedIn;
-      //   if (loggedIn && (onLogin || onRegister)) return '/dashboard';
+      final loggedIn = authState.asData?.value != null;
       final onLogin = state.matchedLocation == '/login';
       final onRegister = state.matchedLocation == '/register';
 
-      // 未登录 + 非公开页面 → 去登录
-      if (!onLogin && !onRegister) return '/login';
+      // 未登录 + 非公共页面 → 跳转登录页
+      if (!loggedIn && !onLogin && !onRegister) return '/login';
+
+      // 已登录 + 在登录/注册页 → 跳转首页
+      if (loggedIn && (onLogin || onRegister)) return '/dashboard';
 
       // 其他情况 → 不重定向
       return null;
