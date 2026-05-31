@@ -36,6 +36,8 @@ class ErrorInterceptor extends Interceptor {
       DioExceptionType.sendTimeout => '连接超时，请检查网络',
       DioExceptionType.connectionError ||
       DioExceptionType.unknown => '网络错误，请检查连接',
+      // badResponse 通常有 statusCode，但若不在状态码映射表中则使用此兜底
+      DioExceptionType.badResponse => '请求失败，服务器返回错误状态码',
       // 兜底
       _ => '网络错误，请检查连接',
     };

@@ -30,6 +30,9 @@ class ApiClient {
       ),
     );
 
+    // 将 Dio 实例注入 AuthInterceptor，用于复用连接池重试请求
+    authInterceptor.dio = _dio;
+
     // 拦截器注册顺序：Auth → Error → Log
     _dio.interceptors.addAll([
       authInterceptor,
@@ -61,5 +64,10 @@ class ApiClient {
   /// 发起 DELETE 请求
   Future<Response<T>> delete<T>(String path) {
     return _dio.delete<T>(path);
+  }
+
+  /// 发起 PATCH 请求
+  Future<Response<T>> patch<T>(String path, {dynamic data}) {
+    return _dio.patch<T>(path, data: data);
   }
 }

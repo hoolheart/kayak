@@ -98,6 +98,7 @@ ApiClient (组合所有拦截器，业务 API 入口)
 | HTTP 500/502/503 | `'服务器内部错误，请稍后重试'` |
 | connectionTimeout / receiveTimeout / sendTimeout | `'连接超时，请检查网络'` |
 | connectionError / unknown | `'网络错误，请检查连接'` |
+| badResponse（状态码不在映射表中） | `'请求失败，服务器返回错误状态码'` |
 | 其他未映射 | `'网络错误，请检查连接'`（兜底） |
 
 ### 2.3 AuthInterceptor
@@ -107,24 +108,34 @@ ApiClient (组合所有拦截器，业务 API 入口)
 2. `onError`: 检测 401 响应 → 并发锁 → 调用 `AuthService.tryRefresh()` → 刷新成功重试原请求 → 刷新失败清除 Token
 
 ```
-┌───────────────────────────────────────┐
-│           AuthInterceptor             │
-├───────────────────────────────────────┤
-│ - _authService: AuthService           │
-│ - _isRefreshing: bool                 │
-│ - _pendingRequests: List<PendingReq>  │
-├───────────────────────────────────────┤
-│ + onRequest(options, handler)         │
-│ + onError(err, handler)               │
-└───────────────────────────────────────┘
+┌───────────────────────────────────────────┐
+│           AuthInterceptor                 │
+├───────────────────────────────────────────┤
+│ - _authService: AuthService               │
+│ - _dio: Dio? (由 ApiClient 通过 setter 注入)│
+│ - _isRefreshing: bool                     │
+│ - _pendingRequests: List<PendingReq>      │
+├───────────────────────────────────────────┤
+│ + onRequest(options, handler)             │
+│ + onError(err, handler) [Future<void>]   │
+│ + set dio(Dio value)                      │
+│ - _retryWithNewToken(err, handler)        │
+│ - _retrySingleRequest(opts, handler, tok) │
+│ - _handleRefreshFailure(err, handler)     │
+│ - _failAllPending(err)                    │
+└───────────────────────────────────────────┘
 ```
+
+> **设计决策**: `onError` 返回 `Future<void>` 而非 `void`，因为内部执行异步刷新操作。      
+> 重试请求时使用 `_dio.fetch(requestOptions)` 而非 `new Dio().fetch()`，复用同一 Dio 实例的连接池。
+> 提取 `_retrySingleRequest` 方法消除 `_retryWithNewToken` 中的重复代码。
 
 **401 刷新流程图**:
 
 ```
 请求 → 服务器 401
     ↓
-AuthInterceptor.onError
+AuthInterceptor.onError (async)
     ↓
 请求路径包含 /auth/refresh? ──→ YES ──→ handler.next(err)，不处理
     ↓ NO
@@ -134,12 +145,18 @@ _isRefreshing = true? ──→ YES ──→ 加入 pending 队列，等待刷�
     ↓
 调用 _authService.tryRefresh()
     ↓
-┌── 成功 ──→ 更新 Token → 重试原请求 + 重试 pending 队列 → handler.resolve
+┌── 成功 ──→ 更新 Token 
+│            → _retrySingleRequest(原请求) → handler.resolve
+│            → _retrySingleRequest(pending 队列) → pending.resolve
 │
-└── 失败 ──→ 调用 _authService.logout() → handler.next(err) → pending 全部 next(err)
+└── 失败 ──→ 调用 _authService.logout() 
+            → handler.next(401 错误) 
+            → pending 全部 next(401)
     ↓
 _isRefreshing = false, pending 队列清空
 ```
+
+> **重试错误处理**: `_retrySingleRequest` 在重试失败时传递真实的 `DioException`（`handler.next(e)`），而非用原始 401 错误信息包装。
 
 **并发锁说明**:
 - 当第一个 401 触发刷新时，`_isRefreshing = true`
@@ -309,7 +326,9 @@ refresh 完成 → 重试 A → 重试 B → 重试 C → 全部 resolve
 | `get<T>` | `(String path, {Map<String, dynamic>? queryParameters}) → Future<Response<T>>` | GET 请求 |
 | `post<T>` | `(String path, {dynamic data}) → Future<Response<T>>` | POST 请求 |
 | `put<T>` | `(String path, {dynamic data}) → Future<Response<T>>` | PUT 请求 |
+| `patch<T>` | `(String path, {dynamic data}) → Future<Response<T>>` | PATCH 请求 |
 | `delete<T>` | `(String path) → Future<Response<T>>` | DELETE 请求 |
+| `patch<T>` | `(String path, {dynamic data}) → Future<Response<T>>` | PATCH 请求 |
 
 ### 5.2 AuthService API
 
@@ -318,7 +337,7 @@ refresh 完成 → 重试 A → 重试 B → 重试 C → 全部 resolve
 | `initialize` | `() → Future<void>` | 从 TokenStorage 读取 Token 到内存 |
 | `login` | `(String email, String password) → Future<AuthTokens>` | 登录 |
 | `register` | `(String email, String password, String? username) → Future<AuthTokens>` | 注册 |
-| `tryRefresh` | `() → Future<bool>` | 尝试刷新 Token，成功返回 true |
+| `tryRefresh` | `() → Future<bool>` | 尝试刷新 Token，成功返回 true；失败时 `print` 记录异常（非静默吞掉） |
 | `getMe` | `() → Future<User>` | 获取当前用户信息 |
 | `logout` | `() → Future<void>` | 清除内存和存储中的 Token |
 
@@ -368,3 +387,10 @@ refresh 完成 → 重试 A → 重试 B → 重试 C → 全部 resolve
 | D5 | 硬编码中文错误消息 | TASK-006（国际化）完成后迁移到 l10n ARB 文件 |
 | D6 | Dio 5.9.2 Duration API | `connectTimeout: Duration(seconds: 10)` 非旧版 `int` 类型 |
 | D7 | `DioException` 类型 | Dio 5.x 废弃 `DioError`，必须使用新类型 |
+| D8 | `onError` 返回 `Future<void>` 而非 `void` | 内部执行异步刷新 Token 操作，必须支持 `await` |
+| D9 | 重试请求时复用 `_dio` 实例（注入方式） | 避免每次重试创建新 `Dio()` 浪费连接池；通过 `AuthInterceptor.dio` setter 由 `ApiClient` 注入 |
+| D10 | `_retrySingleRequest` 提取为独立方法 | 消除 `_retryWithNewToken` 中的重复代码（DRY） |
+| D11 | 重试失败时传递真实 `DioException` | 保留原始错误信息，方便上层调试和错误追踪 |
+| D12 | `tryRefresh` 的 `catch` 中 `print` 记录异常 | 不静默吞掉异常，保留调试可追溯性 |
+| D13 | `ErrorInterceptor` 处理 `badResponse` 类型 | 补全状态码映射表中的遗漏，为未映射状态码提供兜底消息 |
+| D14 | `ApiClient.patch` 方法 | 部分 REST API 使用 PATCH 方法进行部分资源更新 |

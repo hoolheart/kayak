@@ -29,6 +29,15 @@ class AuthInterceptor extends Interceptor {
 
   final AuthService _authService;
 
+  Dio? _dio;
+
+  /// 设置 Dio 实例引用（由 ApiClient 在构造时调用）
+  ///
+  /// 使用同一 Dio 实例重试请求，避免创建多个独立的连接池。
+  set dio(Dio value) {
+    _dio = value;
+  }
+
   /// 是否正在刷新 Token（并发锁标志）
   bool _isRefreshing = false;
 
@@ -45,7 +54,10 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     // 仅处理 401 错误
     if (err.response?.statusCode != 401) {
       handler.next(err);
@@ -77,8 +89,13 @@ class AuthInterceptor extends Interceptor {
     } catch (e) {
       // 刷新过程中抛出了意外异常
       await _authService.logout();
-      handler.next(err);
-      _failAllPending(err);
+      final refreshErr = e is DioException ? e : DioException(
+        requestOptions: err.requestOptions,
+        message: '刷新 Token 时发生意外错误',
+        error: e,
+      );
+      handler.next(refreshErr);
+      _failAllPending(refreshErr);
     } finally {
       _isRefreshing = false;
       _pendingRequests.clear();
@@ -93,37 +110,52 @@ class AuthInterceptor extends Interceptor {
     final newToken = _authService.accessToken;
 
     // 重试原请求
-    err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-    try {
-      final response = await Dio().fetch(err.requestOptions);
-      handler.resolve(response);
-    } catch (e) {
-      handler.next(
-        DioException(
-          requestOptions: err.requestOptions,
-          message: '重试请求失败',
-          type: err.type,
-          response: err.response,
-        ),
-      );
-    }
+    await _retrySingleRequest(err.requestOptions, handler, newToken);
 
     // 重试所有等待中的请求
     for (final pending in _pendingRequests) {
-      pending.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-      try {
-        final resp = await Dio().fetch(pending.requestOptions);
-        pending.handler.resolve(resp);
-      } catch (e) {
-        pending.handler.next(
-          DioException(
-            requestOptions: pending.requestOptions,
-            message: '重试请求失败',
-            type: err.type,
-            response: err.response,
-          ),
-        );
-      }
+      await _retrySingleRequest(
+        pending.requestOptions,
+        pending.handler,
+        newToken,
+      );
+    }
+  }
+
+  /// 使用新 Token 重试单个请求
+  Future<void> _retrySingleRequest(
+    RequestOptions requestOptions,
+    ErrorInterceptorHandler handler,
+    String? newToken,
+  ) async {
+    final dio = _dio;
+    if (dio == null) {
+      // 边界防御：_dio 未被设置（理论上不会发生）
+      handler.next(
+        DioException(
+          requestOptions: requestOptions,
+          message: '重试请求失败：客户端未正确初始化',
+        ),
+      );
+      return;
+    }
+
+    requestOptions.headers['Authorization'] = 'Bearer $newToken';
+    try {
+      final response = await dio.fetch(requestOptions);
+      handler.resolve(response);
+    } on DioException catch (e) {
+      // 重试失败，传递真实的 DioException
+      handler.next(e);
+    } catch (e) {
+      // 非 Dio 异常，包装为 DioException
+      handler.next(
+        DioException(
+          requestOptions: requestOptions,
+          message: '重试请求时发生意外错误',
+          error: e,
+        ),
+      );
     }
   }
 

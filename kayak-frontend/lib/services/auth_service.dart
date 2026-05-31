@@ -126,8 +126,11 @@ class AuthService {
       final tokens = apiResponse.data;
       await _saveTokens(tokens);
       return true;
-    } catch (_) {
+    } catch (e) {
       // 刷新失败（网络错误、Refresh Token 过期等）
+      // 记录日志以便调试
+      // ignore: avoid_print
+      print('AuthService.tryRefresh failed: $e');
       return false;
     }
   }
