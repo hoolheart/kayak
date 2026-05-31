@@ -115,4 +115,70 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get signIn => '登录';
+
+  @override
+  String get confirmPassword => '确认密码';
+
+  @override
+  String get confirmPasswordHint => '请再次输入密码';
+
+  @override
+  String get passwordsDoNotMatch => '两次密码输入不一致';
+
+  @override
+  String get usernameHint => '设置一个显示名称';
+
+  @override
+  String get usernameHelper => '不填则使用邮箱前缀作为用户名';
+
+  @override
+  String get hasAccount => '已有账号？立即登录';
+
+  @override
+  String get registrationSuccess => '注册成功！';
+
+  @override
+  String get passwordStrength => '密码强度';
+
+  @override
+  String get passwordStrengthWeak => '弱';
+
+  @override
+  String get passwordStrengthMedium => '中';
+
+  @override
+  String get passwordStrengthGood => '良';
+
+  @override
+  String get passwordStrengthStrong => '强';
+
+  @override
+  String get passwordMinLength => '至少 8 个字符';
+
+  @override
+  String get passwordUppercaseLowercase => '包含大小写字母';
+
+  @override
+  String get passwordNumber => '包含数字';
+
+  @override
+  String get passwordSpecial => '包含特殊字符';
+
+  @override
+  String get usernameLengthError => '用户名长度需在 3-30 字符之间';
+
+  @override
+  String get usernameInvalidChars => '仅允许字母、数字、下划线和连字符';
+
+  @override
+  String get emailFormatError => '请输入有效的邮箱地址';
+
+  @override
+  String get passwordMinLengthError => '密码至少需要 6 个字符';
+
+  @override
+  String get noAccountRegister => '还没有账号？立即注册';
+
+  @override
+  String get usernameOptional => '用户名（选填）';
 }

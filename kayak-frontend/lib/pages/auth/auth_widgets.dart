@@ -159,3 +159,154 @@ class AuthSubmitButton extends StatelessWidget {
     );
   }
 }
+
+/// 密码强度指示器。
+///
+/// 用于注册页面，展示密码强度等级（4段颜色条）和要求检查列表。
+/// [strength] 范围 0.0 ~ 1.0，[password] 用于检查列表的实时更新。
+class PasswordStrengthIndicator extends StatelessWidget {
+  const PasswordStrengthIndicator({
+    super.key,
+    required this.strength,
+    required this.password,
+  });
+
+  /// 密码强度值，范围 0.0 ~ 1.0。
+  final double strength;
+
+  /// 当前密码文本，用于要求检查列表。
+  final String password;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final localizations = AppLocalizations.of(context)!;
+
+    if (strength <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final (levelLabel, levelColor, filledSegments) = _getStrengthLevel(
+      localizations: localizations,
+      colorScheme: colorScheme,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── 4 段颜色条 ──
+          Row(
+            children: List.generate(4, (index) {
+              final isFilled = index < filledSegments;
+              final segmentColor = isFilled ? levelColor : colorScheme.surfaceContainerHighest;
+              return Expanded(
+                child: Container(
+                  height: 4,
+                  margin: EdgeInsets.only(
+                    left: index > 0 ? 4 : 0,
+                    right: index < 3 ? 4 : 0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: segmentColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 4),
+
+          // ── 强度文字标签 ──
+          Text(
+            '${localizations.passwordStrength}: $levelLabel',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: levelColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // ── 要求检查列表 ──
+          _RequirementItem(
+            met: password.length >= 8,
+            label: localizations.passwordMinLength,
+          ),
+          const SizedBox(height: 4),
+          _RequirementItem(
+            met: _hasUppercase && _hasLowercase,
+            label: localizations.passwordUppercaseLowercase,
+          ),
+          const SizedBox(height: 4),
+          _RequirementItem(
+            met: _hasDigit,
+            label: localizations.passwordNumber,
+          ),
+          const SizedBox(height: 4),
+          _RequirementItem(
+            met: _hasSpecial,
+            label: localizations.passwordSpecial,
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool get _hasUppercase => password.contains(RegExp(r'[A-Z]'));
+  bool get _hasLowercase => password.contains(RegExp(r'[a-z]'));
+  bool get _hasDigit => password.contains(RegExp(r'[0-9]'));
+  bool get _hasSpecial => password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+
+  /// 根据强度值返回对应的等级标签、颜色和填充段数。
+  (String, Color, int) _getStrengthLevel({
+    required AppLocalizations localizations,
+    required ColorScheme colorScheme,
+  }) {
+    if (strength > 0.80) {
+      return (localizations.passwordStrengthStrong, colorScheme.primary, 4);
+    } else if (strength > 0.60) {
+      return (localizations.passwordStrengthGood, colorScheme.primary, 3);
+    } else if (strength > 0.25) {
+      return (localizations.passwordStrengthMedium, colorScheme.error, 2);
+    } else {
+      return (localizations.passwordStrengthWeak, colorScheme.error, 1);
+    }
+  }
+}
+
+/// 密码要求检查项。
+class _RequirementItem extends StatelessWidget {
+  const _RequirementItem({
+    required this.met,
+    required this.label,
+  });
+
+  /// 是否满足要求。
+  final bool met;
+
+  /// 要求描述文本。
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(
+          met ? Icons.check_circle : Icons.circle_outlined,
+          size: 16,
+          color: met ? colorScheme.primary : colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}

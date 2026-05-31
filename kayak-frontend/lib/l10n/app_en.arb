@@ -143,5 +143,93 @@
   "signIn": "Sign In",
   "@signIn": {
     "description": "Sign in button label"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+  "confirmPasswordHint": "Please confirm your password",
+  "@confirmPasswordHint": {
+    "description": "Confirm password field hint"
+  },
+  "passwordsDoNotMatch": "Passwords do not match",
+  "@passwordsDoNotMatch": {
+    "description": "Passwords do not match validation error"
+  },
+  "usernameHint": "Set a display name",
+  "@usernameHint": {
+    "description": "Username field hint text"
+  },
+  "usernameHelper": "Leave blank to use email prefix",
+  "@usernameHelper": {
+    "description": "Username field helper text"
+  },
+  "hasAccount": "Already have an account? Login",
+  "@hasAccount": {
+    "description": "Link text to navigate to login page"
+  },
+  "registrationSuccess": "Registration successful!",
+  "@registrationSuccess": {
+    "description": "Registration success toast message"
+  },
+  "passwordStrength": "Password strength",
+  "@passwordStrength": {
+    "description": "Password strength indicator label"
+  },
+  "passwordStrengthWeak": "Weak",
+  "@passwordStrengthWeak": {
+    "description": "Password strength level: weak"
+  },
+  "passwordStrengthMedium": "Medium",
+  "@passwordStrengthMedium": {
+    "description": "Password strength level: medium"
+  },
+  "passwordStrengthGood": "Good",
+  "@passwordStrengthGood": {
+    "description": "Password strength level: good"
+  },
+  "passwordStrengthStrong": "Strong",
+  "@passwordStrengthStrong": {
+    "description": "Password strength level: strong"
+  },
+  "passwordMinLength": "At least 8 characters",
+  "@passwordMinLength": {
+    "description": "Password requirement: minimum length"
+  },
+  "passwordUppercaseLowercase": "Contains uppercase & lowercase letters",
+  "@passwordUppercaseLowercase": {
+    "description": "Password requirement: uppercase and lowercase"
+  },
+  "passwordNumber": "Contains a number",
+  "@passwordNumber": {
+    "description": "Password requirement: contains a number"
+  },
+  "passwordSpecial": "Contains a special character",
+  "@passwordSpecial": {
+    "description": "Password requirement: special character"
+  },
+  "usernameLengthError": "Username must be 3-30 characters",
+  "@usernameLengthError": {
+    "description": "Username length validation error"
+  },
+  "usernameInvalidChars": "Only letters, numbers, underscores and hyphens allowed",
+  "@usernameInvalidChars": {
+    "description": "Username invalid characters error"
+  },
+  "emailFormatError": "Please enter a valid email address",
+  "@emailFormatError": {
+    "description": "Email format validation error"
+  },
+  "passwordMinLengthError": "Password must be at least 6 characters",
+  "@passwordMinLengthError": {
+    "description": "Password minimum length validation error"
+  },
+  "noAccountRegister": "Don't have an account? Register",
+  "@noAccountRegister": {
+    "description": "Link text to navigate to register page from login"
+  },
+  "usernameOptional": "Username (optional)",
+  "@usernameOptional": {
+    "description": "Username field label with optional indicator"
   }
 }

@@ -143,5 +143,93 @@
   "signIn": "登录",
   "@signIn": {
     "description": "登录按钮标签"
+  },
+  "confirmPassword": "确认密码",
+  "@confirmPassword": {
+    "description": "确认密码字段标签"
+  },
+  "confirmPasswordHint": "请再次输入密码",
+  "@confirmPasswordHint": {
+    "description": "确认密码输入框提示文本"
+  },
+  "passwordsDoNotMatch": "两次密码输入不一致",
+  "@passwordsDoNotMatch": {
+    "description": "两次密码不一致验证错误"
+  },
+  "usernameHint": "设置一个显示名称",
+  "@usernameHint": {
+    "description": "用户名字段提示文本"
+  },
+  "usernameHelper": "不填则使用邮箱前缀作为用户名",
+  "@usernameHelper": {
+    "description": "用户名字段帮助文本"
+  },
+  "hasAccount": "已有账号？立即登录",
+  "@hasAccount": {
+    "description": "跳转到登录页面的链接文本"
+  },
+  "registrationSuccess": "注册成功！",
+  "@registrationSuccess": {
+    "description": "注册成功提示消息"
+  },
+  "passwordStrength": "密码强度",
+  "@passwordStrength": {
+    "description": "密码强度指示器标签"
+  },
+  "passwordStrengthWeak": "弱",
+  "@passwordStrengthWeak": {
+    "description": "密码强度等级：弱"
+  },
+  "passwordStrengthMedium": "中",
+  "@passwordStrengthMedium": {
+    "description": "密码强度等级：中"
+  },
+  "passwordStrengthGood": "良",
+  "@passwordStrengthGood": {
+    "description": "密码强度等级：良"
+  },
+  "passwordStrengthStrong": "强",
+  "@passwordStrengthStrong": {
+    "description": "密码强度等级：强"
+  },
+  "passwordMinLength": "至少 8 个字符",
+  "@passwordMinLength": {
+    "description": "密码要求：最小长度"
+  },
+  "passwordUppercaseLowercase": "包含大小写字母",
+  "@passwordUppercaseLowercase": {
+    "description": "密码要求：包含大小写字母"
+  },
+  "passwordNumber": "包含数字",
+  "@passwordNumber": {
+    "description": "密码要求：包含数字"
+  },
+  "passwordSpecial": "包含特殊字符",
+  "@passwordSpecial": {
+    "description": "密码要求：特殊字符"
+  },
+  "usernameLengthError": "用户名长度需在 3-30 字符之间",
+  "@usernameLengthError": {
+    "description": "用户名长度验证错误"
+  },
+  "usernameInvalidChars": "仅允许字母、数字、下划线和连字符",
+  "@usernameInvalidChars": {
+    "description": "用户名非法字符错误"
+  },
+  "emailFormatError": "请输入有效的邮箱地址",
+  "@emailFormatError": {
+    "description": "邮箱格式验证错误"
+  },
+  "passwordMinLengthError": "密码至少需要 6 个字符",
+  "@passwordMinLengthError": {
+    "description": "密码最小长度验证错误"
+  },
+  "noAccountRegister": "还没有账号？立即注册",
+  "@noAccountRegister": {
+    "description": "从登录页跳转到注册页的链接文本"
+  },
+  "usernameOptional": "用户名（选填）",
+  "@usernameOptional": {
+    "description": "用户名字段标签带选填标记"
   }
 }
