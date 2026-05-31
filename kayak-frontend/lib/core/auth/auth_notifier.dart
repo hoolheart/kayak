@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 /// Auth State Notifier
 ///
 /// 全局认证状态管理，使用Riverpod StateNotifier
@@ -108,21 +110,21 @@ class AuthStateNotifier extends StateNotifier<AuthState>
   /// 登录
   @override
   Future<bool> login(String email, String password) async {
-    debugPrint('[LoginFlow] AuthStateNotifier.login() called with email=$email');
+    print('[LoginFlow] AuthStateNotifier.login() called with email=$email');
     state = AuthState.loading();
 
     try {
-      debugPrint('[LoginFlow] Calling authApiService.login()');
+      print('[LoginFlow] Calling authApiService.login()');
       final response = await _authApiService.login(email, password);
-      debugPrint('[LoginFlow] API login successful, userId=${response.userId}');
+      print('[LoginFlow] API login successful, userId=${response.userId}');
 
-      debugPrint('[LoginFlow] Saving tokens to storage');
+      print('[LoginFlow] Saving tokens to storage');
       await _tokenStorage.saveTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         expiresIn: response.expiresIn,
       );
-      debugPrint('[LoginFlow] Tokens saved');
+      print('[LoginFlow] Tokens saved');
 
       final user = User(
         id: response.userId,
@@ -130,13 +132,13 @@ class AuthStateNotifier extends StateNotifier<AuthState>
         username: response.username,
       );
 
-      debugPrint('[LoginFlow] Setting state to AUTHENTICATED');
+      print('[LoginFlow] Setting state to AUTHENTICATED');
       state = AuthState.authenticated(user, response.accessToken);
-      debugPrint('[LoginFlow] State set to authenticated, isAuthenticated=${state.isAuthenticated}');
+      print('[LoginFlow] State set to authenticated, isAuthenticated=${state.isAuthenticated}');
       return true;
     } catch (e, st) {
-      debugPrint('[LoginFlow] login() FAILED: $e');
-      debugPrint('[LoginFlow] Stack: $st');
+      print('[LoginFlow] login() FAILED: $e');
+      print('[LoginFlow] Stack: $st');
       state = AuthState.error(e.toString());
       return false;
     }

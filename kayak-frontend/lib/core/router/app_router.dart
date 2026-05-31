@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 /// 应用路由配置
 ///
 /// 定义所有应用路由和导航配置
@@ -114,7 +116,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authState.isAuthenticated;
       final isInitialized = authState.isInitialized;
       final path = state.uri.path;
-      debugPrint('[RouterRedirect] Evaluating: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path');
+      print('[RouterRedirect] Evaluating: isLoggedIn=$isLoggedIn, isInitialized=$isInitialized, path=$path');
 
       // 公共路由 - 登录和注册页面始终可访问
       const publicRoutes = ['/login', '/register'];
@@ -122,7 +124,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // 未初始化 -> 留在 splash 页面等待
       if (!isInitialized) {
-        debugPrint(
+        print(
           '[RouterRedirect] -> / (not initialized, waiting on splash)',
         );
         return null;
@@ -131,19 +133,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 未登录访问受保护路由 -> 重定向到登录
       if (!isLoggedIn && !isPublicRoute) {
         final redirect = Uri.encodeComponent(path);
-        debugPrint('[RouterRedirect] -> /login (unauthenticated, redirect=$redirect)');
+        print('[RouterRedirect] -> /login (unauthenticated, redirect=$redirect)');
         return '/login?redirect=$redirect';
       }
 
       // 已登录访问登录页 -> 重定向到首页
       if (isLoggedIn && path == '/login') {
-        debugPrint('[RouterRedirect] -> /dashboard (already logged in, skipping login)');
+        print('[RouterRedirect] -> /dashboard (already logged in, skipping login)');
         return AppRoutes.dashboard;
       }
 
       // 已登录访问启动页 -> 直接跳转到首页
       if (isLoggedIn && path == '/') {
-        debugPrint(
+        print(
           '[RouterRedirect] -> /dashboard (authenticated, skip splash)',
         );
         return AppRoutes.dashboard;

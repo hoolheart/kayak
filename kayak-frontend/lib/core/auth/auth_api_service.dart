@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 /// Auth API Service Interface
 ///
 /// 定义认证相关API的抽象，遵循依赖倒置原则
@@ -36,23 +38,23 @@ class AuthApiService implements AuthApiServiceInterface {
   @override
   Future<LoginResponse> login(String email, String password) async {
     final url = '$_baseUrl/api/v1/auth/login';
-    debugPrint('[LoginFlow] AuthApiService.login() - POST $url');
+    print('[LoginFlow] AuthApiService.login() - POST $url');
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         url,
         data: {'email': email, 'password': password},
       );
-      debugPrint('[LoginFlow] AuthApiService - Response status=${response.statusCode}');
+      print('[LoginFlow] AuthApiService - Response status=${response.statusCode}');
       final responseData = response.data as Map<String, dynamic>;
-      debugPrint('[LoginFlow] AuthApiService - Response data keys=${responseData.keys}');
+      print('[LoginFlow] AuthApiService - Response data keys=${responseData.keys}');
       final loginResponse = LoginResponse.fromJson(
         responseData['data'] as Map<String, dynamic>,
       );
-      debugPrint('[LoginFlow] AuthApiService - Parsed LoginResponse OK, userId=${loginResponse.userId}');
+      print('[LoginFlow] AuthApiService - Parsed LoginResponse OK, userId=${loginResponse.userId}');
       return loginResponse;
     } catch (e, st) {
-      debugPrint('[LoginFlow] AuthApiService - FAILED: $e');
-      debugPrint('[LoginFlow] AuthApiService - Stack: $st');
+      print('[LoginFlow] AuthApiService - FAILED: $e');
+      print('[LoginFlow] AuthApiService - Stack: $st');
       rethrow;
     }
   }
