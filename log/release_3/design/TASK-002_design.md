@@ -11,8 +11,8 @@
 |------|------|---------|
 | R1 | ExperimentStatus 后端使用 UPPERCASE 序列化 ("IDLE"/"LOADED"/"RUNNING"/"PAUSED"/"COMPLETED"/"ABORTED") | Dart enum 使用 `@JsonValue` 注解大写值 |
 | R2 | Device 字段使用 protocol_type + protocol_params 而非 address/port | Device 模型按后端实际字段定义 |
-| R3 | TokenResponse 含额外字段 token_type, expires_in, user | AuthTokens 可选字段包含 user |
-| R4 | PagedResponse 含额外字段 has_next, has_prev | PagedResponse 包含这两个字段 |
+| R3 | TokenResponse 含额外字段 token_type, expires_in, user | AuthTokens 包含 user(必需)字段，token_type/expires_in 为可选 |
+| R4 | PagedResponse 含额外字段 has_next, has_prev | PaginatedResponse 中 hasNext/hasPrev 为可选字段 |
 | R5 | Experiment 含额外字段 owner_type, owner_id | Experiment 包含这两个字段 |
 | R6 | Point 无 description 字段，含 metadata | Point 按后端无 description，有 metadata |
 
@@ -23,7 +23,7 @@
 **ApiResponse\<T\>**: 统一 API 响应包装
 - code: int (必需) — HTTP 状态码
 - message: String (必需) — 响应消息
-- data: T? — 泛型数据负载
+- data: T (必需) — 泛型数据负载
 - timestamp: String? — ISO 8601 时间戳
 
 **PaginatedResponse\<T\>**: 分页响应
@@ -31,15 +31,15 @@
 - size: int (必需) — 每页大小
 - total: int (必需) — 总记录数
 - items: List\<T\> (必需) — 数据项列表
-- hasNext: bool (必需) — 是否有下一页
-- hasPrev: bool (必需) — 是否有上一页
+- hasNext: bool? — 是否有下一页（后端部分接口不返回）
+- hasPrev: bool? — 是否有上一页（后端部分接口不返回）
 
 **AuthTokens**: 认证令牌
 - accessToken: String (必需) — JWT 访问令牌
 - refreshToken: String (必需) — 刷新令牌
-- tokenType: String (必需) — Token 类型（"Bearer"）
-- expiresIn: int (必需) — 过期时间（秒）
-- user: User? — 关联用户信息
+- tokenType: String? — Token 类型（"Bearer"，部分接口不返回）
+- expiresIn: int? — 过期时间（秒，部分接口不返回）
+- user: User (必需) — 关联用户信息
 
 ### 2.2 user.dart — 用户模型
 
@@ -77,6 +77,7 @@
 - name: String (必需)
 - description: String? (可选)
 - ownerType: String (必需)
+- ownerId: String (必需, UUID)
 
 ### 2.4 device.dart — 设备模型
 
@@ -85,7 +86,7 @@
 - workbenchId: String (必需, UUID)
 - parentId: String? (可选, UUID)
 - name: String (必需)
-- protocolType: String (必需, 对应 ProtocolType 枚举)
+- protocolType: ProtocolType (必需, 枚举类型)
 - protocolParams: Map\<String, dynamic\>? (可选)
 - manufacturer: String? (可选)
 - model: String? (可选)
@@ -111,8 +112,8 @@
 - id: String (必需, UUID)
 - deviceId: String (必需, UUID)
 - name: String (必需)
-- dataType: String (必需, 对应 DataType 枚举)
-- accessType: String (必需, 对应 AccessType 枚举)
+- dataType: DataType (必需, 枚举类型)
+- accessType: AccessType (必需, 枚举类型)
 - unit: String? (可选)
 - minValue: double? (可选)
 - maxValue: double? (可选)
@@ -234,7 +235,16 @@ ApiResponse\<T\> 和 PaginatedResponse\<T\> 需要使用 `genericArgumentFactori
 DeviceTreeNode 包含 `List<DeviceTreeNode> children` 递归引用，freezed 3.x + json_serializable 原生支持。
 
 ### 5.3 AuthTokens.user
-AuthTokens 中包含 `user` (User?) 可选字段，同时满足 TC-014（无 user 场景）和 TC-018（含 user 场景）。
+AuthTokens 中包含 `user` (User) 必需字段（非 nullable），与后端 TokenResponse 始终保持返回 user 对象一致。`tokenType` 和 `expiresIn` 改为可选以兼容不同端点的返回格式。
 
 ### 5.4 CreateWorkbenchRequest
-该模型仅用于 API 请求（toJson），不需要 fromJson 工厂方法。
+该模型仅用于 API 请求（toJson），不需要 fromJson 工厂方法。后端要求传入 `owner_id` 字段以标识归属实体。
+
+### 5.5 Enum 类型替代 String
+根据代码审查建议，以下字段改为强类型枚举：
+- `Device.protocolType` → `ProtocolType` 枚举
+- `DeviceTreeNode.protocolType` → `ProtocolType` 枚举
+- `Point.dataType` → `DataType` 枚举
+- `Point.accessType` → `AccessType` 枚举
+
+这提高了类型安全性，避免无效字符串值在运行时传播。
