@@ -277,6 +277,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submit'**
   String get submit;
+
+  /// Email field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email'**
+  String get emailHint;
+
+  /// Password field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password'**
+  String get passwordHint;
+
+  /// Email field validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get emailRequired;
+
+  /// Password field validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
+  /// Link text to navigate to register page
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Register'**
+  String get noAccount;
+
+  /// Sign in button label
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
 }
 
 class _AppLocalizationsDelegate

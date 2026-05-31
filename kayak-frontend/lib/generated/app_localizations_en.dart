@@ -97,4 +97,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get submit => 'Submit';
+
+  @override
+  String get emailHint => 'Please enter your email';
+
+  @override
+  String get passwordHint => 'Please enter your password';
+
+  @override
+  String get emailRequired => 'Email is required';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get noAccount => 'Don\'t have an account? Register';
+
+  @override
+  String get signIn => 'Sign In';
 }

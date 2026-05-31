@@ -119,5 +119,29 @@
   "submit": "提交",
   "@submit": {
     "description": "提交操作按钮"
+  },
+  "emailHint": "请输入邮箱地址",
+  "@emailHint": {
+    "description": "邮箱输入框提示文本"
+  },
+  "passwordHint": "请输入密码",
+  "@passwordHint": {
+    "description": "密码输入框提示文本"
+  },
+  "emailRequired": "请输入邮箱地址",
+  "@emailRequired": {
+    "description": "邮箱字段验证错误"
+  },
+  "passwordRequired": "请输入密码",
+  "@passwordRequired": {
+    "description": "密码字段验证错误"
+  },
+  "noAccount": "还没有账号？立即注册",
+  "@noAccount": {
+    "description": "跳转到注册页面的链接文本"
+  },
+  "signIn": "登录",
+  "@signIn": {
+    "description": "登录按钮标签"
   }
 }

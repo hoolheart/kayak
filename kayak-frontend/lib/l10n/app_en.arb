@@ -119,5 +119,29 @@
   "submit": "Submit",
   "@submit": {
     "description": "Submit action button"
+  },
+  "emailHint": "Please enter your email",
+  "@emailHint": {
+    "description": "Email field hint text"
+  },
+  "passwordHint": "Please enter your password",
+  "@passwordHint": {
+    "description": "Password field hint text"
+  },
+  "emailRequired": "Email is required",
+  "@emailRequired": {
+    "description": "Email field validation error"
+  },
+  "passwordRequired": "Password is required",
+  "@passwordRequired": {
+    "description": "Password field validation error"
+  },
+  "noAccount": "Don't have an account? Register",
+  "@noAccount": {
+    "description": "Link text to navigate to register page"
+  },
+  "signIn": "Sign In",
+  "@signIn": {
+    "description": "Sign in button label"
   }
 }

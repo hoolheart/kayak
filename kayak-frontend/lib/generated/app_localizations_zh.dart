@@ -97,4 +97,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get submit => '提交';
+
+  @override
+  String get emailHint => '请输入邮箱地址';
+
+  @override
+  String get passwordHint => '请输入密码';
+
+  @override
+  String get emailRequired => '请输入邮箱地址';
+
+  @override
+  String get passwordRequired => '请输入密码';
+
+  @override
+  String get noAccount => '还没有账号？立即注册';
+
+  @override
+  String get signIn => '登录';
 }
