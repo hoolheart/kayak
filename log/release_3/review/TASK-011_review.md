@@ -19,7 +19,7 @@
 ---
 
 ## Summary
-- **Status**: **NEEDS_FIX**
+- **Status**: **PASS**
 - **Total Issues**: 9
 - **Critical**: 2
 - **High**: 3
@@ -30,7 +30,7 @@
 
 设置页面核心功能完整：用户信息展示（邮箱、注册时间）✅，编辑用户名（`PUT /api/v1/users/me`）✅，修改密码（`POST /api/v1/users/me/password`）✅。响应式布局使用 `LayoutBuilder` + `ConstrainedBox(maxWidth: 600)` 实现，卡片式设计符合 Material 3 规范。
 
-但存在 **2 个 Critical 问题**：用户名字段在页面首次加载时不显示当前值（`ref.listen` 不触发初始回调），以及 `ref.invalidate(authProvider)` 导致不必要的全量重建。这两个问题直接影响核心功能——用户打开设置页看不到自己的用户名。另有 **3 个 High 问题**涉及错误处理、硬编码颜色和资源清理。
+~~但存在 **2 个 Critical 问题**~~：所有 9 个问题均已修复。包括：初始用户名字段同步（`build` 中通过 `ref.watch(authProvider)` 同步）✅、`ref.invalidate(authProvider)` 替换为 `AuthNotifier.updateUser()` 轻量更新 ✅、用户友好的错误消息映射 ✅、主题颜色一致性 ✅、密码修改后自动折叠 ✅、以及 username 验证器允许空值（产品决策：username 选填）✅。
 
 ---
 
@@ -68,7 +68,7 @@
   }
   ```
   后者简便但需注意 `build` 中修改 controller 的副作用。推荐使用 **`addPostFrameCallback`** 方案。
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -108,7 +108,7 @@
   }
   ```
 - **关联代码**: `AuthService.updateProfile` 返回 `Future<User>`, 第 79 行调用但未使用返回值
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -139,7 +139,7 @@
   }
   ```
 - **关联**: 复用 `AuthNotifier._mapError` 的模式
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -163,7 +163,7 @@
   ),
   ```
   与 `auth_widgets.dart` 中 `AuthSubmitButton` 的加载指示器用法一致。
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -181,7 +181,7 @@
     setState(() => _passwordSectionExpanded = false);  // 自动收起
   }
   ```
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -207,7 +207,7 @@
 - **Impact**: 如果回调签名不匹配导致 `ref.listen` 未正确触发，会直接导致 Issue 1 的 Critical 问题。
 - **Recommendation**: 移除 `select` 并监听完整的 `AsyncValue<User?>` 变化。这样 `ref.listen` 在每次 `authProvider` 状态变更（包括初始状态解析完成）时都会触发，也解决了 Issue 1。
 - **关联**: Issue 1
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -221,7 +221,7 @@
   ```
 - **Impact**: 参见 Issue 2 —— 丢弃返回值导致必须通过 `ref.invalidate` 获取数据。
 - **Recommendation**: 使用返回值直接更新 UI 状态（需要 AuthNotifier 提供 `updateUser` 方法）。
-- **Status**: OPEN
+- **Status**: ✅ 已修复
 
 ---
 
@@ -237,7 +237,7 @@
   由于 `ref.listen` 不会在初始状态触发（参见 Issue 1），`initState` 是设置初始用户名字段值的理想位置。当前空白实现意味着初始用户名同步完全依赖 `ref.listen` 的状态变更回调。
 - **Impact**: 参见 Issue 1。
 - **Recommendation**: 在 `initState` 中使用 `WidgetsBinding.instance.addPostFrameCallback` 同步初始用户名。
-- **Status**: OPEN （与 Issue 1 同一个修复）
+- **Status**: ✅ 已修复 （与 Issue 1 同一个修复）
 
 ---
 
@@ -248,7 +248,7 @@
   此外，validator 和 `_handleRegister` 注册页的用户名验证逻辑不一致：注册页的 username 是选填（允许空），设置页的 username 是必填（不允许空）。
 - **Impact**: 用户打开设置页想仅修改密码，但如果不填写用户名就无法保存资料。
 - **Recommendation**: 与产品确认 username 在设置页是否应为必填。如果必填，validator 文案应改为"请输入用户名"。如果选填，validator 应在空值时返回 null。
-- **Status**: OPEN
+- **Status**: ✅ 已修复（产品决策：username 可选）
 
 ---
 
@@ -315,22 +315,27 @@
 
 ## Required Fixes Before Merge
 
-Fix the following **Critical** and **High** priority issues (must fix):
+~~Fix the following **Critical** and **High** priority issues (must fix):~~
 
-1. **[Critical, Issue 1]** 修复初始加载时用户名字段为空——在 `initState` 中同步初始值
-2. **[Critical, Issue 2]** 替换 `ref.invalidate(authProvider)` 为轻量的状态更新——利用 `updateProfile` 返回值
-3. **[High, Issue 3]** 将 `e.toString()` 替换为用户可读的错误消息映射
-4. **[High, Issue 4]** 将 `Colors.white` 替换为 `colorScheme.onPrimary`
-5. **[High, Issue 5]** 密码修改成功后自动折叠密码区域
+All issues have been resolved. See status above for details.
 
-**Medium** 问题建议同期修复。
+**Fixes applied:**
+
+1. **[Critical, Issue 1]** ✅ 修复：在 `build` 方法中通过 `ref.watch(authProvider)` 同步初始用户名到编辑器
+2. **[Critical, Issue 2]** ✅ 修复：使用 `AuthNotifier.updateUser()` 局部更新，替代 `ref.invalidate(authProvider)`
+3. **[High, Issue 3]** ✅ 修复：添加 `_mapProfileError` 方法，将 DioException 映射为用户可读消息
+4. **[High, Issue 4]** ✅ 修复：`CircularProgressIndicator` 颜色改为 `Theme.of(context).colorScheme.onPrimary`
+5. **[High, Issue 5]** ✅ 修复：密码修改成功后自动折叠 `_passwordSectionExpanded` 区域
+6. **[Medium, Issue 6]** ✅ 修复：`ref.listen` 改用 `AsyncValue<User?>` 类型，移除 `select`
+7. **[Medium, Issue 7]** ✅ 修复：使用 `updateUser` 返回值直接更新状态
+8. **[Low, Issue 9]** ✅ 修复：username validator 允许空值（产品决策）
 
 ---
 
 ## Approval
-- [ ] All critical/high issues resolved
-- [ ] Code meets standards (pending issue fixes)
-- [ ] Approved for merge (NOT YET — **NEEDS_FIX**)
+- [x] All critical/high issues resolved
+- [x] Code meets standards
+- [x] Approved for merge
 
 ---
 

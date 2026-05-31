@@ -226,4 +226,74 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passwordInfo => '密码设置';
+
+  @override
+  String get workbenchSearchHint => '搜索工作台...';
+
+  @override
+  String get workbenchCreate => '创建工作台';
+
+  @override
+  String get workbenchEdit => '编辑工作台';
+
+  @override
+  String get workbenchName => '名称';
+
+  @override
+  String get workbenchDescription => '描述';
+
+  @override
+  String get workbenchNameHint => '请输入工作台名称';
+
+  @override
+  String get workbenchDescriptionHint => '描述（选填）';
+
+  @override
+  String get workbenchNameRequired => '请输入工作台名称';
+
+  @override
+  String get workbenchNameMaxLength => '名称不能超过255个字符';
+
+  @override
+  String get createWorkbenchSuccess => '创建工作台成功';
+
+  @override
+  String get updateWorkbenchSuccess => '工作台已更新';
+
+  @override
+  String get deleteWorkbenchSuccess => '工作台已删除';
+
+  @override
+  String get deleteWorkbenchTitle => '删除工作台？';
+
+  @override
+  String deleteWorkbenchDescription(String name) {
+    return '确定要删除工作台「$name」吗？此操作不可撤销，工作台下所有设备和数据将被永久删除。';
+  }
+
+  @override
+  String get loadMore => '加载更多';
+
+  @override
+  String totalCount(int count) {
+    return '共 $count 个工作台';
+  }
+
+  @override
+  String get searchNoResults => '未找到匹配的工作台';
+
+  @override
+  String get searchNoResultsHint => '请尝试修改搜索关键词';
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get emptyWorkbenchTitle => '您还没有工作台';
+
+  @override
+  String get emptyWorkbenchDescription => '点击下方按钮创建您的第一个工作台';
+
+  @override
+  String get emptyWorkbenchAction => '创建第一个工作台';
 }

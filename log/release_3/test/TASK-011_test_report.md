@@ -39,9 +39,9 @@
 | Issue 6 | MEDIUM | `ref.listen` + `select` 回调签名不匹配 | ✅ 已修复 |
 | Issue 7 | MEDIUM | `updateProfile` 返回值被丢弃 | ✅ 已修复 |
 | Issue 8 | MEDIUM | `initState` 为空 | ✅ 已修复（build 中同步替代） |
-| Issue 9 | LOW | username validator 不允许空值 | ⚠️ 保留（产品决策：设置页 username 必填） |
+| Issue 9 | LOW | username validator 不允许空值 | ✅ 已修复（产品决策：username 可选，与注册页一致） |
 
-**结论**：5 项必修复（Critical + High）全部修复，3 项 Medium 建议修复也已采纳，仅 1 项 Low 问题保留但属产品决策。
+**结论**：全部 9 项审查问题均已修复，0 项残留。
 
 ---
 

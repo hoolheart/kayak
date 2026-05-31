@@ -535,6 +535,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password Settings'**
   String get passwordInfo;
+
+  /// Search bar placeholder text
+  ///
+  /// In en, this message translates to:
+  /// **'Search workbenches...'**
+  String get workbenchSearchHint;
+
+  /// Create workbench dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Workbench'**
+  String get workbenchCreate;
+
+  /// Edit workbench dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Workbench'**
+  String get workbenchEdit;
+
+  /// Workbench name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get workbenchName;
+
+  /// Workbench description field label
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get workbenchDescription;
+
+  /// Workbench name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter workbench name'**
+  String get workbenchNameHint;
+
+  /// Workbench description field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get workbenchDescriptionHint;
+
+  /// Workbench name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench name is required'**
+  String get workbenchNameRequired;
+
+  /// Workbench name max length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot exceed 255 characters'**
+  String get workbenchNameMaxLength;
+
+  /// Create workbench success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench created successfully'**
+  String get createWorkbenchSuccess;
+
+  /// Update workbench success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench updated successfully'**
+  String get updateWorkbenchSuccess;
+
+  /// Delete workbench success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench deleted successfully'**
+  String get deleteWorkbenchSuccess;
+
+  /// Delete workbench confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete workbench?'**
+  String get deleteWorkbenchTitle;
+
+  /// Delete workbench confirmation dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete workbench \"{name}\"? This action cannot be undone. All devices and data under this workbench will be permanently deleted.'**
+  String deleteWorkbenchDescription(String name);
+
+  /// Load more pagination button
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get loadMore;
+
+  /// Total workbench count label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} workbenches total'**
+  String totalCount(int count);
+
+  /// Search no results message
+  ///
+  /// In en, this message translates to:
+  /// **'No matching workbenches found'**
+  String get searchNoResults;
+
+  /// Search no results hint
+  ///
+  /// In en, this message translates to:
+  /// **'Try modifying your search keywords'**
+  String get searchNoResultsHint;
+
+  /// Clear search button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// Empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No workbenches yet'**
+  String get emptyWorkbenchTitle;
+
+  /// Empty state description
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first workbench by clicking the button below'**
+  String get emptyWorkbenchDescription;
+
+  /// Empty state action button
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first workbench'**
+  String get emptyWorkbenchAction;
 }
 
 class _AppLocalizationsDelegate

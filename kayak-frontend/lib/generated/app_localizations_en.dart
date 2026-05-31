@@ -229,4 +229,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordInfo => 'Password Settings';
+
+  @override
+  String get workbenchSearchHint => 'Search workbenches...';
+
+  @override
+  String get workbenchCreate => 'Create Workbench';
+
+  @override
+  String get workbenchEdit => 'Edit Workbench';
+
+  @override
+  String get workbenchName => 'Name';
+
+  @override
+  String get workbenchDescription => 'Description';
+
+  @override
+  String get workbenchNameHint => 'Please enter workbench name';
+
+  @override
+  String get workbenchDescriptionHint => 'Description (optional)';
+
+  @override
+  String get workbenchNameRequired => 'Workbench name is required';
+
+  @override
+  String get workbenchNameMaxLength => 'Name cannot exceed 255 characters';
+
+  @override
+  String get createWorkbenchSuccess => 'Workbench created successfully';
+
+  @override
+  String get updateWorkbenchSuccess => 'Workbench updated successfully';
+
+  @override
+  String get deleteWorkbenchSuccess => 'Workbench deleted successfully';
+
+  @override
+  String get deleteWorkbenchTitle => 'Delete workbench?';
+
+  @override
+  String deleteWorkbenchDescription(String name) {
+    return 'Are you sure you want to delete workbench \"$name\"? This action cannot be undone. All devices and data under this workbench will be permanently deleted.';
+  }
+
+  @override
+  String get loadMore => 'Load more';
+
+  @override
+  String totalCount(int count) {
+    return '$count workbenches total';
+  }
+
+  @override
+  String get searchNoResults => 'No matching workbenches found';
+
+  @override
+  String get searchNoResultsHint => 'Try modifying your search keywords';
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get emptyWorkbenchTitle => 'No workbenches yet';
+
+  @override
+  String get emptyWorkbenchDescription =>
+      'Create your first workbench by clicking the button below';
+
+  @override
+  String get emptyWorkbenchAction => 'Create your first workbench';
 }

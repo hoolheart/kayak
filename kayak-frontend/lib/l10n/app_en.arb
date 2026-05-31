@@ -291,5 +291,105 @@
   "passwordInfo": "Password Settings",
   "@passwordInfo": {
     "description": "Password settings section title"
+  },
+  "workbenchSearchHint": "Search workbenches...",
+  "@workbenchSearchHint": {
+    "description": "Search bar placeholder text"
+  },
+  "workbenchCreate": "Create Workbench",
+  "@workbenchCreate": {
+    "description": "Create workbench dialog title"
+  },
+  "workbenchEdit": "Edit Workbench",
+  "@workbenchEdit": {
+    "description": "Edit workbench dialog title"
+  },
+  "workbenchName": "Name",
+  "@workbenchName": {
+    "description": "Workbench name field label"
+  },
+  "workbenchDescription": "Description",
+  "@workbenchDescription": {
+    "description": "Workbench description field label"
+  },
+  "workbenchNameHint": "Please enter workbench name",
+  "@workbenchNameHint": {
+    "description": "Workbench name field hint"
+  },
+  "workbenchDescriptionHint": "Description (optional)",
+  "@workbenchDescriptionHint": {
+    "description": "Workbench description field hint"
+  },
+  "workbenchNameRequired": "Workbench name is required",
+  "@workbenchNameRequired": {
+    "description": "Workbench name validation error"
+  },
+  "workbenchNameMaxLength": "Name cannot exceed 255 characters",
+  "@workbenchNameMaxLength": {
+    "description": "Workbench name max length validation error"
+  },
+  "createWorkbenchSuccess": "Workbench created successfully",
+  "@createWorkbenchSuccess": {
+    "description": "Create workbench success toast"
+  },
+  "updateWorkbenchSuccess": "Workbench updated successfully",
+  "@updateWorkbenchSuccess": {
+    "description": "Update workbench success toast"
+  },
+  "deleteWorkbenchSuccess": "Workbench deleted successfully",
+  "@deleteWorkbenchSuccess": {
+    "description": "Delete workbench success toast"
+  },
+  "deleteWorkbenchTitle": "Delete workbench?",
+  "@deleteWorkbenchTitle": {
+    "description": "Delete workbench confirmation dialog title"
+  },
+  "deleteWorkbenchDescription": "Are you sure you want to delete workbench \"{name}\"? This action cannot be undone. All devices and data under this workbench will be permanently deleted.",
+  "@deleteWorkbenchDescription": {
+    "description": "Delete workbench confirmation dialog description",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Test Workbench"
+      }
+    }
+  },
+  "loadMore": "Load more",
+  "@loadMore": {
+    "description": "Load more pagination button"
+  },
+  "totalCount": "{count} workbenches total",
+  "@totalCount": {
+    "description": "Total workbench count label",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "searchNoResults": "No matching workbenches found",
+  "@searchNoResults": {
+    "description": "Search no results message"
+  },
+  "searchNoResultsHint": "Try modifying your search keywords",
+  "@searchNoResultsHint": {
+    "description": "Search no results hint"
+  },
+  "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Clear search button"
+  },
+  "emptyWorkbenchTitle": "No workbenches yet",
+  "@emptyWorkbenchTitle": {
+    "description": "Empty state title"
+  },
+  "emptyWorkbenchDescription": "Create your first workbench by clicking the button below",
+  "@emptyWorkbenchDescription": {
+    "description": "Empty state description"
+  },
+  "emptyWorkbenchAction": "Create your first workbench",
+  "@emptyWorkbenchAction": {
+    "description": "Empty state action button"
   }
 }

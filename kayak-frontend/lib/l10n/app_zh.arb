@@ -291,5 +291,105 @@
   "passwordInfo": "密码设置",
   "@passwordInfo": {
     "description": "密码设置区域标题"
+  },
+  "workbenchSearchHint": "搜索工作台...",
+  "@workbenchSearchHint": {
+    "description": "搜索栏占位符文本"
+  },
+  "workbenchCreate": "创建工作台",
+  "@workbenchCreate": {
+    "description": "创建工作台对话框标题"
+  },
+  "workbenchEdit": "编辑工作台",
+  "@workbenchEdit": {
+    "description": "编辑工作台对话框标题"
+  },
+  "workbenchName": "名称",
+  "@workbenchName": {
+    "description": "工作台名称字段标签"
+  },
+  "workbenchDescription": "描述",
+  "@workbenchDescription": {
+    "description": "工作台描述字段标签"
+  },
+  "workbenchNameHint": "请输入工作台名称",
+  "@workbenchNameHint": {
+    "description": "工作台名称输入框提示"
+  },
+  "workbenchDescriptionHint": "描述（选填）",
+  "@workbenchDescriptionHint": {
+    "description": "工作台描述输入框提示"
+  },
+  "workbenchNameRequired": "请输入工作台名称",
+  "@workbenchNameRequired": {
+    "description": "工作台名称验证错误"
+  },
+  "workbenchNameMaxLength": "名称不能超过255个字符",
+  "@workbenchNameMaxLength": {
+    "description": "工作台名称最大长度验证错误"
+  },
+  "createWorkbenchSuccess": "创建工作台成功",
+  "@createWorkbenchSuccess": {
+    "description": "创建工作台成功提示"
+  },
+  "updateWorkbenchSuccess": "工作台已更新",
+  "@updateWorkbenchSuccess": {
+    "description": "更新工作台成功提示"
+  },
+  "deleteWorkbenchSuccess": "工作台已删除",
+  "@deleteWorkbenchSuccess": {
+    "description": "删除工作台成功提示"
+  },
+  "deleteWorkbenchTitle": "删除工作台？",
+  "@deleteWorkbenchTitle": {
+    "description": "删除工作台确认对话框标题"
+  },
+  "deleteWorkbenchDescription": "确定要删除工作台「{name}」吗？此操作不可撤销，工作台下所有设备和数据将被永久删除。",
+  "@deleteWorkbenchDescription": {
+    "description": "删除工作台确认对话框描述",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "测试工作台"
+      }
+    }
+  },
+  "loadMore": "加载更多",
+  "@loadMore": {
+    "description": "加载更多分页按钮"
+  },
+  "totalCount": "共 {count} 个工作台",
+  "@totalCount": {
+    "description": "工作台总数标签",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "searchNoResults": "未找到匹配的工作台",
+  "@searchNoResults": {
+    "description": "搜索无结果消息"
+  },
+  "searchNoResultsHint": "请尝试修改搜索关键词",
+  "@searchNoResultsHint": {
+    "description": "搜索无结果提示"
+  },
+  "clearSearch": "清除搜索",
+  "@clearSearch": {
+    "description": "清除搜索按钮"
+  },
+  "emptyWorkbenchTitle": "您还没有工作台",
+  "@emptyWorkbenchTitle": {
+    "description": "空状态标题"
+  },
+  "emptyWorkbenchDescription": "点击下方按钮创建您的第一个工作台",
+  "@emptyWorkbenchDescription": {
+    "description": "空状态描述"
+  },
+  "emptyWorkbenchAction": "创建第一个工作台",
+  "@emptyWorkbenchAction": {
+    "description": "空状态操作按钮"
   }
 }

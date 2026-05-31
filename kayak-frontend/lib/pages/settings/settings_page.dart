@@ -320,7 +320,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return _l10n.usernameLengthError;
+                    return null; // username is optional
                   }
                   final trimmed = value.trim();
                   if (trimmed.length < 3 || trimmed.length > 30) {
