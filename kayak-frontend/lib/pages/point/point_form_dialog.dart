@@ -495,7 +495,6 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
         // 数据类型
         DropdownButtonFormField<DataType>(
           key: ValueKey('data_type_$_selectedDataType'),
-          value: _selectedDataType,
           initialValue: _selectedDataType,
           decoration: InputDecoration(
             labelText: '${l10n.pointDataTypeLabel} *',
@@ -518,7 +517,6 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
         // 访问权限
         DropdownButtonFormField<AccessType>(
           key: ValueKey('access_type_$_selectedAccessType'),
-          value: _selectedAccessType,
           initialValue: _selectedAccessType,
           decoration: InputDecoration(
             labelText: '${l10n.pointAccessTypeLabel} *',
@@ -630,7 +628,6 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
                 // 寄存器类型
                 DropdownButtonFormField<String>(
                   key: ValueKey('register_type_$_selectedRegisterType'),
-                  value: _selectedRegisterType,
                   initialValue: _selectedRegisterType,
                   decoration: InputDecoration(
                     labelText: '${l10n.pointRegisterTypeLabel} *',
@@ -670,7 +667,6 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
                 // 数据格式
                 DropdownButtonFormField<String>(
                   key: ValueKey('data_format_$_selectedDataFormat'),
-                  value: _selectedDataFormat,
                   initialValue: _selectedDataFormat,
                   decoration: InputDecoration(
                     labelText: '${l10n.pointDataFormatLabel} *',

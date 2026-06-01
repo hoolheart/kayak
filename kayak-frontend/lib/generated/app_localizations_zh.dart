@@ -66,6 +66,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sessionExpired => '会话已过期，请重新登录';
 
   @override
+  String get errorBadRequest => '请求参数有误，请检查输入';
+
+  @override
+  String get errorForbidden => '没有权限执行此操作';
+
+  @override
+  String get errorNotFound => '请求的资源不存在';
+
+  @override
+  String get errorConflict => '资源冲突，请检查是否已存在相同名称';
+
+  @override
+  String get errorValidation => '数据验证失败，请检查输入';
+
+  @override
+  String get errorServer => '服务暂时不可用，请稍后再试';
+
+  @override
+  String get errorDefault => '操作失败，请重试';
+
+  @override
   String get noData => '暂无数据';
 
   @override
@@ -686,6 +707,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get booleanFalse => '关闭';
+
+  @override
+  String get fieldRequired => '必填';
 
   @override
   String get pointSaveFailed => '测点保存失败';

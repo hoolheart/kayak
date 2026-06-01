@@ -212,6 +212,48 @@ abstract class AppLocalizations {
   /// **'Session expired, please login again'**
   String get sessionExpired;
 
+  /// Bad request error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid request parameters, please check your input'**
+  String get errorBadRequest;
+
+  /// Forbidden error message
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to perform this action'**
+  String get errorForbidden;
+
+  /// Not found error message
+  ///
+  /// In en, this message translates to:
+  /// **'Requested resource not found'**
+  String get errorNotFound;
+
+  /// Conflict error message
+  ///
+  /// In en, this message translates to:
+  /// **'Resource conflict, please check for duplicates'**
+  String get errorConflict;
+
+  /// Validation error message
+  ///
+  /// In en, this message translates to:
+  /// **'Data validation failed, please check your input'**
+  String get errorValidation;
+
+  /// Server error message
+  ///
+  /// In en, this message translates to:
+  /// **'Service temporarily unavailable, please try again later'**
+  String get errorServer;
+
+  /// Default error message
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed, please try again'**
+  String get errorDefault;
+
   /// Empty state message
   ///
   /// In en, this message translates to:
@@ -1435,6 +1477,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get booleanFalse;
+
+  /// Generic form field required validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get fieldRequired;
 
   /// Point save failure toast message
   ///

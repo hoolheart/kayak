@@ -66,6 +66,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sessionExpired => 'Session expired, please login again';
 
   @override
+  String get errorBadRequest =>
+      'Invalid request parameters, please check your input';
+
+  @override
+  String get errorForbidden =>
+      'You don\'t have permission to perform this action';
+
+  @override
+  String get errorNotFound => 'Requested resource not found';
+
+  @override
+  String get errorConflict => 'Resource conflict, please check for duplicates';
+
+  @override
+  String get errorValidation =>
+      'Data validation failed, please check your input';
+
+  @override
+  String get errorServer =>
+      'Service temporarily unavailable, please try again later';
+
+  @override
+  String get errorDefault => 'Operation failed, please try again';
+
+  @override
   String get noData => 'No data available';
 
   @override
@@ -690,6 +715,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get booleanFalse => 'Off';
+
+  @override
+  String get fieldRequired => 'Required';
 
   @override
   String get pointSaveFailed => 'Failed to save point';

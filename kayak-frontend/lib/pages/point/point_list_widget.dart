@@ -198,23 +198,20 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
     if (isMobile) {
       skeletonContent = Column(
         children: List.generate(5, (index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                Expanded(
-                  flex: 2,
-                  child: ShimmerBlock(height: 16, width: 120),
-                ),
-                const SizedBox(width: 8),
+                Expanded(flex: 2, child: ShimmerBlock(height: 16, width: 120)),
+                SizedBox(width: 8),
                 ShimmerBlock(height: 20, width: 60),
-                const SizedBox(width: 8),
-                const ShimmerBlock(height: 16, width: 16, borderRadius: 8),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
+                ShimmerBlock(height: 16, width: 16, borderRadius: 8),
+                SizedBox(width: 8),
                 ShimmerBlock(height: 16, width: 40),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 ShimmerBlock(height: 16, width: 60),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 ShimmerBlock(height: 32, width: 64),
               ],
             ),
@@ -245,57 +242,55 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
   }
 
   Widget _buildSkeletonHeader(BuildContext context) {
-    return Container(
+    return const SizedBox(
       height: 48,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-      ),
-      child: Row(
-        children: [
-          Expanded(flex: 2, child: ShimmerBlock(height: 14, width: 40)),
-          const SizedBox(width: 16),
-          ShimmerBlock(height: 14, width: 30),
-          const SizedBox(width: 16),
-          ShimmerBlock(height: 14, width: 30),
-          const SizedBox(width: 16),
-          ShimmerBlock(height: 14, width: 30),
-          const SizedBox(width: 16),
-          Expanded(child: ShimmerBlock(height: 14, width: 40)),
-          const SizedBox(width: 16),
-          ShimmerBlock(height: 14, width: 50),
-        ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Expanded(flex: 2, child: ShimmerBlock(height: 14, width: 40)),
+            SizedBox(width: 16),
+            ShimmerBlock(height: 14, width: 30),
+            SizedBox(width: 16),
+            ShimmerBlock(height: 14, width: 30),
+            SizedBox(width: 16),
+            ShimmerBlock(height: 14, width: 30),
+            SizedBox(width: 16),
+            Expanded(child: ShimmerBlock(height: 14, width: 40)),
+            SizedBox(width: 16),
+            ShimmerBlock(height: 14, width: 50),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildSkeletonRow(BuildContext context) {
+    final borderColor = Theme.of(context).colorScheme.outlineVariant.withAlpha(77);
     return Container(
       height: 52,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outlineVariant.withAlpha(77),
-          ),
+          bottom: BorderSide(color: borderColor),
         ),
       ),
-      child: Row(
+      child: const Row(
         children: [
           Expanded(flex: 2, child: ShimmerBlock(height: 14, width: 120)),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           ShimmerBlock(height: 20, width: 60),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           ShimmerBlock(height: 16, width: 16, borderRadius: 8),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           ShimmerBlock(height: 14, width: 30),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(child: ShimmerBlock(height: 16, width: 80)),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Row(
             children: [
               ShimmerBlock(height: 32, width: 32, borderRadius: 16),
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               ShimmerBlock(height: 32, width: 32, borderRadius: 16),
             ],
           ),
