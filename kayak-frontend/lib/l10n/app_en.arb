@@ -925,6 +925,10 @@
   "@booleanFalse": {
     "description": "Boolean false display text"
   },
+  "fieldRequired": "Required",
+  "@fieldRequired": {
+    "description": "Generic form field required validation error"
+  },
   "pointSaveFailed": "Failed to save point",
   "@pointSaveFailed": {
     "description": "Point save failure toast message"

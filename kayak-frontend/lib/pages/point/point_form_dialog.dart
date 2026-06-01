@@ -347,7 +347,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 头部
-            _buildHeader(dialogTitle, colorScheme, textTheme),
+            _buildHeader(l10n, dialogTitle, colorScheme, textTheme),
             // 内容区
             Flexible(
               child: SingleChildScrollView(
@@ -392,6 +392,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
 
   /// 头部
   Widget _buildHeader(
+    AppLocalizations l10n,
     String title,
     ColorScheme colorScheme,
     TextTheme textTheme,
@@ -417,7 +418,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
           IconButton(
             icon: const Icon(Icons.close, size: 20),
             onPressed: () => Navigator.of(context).pop(),
-            tooltip: 'Close',
+            tooltip: l10n.cancel,
           ),
         ],
       ),
@@ -480,7 +481,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
             setState(() => _selectedDataType = value);
           },
           validator: (value) {
-            if (value == null) return 'Required';
+            if (value == null) return l10n.fieldRequired;
             return null;
           },
         ),
@@ -502,7 +503,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
             setState(() => _selectedAccessType = value);
           },
           validator: (value) {
-            if (value == null) return 'Required';
+            if (value == null) return l10n.fieldRequired;
             return null;
           },
         ),

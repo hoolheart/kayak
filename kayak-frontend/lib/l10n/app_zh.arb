@@ -925,6 +925,10 @@
   "@booleanFalse": {
     "description": "布尔值假值显示文本"
   },
+  "fieldRequired": "必填",
+  "@fieldRequired": {
+    "description": "通用表单字段必填验证错误"
+  },
   "pointSaveFailed": "测点保存失败",
   "@pointSaveFailed": {
     "description": "测点保存失败提示"
