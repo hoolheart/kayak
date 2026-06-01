@@ -481,6 +481,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
               ),
             );
           },
+          onChanged: (_) => setState(() {}),
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return l10n.pointNameRequired;
@@ -546,6 +547,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
           maxLength: 32,
           maxLengthEnforcement: MaxLengthEnforcement.enforced,
           buildCounter: (context, {required int currentLength, required bool isFocused, required int? maxLength}) => null,
+          onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 16),
         // 最小值
@@ -555,6 +557,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
             labelText: l10n.pointMinValueLabel,
           ),
           keyboardType: TextInputType.number,
+          onChanged: (_) => setState(() {}),
         ),
         const SizedBox(height: 16),
         // 最大值
@@ -564,6 +567,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
             labelText: l10n.pointMaxValueLabel,
           ),
           keyboardType: TextInputType.number,
+          onChanged: (_) => setState(() {}),
           validator: (value) {
             if (value != null && value.isNotEmpty) {
               final minVal = double.tryParse(_minValueController.text);
@@ -582,6 +586,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
           decoration: InputDecoration(
             labelText: l10n.pointDefaultValueLabel,
           ),
+          onChanged: (_) => setState(() {}),
         ),
       ],
     );
@@ -651,6 +656,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
                     hintText: '0-65535',
                   ),
                   keyboardType: TextInputType.number,
+                  onChanged: (_) => setState(() {}),
                   validator: (value) {
                     if (_isModbusDevice &&
                         value != null &&
