@@ -108,6 +108,28 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
   // 是否为编辑模式
   bool get _isEdit => widget.existing != null;
 
+  // 编辑模式初始值（用于变更检测）
+  String _initialName = '';
+  String _initialUnit = '';
+  String _initialMinValue = '';
+  String _initialMaxValue = '';
+  String _initialDefaultValue = '';
+  DataType? _initialDataType;
+  AccessType? _initialAccessType;
+
+  /// 编辑模式下表单是否有未保存的变更。
+  /// 添加模式下始终为 true（保存按钮始终启用）。
+  bool get _isDirty {
+    if (!_isEdit) return true;
+    return _nameController.text != _initialName ||
+        _unitController.text != _initialUnit ||
+        _minValueController.text != _initialMinValue ||
+        _maxValueController.text != _initialMaxValue ||
+        _defaultValueController.text != _initialDefaultValue ||
+        _selectedDataType != _initialDataType ||
+        _selectedAccessType != _initialAccessType;
+  }
+
   // Modbus 寄存器类型选项
   static const _registerTypeOptions = [
     'Coil',
@@ -145,6 +167,17 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
 
     _selectedDataType = existing?.dataType ?? DataType.number;
     _selectedAccessType = existing?.accessType ?? AccessType.ro;
+
+    // 保存初始值用于编辑模式变更检测
+    if (_isEdit) {
+      _initialName = existing?.name ?? '';
+      _initialUnit = existing?.unit ?? '';
+      _initialMinValue = existing?.minValue?.toString() ?? '';
+      _initialMaxValue = existing?.maxValue?.toString() ?? '';
+      _initialDefaultValue = existing?.defaultValue ?? '';
+      _initialDataType = existing?.dataType;
+      _initialAccessType = existing?.accessType;
+    }
 
     // 异步检查设备类型
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -678,7 +711,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 FilledButton(
-                  onPressed: _isSaving ? null : _handleSave,
+                  onPressed: (_isSaving || !_isDirty) ? null : _handleSave,
                   child: _isSaving
                       ? const SizedBox(
                           width: 20,
@@ -707,7 +740,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
                 ),
                 const SizedBox(width: 12),
                 FilledButton(
-                  onPressed: _isSaving ? null : _handleSave,
+                  onPressed: (_isSaving || !_isDirty) ? null : _handleSave,
                   child: _isSaving
                       ? const SizedBox(
                           width: 20,
