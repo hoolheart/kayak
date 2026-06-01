@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/point.dart';
-import '../../providers/point_provider.dart';
+import '../../providers/point_provider.dart' show pointListProvider, resolveErrorCode;
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_view.dart';
 import '../../widgets/error_view.dart';
@@ -96,7 +96,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
           if (!mounted) return;
           Toast.show(
             context: context,
-            message: '$e',
+            message: resolveErrorCode('$e', l10n),
             type: ToastType.error,
           );
         }
@@ -325,7 +325,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
     String errorMessage,
   ) {
     return ErrorView(
-      title: errorMessage,
+      title: resolveErrorCode(errorMessage, l10n),
       compact: true,
       onRetry: () {
         ref.invalidate(pointListProvider(widget.deviceId));

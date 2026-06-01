@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../generated/app_localizations.dart';
 import '../models/point.dart';
 import 'services.dart';
 
@@ -161,7 +162,10 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
     return Map.unmodifiable(_values);
   }
 
-  /// 将异常映射为用户可读的错误消息
+  /// 将异常映射为错误代码标识符。
+  ///
+  /// 返回以 `error.` 为前缀的错误代码，UI 层可通过 [resolveErrorCode] 结合 l10n 显示。
+  /// 相比于直接返回硬编码字符串，此方式支持国际化。
   String _mapError(Object error) {
     if (error is DioException) {
       switch (error.type) {
@@ -169,42 +173,72 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
         case DioExceptionType.connectionError:
-          return '网络连接失败，请检查网络后重试';
+          return 'error.network';
 
         case DioExceptionType.badResponse:
           final statusCode = error.response?.statusCode;
           return _mapStatusCode(statusCode);
 
         default:
-          return '网络异常，请稍后重试';
+          return 'error.network';
       }
     }
 
     return error.toString();
   }
 
-  /// 将 HTTP 状态码映射为用户可读的消息
+  /// 将 HTTP 状态码映射为错误代码
   String _mapStatusCode(int? statusCode) {
     switch (statusCode) {
       case 400:
-        return '请求参数有误，请检查输入';
+        return 'error.badRequest';
       case 401:
-        return '登录已过期，请重新登录';
+        return 'error.unauthorized';
       case 403:
-        return '没有权限执行此操作';
+        return 'error.forbidden';
       case 404:
-        return '请求的资源不存在';
+        return 'error.notFound';
       case 409:
-        return '资源冲突，请检查是否已存在相同名称的测点';
+        return 'error.conflict';
       case 422:
-        return '数据验证失败，请检查输入';
+        return 'error.validation';
       case 500:
       case 502:
       case 503:
-        return '服务暂时不可用，请稍后再试';
+        return 'error.server';
       default:
-        return '操作失败，请重试（错误码: $statusCode）';
+        return 'error.unknown($statusCode)';
     }
+  }
+}
+
+/// 将 Provider 错误代码解析为用户可读的错误消息。
+///
+/// [errorCode] _mapError 返回的错误代码字符串。
+/// [l10n] AppLocalizations 实例，用于获取本地化文本。
+/// 返回本地化的错误消息。
+String resolveErrorCode(String errorCode, AppLocalizations l10n) {
+  switch (errorCode) {
+    case 'error.network':
+      return l10n.networkError;
+    case 'error.unauthorized':
+      return l10n.sessionExpired;
+    case 'error.badRequest':
+      return '${l10n.pointSaveFailed}: ${l10n.errorBadRequest}';
+    case 'error.forbidden':
+      return l10n.errorForbidden;
+    case 'error.notFound':
+      return l10n.errorNotFound;
+    case 'error.conflict':
+      return l10n.errorConflict;
+    case 'error.validation':
+      return l10n.errorValidation;
+    case 'error.server':
+      return l10n.errorServer;
+    default:
+      return errorCode.startsWith('error.')
+          ? '${l10n.errorDefault} ($errorCode)'
+          : errorCode;
   }
 }
 

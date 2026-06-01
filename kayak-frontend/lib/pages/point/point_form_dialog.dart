@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../generated/app_localizations.dart';
 import '../../models/device.dart';
 import '../../models/point.dart';
-import '../../providers/point_provider.dart';
+import '../../providers/point_provider.dart' show pointListProvider, resolveErrorCode;
 import '../../providers/services.dart';
 import '../../widgets/toast.dart';
 
@@ -347,7 +347,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
       if (!mounted) return;
       Toast.show(
         context: context,
-        message: '${l10n.pointSaveFailed}: $e',
+        message: '${l10n.pointSaveFailed}: ${resolveErrorCode('$e', l10n)}',
         type: ToastType.error,
       );
     } finally {

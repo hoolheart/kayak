@@ -76,6 +76,34 @@
   "@sessionExpired": {
     "description": "Session expired message"
   },
+  "errorBadRequest": "Invalid request parameters, please check your input",
+  "@errorBadRequest": {
+    "description": "Bad request error message"
+  },
+  "errorForbidden": "You don't have permission to perform this action",
+  "@errorForbidden": {
+    "description": "Forbidden error message"
+  },
+  "errorNotFound": "Requested resource not found",
+  "@errorNotFound": {
+    "description": "Not found error message"
+  },
+  "errorConflict": "Resource conflict, please check for duplicates",
+  "@errorConflict": {
+    "description": "Conflict error message"
+  },
+  "errorValidation": "Data validation failed, please check your input",
+  "@errorValidation": {
+    "description": "Validation error message"
+  },
+  "errorServer": "Service temporarily unavailable, please try again later",
+  "@errorServer": {
+    "description": "Server error message"
+  },
+  "errorDefault": "Operation failed, please try again",
+  "@errorDefault": {
+    "description": "Default error message"
+  },
   "noData": "No data available",
   "@noData": {
     "description": "Empty state message"
