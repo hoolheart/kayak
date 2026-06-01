@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../generated/app_localizations.dart';
 import '../../models/point.dart';
 import '../../providers/services.dart';
+import '../../widgets/skeleton.dart' show ShimmerBlock, ShimmerContainer;
 
 // ============================================================
 // PointValueDisplay — 测点值显示组件
@@ -50,6 +51,7 @@ class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
   bool _isRefreshing = false;
   String? _errorMessage;
   late AnimationController _rotationController;
+  late AnimationController _shimmerController;
 
   @override
   void initState() {
@@ -58,12 +60,17 @@ class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
       vsync: this,
       duration: const Duration(seconds: 1),
     );
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
     _loadValue();
   }
 
   @override
   void dispose() {
     _rotationController.dispose();
+    _shimmerController.dispose();
     super.dispose();
   }
 
@@ -278,38 +285,40 @@ class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
     );
   }
 
-  /// 骨架占位（加载中）
+  /// 骨架占位（加载中），带 shimmer 脉冲动画
   Widget _buildSkeleton(ColorScheme colorScheme) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 60,
-          height: 16,
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withAlpha(128),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 20,
-          height: 20,
-          child: IconButton(
-            icon: Icon(
-              Icons.refresh,
-              size: 16,
-              color: colorScheme.primary.withAlpha(128),
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, child) {
+        return ShimmerContainer(
+          animation: _shimmerController,
+          child: child!,
+        );
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const ShimmerBlock(width: 60, height: 16),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: IconButton(
+              icon: Icon(
+                Icons.refresh,
+                size: 16,
+                color: colorScheme.primary.withAlpha(128),
+              ),
+              onPressed: null,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(
+                minWidth: 20,
+                minHeight: 20,
+              ),
             ),
-            onPressed: null,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 20,
-              minHeight: 20,
-            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

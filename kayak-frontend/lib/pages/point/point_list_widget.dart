@@ -7,6 +7,7 @@ import '../../providers/point_provider.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_view.dart';
 import '../../widgets/error_view.dart';
+import '../../widgets/skeleton.dart' show ShimmerBlock, ShimmerContainer;
 import '../../widgets/toast.dart';
 import 'point_form_dialog.dart';
 import 'point_value_display.dart';
@@ -34,7 +35,24 @@ class PointListWidget extends ConsumerStatefulWidget {
   ConsumerState<PointListWidget> createState() => _PointListWidgetState();
 }
 
-class _PointListWidgetState extends ConsumerState<PointListWidget> {
+class _PointListWidgetState extends ConsumerState<PointListWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shimmerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    super.dispose();
+  }
   /// 打开添加测点对话框
   Future<void> _handleAddPoint() async {
     await PointFormDialog.show(
@@ -172,12 +190,13 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
     );
   }
 
-  /// 骨架屏（5 行 × 6 列）
+  /// 骨架屏（5 行 × 6 列），带 shimmer 脉冲动画
   Widget _buildSkeleton(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
+    Widget skeletonContent;
     if (isMobile) {
-      return Column(
+      skeletonContent = Column(
         children: List.generate(5, (index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -185,56 +204,66 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
               children: [
                 Expanded(
                   flex: 2,
-                  child: _skeletonBlock(context, height: 16, width: 120),
+                  child: ShimmerBlock(height: 16, width: 120),
                 ),
                 const SizedBox(width: 8),
-                _skeletonBlock(context, height: 20, width: 60),
+                ShimmerBlock(height: 20, width: 60),
                 const SizedBox(width: 8),
-                _skeletonBlock(context, height: 16, width: 16, borderRadius: 8),
+                const ShimmerBlock(height: 16, width: 16, borderRadius: 8),
                 const SizedBox(width: 8),
-                _skeletonBlock(context, height: 16, width: 40),
+                ShimmerBlock(height: 16, width: 40),
                 const SizedBox(width: 8),
-                _skeletonBlock(context, height: 16, width: 60),
+                ShimmerBlock(height: 16, width: 60),
                 const SizedBox(width: 8),
-                _skeletonBlock(context, height: 32, width: 64),
+                ShimmerBlock(height: 32, width: 64),
               ],
             ),
           );
         }),
       );
+    } else {
+      skeletonContent = Column(
+        children: [
+          // 表头骨架
+          _buildSkeletonHeader(context),
+          // 行骨架
+          ...List.generate(5, (_) => _buildSkeletonRow(context)),
+        ],
+      );
     }
 
-    return Column(
-      children: [
-        // 表头骨架
-        _buildSkeletonHeader(context),
-        // 行骨架
-        ...List.generate(5, (_) => _buildSkeletonRow(context)),
-      ],
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, child) {
+        return ShimmerContainer(
+          animation: _shimmerController,
+          child: child!,
+        );
+      },
+      child: skeletonContent,
     );
   }
 
   Widget _buildSkeletonHeader(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withAlpha(128),
+        color: Colors.transparent,
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: _skeletonBlock(context, height: 14, width: 40)),
+          Expanded(flex: 2, child: ShimmerBlock(height: 14, width: 40)),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 14, width: 30),
+          ShimmerBlock(height: 14, width: 30),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 14, width: 30),
+          ShimmerBlock(height: 14, width: 30),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 14, width: 30),
+          ShimmerBlock(height: 14, width: 30),
           const SizedBox(width: 16),
-          Expanded(child: _skeletonBlock(context, height: 14, width: 40)),
+          Expanded(child: ShimmerBlock(height: 14, width: 40)),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 14, width: 50),
+          ShimmerBlock(height: 14, width: 50),
         ],
       ),
     );
@@ -253,41 +282,24 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: _skeletonBlock(context, height: 14, width: 120)),
+          Expanded(flex: 2, child: ShimmerBlock(height: 14, width: 120)),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 20, width: 60),
+          ShimmerBlock(height: 20, width: 60),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 16, width: 16, borderRadius: 8),
+          ShimmerBlock(height: 16, width: 16, borderRadius: 8),
           const SizedBox(width: 16),
-          _skeletonBlock(context, height: 14, width: 30),
+          ShimmerBlock(height: 14, width: 30),
           const SizedBox(width: 16),
-          Expanded(child: _skeletonBlock(context, height: 16, width: 80)),
+          Expanded(child: ShimmerBlock(height: 16, width: 80)),
           const SizedBox(width: 16),
           Row(
             children: [
-              _skeletonBlock(context, height: 32, width: 32, borderRadius: 16),
+              ShimmerBlock(height: 32, width: 32, borderRadius: 16),
               const SizedBox(width: 4),
-              _skeletonBlock(context, height: 32, width: 32, borderRadius: 16),
+              ShimmerBlock(height: 32, width: 32, borderRadius: 16),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _skeletonBlock(
-    BuildContext context, {
-    required double height,
-    required double width,
-    double borderRadius = 4,
-  }) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withAlpha(128),
-        borderRadius: BorderRadius.circular(borderRadius),
       ),
     );
   }

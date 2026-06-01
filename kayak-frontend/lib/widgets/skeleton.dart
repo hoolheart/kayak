@@ -94,7 +94,7 @@ class _SkeletonState extends State<Skeleton>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return _ShimmerContainer(
+        return ShimmerContainer(
           animation: _controller,
           child: child!,
         );
@@ -129,7 +129,7 @@ class _SkeletonState extends State<Skeleton>
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ShimmerPlaceholder(
+              ShimmerPlaceholder(
                 width: 40,
                 height: 40,
                 borderRadius: 20,
@@ -139,18 +139,18 @@ class _SkeletonState extends State<Skeleton>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ShimmerPlaceholder(
+                    ShimmerPlaceholder(
                       width: double.infinity,
                       height: 16,
                       widthFraction: 0.6,
                     ),
                     SizedBox(height: 8),
-                    _ShimmerPlaceholder(
+                    ShimmerPlaceholder(
                       width: double.infinity,
                       height: 14,
                     ),
                     SizedBox(height: 4),
-                    _ShimmerPlaceholder(
+                    ShimmerPlaceholder(
                       width: double.infinity,
                       height: 14,
                       widthFraction: 0.7,
@@ -176,7 +176,7 @@ class _SkeletonState extends State<Skeleton>
             borderRadius: BorderRadius.all(Radius.circular(8)),
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: _ShimmerPlaceholder(
+              child: ShimmerPlaceholder(
                 width: double.infinity,
                 height: double.infinity,
                 borderRadius: 0,
@@ -185,20 +185,20 @@ class _SkeletonState extends State<Skeleton>
           ),
           SizedBox(height: 16),
           // 标题
-          _ShimmerPlaceholder(
+          ShimmerPlaceholder(
             width: double.infinity,
             height: 16,
             widthFraction: 0.6,
           ),
           SizedBox(height: 8),
           // 描述行1
-          _ShimmerPlaceholder(
+          ShimmerPlaceholder(
             width: double.infinity,
             height: 14,
           ),
           SizedBox(height: 4),
           // 描述行2
-          _ShimmerPlaceholder(
+          ShimmerPlaceholder(
             width: double.infinity,
             height: 14,
             widthFraction: 0.85,
@@ -207,12 +207,12 @@ class _SkeletonState extends State<Skeleton>
           // 底部信息
           Row(
             children: [
-              _ShimmerPlaceholder(
+              ShimmerPlaceholder(
                 width: 80,
                 height: 12,
               ),
               Spacer(),
-              _ShimmerPlaceholder(
+              ShimmerPlaceholder(
                 width: 100,
                 height: 12,
               ),
@@ -232,7 +232,7 @@ class _SkeletonState extends State<Skeleton>
           final isLastLine = index == lines - 1;
           return Padding(
             padding: EdgeInsets.only(bottom: index < lines - 1 ? 8.0 : 0),
-            child: _ShimmerPlaceholder(
+            child: ShimmerPlaceholder(
               width: double.infinity,
               height: 14,
               widthFraction: isLastLine ? 0.7 : 1.0,
@@ -247,7 +247,7 @@ class _SkeletonState extends State<Skeleton>
     return const Padding(
       padding: EdgeInsets.all(16),
       child: Center(
-        child: _ShimmerPlaceholder(
+        child: ShimmerPlaceholder(
           width: 80,
           height: 80,
           borderRadius: 40,
@@ -258,8 +258,9 @@ class _SkeletonState extends State<Skeleton>
 }
 
 /// Shimmer 动画容器，使用 ShaderMask 实现光泽扫过效果。
-class _ShimmerContainer extends StatelessWidget {
-  const _ShimmerContainer({
+class ShimmerContainer extends StatelessWidget {
+  const ShimmerContainer({
+    super.key,
     required this.animation,
     required this.child,
   });
@@ -302,8 +303,9 @@ class _ShimmerContainer extends StatelessWidget {
 ///
 /// 当提供了 [widthFraction] 时，使用 [FractionallySizedBox] 按比例约束宽度，
 /// 避免 `double.infinity * widthFraction` 产生无穷大值的问题。
-class _ShimmerPlaceholder extends StatelessWidget {
-  const _ShimmerPlaceholder({
+class ShimmerPlaceholder extends StatelessWidget {
+  const ShimmerPlaceholder({
+    super.key,
     required this.width,
     required this.height,
     this.borderRadius = 4,
@@ -339,6 +341,62 @@ class _ShimmerPlaceholder extends StatelessWidget {
     return SizedBox(
       width: width,
       child: placeholder,
+    );
+  }
+}
+
+/// Self-contained shimmer block with its own animation controller.
+/// Convenience widget for use outside of the Skeleton component.
+class ShimmerBlock extends StatefulWidget {
+  const ShimmerBlock({
+    super.key,
+    required this.width,
+    required this.height,
+    this.borderRadius = 4,
+  });
+
+  final double width;
+  final double height;
+  final double borderRadius;
+
+  @override
+  State<ShimmerBlock> createState() => _ShimmerBlockState();
+}
+
+class _ShimmerBlockState extends State<ShimmerBlock>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShimmerContainer(
+          animation: _controller,
+          child: child!,
+        );
+      },
+      child: ShimmerPlaceholder(
+        width: widget.width,
+        height: widget.height,
+        borderRadius: widget.borderRadius,
+      ),
     );
   }
 }
