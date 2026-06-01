@@ -46,6 +46,12 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
   /// 范围：'personal' | 'team'
   String? _scope;
 
+  /// methodId → methodName 映射缓存
+  final Map<String, String> _methodNames = {};
+
+  /// 获取 methodId → methodName 映射（不可变快照）
+  Map<String, String> get methodNames => Map.unmodifiable(_methodNames);
+
   @override
   Future<List<Experiment>> build() async {
     final service = ref.read(experimentServiceProvider);
@@ -58,7 +64,35 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
       scope: _scope,
     );
     _total = response.total;
+    // 批量拉取方法名称（去重）
+    await _fetchMethodNames(response.items);
     return response.items;
+  }
+
+  /// 从试验列表中提取不重复的 methodId，批量拉取方法名称。
+  Future<void> _fetchMethodNames(List<Experiment> experiments) async {
+    final methodIds = experiments
+        .map((e) => e.methodId)
+        .where((id) => id != null && id.isNotEmpty)
+        .map((id) => id!)
+        .toSet()
+        .difference(_methodNames.keys.toSet());
+    if (methodIds.isEmpty) return;
+
+    try {
+      final methodService = ref.read(methodServiceProvider);
+      for (final id in methodIds) {
+        try {
+          final method = await methodService.getById(id);
+          _methodNames[id] = method.name;
+        } catch (_) {
+          // 单个方法加载失败，不阻塞整体列表，使用 ID 作为 fallback
+          _methodNames[id] = id;
+        }
+      }
+    } catch (_) {
+      // 整体加载失败，忽略
+    }
   }
 
   /// 刷新列表（回到第 1 页）。
@@ -89,6 +123,9 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
         scope: _scope,
       );
       _total = response.total;
+
+      // 批量拉取新试验的方法名称
+      await _fetchMethodNames(response.items);
 
       // 追加到现有列表
       if (state.hasValue) {

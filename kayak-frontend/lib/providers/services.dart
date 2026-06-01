@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/device_service.dart';
 import '../services/error_interceptor.dart';
 import '../services/experiment_service.dart';
+import '../services/method_service.dart';
 import '../services/point_service.dart';
 import '../services/token_storage.dart';
 import '../services/workbench_service.dart';
@@ -108,6 +109,21 @@ final pointServiceProvider = Provider<PointService>((ref) {
 /// ```
 final experimentServiceProvider = Provider<ExperimentService>((ref) {
   return ExperimentService(ref.read(apiClientProvider));
+});
+
+/// MethodService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [MethodService] 实例。
+/// 依赖 [apiClientProvider] 用于 HTTP 请求。
+///
+/// 在测试中通过 `overrideWithValue` 注入 FakeMethodService：
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   methodServiceProvider.overrideWithValue(fakeService),
+/// ]);
+/// ```
+final methodServiceProvider = Provider<MethodService>((ref) {
+  return MethodService(ref.read(apiClientProvider));
 });
 
 /// WsService 的 Riverpod Provider

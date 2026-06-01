@@ -149,12 +149,14 @@ class _ExperimentListPageState extends ConsumerState<ExperimentListPage> {
                       child: isMobile
                           ? _ExperimentCardList(
                               experiments: experiments,
+                              methodNames: notifier.methodNames,
                               onStop: _handleStop,
                               onOpenConsole: (id) =>
                                   context.go('/experiments/$id'),
                             )
                         : _ExperimentDataTable(
                             experiments: experiments,
+                            methodNames: notifier.methodNames,
                             onStop: _handleStop,
                               onOpenConsole: (id) =>
                                   context.go('/experiments/$id'),
@@ -547,11 +549,13 @@ class _StatusDot extends StatelessWidget {
 class _ExperimentDataTable extends StatelessWidget {
   const _ExperimentDataTable({
     required this.experiments,
+    required this.methodNames,
     required this.onStop,
     required this.onOpenConsole,
   });
 
   final List<Experiment> experiments;
+  final Map<String, String> methodNames;
   final ValueChanged<Experiment> onStop;
   final ValueChanged<String> onOpenConsole;
 
@@ -659,7 +663,12 @@ class _ExperimentDataTable extends StatelessWidget {
               ),
               DataCell(
                 Text(
-                  exp.methodId ?? l10n.methodNotSet,
+                  // TODO: 后端 Experiment 响应暂无 method_name 字段，
+                  // 当前通过 MethodService.getById 批量解析；待后端加入
+                  // method_name 后可直接使用，移除 batch-fetch 逻辑。
+                  exp.methodId != null
+                      ? (methodNames[exp.methodId] ?? l10n.methodNotSet)
+                      : l10n.methodNotSet,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -668,7 +677,10 @@ class _ExperimentDataTable extends StatelessWidget {
                 ),
               ),
               DataCell(
-                StatusBadge(status: exp.status),
+                StatusBadge(
+                  status: exp.status,
+                  label: _statusLabelText(context, exp.status),
+                ),
               ),
               DataCell(
                 Text(
@@ -757,11 +769,13 @@ class _ExperimentDataTable extends StatelessWidget {
 class _ExperimentCardList extends StatelessWidget {
   const _ExperimentCardList({
     required this.experiments,
+    required this.methodNames,
     required this.onStop,
     required this.onOpenConsole,
   });
 
   final List<Experiment> experiments;
+  final Map<String, String> methodNames;
   final ValueChanged<Experiment> onStop;
   final ValueChanged<String> onOpenConsole;
 
@@ -769,6 +783,7 @@ class _ExperimentCardList extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -793,7 +808,10 @@ class _ExperimentCardList extends StatelessWidget {
                   ? BoxDecoration(
                       border: Border(
                         top: BorderSide(
-                          color: colorScheme.primary,
+                          // RUNNING 状态：绿色边框（匹配 StatusBadge 绿色主题）
+                          color: isDark
+                              ? const Color(0xFF81C784)
+                              : const Color(0xFF2E7D32),
                           width: 3,
                         ),
                       ),
@@ -821,14 +839,23 @@ class _ExperimentCardList extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        StatusBadge(status: exp.status),
+                        StatusBadge(
+                          status: exp.status,
+                          label: _statusLabelText(context, exp.status),
+                          compact: true,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     // 信息行
                     _InfoRow(
                       label: l10n.columnMethod,
-                      value: exp.methodId ?? l10n.methodNotSet,
+                      // TODO: 后端 Experiment 响应暂无 method_name 字段，
+                      // 当前通过 MethodService.getById 批量解析；待后端加入
+                      // method_name 后可直接使用，移除 batch-fetch 逻辑。
+                      value: exp.methodId != null
+                          ? (methodNames[exp.methodId] ?? l10n.methodNotSet)
+                          : l10n.methodNotSet,
                     ),
                     const SizedBox(height: 4),
                     _InfoRow(
@@ -924,6 +951,25 @@ class _ExperimentCardList extends StatelessWidget {
     return '${hours.toString().padLeft(2, '0')}:'
         '${minutes.toString().padLeft(2, '0')}:'
         '${seconds.toString().padLeft(2, '0')}';
+  }
+}
+
+/// 获取状态对应的本地化文本。
+String _statusLabelText(BuildContext context, ExperimentStatus status) {
+  final l10n = AppLocalizations.of(context)!;
+  switch (status) {
+    case ExperimentStatus.idle:
+      return l10n.statusIdle;
+    case ExperimentStatus.loaded:
+      return l10n.statusLoaded;
+    case ExperimentStatus.running:
+      return l10n.statusRunning;
+    case ExperimentStatus.paused:
+      return l10n.statusPaused;
+    case ExperimentStatus.completed:
+      return l10n.statusCompleted;
+    case ExperimentStatus.aborted:
+      return l10n.statusAborted;
   }
 }
 

@@ -21,6 +21,7 @@ class StatusBadge extends StatefulWidget {
   const StatusBadge({
     super.key,
     required this.status,
+    this.label,
     this.showIcon = true,
     this.showPulse = true,
     this.onTap,
@@ -29,6 +30,12 @@ class StatusBadge extends StatefulWidget {
 
   /// 试验状态。
   final ExperimentStatus status;
+
+  /// 自定义标签文本（从 l10n 传入）。
+  ///
+  /// 如果提供，将替代默认的英文 fallback 文本。
+  /// 使用方应通过 AppLocalizations 传入本地化状态文本。
+  final String? label;
 
   /// 是否显示状态图标/圆点，默认 true。
   final bool showIcon;
@@ -263,10 +270,13 @@ class _StatusBadgeState extends State<StatusBadge>
     return badge;
   }
 
-  /// 获取状态文本（实际通过 l10n 获取，此处为 fallback）。
-  /// 组件使用方应通过 l10n 覆盖文本，但此组件也提供默认文本。
+  /// 获取状态文本。
+  ///
+  /// 如果提供了 [widget.label]，优先使用（即 l10n 文本）。
+  /// 否则返回默认英文 fallback。
   String _statusLabel(ExperimentStatus status) {
-    // 使用语义标签支持无障碍
+    if (widget.label != null) return widget.label!;
+    // 默认英文 fallback
     switch (status) {
       case ExperimentStatus.idle:
         return 'Idle';
