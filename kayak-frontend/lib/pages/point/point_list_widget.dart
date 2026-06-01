@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/point.dart';
-import '../../providers/device_provider.dart';
 import '../../providers/point_provider.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/empty_view.dart';
@@ -69,14 +68,14 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
           await ref
               .read(pointListProvider(widget.deviceId).notifier)
               .deletePoint(point.id);
-          if (!context.mounted) return;
+          if (!mounted) return;
           Toast.show(
             context: context,
             message: l10n.pointDeleteSuccess,
             type: ToastType.success,
           );
         } catch (e) {
-          if (!context.mounted) return;
+          if (!mounted) return;
           Toast.show(
             context: context,
             message: '$e',
@@ -112,8 +111,6 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
     AppLocalizations l10n,
     AsyncValue<List<Point>> pointsState,
   ) {
-    final isTablet = MediaQuery.of(context).size.width >= 600 &&
-        MediaQuery.of(context).size.width < 1024;
     final isMobile = MediaQuery.of(context).size.width < 600;
     // 移动端添加按钮在底部显示
     final showAddInHeader = !isMobile;
@@ -177,7 +174,6 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
 
   /// 骨架屏（5 行 × 6 列）
   Widget _buildSkeleton(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     if (isMobile) {
@@ -236,7 +232,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
           const SizedBox(width: 16),
           _skeletonBlock(context, height: 14, width: 30),
           const SizedBox(width: 16),
-          Expanded(flex: 1, child: _skeletonBlock(context, height: 14, width: 40)),
+          Expanded(child: _skeletonBlock(context, height: 14, width: 40)),
           const SizedBox(width: 16),
           _skeletonBlock(context, height: 14, width: 50),
         ],
@@ -265,7 +261,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
           const SizedBox(width: 16),
           _skeletonBlock(context, height: 14, width: 30),
           const SizedBox(width: 16),
-          Expanded(flex: 1, child: _skeletonBlock(context, height: 16, width: 80)),
+          Expanded(child: _skeletonBlock(context, height: 16, width: 80)),
           const SizedBox(width: 16),
           Row(
             children: [
@@ -373,7 +369,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
                 child: Center(child: _headerCell(l10n.pointColumnUnit, textTheme, colorScheme)),
               ),
               const SizedBox(width: 16),
-              Expanded(flex: 1, child: _headerCell(l10n.pointColumnValue, textTheme, colorScheme)),
+              Expanded(child: _headerCell(l10n.pointColumnValue, textTheme, colorScheme)),
               const SizedBox(width: 16),
               SizedBox(
                 width: 100,
@@ -413,131 +409,122 @@ class _PointListWidgetState extends ConsumerState<PointListWidget> {
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    return StatefulBuilder(
-      builder: (context, setLocalState) {
-        bool isHovered = false;
-        return MouseRegion(
-          onEnter: (_) => setLocalState(() => isHovered = true),
-          onExit: (_) => setLocalState(() => isHovered = false),
-          child: Container(
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: isHovered
-                  ? colorScheme.onSurface.withAlpha(10)
-                  : Colors.transparent,
-              border: Border(
-                bottom: BorderSide(
-                  color: colorScheme.outlineVariant.withAlpha(77),
+    return InkWell(
+      onTap: () {},
+      hoverColor: colorScheme.onSurface.withAlpha(10),
+      child: Container(
+        height: 52,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: colorScheme.outlineVariant.withAlpha(77),
+            ),
+          ),
+        ),
+        child: Row(
+          children: [
+            // 名称
+            Expanded(
+              flex: 2,
+              child: Text(
+                point.name,
+                style: textTheme.bodyLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // 类型标签
+            SizedBox(
+              width: 80,
+              child: Center(child: _buildTypeChip(point.dataType, colorScheme, textTheme)),
+            ),
+            const SizedBox(width: 16),
+            // 访问权限
+            SizedBox(
+              width: 80,
+              child: Center(
+                child: Tooltip(
+                  message: _accessTypeLabel(point.accessType, l10n),
+                  child: Icon(
+                    _accessTypeIcon(point.accessType),
+                    size: 16,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
-            child: Row(
-              children: [
-                // 名称
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    point.name,
-                    style: textTheme.bodyLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+            const SizedBox(width: 16),
+            // 单位
+            SizedBox(
+              width: 60,
+              child: Center(
+                child: Text(
+                  point.unit ?? '—',
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(width: 16),
-                // 类型标签
-                SizedBox(
-                  width: 80,
-                  child: Center(child: _buildTypeChip(point.dataType, colorScheme, textTheme)),
-                ),
-                const SizedBox(width: 16),
-                // 访问权限
-                SizedBox(
-                  width: 80,
-                  child: Center(
-                    child: Tooltip(
-                      message: _accessTypeLabel(point.accessType, l10n),
-                      child: Icon(
-                        _accessTypeIcon(point.accessType),
-                        size: 16,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // 单位
-                SizedBox(
-                  width: 60,
-                  child: Center(
-                    child: Text(
-                      point.unit ?? '—',
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // 当前值
-                Expanded(
-                  flex: 1,
-                  child: PointValueDisplay(
-                    pointId: point.id,
-                    dataType: point.dataType,
-                    unit: point.unit,
-                    status: point.status,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // 操作按钮
-                SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.edit_outlined,
-                          size: 20,
-                          color: colorScheme.primary,
-                        ),
-                        onPressed: () => _handleEditPoint(point),
-                        tooltip: l10n.edit,
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                        padding: EdgeInsets.zero,
-                        style: IconButton.styleFrom(
-                          hoverColor: colorScheme.primary.withAlpha(20),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          size: 20,
-                          color: colorScheme.error,
-                        ),
-                        onPressed: () => _handleDeletePoint(point),
-                        tooltip: l10n.delete,
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                        padding: EdgeInsets.zero,
-                        style: IconButton.styleFrom(
-                          hoverColor: colorScheme.error.withAlpha(20),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            const SizedBox(width: 16),
+            // 当前值
+            Expanded(
+              child: PointValueDisplay(
+                pointId: point.id,
+                dataType: point.dataType,
+                unit: point.unit,
+                status: point.status,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // 操作按钮
+            SizedBox(
+              width: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit_outlined,
+                      size: 20,
+                      color: colorScheme.primary,
+                    ),
+                    onPressed: () => _handleEditPoint(point),
+                    tooltip: l10n.edit,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    padding: EdgeInsets.zero,
+                    style: IconButton.styleFrom(
+                      hoverColor: colorScheme.primary.withAlpha(20),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: 20,
+                      color: colorScheme.error,
+                    ),
+                    onPressed: () => _handleDeletePoint(point),
+                    tooltip: l10n.delete,
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
+                    padding: EdgeInsets.zero,
+                    style: IconButton.styleFrom(
+                      hoverColor: colorScheme.error.withAlpha(20),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

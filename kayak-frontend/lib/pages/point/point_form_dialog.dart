@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/device.dart';
 import '../../models/point.dart';
-import '../../providers/device_provider.dart';
 import '../../providers/point_provider.dart';
 import '../../providers/services.dart';
 import '../../widgets/toast.dart';
@@ -244,7 +244,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
 
     // Read-modify-write: 读取现有 protocol_params
     final protocolParams = Map<String, dynamic>.from(
-      (device.protocolParams as Map<String, dynamic>?) ?? {},
+      device.protocolParams ?? {},
     );
     final points = Map<String, dynamic>.from(
       (protocolParams['points'] as Map<String, dynamic>?) ?? {},
@@ -465,7 +465,8 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
         const SizedBox(height: 16),
         // 数据类型
         DropdownButtonFormField<DataType>(
-          value: _selectedDataType,
+          key: ValueKey('data_type_$_selectedDataType'),
+          initialValue: _selectedDataType,
           decoration: InputDecoration(
             labelText: '${l10n.pointDataTypeLabel} *',
           ),
@@ -486,7 +487,8 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
         const SizedBox(height: 16),
         // 访问权限
         DropdownButtonFormField<AccessType>(
-          value: _selectedAccessType,
+          key: ValueKey('access_type_$_selectedAccessType'),
+          initialValue: _selectedAccessType,
           decoration: InputDecoration(
             labelText: '${l10n.pointAccessTypeLabel} *',
           ),
@@ -596,7 +598,8 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
               children: [
                 // 寄存器类型
                 DropdownButtonFormField<String>(
-                  value: _selectedRegisterType,
+                  key: ValueKey('register_type_$_selectedRegisterType'),
+                  initialValue: _selectedRegisterType,
                   decoration: InputDecoration(
                     labelText: '${l10n.pointRegisterTypeLabel} *',
                   ),
@@ -634,7 +637,8 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
                 const SizedBox(height: 16),
                 // 数据格式
                 DropdownButtonFormField<String>(
-                  value: _selectedDataFormat,
+                  key: ValueKey('data_format_$_selectedDataFormat'),
+                  initialValue: _selectedDataFormat,
                   decoration: InputDecoration(
                     labelText: '${l10n.pointDataFormatLabel} *',
                   ),

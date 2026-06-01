@@ -1189,6 +1189,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot exceed 255 characters'**
   String get max255Chars;
+
+  /// Point list widget title
+  ///
+  /// In en, this message translates to:
+  /// **'Points'**
+  String get pointListTitle;
+
+  /// Point count text in header
+  ///
+  /// In en, this message translates to:
+  /// **'{count} points'**
+  String pointCount(int count);
+
+  /// Add point button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Point'**
+  String get addPoint;
+
+  /// Add first point button in empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Point'**
+  String get addFirstPoint;
+
+  /// Empty state text for point list
+  ///
+  /// In en, this message translates to:
+  /// **'No points for this device'**
+  String get pointListEmpty;
+
+  /// Point name required validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Point name is required'**
+  String get pointNameRequired;
+
+  /// Point name max length validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Name must not exceed 255 characters'**
+  String get pointNameTooLong;
+
+  /// Point save success toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Point saved'**
+  String get pointSaveSuccess;
+
+  /// Point delete success toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Point deleted'**
+  String get pointDeleteSuccess;
+
+  /// Delete point confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete point \"{name}\"?'**
+  String pointDeleteConfirm(String name);
+
+  /// Delete point confirmation dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get pointDeleteWarning;
+
+  /// Range validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Max must be greater than min'**
+  String get pointRangeInvalid;
+
+  /// Point status normal tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get pointStatusNormal;
+
+  /// Point status timeout tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Timeout'**
+  String get pointStatusTimeout;
+
+  /// Point status error tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get pointStatusError;
+
+  /// Refresh button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// Point name field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get pointNameLabel;
+
+  /// Point name field hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Enter point name'**
+  String get pointNameHint;
+
+  /// Data type field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Data Type'**
+  String get pointDataTypeLabel;
+
+  /// Access type field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Access'**
+  String get pointAccessTypeLabel;
+
+  /// Unit field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get pointUnitLabel;
+
+  /// Modbus configuration section title
+  ///
+  /// In en, this message translates to:
+  /// **'Modbus Configuration'**
+  String get pointModbusConfig;
+
+  /// Register type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Register Type'**
+  String get pointRegisterTypeLabel;
+
+  /// Start address field label
+  ///
+  /// In en, this message translates to:
+  /// **'Start Address'**
+  String get pointAddressLabel;
+
+  /// Address range validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Address must be 0-65535'**
+  String get pointAddressRange;
+
+  /// Data format field label
+  ///
+  /// In en, this message translates to:
+  /// **'Data Format'**
+  String get pointDataFormatLabel;
+
+  /// Table column header for name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get pointColumnName;
+
+  /// Table column header for type
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get pointColumnType;
+
+  /// Table column header for access
+  ///
+  /// In en, this message translates to:
+  /// **'Access'**
+  String get pointColumnAccess;
+
+  /// Table column header for unit
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get pointColumnUnit;
+
+  /// Table column header for value
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get pointColumnValue;
+
+  /// Table column header for actions
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get pointColumnAction;
+
+  /// Data type option: number
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get dataTypeNumber;
+
+  /// Data type option: integer
+  ///
+  /// In en, this message translates to:
+  /// **'Integer'**
+  String get dataTypeInteger;
+
+  /// Data type option: boolean
+  ///
+  /// In en, this message translates to:
+  /// **'Boolean'**
+  String get dataTypeBoolean;
+
+  /// Data type option: string
+  ///
+  /// In en, this message translates to:
+  /// **'String'**
+  String get dataTypeString;
+
+  /// Access type option: read only
+  ///
+  /// In en, this message translates to:
+  /// **'Read Only'**
+  String get accessTypeRo;
+
+  /// Access type option: write only
+  ///
+  /// In en, this message translates to:
+  /// **'Write Only'**
+  String get accessTypeWo;
+
+  /// Access type option: read and write
+  ///
+  /// In en, this message translates to:
+  /// **'Read & Write'**
+  String get accessTypeRw;
+
+  /// Boolean true display text
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get booleanTrue;
+
+  /// Boolean false display text
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get booleanFalse;
+
+  /// Point save failure toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save point'**
+  String get pointSaveFailed;
+
+  /// Point delete failure toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete point'**
+  String get pointDeleteFailed;
+
+  /// Min value field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Min Value'**
+  String get pointMinValueLabel;
+
+  /// Max value field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Max Value'**
+  String get pointMaxValueLabel;
+
+  /// Default value field label in form
+  ///
+  /// In en, this message translates to:
+  /// **'Default Value'**
+  String get pointDefaultValueLabel;
+
+  /// Edit point dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Point'**
+  String get editPoint;
+
+  /// Add point dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Point'**
+  String get addPointTitle;
 }
 
 class _AppLocalizationsDelegate

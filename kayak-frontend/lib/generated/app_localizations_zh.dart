@@ -559,4 +559,152 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get max255Chars => '最多 255 个字符';
+
+  @override
+  String get pointListTitle => '测点列表';
+
+  @override
+  String pointCount(int count) {
+    return '共 $count 个测点';
+  }
+
+  @override
+  String get addPoint => '添加测点';
+
+  @override
+  String get addFirstPoint => '添加第一个测点';
+
+  @override
+  String get pointListEmpty => '该设备下暂无测点';
+
+  @override
+  String get pointNameRequired => '请输入测点名称';
+
+  @override
+  String get pointNameTooLong => '名称不能超过 255 个字符';
+
+  @override
+  String get pointSaveSuccess => '测点已保存';
+
+  @override
+  String get pointDeleteSuccess => '测点已删除';
+
+  @override
+  String pointDeleteConfirm(String name) {
+    return '确定要删除测点「$name」吗？';
+  }
+
+  @override
+  String get pointDeleteWarning => '此操作不可撤销。';
+
+  @override
+  String get pointRangeInvalid => '最大值必须大于最小值';
+
+  @override
+  String get pointStatusNormal => '正常';
+
+  @override
+  String get pointStatusTimeout => '超时';
+
+  @override
+  String get pointStatusError => '异常';
+
+  @override
+  String get refresh => '刷新';
+
+  @override
+  String get pointNameLabel => '名称';
+
+  @override
+  String get pointNameHint => '请输入测点名称';
+
+  @override
+  String get pointDataTypeLabel => '数据类型';
+
+  @override
+  String get pointAccessTypeLabel => '访问权限';
+
+  @override
+  String get pointUnitLabel => '单位';
+
+  @override
+  String get pointModbusConfig => 'Modbus 配置';
+
+  @override
+  String get pointRegisterTypeLabel => '寄存器类型';
+
+  @override
+  String get pointAddressLabel => '起始地址';
+
+  @override
+  String get pointAddressRange => '起始地址必须在 0-65535 之间';
+
+  @override
+  String get pointDataFormatLabel => '数据格式';
+
+  @override
+  String get pointColumnName => '名称';
+
+  @override
+  String get pointColumnType => '类型';
+
+  @override
+  String get pointColumnAccess => '访问权限';
+
+  @override
+  String get pointColumnUnit => '单位';
+
+  @override
+  String get pointColumnValue => '当前值';
+
+  @override
+  String get pointColumnAction => '操作';
+
+  @override
+  String get dataTypeNumber => '浮点数';
+
+  @override
+  String get dataTypeInteger => '整数';
+
+  @override
+  String get dataTypeBoolean => '布尔值';
+
+  @override
+  String get dataTypeString => '字符串';
+
+  @override
+  String get accessTypeRo => '只读';
+
+  @override
+  String get accessTypeWo => '只写';
+
+  @override
+  String get accessTypeRw => '读写';
+
+  @override
+  String get booleanTrue => '开启';
+
+  @override
+  String get booleanFalse => '关闭';
+
+  @override
+  String get pointSaveFailed => '测点保存失败';
+
+  @override
+  String get pointDeleteFailed => '测点删除失败';
+
+  @override
+  String get pointMinValueLabel => '最小值';
+
+  @override
+  String get pointMaxValueLabel => '最大值';
+
+  @override
+  String get pointDefaultValueLabel => '默认值';
+
+  @override
+  String get editPoint => '编辑测点';
+
+  @override
+  String get addPointTitle => '添加测点';
 }

@@ -563,4 +563,152 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get max255Chars => 'Cannot exceed 255 characters';
+
+  @override
+  String get pointListTitle => 'Points';
+
+  @override
+  String pointCount(int count) {
+    return '$count points';
+  }
+
+  @override
+  String get addPoint => 'Add Point';
+
+  @override
+  String get addFirstPoint => 'Add First Point';
+
+  @override
+  String get pointListEmpty => 'No points for this device';
+
+  @override
+  String get pointNameRequired => 'Point name is required';
+
+  @override
+  String get pointNameTooLong => 'Name must not exceed 255 characters';
+
+  @override
+  String get pointSaveSuccess => 'Point saved';
+
+  @override
+  String get pointDeleteSuccess => 'Point deleted';
+
+  @override
+  String pointDeleteConfirm(String name) {
+    return 'Delete point \"$name\"?';
+  }
+
+  @override
+  String get pointDeleteWarning => 'This action cannot be undone.';
+
+  @override
+  String get pointRangeInvalid => 'Max must be greater than min';
+
+  @override
+  String get pointStatusNormal => 'Normal';
+
+  @override
+  String get pointStatusTimeout => 'Timeout';
+
+  @override
+  String get pointStatusError => 'Error';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get pointNameLabel => 'Name';
+
+  @override
+  String get pointNameHint => 'Enter point name';
+
+  @override
+  String get pointDataTypeLabel => 'Data Type';
+
+  @override
+  String get pointAccessTypeLabel => 'Access';
+
+  @override
+  String get pointUnitLabel => 'Unit';
+
+  @override
+  String get pointModbusConfig => 'Modbus Configuration';
+
+  @override
+  String get pointRegisterTypeLabel => 'Register Type';
+
+  @override
+  String get pointAddressLabel => 'Start Address';
+
+  @override
+  String get pointAddressRange => 'Address must be 0-65535';
+
+  @override
+  String get pointDataFormatLabel => 'Data Format';
+
+  @override
+  String get pointColumnName => 'Name';
+
+  @override
+  String get pointColumnType => 'Type';
+
+  @override
+  String get pointColumnAccess => 'Access';
+
+  @override
+  String get pointColumnUnit => 'Unit';
+
+  @override
+  String get pointColumnValue => 'Value';
+
+  @override
+  String get pointColumnAction => 'Actions';
+
+  @override
+  String get dataTypeNumber => 'Number';
+
+  @override
+  String get dataTypeInteger => 'Integer';
+
+  @override
+  String get dataTypeBoolean => 'Boolean';
+
+  @override
+  String get dataTypeString => 'String';
+
+  @override
+  String get accessTypeRo => 'Read Only';
+
+  @override
+  String get accessTypeWo => 'Write Only';
+
+  @override
+  String get accessTypeRw => 'Read & Write';
+
+  @override
+  String get booleanTrue => 'On';
+
+  @override
+  String get booleanFalse => 'Off';
+
+  @override
+  String get pointSaveFailed => 'Failed to save point';
+
+  @override
+  String get pointDeleteFailed => 'Failed to delete point';
+
+  @override
+  String get pointMinValueLabel => 'Min Value';
+
+  @override
+  String get pointMaxValueLabel => 'Max Value';
+
+  @override
+  String get pointDefaultValueLabel => 'Default Value';
+
+  @override
+  String get editPoint => 'Edit Point';
+
+  @override
+  String get addPointTitle => 'Add Point';
 }

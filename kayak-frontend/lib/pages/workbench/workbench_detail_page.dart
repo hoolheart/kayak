@@ -881,7 +881,7 @@ class _DeviceDetailView extends ConsumerWidget {
       // ignore: unnecessary_lambdas
       loading: () => _buildDetailSkeleton(context),
       // ignore: unnecessary_lambdas
-      error: (error, _) => _buildDetailError(context, error),
+      error: (error, _) => _buildDetailError(context, ref, error),
       // ignore: unnecessary_lambdas
       data: (device) => _buildDetailContent(context, device),
     );
@@ -915,9 +915,7 @@ class _DeviceDetailView extends ConsumerWidget {
     );
   }
 
-  Widget _buildDetailError(BuildContext context, Object error) {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildDetailError(BuildContext context, WidgetRef ref, Object error) {
     return Container(
       constraints: const BoxConstraints(minHeight: 400),
       decoration: BoxDecoration(
@@ -929,7 +927,7 @@ class _DeviceDetailView extends ConsumerWidget {
         title: '$error',
         compact: true,
         onRetry: () {
-          ref.invalidate(deviceDetailProvider(_selectedDeviceId!));
+          ref.invalidate(deviceDetailProvider(deviceId));
         },
       ),
     );

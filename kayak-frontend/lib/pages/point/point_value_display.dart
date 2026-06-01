@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/point.dart';
-import '../../providers/point_provider.dart';
 import '../../providers/services.dart';
 
 // ============================================================
