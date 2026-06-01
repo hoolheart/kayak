@@ -1,8 +1,8 @@
 # Kayak 科学研究支持软件 - 架构设计文档
 
-**版本**: 1.3  
-**日期**: 2026-05-11  
-**状态**: Active (Release 2 实时架构)
+**版本**: 1.4  
+**日期**: 2026-06-01  
+**状态**: Active (Release 2 + Sprint 4 实时架构)
 
 ---
 
@@ -62,6 +62,19 @@
 - ✅ Python SDK（`KayakClient` 上下文管理器、`AuthManager` 自动Token刷新、资源API）
 - ✅ 试验数据查询与下载API（数据点历史、HDF5数据文件下载）
 - ✅ 团队路由与面包屑导航支持
+
+### 1.6 Sprint 4 已实现特性（设备树 & 测点管理前端重塑）
+- ✅ 设备树组件（`DeviceTree`）：递归树节点渲染，展开/折叠动画，协议图标，状态圆点，上下文菜单（添加/编辑/删除/添加子设备）
+- ✅ 设备配置对话框（`DeviceConfigDialog`）：创建/编辑双模式，Virtual/Modbus TCP/Modbus RTU 协议动态表单，响应式布局（桌面 Dialog / 移动端 Bottom Sheet）
+- ✅ 设备 API 服务（`DeviceService`）：listByWorkbench/getById/create/update/delete/testConnection/connect/disconnect/getStatus
+- ✅ 测点 API 服务（`PointService`）：listByDevice/getById/create/update/delete/getValue/setValue
+- ✅ 设备状态管理（`DeviceTreeNotifier` + `DeviceDetailNotifier`）：AsyncNotifier.family 按 workbenchId/deviceId 区分，平铺设备列表转树结构，操作互斥锁
+- ✅ 测点状态管理（`PointListNotifier`）：AsyncNotifier.family 按 deviceId 区分，测点值缓存 Map，批量值刷新，错误代码国际化
+- ✅ 测点列表组件（`PointListWidget`）：响应式布局（桌面 DataTable / 移动端 Card 列表），shimmer 骨架屏，状态三态处理，类型彩色标签
+- ✅ 测点表单对话框（`PointFormDialog`）：添加/编辑双模式，Modbus 设备自动检测与配置区域，变更检测（脏检查），Modbus 配置 Read-Modify-Write 模式
+- ✅ 测点值显示组件（`PointValueDisplay`）：独立加载状态，状态指示（normal/timeout/error），手动刷新动画，shimmer 占位
+- ✅ 工作台详情页重构（`WorkbenchDetailPage`）：集成设备树+设备详情+测点列表，响应式布局（桌面左右分栏 / 平板上下堆叠可折叠 / 移动端全堆叠）
+- ✅ 协议配置模型（`ProtocolConfig` sealed class hierarchy：`VirtualConfig`, `ModbusTcpConfig`, `ModbusRtuConfig`）
 
 ---
 
@@ -1817,70 +1830,98 @@ kayak-backend/src/
 └── test_utils/                     # 测试工具
 ```
 
-### 9.3 前端目录结构（Release 1 实时）
+### 9.3 前端目录结构（Release 2 + Sprint 4 实时）
 
 ```
 kayak-frontend/lib/
 ├── main.dart                       # 应用入口 (ProviderScope + KayakApp)
 ├── app.dart                        # MaterialApp配置 (ThemeData, Router, Locale)
-├── core/
-│   ├── auth/
-│   │   └── providers.dart          # AuthNotifier (authStateProvider)
-│   ├── common/
-│   ├── error/
-│   ├── navigation/
-│   │   └── app_shell.dart          # AppShell (NavigationRail + content)
-│   ├── platform/
-│   │   ├── desktop_init_real.dart  # 桌面窗口初始化
-│   │   └── desktop_init_stub.dart  # Web平台存根 (conditional import)
-│   ├── router/
-│   │   └── app_router.dart         # go_router路由配置 + SplashScreen
-│   └── theme/
-│       ├── app_theme.dart          # lightTheme() / darkTheme()
-│       ├── app_typography.dart     # 字体排版配置
-│       └── color_schemes.dart      # 深色/浅色ColorScheme (#1976D2主色)
-├── contracts/
-│   └── locale_settings.dart        # 国际化契约接口
-├── features/
-│   ├── auth/
-│   │   └── screens/
-│   │       ├── login_screen.dart
-│   │       └── register_screen.dart
-│   ├── dashboard/
-│   │   └── screens/
-│   │       └── dashboard_screen.dart
-│   ├── experiments/
-│   │   └── screens/
-│   │       ├── experiment_list_page.dart
-│   │       └── experiment_console_page.dart
-│   ├── methods/
-│   │   └── screens/
-│   │       ├── method_list_page.dart
-│   │       └── method_edit_page.dart
-│   └── workbench/
-│       └── screens/
-│           ├── workbench_list_page.dart
-│           └── detail/
-│               └── workbench_detail_page.dart
-├── screens/
-│   └── settings/
-│       └── settings_page.dart
-├── providers/
-│   └── core/
-│       ├── theme_provider.dart      # ThemeNotifier (StateNotifier + SharedPreferences)
-│       └── locale_provider.dart     # LocaleNotifier
-├── services/
-│   └── translation_service.dart
-├── validators/
-├── widgets/
-│   ├── language_selector.dart
-│   └── localized_text.dart
-├── l10n/
-│   ├── app_en.arb
-│   ├── app_zh.arb
-│   └── app_fr.arb
-└── generated/
-    └── l10n.dart
+│
+├── models/                         # 数据模型（json_annotation + freezed）
+│   ├── common.dart                 # ApiResponse 通用响应包装
+│   ├── device.dart                 # Device + DeviceTreeNode（递归树节点）+ ProtocolType枚举
+│   ├── point.dart                  # Point + DataType枚举 + AccessType枚举 + PointValue
+│   ├── protocol.dart               # ProtocolConfig sealed class（VirtualConfig/ModbusTcpConfig/ModbusRtuConfig）
+│   ├── workbench.dart              # Workbench 实体
+│   ├── team.dart                   # Team + TeamMember + TeamInvitation 实体
+│   ├── user.dart                   # User 实体
+│   ├── experiment.dart             # Experiment 实体
+│   ├── method.dart                 # Method 实体
+│   └── *.g.dart                    # 代码生成文件（fromJson/toJson）
+│
+├── providers/                      # Riverpod 状态管理（AsyncNotifier）
+│   ├── services.dart               # 服务层 Provider 注册（authService/apiClient/deviceService/pointService/workbenchService）
+│   ├── auth_provider.dart          # AuthNotifier（登录/注册/Token刷新）
+│   ├── device_provider.dart        # DeviceTreeNotifier（AsyncNotifier.family by workbenchId）+ DeviceDetailNotifier（AsyncNotifier.family by deviceId）
+│   ├── point_provider.dart         # PointListNotifier（AsyncNotifier.family by deviceId）+ pointValueProvider（FutureProvider.family by pointId）+ resolveErrorCode()
+│   ├── workbench_provider.dart     # WorkbenchListNotifier + WorkbenchDetailNotifier
+│   └── settings_provider.dart      # ThemeNotifier + LocaleNotifier
+│
+├── services/                       # HTTP API 服务层（Dio + ApiClient）
+│   ├── api_client.dart             # ApiClient（Dio封装，支持 authInterceptor/errorInterceptor）
+│   ├── auth_interceptor.dart       # AuthInterceptor（自动注入 Bearer Token，401时刷新Token重试）
+│   ├── error_interceptor.dart      # ErrorInterceptor（统一错误转换 DioException → AppException）
+│   ├── token_storage.dart          # TokenStorage（flutter_secure_storage）
+│   ├── auth_service.dart           # AuthService（register/login/refresh/me）
+│   ├── device_service.dart         # DeviceService（listByWorkbench/getById/create/update/delete/testConnection/connect/disconnect/getStatus）
+│   ├── point_service.dart          # PointService（listByDevice/getById/create/update/delete/getValue/setValue）
+│   └── workbench_service.dart      # WorkbenchService（list/getById/create/update/delete）
+│
+├── widgets/                        # 通用可复用组件
+│   ├── app_shell.dart              # AppShell（NavigationRail + content area）
+│   ├── async_value_widget.dart     # AsyncValueWidget（loading/data/error三态处理）
+│   ├── confirm_dialog.dart         # ConfirmDialog（确认对话框，支持危险操作样式）
+│   ├── device_tree.dart            # DeviceTree（ConsumerStatefulWidget，递归树节点，展开/折叠，状态点，上下文菜单）
+│   ├── device_config_dialog.dart   # DeviceConfigDialog（ConsumerStatefulWidget，创建/编辑模式，Virtual/Modbus配置区，响应式布局）
+│   ├── empty_view.dart             # EmptyView（空状态占位 + 可选操作按钮）
+│   ├── error_view.dart             # ErrorView（错误状态 + 重试按钮）
+│   ├── skeleton.dart               # ShimmerBlock / ShimmerContainer（骨架屏组件）
+│   └── toast.dart                  # Toast（轻量级消息提示，success/error/info类型）
+│
+├── pages/                          # 业务页面组件（按领域划分）
+│   ├── auth/                       # 认证相关页面
+│   │   ├── login_page.dart
+│   │   └── register_page.dart
+│   ├── dashboard/                  # 仪表盘
+│   │   └── dashboard_page.dart
+│   ├── workbench/                  # 工作台页面
+│   │   ├── workbench_list_page.dart
+│   │   ├── workbench_detail_page.dart   # ← Sprint 4 重构：集成DeviceTree + _DeviceDetailView + PointListWidget
+│   │   └── workbench_create_dialog.dart
+│   ├── point/                      # 测点管理组件 ← Sprint 4 新增
+│   │   ├── point_list_widget.dart      # PointListWidget（响应式DataTable/Card列表，shimmer骨架屏，状态三态）
+│   │   ├── point_form_dialog.dart      # PointFormDialog（添加/编辑，Modbus自动检测，RMW模式）
+│   │   └── point_value_display.dart    # PointValueDisplay（独立加载，状态指示，手动刷新动画）
+│   ├── device/                     # 设备页面
+│   │   └── device_detail_page.dart
+│   ├── experiment/                 # 试验页面
+│   │   ├── experiment_list_page.dart
+│   │   └── experiment_console_page.dart
+│   ├── method/                     # 方法页面
+│   │   ├── method_list_page.dart
+│   │   └── method_edit_page.dart
+│   ├── analysis/                   # 数据分析页面
+│   ├── settings/                   # 设置页面
+│   │   └── settings_page.dart
+│   └── not_found_page.dart
+│
+├── router/                         # 路由配置
+│   └── app_router.dart             # go_router 声明式路由 + 认证守卫（redirect logic）
+│
+├── theme/                          # 主题系统
+│   ├── app_theme.dart              # lightTheme() / darkTheme()
+│   ├── app_typography.dart         # 字体排版配置
+│   └── color_schemes.dart          # 深色/浅色ColorScheme (#1976D2主色)
+│
+├── utils/                          # 工具函数
+│
+├── l10n/                           # 国际化翻译文件
+│   ├── app_en.arb                  # 英文翻译（Sprint 4: +48 keys）
+│   ├── app_zh.arb                  # 中文翻译（Sprint 4: +48 keys）
+│   └── app_fr.arb                  # 法文翻译
+│
+└── generated/                      # 自动生成代码（勿手动编辑）
+    └── l10n.dart                   # AppLocalizations 多语言访问类
 ```
 
 ---
@@ -1958,7 +1999,234 @@ Browser → :8080 → Axum API Router
 
 ---
 
-## 11. 附录
+## 10.9 Sprint 4 架构扩展：设备树 & 测点管理前端重塑
+
+### 10.9.1 WorkbenchDetailPage 组件层级关系
+
+```
+WorkbenchDetailPage (ConsumerStatefulWidget)
+├── AppBar
+│   ├── 编辑按钮 → WorkbenchFormDialog.show()
+│   └── 删除按钮 → ConfirmDialog → workbenchDetailProvider.notifier.deleteWorkbench()
+│
+├── 信息区 (_buildInfoSection)
+│   ├── Workbench 图标 + 名称 + _StatusChip
+│   ├── 描述文本
+│   └── 创建/修改时间元数据
+│
+└── 主内容区（响应式布局）
+    │
+    ├── [Desktop ≥1024px] Row
+    │   ├── 左侧 280px: DeviceTree (deviceTreeProvider(wbId))
+    │   │   ├── 头部（标题 + 计数 + 添加按钮 → DeviceConfigDialog.show()）
+    │   │   └── 递归树节点
+    │   │       ├── 展开/折叠图标（子设备 > 0 时显示）
+    │   │       ├── 协议图标（memory/lan/cable/usb/hub）
+    │   │       ├── _StatusDot（online/offline/error）
+    │   │       ├── 设备名称
+    │   │       └── 上下文菜单按钮（编辑/添加子设备/删除）
+    │   │
+    │   └── 右侧 flex:1: _DeviceDetailView (deviceDetailProvider(deviceId))
+    │       ├── 设备信息头部（图标 + 名称 + _DeviceStatusChip + 协议标签）
+    │       ├── 协议参数表（protocol_params key-value 展示）
+    │       ├── 测点列表标题
+    │       └── PointListWidget (pointListProvider(deviceId))
+    │           ├── 头部（标题 + 计数 + 添加按钮 → PointFormDialog.show()）
+    │           ├── [Desktop] DataTable（6列：名称/类型/访问权限/单位/值/操作）
+    │           │   └── 每行: name | _buildTypeChip | _accessTypeIcon | unit | PointValueDisplay | 编辑/删除按钮
+    │           └── [Mobile <600px] Card 列表
+    │
+    ├── [Tablet 600-1024px] Column
+    │   ├── 可折叠设备树面板 (_buildCollapsibleTreePanel)
+    │   └── _DeviceDetailView
+    │
+    └── [Mobile <600px] Column
+        ├── 可折叠设备树面板（默认折叠）
+        └── _DeviceDetailView
+```
+
+### 10.9.2 数据流：设备树 → 设备详情 → 测点列表
+
+```
+用户点击工作台
+    │
+    ▼
+WorkbenchDetailPage(wbId)
+    │
+    ├── ref.watch(workbenchDetailProvider(wbId))     ← Workbench 基本信息
+    │
+    └── DeviceTree(wbId)
+        │
+        ├── ref.watch(deviceTreeProvider(wbId))       ← List<DeviceTreeNode>
+        │       │                                        ↑
+        │       │    DeviceTreeNotifier._buildTree()     │
+        │       │    将平铺 Device[] → 按 parentId 分组   │
+        │       │    递归构建树节点 DeviceTreeNode[]     │
+        │       │                                        │
+        │       └── DeviceService.listByWorkbench(wbId) ─┘
+        │                    │
+        │                    │ GET /api/v1/devices?workbench_id={wbId}
+        │                    ▼
+        │              后端 Device 列表
+        │
+        └── onDeviceSelected(deviceId)
+                │
+                ▼
+            _DeviceDetailView(deviceId)
+                │
+                ├── ref.watch(deviceDetailProvider(deviceId))  ← Device
+                │       │
+                │       └── DeviceService.getById(deviceId)
+                │               │
+                │               │ GET /api/v1/devices/{id}
+                │               ▼
+                │          后端 Device 实体（含 protocol_params）
+                │
+                └── PointListWidget(deviceId)
+                        │
+                        ├── ref.watch(pointListProvider(deviceId))  ← List<Point>
+                        │       │
+                        │       └── PointService.listByDevice(deviceId)
+                        │               │
+                        │               │ GET /api/v1/points?device_id={deviceId}
+                        │               ▼
+                        │          后端 Point 列表
+                        │
+                        └── 每行嵌入 PointValueDisplay(pointId)
+                                │
+                                ├── 独立加载 _loadValue()
+                                │   └── PointService.getValue(pointId)
+                                │       │
+                                │       │ GET /api/v1/points/{id}/value
+                                │       ▼
+                                │   后端 PointValue {pointId, value, timestamp}
+                                │
+                                └── 手动刷新 _handleRefresh()
+                                    旋转动画 + 重新读取值
+```
+
+### 10.9.3 Modbus 测点配置存储策略（关键设计决策）
+
+**问题**: Modbus 测点需要额外的配置（寄存器类型、起始地址、数据格式），但这些是 Modbus 协议特有的，不应污染通用的 Point 模型。
+
+**决策**: Modbus 配置存储于 `Device.protocol_params.points[pointId]`，不存储于 Point 模型。
+
+```
+Device {
+    id: "dev-1",
+    protocol_type: "modbus_tcp",
+    protocol_params: {
+        "host": "192.168.1.100",
+        "port": 502,
+        "slave_id": 1,
+        "points": {                          ← Modbus 测点配置存储点
+            "pt-temp-1": {
+                "register_type": "Holding Register",
+                "address": 40001,
+                "data_format": "float32"
+            },
+            "pt-pressure-1": {
+                "register_type": "Input Register",
+                "address": 30001,
+                "data_format": "uint16"
+            }
+        }
+    }
+}
+
+Point {
+    id: "pt-temp-1",
+    device_id: "dev-1",
+    name: "Temperature",
+    data_type: "number",
+    access_type: "ro",
+    unit: "°C"
+    // 没有 Modbus 特定字段！
+}
+```
+
+**优势**:
+1. **协议无关**: Point 模型保持清洁通用，不依赖具体协议
+2. **配置聚合**: 同一设备的所有 Modbus 测点配置集中管理
+3. **向后兼容**: 未来添加新协议（CAN/VISA/MQTT）无需修改 Point 模型
+
+**实现**: `PointFormDialog._saveModbusConfig(pointId)` 使用 Read-Modify-Write 模式：
+
+```dart
+// RMW 模式防止并发覆盖
+final device = await deviceService.getById(deviceId);               // Read
+final protocolParams = Map<String, dynamic>.from(device.protocolParams ?? {});
+final points = Map<String, dynamic>.from(protocolParams['points'] ?? {});
+points[pointId] = { register_type, address, data_format };         // Modify
+protocolParams['points'] = points;
+await deviceService.update(deviceId, {'protocol_params': protocolParams});  // Write
+```
+
+### 10.9.4 AsyncNotifier.family 状态管理策略
+
+**问题**: 同一 Provider 类型需要为不同资源实例（不同 workbenchId/deviceId）维护独立状态。
+
+**决策**: 使用 Riverpod 3.x `AsyncNotifierProvider.family`，以资源 ID 为 family 参数。
+
+```dart
+// 设备树 Provider：按 workbenchId 区分
+final deviceTreeProvider = AsyncNotifierProvider.family<
+  DeviceTreeNotifier, List<DeviceTreeNode>, String
+>(DeviceTreeNotifier.new);
+
+// 设备详情 Provider：按 deviceId 区分
+final deviceDetailProvider = AsyncNotifierProvider.family<
+  DeviceDetailNotifier, Device, String
+>(DeviceDetailNotifier.new);
+
+// 测点列表 Provider：按 deviceId 区分
+final pointListProvider = AsyncNotifierProvider.family<
+  PointListNotifier, List<Point>, String
+>(PointListNotifier.new);
+```
+
+**优势**:
+1. **独立生命周期**: 每个 workbenchId/deviceId 实例独立管理 loading/data/error 状态
+2. **自动缓存**: family provider 自动缓存已加载的数据，切换选中设备时可复用
+3. **精确刷新**: `ref.invalidate(provider(id))` 精确失效特定实例，不影响其他
+4. **类型安全**: 编译时保证 family 参数类型正确
+
+### 10.9.5 测点值加载策略：分布式 vs 集中式
+
+**决策**: 采用混合策略——`PointValueDisplay` 组件独立维护自己的加载状态，`PointListNotifier.refreshValues()` 提供批量刷新能力。
+
+| 模式 | 触发方式 | 适用场景 |
+|------|----------|----------|
+| **独立加载** | `PointValueDisplay._loadValue()` 初始化时自动执行 | 首次渲染列表，每个组件静默加载自己的值 |
+| **手动刷新** | 用户点击单测点的刷新按钮 | 关注单个测点实时值 |
+| **批量刷新** | `PointListNotifier.refreshValues()` | 列表级别"刷新全部"操作 |
+
+**关键**: 独立加载模式确保单个测点值刷新不会重建整个测点列表 UI（`PointValueDisplay` 的 setState 仅限于自身 widget）。
+
+### 10.9.6 响应式布局策略（3 断点）
+
+| 断点 | 布局模式 | 设备树 | 测点列表 | 对话框 |
+|------|----------|--------|---------|--------|
+| **< 600px** (移动端) | 全屏堆叠 | 可折叠面板（默认折叠） | Card 列表 + 底部添加按钮 | ModalBottomSheet |
+| **600-1024px** (平板) | 上下堆叠 | 可折叠面板（默认展开） | DataTable（可横向滚动） | AlertDialog 560px |
+| **≥ 1024px** (桌面) | 左右分栏 | 左侧 280px 固定面板 | 完整 DataTable 6列 | AlertDialog 560px |
+
+```dart
+// DeviceConfigDialog.show() 内的响应式派发
+if (screenWidth < 600) {
+  showModalBottomSheet(...);
+} else {
+  showDialog(AlertDialog(...));
+}
+
+// PointListWidget 内的响应式渲染
+LayoutBuilder(
+  builder: (context, constraints) {
+    if (constraints.maxWidth < 600) return _buildCardList(...);
+    return _buildTable(...);
+  },
+)
+```
 
 ### 11.1 参考资料
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
@@ -1975,6 +2243,8 @@ Browser → :8080 → Axum API Router
 | 1.0 | 2024-03-15 | Architecture Team | 初始版本（Release 0架构） |
 | 1.1 | 2026-04-06 | Architecture Team | 更新认证模块，添加get_user_by_id和verify_access_token方法 |
 | 1.2 | 2026-05-03 | Architecture Team | Release 1 实时架构：AnyDriver枚举驱动架构、Modbus协议实现、连接池、单端口部署、Material Design 3前端、modbus-simulator CLI、全栈API |
+| 1.3 | 2026-05-11 | Architecture Team | Release 2 实时架构：团队管理模块、Python SDK、试验数据查询与下载API、前端团队功能、RequireTeamRole提取器 |
+| 1.4 | 2026-06-01 | Architecture Team | Sprint 4 实时架构：设备树组件、设备配置对话框、测点管理前端重塑（PointListWidget/PointFormDialog/PointValueDisplay）、DeviceService/PointService、Riverpod AsyncNotifier.family状态管理、Modbus配置RMW存储策略、响应式3断点布局 |
 
 ---
 
