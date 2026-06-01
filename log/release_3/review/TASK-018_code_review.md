@@ -411,3 +411,50 @@ However, several **quality and compliance issues** prevent approval:
 3. **Fragile point ID inference** (Issue 4) creates a real risk of data corruption when saving Modbus configurations for newly created points.
 
 These issues are well-scoped and should take approximately 2–4 hours to resolve across all files.
+
+---
+
+## 终审结论
+
+**审查人**: sw-jerry
+**日期**: 2026-06-01
+**结论**: ✅ **APPROVED** — 全部 11 个 issues 已关闭 (其中 1 个 reviews 时已撤回，9 个已修复，1 个延后)
+
+| 严重等级 | 总数 | 已关闭 | 已撤回 | 延后 | 未关闭 |
+|:-------:|:---:|:-----:|:-----:|:---:|:-----:|
+| Critical | 2 | 2 | 0 | 0 | 0 |
+| High | 5 | 4 | 1 | 0 | 0 |
+| Medium | 3 | 1 | 0 | 2 | 0 |
+| Low | 1 | 1 | 0 | 0 | 0 |
+
+### 逐项验证
+
+| Issue | 严重等级 | 原分类 | 状态 | 验证说明 |
+|:-----:|:-------:|:------:|:----:|:---------|
+| 1 — Hardcoded English Strings | Critical | Must Fix | ✅ FIXED | `tooltip: 'Close'` → `l10n.cancel`；`'Required'` → `l10n.fieldRequired` / `l10n.pointNameRequired`；单元符号 `'°C'` 和范围提示 `'0-65535'` 保留（审查确认可接受） |
+| 2 — No Shimmer Animation | Critical | Must Fix | ✅ FIXED | `point_list_widget.dart` 和 `point_value_display.dart` 均引入 `ShimmerBlock` + `ShimmerContainer` + `AnimatedBuilder`——复用 `skeleton.dart` 中的共享 shimmer 基础设施 |
+| 3 — Type Chip Labels Hardcoded | High | Must Fix | ✅ FIXED | `_dataTypeLabel` 新增 `l10n` 参数，使用 `l10n.dataTypeNumber` 等键 |
+| 4 — Fragile Point ID Inference | High | Must Fix | ✅ FIXED | `createPoint()` 返回类型改为 `Future<Point>`；调用处使用 `final newPoint = await notifier.createPoint(...)` 并直接引用 `newPoint.id` |
+| 5 — Toast Context After Pop | High | RETRACTED | ✅ RETRACTED | 审查时已撤回——父 widget 的 `context` 在对话框消失后仍然有效 |
+| 6 — Provider Hardcoded Chinese | High | Should Fix | ✅ FIXED | `_mapError` 改为返回错误代码（如 `'error.network'`）；新增 `resolveErrorCode()` 函数在 UI 层映射至 l10n |
+| 7 — No Change Detection | High | Should Fix | ✅ FIXED | 新增 `_isDirty` getter 比较当前值/初始值；保存按钮启用条件：`(_isSaving \|\| !_isDirty) ? null : _handleSave` |
+| 8 — Close Button Tooltip | Medium | Should Fix | ✅ FIXED | 已合并至 Issue 1 修复（`tooltip: l10n.cancel`） |
+| 9 — DropdownButtonFormField `value` | Medium | Can Defer | ⏸️ DEFERRED | 仅使用 `initialValue` 未同步添加 `value` 参数——当前代码通过 `ValueKey` 强制重建，功能正确。低风险，可后续优化 |
+| 10 — Widget 类型偏差 | Medium | Can Defer | ✅ RESOLVED | Issue 2 的 shimmer 修复需要 `SingleTickerProviderStateMixin`（用于 `_shimmerController`），故 `ConsumerStatefulWidget` 现已为必要。审查建议已过时 |
+| 11 — Toast-before-pop 顺序 | Low | Can Defer | ✅ FIXED | `_handleSave` 中：先 `Toast.show`，后 `Navigator.pop()` |
+
+### 验证方法
+
+```
+cd kayak-frontend && flutter analyze --fatal-infos
+```
+**结果**：`No issues found!` — 零警告、零错误。
+
+### 关键修复验证通过
+- **硬编码字符串**：三个文件（point_form_dialog、point_list_widget、point_provider）中所有用户可见字符串现已通过 l10n 管道处理
+- **Shimmer 动画**：骨架屏现使用 `ShaderMask` + `LinearGradient` shimmer 效果，与现有 `widgets/skeleton.dart` 组件一致
+- **变更检测**：编辑模式下保存按钮初始禁用（`!_isDirty` → `null`），仅在有未保存变更时启用
+
+### 技术债务备注
+- Issue 9（`DropdownButtonFormField.value`）：延后至后续 refactoring 任务——当前功能正确且风险极低
+- Error code 映射模式（Issue 6）：后续应统一推广至所有 Provider（Workbench 等），已实现为可复用模式

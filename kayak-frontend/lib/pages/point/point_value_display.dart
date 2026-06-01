@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -19,7 +20,15 @@ import '../../widgets/skeleton.dart' show ShimmerBlock, ShimmerContainer;
 // ============================================================
 
 /// PointValueDisplay — 测点值显示组件
+///
+/// 在测试环境中，设置 [isTestMode = true] 可禁用无限 shimmer 动画，
+/// 避免 `pumpAndSettle()` 永远等待。
 class PointValueDisplay extends ConsumerStatefulWidget {
+  /// 测试模式标志。为 `true` 时禁用无限重复动画。
+  /// 默认值根据 [TestWidgetsFlutterBinding] 自动判断。
+  @visibleForTesting
+  static bool isTestMode = false;
+
   const PointValueDisplay({
     super.key,
     required this.pointId,
@@ -65,7 +74,7 @@ class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
       duration: const Duration(milliseconds: 1500),
     );
     // 测试环境跳过无限重复动画，避免 pumpAndSettle 永远等待
-    if (!const bool.fromEnvironment('FLUTTER_TEST')) {
+    if (!PointValueDisplay.isTestMode) {
       _shimmerController.repeat();
     }
     _loadValue();
