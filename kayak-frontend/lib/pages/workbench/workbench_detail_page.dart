@@ -589,21 +589,34 @@ class _WorkbenchDetailPageState extends ConsumerState<WorkbenchDetailPage> {
   }
 
   /// 桌面端主内容区（左右分栏）
+  ///
+  /// 注意：Row 需要包裹在 SizedBox 中提供有界高度约束，
+  /// 否则内部 DeviceTree 的 Expanded 会因高度无界而崩溃。
   Widget _buildDesktopContent(Workbench workbench, AppLocalizations l10n) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 左侧设备树面板（280px 固定宽度）
-        SizedBox(
-          width: 280,
-          child: _buildDeviceTreePanel(l10n),
-        ),
-        const SizedBox(width: 16),
-        // 右侧设备详情面板（flex: 1）
-        Expanded(
-          child: _buildDeviceDetailPanel(l10n),
-        ),
-      ],
+    // 计算主内容区域可用高度：屏幕高度 - AppBar - 信息区 - 上下 padding 间距
+    final viewHeight = MediaQuery.of(context).size.height;
+    final topPadding = MediaQuery.of(context).padding.top;
+    // AppBar 约 56px，信息区约 200px，间距 16px + 上下 padding 48px
+    final occupiedHeight = topPadding + kToolbarHeight + 200 + 48 + 16;
+    final contentHeight = (viewHeight - occupiedHeight).clamp(400.0, 1200.0);
+
+    return SizedBox(
+      height: contentHeight,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 左侧设备树面板（280px 固定宽度）
+          SizedBox(
+            width: 280,
+            child: _buildDeviceTreePanel(l10n),
+          ),
+          const SizedBox(width: 16),
+          // 右侧设备详情面板（flex: 1）
+          Expanded(
+            child: _buildDeviceDetailPanel(l10n),
+          ),
+        ],
+      ),
     );
   }
 
