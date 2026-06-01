@@ -747,5 +747,210 @@
   "max255Chars": "Cannot exceed 255 characters",
   "@max255Chars": {
     "description": "Max 255 characters validation error"
+  },
+
+  "pointListTitle": "Points",
+  "@pointListTitle": {
+    "description": "Point list widget title"
+  },
+  "pointCount": "{count} points",
+  "@pointCount": {
+    "description": "Point count text in header",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "addPoint": "Add Point",
+  "@addPoint": {
+    "description": "Add point button"
+  },
+  "addFirstPoint": "Add First Point",
+  "@addFirstPoint": {
+    "description": "Add first point button in empty state"
+  },
+  "pointListEmpty": "No points for this device",
+  "@pointListEmpty": {
+    "description": "Empty state text for point list"
+  },
+  "pointNameRequired": "Point name is required",
+  "@pointNameRequired": {
+    "description": "Point name required validation error"
+  },
+  "pointNameTooLong": "Name must not exceed 255 characters",
+  "@pointNameTooLong": {
+    "description": "Point name max length validation error"
+  },
+  "pointSaveSuccess": "Point saved",
+  "@pointSaveSuccess": {
+    "description": "Point save success toast message"
+  },
+  "pointDeleteSuccess": "Point deleted",
+  "@pointDeleteSuccess": {
+    "description": "Point delete success toast message"
+  },
+  "pointDeleteConfirm": "Delete point \"{name}\"?",
+  "@pointDeleteConfirm": {
+    "description": "Delete point confirmation dialog title",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Temperature Sensor"
+      }
+    }
+  },
+  "pointDeleteWarning": "This action cannot be undone.",
+  "@pointDeleteWarning": {
+    "description": "Delete point confirmation dialog description"
+  },
+  "pointRangeInvalid": "Max must be greater than min",
+  "@pointRangeInvalid": {
+    "description": "Range validation error"
+  },
+  "pointStatusNormal": "Normal",
+  "@pointStatusNormal": {
+    "description": "Point status normal tooltip"
+  },
+  "pointStatusTimeout": "Timeout",
+  "@pointStatusTimeout": {
+    "description": "Point status timeout tooltip"
+  },
+  "pointStatusError": "Error",
+  "@pointStatusError": {
+    "description": "Point status error tooltip"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button tooltip"
+  },
+  "pointNameLabel": "Name",
+  "@pointNameLabel": {
+    "description": "Point name field label in form"
+  },
+  "pointNameHint": "Enter point name",
+  "@pointNameHint": {
+    "description": "Point name field hint text"
+  },
+  "pointDataTypeLabel": "Data Type",
+  "@pointDataTypeLabel": {
+    "description": "Data type field label in form"
+  },
+  "pointAccessTypeLabel": "Access",
+  "@pointAccessTypeLabel": {
+    "description": "Access type field label in form"
+  },
+  "pointUnitLabel": "Unit",
+  "@pointUnitLabel": {
+    "description": "Unit field label in form"
+  },
+  "pointModbusConfig": "Modbus Configuration",
+  "@pointModbusConfig": {
+    "description": "Modbus configuration section title"
+  },
+  "pointRegisterTypeLabel": "Register Type",
+  "@pointRegisterTypeLabel": {
+    "description": "Register type field label"
+  },
+  "pointAddressLabel": "Start Address",
+  "@pointAddressLabel": {
+    "description": "Start address field label"
+  },
+  "pointAddressRange": "Address must be 0-65535",
+  "@pointAddressRange": {
+    "description": "Address range validation error"
+  },
+  "pointDataFormatLabel": "Data Format",
+  "@pointDataFormatLabel": {
+    "description": "Data format field label"
+  },
+  "pointColumnName": "Name",
+  "@pointColumnName": {
+    "description": "Table column header for name"
+  },
+  "pointColumnType": "Type",
+  "@pointColumnType": {
+    "description": "Table column header for type"
+  },
+  "pointColumnAccess": "Access",
+  "@pointColumnAccess": {
+    "description": "Table column header for access"
+  },
+  "pointColumnUnit": "Unit",
+  "@pointColumnUnit": {
+    "description": "Table column header for unit"
+  },
+  "pointColumnValue": "Value",
+  "@pointColumnValue": {
+    "description": "Table column header for value"
+  },
+  "pointColumnAction": "Actions",
+  "@pointColumnAction": {
+    "description": "Table column header for actions"
+  },
+  "dataTypeNumber": "Number",
+  "@dataTypeNumber": {
+    "description": "Data type option: number"
+  },
+  "dataTypeInteger": "Integer",
+  "@dataTypeInteger": {
+    "description": "Data type option: integer"
+  },
+  "dataTypeBoolean": "Boolean",
+  "@dataTypeBoolean": {
+    "description": "Data type option: boolean"
+  },
+  "dataTypeString": "String",
+  "@dataTypeString": {
+    "description": "Data type option: string"
+  },
+  "accessTypeRo": "Read Only",
+  "@accessTypeRo": {
+    "description": "Access type option: read only"
+  },
+  "accessTypeWo": "Write Only",
+  "@accessTypeWo": {
+    "description": "Access type option: write only"
+  },
+  "accessTypeRw": "Read & Write",
+  "@accessTypeRw": {
+    "description": "Access type option: read and write"
+  },
+  "booleanTrue": "On",
+  "@booleanTrue": {
+    "description": "Boolean true display text"
+  },
+  "booleanFalse": "Off",
+  "@booleanFalse": {
+    "description": "Boolean false display text"
+  },
+  "pointSaveFailed": "Failed to save point",
+  "@pointSaveFailed": {
+    "description": "Point save failure toast message"
+  },
+  "pointDeleteFailed": "Failed to delete point",
+  "@pointDeleteFailed": {
+    "description": "Point delete failure toast message"
+  },
+  "pointMinValueLabel": "Min Value",
+  "@pointMinValueLabel": {
+    "description": "Min value field label in form"
+  },
+  "pointMaxValueLabel": "Max Value",
+  "@pointMaxValueLabel": {
+    "description": "Max value field label in form"
+  },
+  "pointDefaultValueLabel": "Default Value",
+  "@pointDefaultValueLabel": {
+    "description": "Default value field label in form"
+  },
+  "editPoint": "Edit Point",
+  "@editPoint": {
+    "description": "Edit point dialog title"
+  },
+  "addPointTitle": "Add Point",
+  "@addPointTitle": {
+    "description": "Add point dialog title"
   }
 }

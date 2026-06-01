@@ -747,5 +747,210 @@
   "max255Chars": "最多 255 个字符",
   "@max255Chars": {
     "description": "最多 255 个字符验证错误"
+  },
+
+  "pointListTitle": "测点列表",
+  "@pointListTitle": {
+    "description": "测点列表组件标题"
+  },
+  "pointCount": "共 {count} 个测点",
+  "@pointCount": {
+    "description": "测点计数器文本",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "addPoint": "添加测点",
+  "@addPoint": {
+    "description": "添加测点按钮"
+  },
+  "addFirstPoint": "添加第一个测点",
+  "@addFirstPoint": {
+    "description": "空状态添加第一个测点按钮"
+  },
+  "pointListEmpty": "该设备下暂无测点",
+  "@pointListEmpty": {
+    "description": "测点列表空状态文本"
+  },
+  "pointNameRequired": "请输入测点名称",
+  "@pointNameRequired": {
+    "description": "测点名称必填验证错误"
+  },
+  "pointNameTooLong": "名称不能超过 255 个字符",
+  "@pointNameTooLong": {
+    "description": "测点名称最大长度验证错误"
+  },
+  "pointSaveSuccess": "测点已保存",
+  "@pointSaveSuccess": {
+    "description": "测点保存成功提示"
+  },
+  "pointDeleteSuccess": "测点已删除",
+  "@pointDeleteSuccess": {
+    "description": "测点删除成功提示"
+  },
+  "pointDeleteConfirm": "确定要删除测点「{name}」吗？",
+  "@pointDeleteConfirm": {
+    "description": "删除测点确认对话框标题",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "温度传感器"
+      }
+    }
+  },
+  "pointDeleteWarning": "此操作不可撤销。",
+  "@pointDeleteWarning": {
+    "description": "删除测点确认对话框描述"
+  },
+  "pointRangeInvalid": "最大值必须大于最小值",
+  "@pointRangeInvalid": {
+    "description": "取值范围验证错误"
+  },
+  "pointStatusNormal": "正常",
+  "@pointStatusNormal": {
+    "description": "测点状态正常提示"
+  },
+  "pointStatusTimeout": "超时",
+  "@pointStatusTimeout": {
+    "description": "测点状态超时提示"
+  },
+  "pointStatusError": "异常",
+  "@pointStatusError": {
+    "description": "测点状态异常提示"
+  },
+  "refresh": "刷新",
+  "@refresh": {
+    "description": "刷新按钮提示"
+  },
+  "pointNameLabel": "名称",
+  "@pointNameLabel": {
+    "description": "表单名称字段标签"
+  },
+  "pointNameHint": "请输入测点名称",
+  "@pointNameHint": {
+    "description": "表单名称字段占位文本"
+  },
+  "pointDataTypeLabel": "数据类型",
+  "@pointDataTypeLabel": {
+    "description": "表单数据类型字段标签"
+  },
+  "pointAccessTypeLabel": "访问权限",
+  "@pointAccessTypeLabel": {
+    "description": "表单访问权限字段标签"
+  },
+  "pointUnitLabel": "单位",
+  "@pointUnitLabel": {
+    "description": "表单单位字段标签"
+  },
+  "pointModbusConfig": "Modbus 配置",
+  "@pointModbusConfig": {
+    "description": "Modbus 配置区域标题"
+  },
+  "pointRegisterTypeLabel": "寄存器类型",
+  "@pointRegisterTypeLabel": {
+    "description": "寄存器类型字段标签"
+  },
+  "pointAddressLabel": "起始地址",
+  "@pointAddressLabel": {
+    "description": "起始地址字段标签"
+  },
+  "pointAddressRange": "起始地址必须在 0-65535 之间",
+  "@pointAddressRange": {
+    "description": "起始地址范围验证错误"
+  },
+  "pointDataFormatLabel": "数据格式",
+  "@pointDataFormatLabel": {
+    "description": "数据格式字段标签"
+  },
+  "pointColumnName": "名称",
+  "@pointColumnName": {
+    "description": "表格列标题名称"
+  },
+  "pointColumnType": "类型",
+  "@pointColumnType": {
+    "description": "表格列标题类型"
+  },
+  "pointColumnAccess": "访问权限",
+  "@pointColumnAccess": {
+    "description": "表格列标题访问权限"
+  },
+  "pointColumnUnit": "单位",
+  "@pointColumnUnit": {
+    "description": "表格列标题单位"
+  },
+  "pointColumnValue": "当前值",
+  "@pointColumnValue": {
+    "description": "表格列标题当前值"
+  },
+  "pointColumnAction": "操作",
+  "@pointColumnAction": {
+    "description": "表格列标题操作"
+  },
+  "dataTypeNumber": "浮点数",
+  "@dataTypeNumber": {
+    "description": "数据类型选项：浮点数"
+  },
+  "dataTypeInteger": "整数",
+  "@dataTypeInteger": {
+    "description": "数据类型选项：整数"
+  },
+  "dataTypeBoolean": "布尔值",
+  "@dataTypeBoolean": {
+    "description": "数据类型选项：布尔值"
+  },
+  "dataTypeString": "字符串",
+  "@dataTypeString": {
+    "description": "数据类型选项：字符串"
+  },
+  "accessTypeRo": "只读",
+  "@accessTypeRo": {
+    "description": "访问权限选项：只读"
+  },
+  "accessTypeWo": "只写",
+  "@accessTypeWo": {
+    "description": "访问权限选项：只写"
+  },
+  "accessTypeRw": "读写",
+  "@accessTypeRw": {
+    "description": "访问权限选项：读写"
+  },
+  "booleanTrue": "开启",
+  "@booleanTrue": {
+    "description": "布尔值真值显示文本"
+  },
+  "booleanFalse": "关闭",
+  "@booleanFalse": {
+    "description": "布尔值假值显示文本"
+  },
+  "pointSaveFailed": "测点保存失败",
+  "@pointSaveFailed": {
+    "description": "测点保存失败提示"
+  },
+  "pointDeleteFailed": "测点删除失败",
+  "@pointDeleteFailed": {
+    "description": "测点删除失败提示"
+  },
+  "pointMinValueLabel": "最小值",
+  "@pointMinValueLabel": {
+    "description": "表单最小值字段标签"
+  },
+  "pointMaxValueLabel": "最大值",
+  "@pointMaxValueLabel": {
+    "description": "表单最大值字段标签"
+  },
+  "pointDefaultValueLabel": "默认值",
+  "@pointDefaultValueLabel": {
+    "description": "表单默认值字段标签"
+  },
+  "editPoint": "编辑测点",
+  "@editPoint": {
+    "description": "编辑测点对话框标题"
+  },
+  "addPointTitle": "添加测点",
+  "@addPointTitle": {
+    "description": "添加测点对话框标题"
   }
 }
