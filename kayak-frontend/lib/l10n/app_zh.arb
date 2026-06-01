@@ -984,5 +984,182 @@
   "addPointTitle": "添加测点",
   "@addPointTitle": {
     "description": "添加测点对话框标题"
+  },
+
+  "statusIdle": "空闲",
+  "@statusIdle": {
+    "description": "试验状态：空闲"
+  },
+  "statusLoaded": "已载入",
+  "@statusLoaded": {
+    "description": "试验状态：已载入"
+  },
+  "statusRunning": "运行中",
+  "@statusRunning": {
+    "description": "试验状态：运行中"
+  },
+  "statusPaused": "已暂停",
+  "@statusPaused": {
+    "description": "试验状态：已暂停"
+  },
+  "statusCompleted": "已完成",
+  "@statusCompleted": {
+    "description": "试验状态：已完成"
+  },
+  "statusAborted": "已中止",
+  "@statusAborted": {
+    "description": "试验状态：已中止"
+  },
+  "statusUnknown": "未知",
+  "@statusUnknown": {
+    "description": "试验状态：未知"
+  },
+  "allStatuses": "全部状态",
+  "@allStatuses": {
+    "description": "状态下拉选项：全部状态"
+  },
+  "filterStatus": "状态",
+  "@filterStatus": {
+    "description": "筛选栏状态标签"
+  },
+  "filterDateRange": "时间",
+  "@filterDateRange": {
+    "description": "筛选栏时间范围标签"
+  },
+  "resetFilter": "重置筛选",
+  "@resetFilter": {
+    "description": "重置筛选按钮"
+  },
+  "noExperiments": "暂无试验",
+  "@noExperiments": {
+    "description": "试验列表空状态标题"
+  },
+  "noExperimentsHint": "点击下方按钮创建您的第一个试验",
+  "@noExperimentsHint": {
+    "description": "试验列表空状态描述"
+  },
+  "createFirstExperiment": "创建第一个试验",
+  "@createFirstExperiment": {
+    "description": "空状态创建试验按钮"
+  },
+  "noFilteredResults": "没有符合条件的试验",
+  "@noFilteredResults": {
+    "description": "筛选后无结果标题"
+  },
+  "noFilteredResultsHint": "请尝试调整筛选条件",
+  "@noFilteredResultsHint": {
+    "description": "筛选后无结果提示"
+  },
+  "clearFilter": "清除筛选条件",
+  "@clearFilter": {
+    "description": "清除所有筛选按钮"
+  },
+  "loadFailed": "加载试验列表失败",
+  "@loadFailed": {
+    "description": "错误状态标题"
+  },
+  "loadFailedHint": "请检查网络连接后点击重试",
+  "@loadFailedHint": {
+    "description": "错误状态提示"
+  },
+  "totalRecords": "共 {count} 条记录",
+  "@totalRecords": {
+    "description": "总记录数标签",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "47"
+      }
+    }
+  },
+  "pageOf": "第 {current} 页，共 {total} 页",
+  "@pageOf": {
+    "description": "移动端页码指示",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "recordsPerPage": "每页条数",
+  "@recordsPerPage": {
+    "description": "每页条数选择器标签"
+  },
+  "columnName": "名称",
+  "@columnName": {
+    "description": "表格列：试验名称"
+  },
+  "columnMethod": "方法",
+  "@columnMethod": {
+    "description": "表格列：方法名称"
+  },
+  "columnStatus": "状态",
+  "@columnStatus": {
+    "description": "表格列：状态"
+  },
+  "columnStartTime": "开始时间",
+  "@columnStartTime": {
+    "description": "表格列：开始时间"
+  },
+  "columnDuration": "持续时间",
+  "@columnDuration": {
+    "description": "表格列：持续时间"
+  },
+  "columnActions": "操作",
+  "@columnActions": {
+    "description": "表格列：操作"
+  },
+  "openConsole": "进入控制台",
+  "@openConsole": {
+    "description": "打开试验控制台操作"
+  },
+  "stopExperiment": "停止",
+  "@stopExperiment": {
+    "description": "停止试验操作"
+  },
+  "confirmStopTitle": "确认停止",
+  "@confirmStopTitle": {
+    "description": "停止确认对话框标题"
+  },
+  "confirmStopDesc": "确定要停止试验「{name}」吗？",
+  "@confirmStopDesc": {
+    "description": "停止确认对话框描述",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "温度测试"
+      }
+    }
+  },
+  "experimentStopped": "试验已停止",
+  "@experimentStopped": {
+    "description": "停止成功提示"
+  },
+  "stopFailed": "停止失败：{reason}",
+  "@stopFailed": {
+    "description": "停止失败提示",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "网络错误"
+      }
+    }
+  },
+  "createExperiment": "创建试验",
+  "@createExperiment": {
+    "description": "创建试验按钮"
+  },
+  "notStarted": "—",
+  "@notStarted": {
+    "description": "未开始时间占位符"
+  },
+  "methodNotSet": "—",
+  "@methodNotSet": {
+    "description": "未设置方法占位符"
   }
 }

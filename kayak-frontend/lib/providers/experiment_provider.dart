@@ -29,7 +29,7 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
   int _currentPage = 1;
 
   /// 每页条数（默认与后端一致）
-  final int _pageSize = 10;
+  int _pageSize = 10;
 
   /// 总记录数
   int _total = 0;
@@ -117,6 +117,12 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
     state = await AsyncValue.guard(build);
   }
 
+    /// 当前页码
+  int get currentPage => _currentPage;
+
+  /// 每页条数
+  int get pageSize => _pageSize;
+
   /// 总记录数
   int get total => _total;
 
@@ -125,6 +131,31 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
 
   /// 是否有上一页
   bool get hasPrev => _currentPage > 1;
+
+  /// 跳转到指定页码。
+  Future<void> goToPage(int page) async {
+    if (page < 1) return;
+    _currentPage = page;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(build);
+  }
+
+  /// 设置每页条数并重置到第 1 页。
+  Future<void> setPageSize(int size) async {
+    _pageSize = size;
+    _currentPage = 1;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(build);
+  }
+
+  /// 当前筛选状态（用于 UI 显示）。
+  ExperimentStatus? get statusFilter => _statusFilter;
+
+  /// 当前创建时间下限。
+  DateTime? get createdAfter => _createdAfter;
+
+  /// 当前创建时间上限。
+  DateTime? get createdBefore => _createdBefore;
 
   /// 将异常映射为用户可读的错误消息
   String _mapError(Object error) {

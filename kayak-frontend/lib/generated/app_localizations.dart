@@ -1525,6 +1525,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Point'**
   String get addPointTitle;
+
+  /// Experiment status: idle
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get statusIdle;
+
+  /// Experiment status: loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Loaded'**
+  String get statusLoaded;
+
+  /// Experiment status: running
+  ///
+  /// In en, this message translates to:
+  /// **'Running'**
+  String get statusRunning;
+
+  /// Experiment status: paused
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get statusPaused;
+
+  /// Experiment status: completed
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// Experiment status: aborted
+  ///
+  /// In en, this message translates to:
+  /// **'Aborted'**
+  String get statusAborted;
+
+  /// Experiment status: unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get statusUnknown;
+
+  /// Dropdown option to show all experiment statuses
+  ///
+  /// In en, this message translates to:
+  /// **'All Statuses'**
+  String get allStatuses;
+
+  /// Filter bar status label
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get filterStatus;
+
+  /// Filter bar date range label
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get filterDateRange;
+
+  /// Reset filter button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Filters'**
+  String get resetFilter;
+
+  /// Empty state title for experiment list
+  ///
+  /// In en, this message translates to:
+  /// **'No experiments yet'**
+  String get noExperiments;
+
+  /// Empty state description for experiment list
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first experiment to get started'**
+  String get noExperimentsHint;
+
+  /// Empty state create experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Create First Experiment'**
+  String get createFirstExperiment;
+
+  /// No results after filtering
+  ///
+  /// In en, this message translates to:
+  /// **'No matching experiments'**
+  String get noFilteredResults;
+
+  /// No results hint after filtering
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your filter criteria'**
+  String get noFilteredResultsHint;
+
+  /// Clear all filters button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Filters'**
+  String get clearFilter;
+
+  /// Error state title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load experiments'**
+  String get loadFailed;
+
+  /// Error state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your connection and try again'**
+  String get loadFailedHint;
+
+  /// Total record count label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records total'**
+  String totalRecords(int count);
+
+  /// Page indicator for mobile
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String pageOf(int current, int total);
+
+  /// Page size selector label
+  ///
+  /// In en, this message translates to:
+  /// **'Rows per page'**
+  String get recordsPerPage;
+
+  /// Table column: experiment name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get columnName;
+
+  /// Table column: method name
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get columnMethod;
+
+  /// Table column: status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get columnStatus;
+
+  /// Table column: start time
+  ///
+  /// In en, this message translates to:
+  /// **'Start Time'**
+  String get columnStartTime;
+
+  /// Table column: duration
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get columnDuration;
+
+  /// Table column: actions
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get columnActions;
+
+  /// Open experiment console action
+  ///
+  /// In en, this message translates to:
+  /// **'Open Console'**
+  String get openConsole;
+
+  /// Stop experiment action
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopExperiment;
+
+  /// Stop confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Stop'**
+  String get confirmStopTitle;
+
+  /// Stop confirmation dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to stop experiment \"{name}\"?'**
+  String confirmStopDesc(String name);
+
+  /// Stop success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment stopped'**
+  String get experimentStopped;
+
+  /// Stop failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to stop experiment: {reason}'**
+  String stopFailed(String reason);
+
+  /// Create experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Create Experiment'**
+  String get createExperiment;
+
+  /// Placeholder for not started time
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get notStarted;
+
+  /// Placeholder for no method set
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get methodNotSet;
 }
 
 class _AppLocalizationsDelegate

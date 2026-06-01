@@ -121,6 +121,8 @@ void main() {
         'portHint',
         'slaveIdHint',
         'timeoutHint',
+        'notStarted',
+        'methodNotSet',
       };
 
       final enKeys = enJson.keys.where((k) => !k.startsWith('@')).toSet();

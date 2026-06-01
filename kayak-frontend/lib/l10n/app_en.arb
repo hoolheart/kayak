@@ -984,5 +984,182 @@
   "addPointTitle": "Add Point",
   "@addPointTitle": {
     "description": "Add point dialog title"
+  },
+
+  "statusIdle": "Idle",
+  "@statusIdle": {
+    "description": "Experiment status: idle"
+  },
+  "statusLoaded": "Loaded",
+  "@statusLoaded": {
+    "description": "Experiment status: loaded"
+  },
+  "statusRunning": "Running",
+  "@statusRunning": {
+    "description": "Experiment status: running"
+  },
+  "statusPaused": "Paused",
+  "@statusPaused": {
+    "description": "Experiment status: paused"
+  },
+  "statusCompleted": "Completed",
+  "@statusCompleted": {
+    "description": "Experiment status: completed"
+  },
+  "statusAborted": "Aborted",
+  "@statusAborted": {
+    "description": "Experiment status: aborted"
+  },
+  "statusUnknown": "Unknown",
+  "@statusUnknown": {
+    "description": "Experiment status: unknown"
+  },
+  "allStatuses": "All Statuses",
+  "@allStatuses": {
+    "description": "Dropdown option to show all experiment statuses"
+  },
+  "filterStatus": "Status",
+  "@filterStatus": {
+    "description": "Filter bar status label"
+  },
+  "filterDateRange": "Date",
+  "@filterDateRange": {
+    "description": "Filter bar date range label"
+  },
+  "resetFilter": "Reset Filters",
+  "@resetFilter": {
+    "description": "Reset filter button"
+  },
+  "noExperiments": "No experiments yet",
+  "@noExperiments": {
+    "description": "Empty state title for experiment list"
+  },
+  "noExperimentsHint": "Create your first experiment to get started",
+  "@noExperimentsHint": {
+    "description": "Empty state description for experiment list"
+  },
+  "createFirstExperiment": "Create First Experiment",
+  "@createFirstExperiment": {
+    "description": "Empty state create experiment button"
+  },
+  "noFilteredResults": "No matching experiments",
+  "@noFilteredResults": {
+    "description": "No results after filtering"
+  },
+  "noFilteredResultsHint": "Try adjusting your filter criteria",
+  "@noFilteredResultsHint": {
+    "description": "No results hint after filtering"
+  },
+  "clearFilter": "Clear Filters",
+  "@clearFilter": {
+    "description": "Clear all filters button"
+  },
+  "loadFailed": "Failed to load experiments",
+  "@loadFailed": {
+    "description": "Error state title"
+  },
+  "loadFailedHint": "Please check your connection and try again",
+  "@loadFailedHint": {
+    "description": "Error state hint"
+  },
+  "totalRecords": "{count} records total",
+  "@totalRecords": {
+    "description": "Total record count label",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "47"
+      }
+    }
+  },
+  "pageOf": "Page {current} of {total}",
+  "@pageOf": {
+    "description": "Page indicator for mobile",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "recordsPerPage": "Rows per page",
+  "@recordsPerPage": {
+    "description": "Page size selector label"
+  },
+  "columnName": "Name",
+  "@columnName": {
+    "description": "Table column: experiment name"
+  },
+  "columnMethod": "Method",
+  "@columnMethod": {
+    "description": "Table column: method name"
+  },
+  "columnStatus": "Status",
+  "@columnStatus": {
+    "description": "Table column: status"
+  },
+  "columnStartTime": "Start Time",
+  "@columnStartTime": {
+    "description": "Table column: start time"
+  },
+  "columnDuration": "Duration",
+  "@columnDuration": {
+    "description": "Table column: duration"
+  },
+  "columnActions": "Actions",
+  "@columnActions": {
+    "description": "Table column: actions"
+  },
+  "openConsole": "Open Console",
+  "@openConsole": {
+    "description": "Open experiment console action"
+  },
+  "stopExperiment": "Stop",
+  "@stopExperiment": {
+    "description": "Stop experiment action"
+  },
+  "confirmStopTitle": "Confirm Stop",
+  "@confirmStopTitle": {
+    "description": "Stop confirmation dialog title"
+  },
+  "confirmStopDesc": "Are you sure you want to stop experiment \"{name}\"?",
+  "@confirmStopDesc": {
+    "description": "Stop confirmation dialog description",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Temperature Test"
+      }
+    }
+  },
+  "experimentStopped": "Experiment stopped",
+  "@experimentStopped": {
+    "description": "Stop success toast"
+  },
+  "stopFailed": "Failed to stop experiment: {reason}",
+  "@stopFailed": {
+    "description": "Stop failure toast",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "createExperiment": "Create Experiment",
+  "@createExperiment": {
+    "description": "Create experiment button"
+  },
+  "notStarted": "—",
+  "@notStarted": {
+    "description": "Placeholder for not started time"
+  },
+  "methodNotSet": "—",
+  "@methodNotSet": {
+    "description": "Placeholder for no method set"
   }
 }

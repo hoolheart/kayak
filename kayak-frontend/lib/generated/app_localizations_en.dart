@@ -739,4 +739,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPointTitle => 'Add Point';
+
+  @override
+  String get statusIdle => 'Idle';
+
+  @override
+  String get statusLoaded => 'Loaded';
+
+  @override
+  String get statusRunning => 'Running';
+
+  @override
+  String get statusPaused => 'Paused';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get statusAborted => 'Aborted';
+
+  @override
+  String get statusUnknown => 'Unknown';
+
+  @override
+  String get allStatuses => 'All Statuses';
+
+  @override
+  String get filterStatus => 'Status';
+
+  @override
+  String get filterDateRange => 'Date';
+
+  @override
+  String get resetFilter => 'Reset Filters';
+
+  @override
+  String get noExperiments => 'No experiments yet';
+
+  @override
+  String get noExperimentsHint => 'Create your first experiment to get started';
+
+  @override
+  String get createFirstExperiment => 'Create First Experiment';
+
+  @override
+  String get noFilteredResults => 'No matching experiments';
+
+  @override
+  String get noFilteredResultsHint => 'Try adjusting your filter criteria';
+
+  @override
+  String get clearFilter => 'Clear Filters';
+
+  @override
+  String get loadFailed => 'Failed to load experiments';
+
+  @override
+  String get loadFailedHint => 'Please check your connection and try again';
+
+  @override
+  String totalRecords(int count) {
+    return '$count records total';
+  }
+
+  @override
+  String pageOf(int current, int total) {
+    return 'Page $current of $total';
+  }
+
+  @override
+  String get recordsPerPage => 'Rows per page';
+
+  @override
+  String get columnName => 'Name';
+
+  @override
+  String get columnMethod => 'Method';
+
+  @override
+  String get columnStatus => 'Status';
+
+  @override
+  String get columnStartTime => 'Start Time';
+
+  @override
+  String get columnDuration => 'Duration';
+
+  @override
+  String get columnActions => 'Actions';
+
+  @override
+  String get openConsole => 'Open Console';
+
+  @override
+  String get stopExperiment => 'Stop';
+
+  @override
+  String get confirmStopTitle => 'Confirm Stop';
+
+  @override
+  String confirmStopDesc(String name) {
+    return 'Are you sure you want to stop experiment \"$name\"?';
+  }
+
+  @override
+  String get experimentStopped => 'Experiment stopped';
+
+  @override
+  String stopFailed(String reason) {
+    return 'Failed to stop experiment: $reason';
+  }
+
+  @override
+  String get createExperiment => 'Create Experiment';
+
+  @override
+  String get notStarted => '—';
+
+  @override
+  String get methodNotSet => '—';
 }

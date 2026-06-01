@@ -731,4 +731,123 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addPointTitle => '添加测点';
+
+  @override
+  String get statusIdle => '空闲';
+
+  @override
+  String get statusLoaded => '已载入';
+
+  @override
+  String get statusRunning => '运行中';
+
+  @override
+  String get statusPaused => '已暂停';
+
+  @override
+  String get statusCompleted => '已完成';
+
+  @override
+  String get statusAborted => '已中止';
+
+  @override
+  String get statusUnknown => '未知';
+
+  @override
+  String get allStatuses => '全部状态';
+
+  @override
+  String get filterStatus => '状态';
+
+  @override
+  String get filterDateRange => '时间';
+
+  @override
+  String get resetFilter => '重置筛选';
+
+  @override
+  String get noExperiments => '暂无试验';
+
+  @override
+  String get noExperimentsHint => '点击下方按钮创建您的第一个试验';
+
+  @override
+  String get createFirstExperiment => '创建第一个试验';
+
+  @override
+  String get noFilteredResults => '没有符合条件的试验';
+
+  @override
+  String get noFilteredResultsHint => '请尝试调整筛选条件';
+
+  @override
+  String get clearFilter => '清除筛选条件';
+
+  @override
+  String get loadFailed => '加载试验列表失败';
+
+  @override
+  String get loadFailedHint => '请检查网络连接后点击重试';
+
+  @override
+  String totalRecords(int count) {
+    return '共 $count 条记录';
+  }
+
+  @override
+  String pageOf(int current, int total) {
+    return '第 $current 页，共 $total 页';
+  }
+
+  @override
+  String get recordsPerPage => '每页条数';
+
+  @override
+  String get columnName => '名称';
+
+  @override
+  String get columnMethod => '方法';
+
+  @override
+  String get columnStatus => '状态';
+
+  @override
+  String get columnStartTime => '开始时间';
+
+  @override
+  String get columnDuration => '持续时间';
+
+  @override
+  String get columnActions => '操作';
+
+  @override
+  String get openConsole => '进入控制台';
+
+  @override
+  String get stopExperiment => '停止';
+
+  @override
+  String get confirmStopTitle => '确认停止';
+
+  @override
+  String confirmStopDesc(String name) {
+    return '确定要停止试验「$name」吗？';
+  }
+
+  @override
+  String get experimentStopped => '试验已停止';
+
+  @override
+  String stopFailed(String reason) {
+    return '停止失败：$reason';
+  }
+
+  @override
+  String get createExperiment => '创建试验';
+
+  @override
+  String get notStarted => '—';
+
+  @override
+  String get methodNotSet => '—';
 }
