@@ -45,7 +45,7 @@ class PointValueDisplay extends ConsumerStatefulWidget {
 }
 
 class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Object? _latestValue;
   bool _isLoading = true;
   bool _isRefreshing = false;
