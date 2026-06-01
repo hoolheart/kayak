@@ -337,12 +337,12 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
       }
 
       if (!mounted) return;
-      Navigator.of(context).pop();
       Toast.show(
         context: context,
         message: l10n.pointSaveSuccess,
         type: ToastType.success,
       );
+      Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       Toast.show(
