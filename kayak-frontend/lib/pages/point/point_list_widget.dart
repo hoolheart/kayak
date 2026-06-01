@@ -450,7 +450,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
             // 类型标签
             SizedBox(
               width: 80,
-              child: Center(child: _buildTypeChip(point.dataType, colorScheme, textTheme)),
+              child: Center(child: _buildTypeChip(point.dataType, l10n, colorScheme, textTheme)),
             ),
             const SizedBox(width: 16),
             // 访问权限
@@ -576,7 +576,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
                           ),
                         ),
                         const SizedBox(width: 8),
-                        _buildTypeChip(point.dataType, colorScheme, textTheme),
+                        _buildTypeChip(point.dataType, l10n, colorScheme, textTheme),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -670,7 +670,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
   }
 
   /// 类型标签
-  Widget _buildTypeChip(DataType dataType, ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildTypeChip(DataType dataType, AppLocalizations l10n, ColorScheme colorScheme, TextTheme textTheme) {
     final (Color bgColor, Color textColor) = _typeColors(dataType, colorScheme);
 
     return Container(
@@ -680,7 +680,7 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        _dataTypeLabel(dataType),
+        _dataTypeLabel(dataType, l10n),
         style: textTheme.labelMedium?.copyWith(
           color: textColor,
           fontWeight: FontWeight.w500,
@@ -704,16 +704,16 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
   }
 
   /// 数据类型标签文本
-  String _dataTypeLabel(DataType dataType) {
+  String _dataTypeLabel(DataType dataType, AppLocalizations l10n) {
     switch (dataType) {
       case DataType.number:
-        return 'Number';
+        return l10n.dataTypeNumber;
       case DataType.integer:
-        return 'Integer';
+        return l10n.dataTypeInteger;
       case DataType.boolean:
-        return 'Boolean';
+        return l10n.dataTypeBoolean;
       case DataType.string:
-        return 'String';
+        return l10n.dataTypeString;
     }
   }
 
