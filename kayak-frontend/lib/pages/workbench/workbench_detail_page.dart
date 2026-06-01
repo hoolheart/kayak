@@ -5,14 +5,14 @@ import 'package:intl/intl.dart';
 
 import '../../generated/app_localizations.dart';
 import '../../models/device.dart';
-import '../../models/point.dart';
 import '../../models/workbench.dart';
 import '../../providers/device_provider.dart';
-import '../../providers/point_provider.dart';
 import '../../providers/workbench_provider.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/device_tree.dart';
+import '../../widgets/error_view.dart';
 import '../../widgets/toast.dart';
+import '../point/point_list_widget.dart';
 import 'workbench_create_dialog.dart';
 
 /// ============================================================
@@ -916,26 +916,27 @@ class _DeviceDetailView extends ConsumerWidget {
   }
 
   Widget _buildDetailError(BuildContext context, Object error) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints: const BoxConstraints(minHeight: 400),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border.all(color: colorScheme.outlineVariant),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Center(
-        child: Text(
-          'Error: $error',
-          style: textTheme.bodyMedium,
-        ),
+      child: ErrorView(
+        title: '$error',
+        compact: true,
+        onRetry: () {
+          ref.invalidate(deviceDetailProvider(_selectedDeviceId!));
+        },
       ),
     );
   }
 
   Widget _buildDetailContent(BuildContext context, Device device) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -1013,7 +1014,7 @@ class _DeviceDetailView extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Text(
-              '测点列表',
+              l10n.pointListTitle,
               style: textTheme.titleSmall?.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -1021,7 +1022,7 @@ class _DeviceDetailView extends ConsumerWidget {
           ),
           // 测点列表
           Expanded(
-            child: _PointListSection(deviceId: deviceId),
+            child: PointListWidget(deviceId: deviceId),
           ),
         ],
       ),
@@ -1165,102 +1166,9 @@ class _DeviceStatusChip extends StatelessWidget {
 }
 
 // ============================================================
-// _PointListSection — 测点列表区域
+// _PointListSection and _PointListItem are now in PointListWidget
+// (lib/pages/point/point_list_widget.dart)
 // ============================================================
-
-class _PointListSection extends ConsumerWidget {
-  const _PointListSection({required this.deviceId});
-
-  final String deviceId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pointsState = ref.watch(pointListProvider(deviceId));
-
-    return pointsState.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
-        child: Text('Error: $error'),
-      ),
-      data: (points) {
-        if (points.isEmpty) {
-          return const Center(
-            child: Text('暂无测点'),
-          );
-        }
-
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: points.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final point = points[index];
-            return _PointListItem(point: point);
-          },
-        );
-      },
-    );
-  }
-}
-
-// ============================================================
-// _PointListItem — 测点列表项
-// ============================================================
-
-class _PointListItem extends StatelessWidget {
-  const _PointListItem({required this.point});
-
-  final Point point;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          // 测点名称
-          Expanded(
-            child: Text(
-              point.name,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // 数据类型标签
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              point.dataType.name,
-              style: textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // 访问类型标签
-          Icon(
-            point.accessType == AccessType.ro
-                ? Icons.visibility_outlined
-                : point.accessType == AccessType.wo
-                    ? Icons.edit_outlined
-                    : Icons.sync_alt,
-            size: 16,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // ============================================================
 // _StatusChip — 状态标签
