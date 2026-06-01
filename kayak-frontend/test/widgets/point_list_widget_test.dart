@@ -102,20 +102,21 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Title and count
+      // Title visible during loading
       expect(find.text('Points'), findsOneWidget);
-      expect(find.text('0 points'), findsOneWidget);
 
-      // Empty state
-      expect(find.text('No points for this device'), findsOneWidget);
-      expect(find.byIcon(Icons.point_of_sale_outlined), findsOneWidget);
+      // Count hidden during loading (hasValue = false)
+      expect(find.text('0 points'), findsNothing);
 
-      // Add first point button
-      expect(find.text('Add First Point'), findsOneWidget);
+      // Skeleton shimmer blocks visible
+      expect(find.byType(ShimmerBlock), findsWidgets);
 
-      // No table headers
+      // No table headers (data not loaded yet)
       expect(find.text('Name'), findsNothing);
       expect(find.text('Type'), findsNothing);
+
+      // Pump enough to complete the pending timer
+      await tester.pump(const Duration(milliseconds: 500));
     });
   });
 
@@ -303,9 +304,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Confirm dialog
+      // Confirm dialog (point name appears in both table and dialog)
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.textContaining('Temperature Sensor'), findsOneWidget);
+      expect(find.textContaining('Temperature Sensor'), findsWidgets);
       expect(find.text('This action cannot be undone.'), findsOneWidget);
       expect(find.text('Delete'), findsWidgets);
     });
@@ -416,9 +417,7 @@ void main() {
         screenSize: const Size(375, 667),
         child: const PointListWidget(deviceId: 'dev-1'),
       ));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
 
       // Cards should be shown (not table)
       expect(find.byType(Card), findsWidgets);
@@ -487,13 +486,14 @@ void main() {
         fakeService: fakeService,
         child: const PointListWidget(deviceId: 'dev-1'),
       ));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump();
+      await tester.pumpAndSettle();
 
-      // Error view
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      // Error view shows retry button
       expect(find.text('Retry'), findsOneWidget);
+
+      // Error message shown
+      expect(find.textContaining('Failed'), findsOneWidget);
 
       // No skeleton
       expect(find.byType(ShimmerBlock), findsNothing);

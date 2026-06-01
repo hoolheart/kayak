@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,11 +29,11 @@ import 'point_value_display.dart';
 /// 在测试环境中，设置 [isTestMode = true] 可禁用无限 shimmer 动画，
 /// 避免 `pumpAndSettle()` 永远等待。
 class PointListWidget extends ConsumerStatefulWidget {
+  const PointListWidget({super.key, required this.deviceId});
+
   /// 测试模式标志。为 `true` 时禁用无限重复动画。
   @visibleForTesting
   static bool isTestMode = false;
-
-  const PointListWidget({super.key, required this.deviceId});
 
   /// 所属设备 ID
   final String deviceId;

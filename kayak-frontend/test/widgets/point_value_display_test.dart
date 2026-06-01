@@ -66,7 +66,7 @@ void main() {
       expect(find.text('°C'), findsOneWidget);
     });
 
-    testWidgets('TC-PV-002: different data types formatted', (tester) async {
+    testWidgets('TC-PV-002a: number type formatted', (tester) async {
       final fakeService = FakePointService(
         values: {
           'pt-num': const PointValue(
@@ -74,25 +74,8 @@ void main() {
             value: 25.3256,
             timestamp: '2026-06-01T10:00:00Z',
           ),
-          'pt-int': const PointValue(
-            pointId: 'pt-int',
-            value: 101,
-            timestamp: '2026-06-01T10:00:00Z',
-          ),
-          'pt-bool': const PointValue(
-            pointId: 'pt-bool',
-            value: true,
-            timestamp: '2026-06-01T10:00:00Z',
-          ),
-          'pt-str': const PointValue(
-            pointId: 'pt-str',
-            value: 'Running',
-            timestamp: '2026-06-01T10:00:00Z',
-          ),
         },
       );
-
-      // Number
       await tester.pumpWidget(_wrapValueDisplay(
         fakeService: fakeService,
         child: const PointValueDisplay(
@@ -103,8 +86,18 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('25.33'), findsOneWidget);
+    });
 
-      // Integer
+    testWidgets('TC-PV-002b: integer type formatted', (tester) async {
+      final fakeService = FakePointService(
+        values: {
+          'pt-int': const PointValue(
+            pointId: 'pt-int',
+            value: 101,
+            timestamp: '2026-06-01T10:00:00Z',
+          ),
+        },
+      );
       await tester.pumpWidget(_wrapValueDisplay(
         fakeService: fakeService,
         child: const PointValueDisplay(
@@ -115,8 +108,18 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('101'), findsOneWidget);
+    });
 
-      // Boolean
+    testWidgets('TC-PV-002c: boolean type formatted', (tester) async {
+      final fakeService = FakePointService(
+        values: {
+          'pt-bool': const PointValue(
+            pointId: 'pt-bool',
+            value: true,
+            timestamp: '2026-06-01T10:00:00Z',
+          ),
+        },
+      );
       await tester.pumpWidget(_wrapValueDisplay(
         fakeService: fakeService,
         child: const PointValueDisplay(
@@ -127,8 +130,18 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('On'), findsOneWidget);
+    });
 
-      // String
+    testWidgets('TC-PV-002d: string type formatted', (tester) async {
+      final fakeService = FakePointService(
+        values: {
+          'pt-str': const PointValue(
+            pointId: 'pt-str',
+            value: 'Running',
+            timestamp: '2026-06-01T10:00:00Z',
+          ),
+        },
+      );
       await tester.pumpWidget(_wrapValueDisplay(
         fakeService: fakeService,
         child: const PointValueDisplay(
@@ -164,8 +177,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Value shown
-      expect(find.text('25.33'), findsOneWidget);
+      // Value shown (25.3 formatted as "25.30" with 2 decimal places)
+      expect(find.text('25.30'), findsOneWidget);
 
       // Status dot exists (circle Container)
       final containers = find.byType(Container);
@@ -202,8 +215,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Value shown but grayed
-      expect(find.text('25.33'), findsOneWidget);
+      // Value shown but grayed (25.3 formatted as "25.30")
+      expect(find.text('25.30'), findsOneWidget);
     });
 
     testWidgets('TC-PV-005: error status red dot', (tester) async {
@@ -276,7 +289,7 @@ void main() {
   group('PointValueDisplay — Loading (TC-PV-007)', () {
     testWidgets('TC-PV-007: loading shows skeleton', (tester) async {
       final fakeService = FakePointService(
-        delay: const Duration(seconds: 10),
+        delay: const Duration(milliseconds: 500),
       );
 
       await tester.pumpWidget(_wrapValueDisplay(
@@ -289,8 +302,11 @@ void main() {
       ));
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Skeleton shown (ShimmerBlock)
+      // Skeleton shown (ShimmerBlock) while loading
       expect(find.byType(ShimmerBlock), findsWidgets);
+
+      // Complete the pending timer to avoid "timer pending" error
+      await tester.pump(const Duration(seconds: 1));
     });
   });
 

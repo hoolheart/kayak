@@ -159,8 +159,8 @@ void main() {
       await tester.enterText(find.byType(TextFormField).first, maxName);
       await tester.pumpAndSettle();
 
-      // Counter shows 255/255
-      expect(find.text('255/255'), findsOneWidget);
+      // Counter shows 255/255 (both helperText and buildCounter show it)
+      expect(find.text('255/255'), findsWidgets);
 
       // Save should work with 255 chars
       await tester.tap(find.widgetWithText(FilledButton, 'Save'));

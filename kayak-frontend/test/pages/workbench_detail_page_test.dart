@@ -6,6 +6,8 @@ import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/models/device.dart';
 import 'package:kayak_frontend/models/point.dart';
 import 'package:kayak_frontend/models/workbench.dart';
+import 'package:kayak_frontend/pages/point/point_list_widget.dart';
+import 'package:kayak_frontend/pages/point/point_value_display.dart';
 import 'package:kayak_frontend/pages/workbench/workbench_detail_page.dart';
 import 'package:kayak_frontend/providers/services.dart';
 import 'package:kayak_frontend/widgets/toast.dart';
@@ -155,8 +157,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Placeholder shown
-      expect(find.byIcon(Icons.memory), findsOneWidget);
+      // Placeholder shown (memory icon also in device tree for virtual dev)
+      expect(find.byIcon(Icons.memory), findsWidgets);
       expect(find.text('Device Details'), findsWidgets);
       expect(find.text('Select a device to view details'), findsOneWidget);
 
@@ -218,8 +220,8 @@ void main() {
       expect(find.text('Virtual Device'), findsWidgets);
       expect(find.text('Virtual'), findsWidgets);
 
-      // Point list shown
-      expect(find.text('Points'), findsOneWidget);
+      // Point list shown (Points text appears in both detail header and table)
+      expect(find.text('Points'), findsWidgets);
       expect(find.text('2 points'), findsOneWidget);
       expect(find.text('Temperature Sensor'), findsOneWidget);
       expect(find.text('Pressure'), findsOneWidget);
@@ -266,11 +268,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // l10n texts (not hardcoded Chinese)
-      expect(find.text('Points'), findsOneWidget);
+      // Note: Edit/Delete in AppBar are IconButton tooltips, not Text widgets
+      expect(find.text('Points'), findsWidgets);
       expect(find.text('1 points'), findsOneWidget);
-      expect(find.text('Add Point'), findsOneWidget);
-      expect(find.text('Edit'), findsWidgets);
-      expect(find.text('Delete'), findsWidgets);
+      expect(find.text('Add Point'), findsWidgets);
     });
   });
 
@@ -331,7 +332,7 @@ void main() {
       expect(find.text('502'), findsOneWidget);
 
       // Point list
-      expect(find.text('Points'), findsOneWidget);
+      expect(find.text('Points'), findsWidgets);
       expect(find.text('Coil Status'), findsOneWidget);
     });
   });

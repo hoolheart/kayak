@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,11 +23,6 @@ import '../../widgets/skeleton.dart' show ShimmerBlock, ShimmerContainer;
 /// 在测试环境中，设置 [isTestMode = true] 可禁用无限 shimmer 动画，
 /// 避免 `pumpAndSettle()` 永远等待。
 class PointValueDisplay extends ConsumerStatefulWidget {
-  /// 测试模式标志。为 `true` 时禁用无限重复动画。
-  /// 默认值根据 [TestWidgetsFlutterBinding] 自动判断。
-  @visibleForTesting
-  static bool isTestMode = false;
-
   const PointValueDisplay({
     super.key,
     required this.pointId,
@@ -36,6 +30,10 @@ class PointValueDisplay extends ConsumerStatefulWidget {
     this.unit,
     this.status = 'normal',
   });
+
+  /// 测试模式标志。为 `true` 时禁用无限重复动画。
+  @visibleForTesting
+  static bool isTestMode = false;
 
   /// 测点 ID
   final String pointId;
@@ -240,27 +238,36 @@ class _PointValueDisplayState extends ConsumerState<PointValueDisplay>
             ),
           ),
         const SizedBox(width: 8),
-        // 数值 + 单位
+        // 数值 + 单位（使用 Flexible 防止窄容器中溢出）
         if (_errorMessage != null)
-          Text(
-            '—',
-            style: textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+          Flexible(
+            child: Text(
+              '—',
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           )
         else ...[
-          Text(
-            _formatValue(_latestValue),
-            style: textTheme.bodyLarge?.copyWith(
-              color: _valueColor(colorScheme),
+          Flexible(
+            child: Text(
+              _formatValue(_latestValue),
+              style: textTheme.bodyLarge?.copyWith(
+                color: _valueColor(colorScheme),
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (widget.unit != null && widget.unit!.isNotEmpty) ...[
             const SizedBox(width: 4),
-            Text(
-              widget.unit!,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+            Flexible(
+              child: Text(
+                widget.unit!,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
