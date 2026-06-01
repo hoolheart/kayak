@@ -283,7 +283,7 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
       } else {
         // 添加模式
         final notifier = ref.read(pointListProvider(widget.deviceId).notifier);
-        await notifier.createPoint(
+        final newPoint = await notifier.createPoint(
           name: _nameController.text.trim(),
           dataType: _selectedDataType!.name,
           accessType: _selectedAccessType!.name,
@@ -297,14 +297,9 @@ class _PointFormDialogState extends ConsumerState<PointFormDialog> {
               : null,
         );
 
-        // 创建成功后，获取最新的列表找到新创建的测点 ID
         // 保存 Modbus 配置
         if (_isModbusDevice) {
-          final currentPoints = ref.read(pointListProvider(widget.deviceId));
-          final newPoint = currentPoints.value?.lastOrNull;
-          if (newPoint != null) {
-            await _saveModbusConfig(newPoint.id);
-          }
+          await _saveModbusConfig(newPoint.id);
         }
       }
 

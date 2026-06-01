@@ -54,7 +54,7 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
     state = await AsyncValue.guard(build);
   }
 
-  /// 创建测点，创建成功后刷新列表
+  /// 创建测点，创建成功后刷新列表并返回创建的 [Point] 对象。
   ///
   /// [name] 测点名称
   /// [dataType] 数据类型
@@ -63,7 +63,8 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
   /// [minValue] 最小值（可选）
   /// [maxValue] 最大值（可选）
   /// [defaultValue] 默认值（可选）
-  Future<void> createPoint({
+  /// 返回创建的 [Point] 对象。
+  Future<Point> createPoint({
     required String name,
     required String dataType,
     required String accessType,
@@ -76,7 +77,7 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
 
     try {
       final service = ref.read(pointServiceProvider);
-      await service.create(
+      final newPoint = await service.create(
         deviceId: deviceId,
         name: name,
         dataType: dataType,
@@ -89,8 +90,11 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
 
       // 创建成功后刷新列表
       state = await AsyncValue.guard(build);
+
+      return newPoint;
     } catch (e, st) {
       state = AsyncError(_mapError(e), st);
+      rethrow;
     }
   }
 
