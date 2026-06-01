@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/models/point.dart';
 import 'package:kayak_frontend/pages/point/point_list_widget.dart';
+import 'package:kayak_frontend/pages/point/point_value_display.dart';
 import 'package:kayak_frontend/providers/services.dart';
 import 'package:kayak_frontend/widgets/skeleton.dart';
 import 'package:kayak_frontend/widgets/toast.dart';
@@ -86,6 +87,7 @@ Widget _wrapPointList({
 void main() {
   // 禁用无限 shimmer 动画以避免 pumpAndSettle 永远等待
   PointListWidget.isTestMode = true;
+  PointValueDisplay.isTestMode = true;
 
   group('PointListWidget — Loading State (TC-PL-001)', () {
     testWidgets('TC-PL-001: loading state shows skeleton rows',
@@ -412,6 +414,7 @@ void main() {
         ],
       );
 
+      await tester.binding.setSurfaceSize(const Size(375, 667));
       await tester.pumpWidget(_wrapPointList(
         fakeService: fakeService,
         screenSize: const Size(375, 667),
@@ -431,6 +434,8 @@ void main() {
 
       // Full-width add button at bottom
       expect(find.text('Add Point'), findsOneWidget);
+
+      addTearDown(() => tester.binding.setSurfaceSize(null));
     });
 
     testWidgets('TC-PL-010: desktop shows full table', (tester) async {
@@ -454,6 +459,7 @@ void main() {
         ],
       );
 
+      await tester.binding.setSurfaceSize(const Size(1440, 900));
       await tester.pumpWidget(_wrapPointList(
         fakeService: fakeService,
         screenSize: const Size(1440, 900),
@@ -473,6 +479,8 @@ void main() {
 
       // No cards
       expect(find.byType(Card), findsNothing);
+
+      addTearDown(() => tester.binding.setSurfaceSize(null));
     });
   });
 
