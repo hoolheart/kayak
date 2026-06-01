@@ -45,7 +45,11 @@ class _PointListWidgetState extends ConsumerState<PointListWidget>
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+    // 测试环境跳过无限重复动画，避免 pumpAndSettle 永远等待
+    if (!const bool.fromEnvironment('FLUTTER_TEST')) {
+      _shimmerController.repeat();
+    }
   }
 
   @override
