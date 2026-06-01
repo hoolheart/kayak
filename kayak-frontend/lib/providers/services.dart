@@ -5,9 +5,11 @@ import '../services/auth_interceptor.dart';
 import '../services/auth_service.dart';
 import '../services/device_service.dart';
 import '../services/error_interceptor.dart';
+import '../services/experiment_service.dart';
 import '../services/point_service.dart';
 import '../services/token_storage.dart';
 import '../services/workbench_service.dart';
+import '../services/ws_service.dart';
 
 /// AuthService 的 Riverpod Provider
 ///
@@ -91,4 +93,34 @@ final deviceServiceProvider = Provider<DeviceService>((ref) {
 /// ```
 final pointServiceProvider = Provider<PointService>((ref) {
   return PointService(ref.read(apiClientProvider));
+});
+
+/// ExperimentService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [ExperimentService] 实例。
+/// 依赖 [apiClientProvider] 用于 HTTP 请求。
+///
+/// 在测试中通过 `overrideWithValue` 注入 FakeExperimentService：
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   experimentServiceProvider.overrideWithValue(fakeService),
+/// ]);
+/// ```
+final experimentServiceProvider = Provider<ExperimentService>((ref) {
+  return ExperimentService(ref.read(apiClientProvider));
+});
+
+/// WsService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [WsService] 实例。
+/// WsService 内部管理 WebSocket 连接状态，本身是无状态的单例。
+///
+/// 在测试中通过 `overrideWithValue` 注入 MockWsService：
+/// ```dart
+/// final container = ProviderContainer(overrides: [
+///   wsServiceProvider.overrideWithValue(mockWsService),
+/// ]);
+/// ```
+final wsServiceProvider = Provider<WsService>((ref) {
+  return WsService();
 });
