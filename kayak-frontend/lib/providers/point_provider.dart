@@ -94,6 +94,24 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
     }
   }
 
+  /// 更新测点，更新成功后刷新列表
+  ///
+  /// [pointId] 要更新的测点 ID
+  /// [data] 需要更新的字段 Map
+  Future<void> updatePoint(String pointId, Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+
+    try {
+      final service = ref.read(pointServiceProvider);
+      await service.update(pointId, data);
+
+      // 更新成功后刷新列表
+      state = await AsyncValue.guard(build);
+    } catch (e, st) {
+      state = AsyncError(_mapError(e), st);
+    }
+  }
+
   /// 删除测点，删除成功后刷新列表
   ///
   /// [pointId] 要删除的测点 ID
@@ -202,6 +220,8 @@ class PointListNotifier extends AsyncNotifier<List<Point>> {
 /// // 调用方法
 /// ref.read(pointListProvider('dev-1').notifier).refresh();
 /// ref.read(pointListProvider('dev-1').notifier).createPoint(name: 'Temp', ...);
+/// ref.read(pointListProvider('dev-1').notifier).updatePoint('pt-1', {'name': 'New Name'});
+/// ref.read(pointListProvider('dev-1').notifier).deletePoint('pt-1');
 /// ref.read(pointListProvider('dev-1').notifier).refreshValues();
 /// ```
 final pointListProvider = AsyncNotifierProvider.family<
@@ -211,3 +231,13 @@ final pointListProvider = AsyncNotifierProvider.family<
 >(
   PointListNotifier.new,
 );
+
+/// 单测点值 Provider
+///
+/// 通过 [FutureProvider.family] 暴露，以 pointId 为参数。
+/// 返回 [PointValue] 对象，包含 pointId, value, timestamp。
+/// 通过 [ref.invalidate] 触发刷新。
+final pointValueProvider = FutureProvider.family<PointValue, String>((ref, pointId) async {
+  final service = ref.read(pointServiceProvider);
+  return service.getValue(pointId);
+});
