@@ -408,27 +408,15 @@ class _FilterBar extends StatelessWidget {
 
     return Row(
       children: [
-        SizedBox(
-          width: isMobile ? null : 140,
-          child: TextField(
-            controller: startDateController,
-            decoration: InputDecoration(
-              labelText: l10n.filterDateRange,
-              hintText: 'YYYY-MM-DD',
-              suffixIcon: const Icon(Icons.calendar_today, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            readOnly: true,
-            onTap: () => _pickDate(context, (date) {
-              startDateController.text = dateFormat.format(date);
-              onStartDateChanged(date);
-            }),
-          ),
+        _buildDateField(
+          context: context,
+          isMobile: isMobile,
+          controller: startDateController,
+          labelText: l10n.filterDateRange,
+          onDatePicked: (date) {
+            startDateController.text = dateFormat.format(date);
+            onStartDateChanged(date);
+          },
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 4 : 8),
@@ -437,29 +425,48 @@ class _FilterBar extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
-        SizedBox(
-          width: isMobile ? null : 140,
-          child: TextField(
-            controller: endDateController,
-            decoration: InputDecoration(
-              hintText: 'YYYY-MM-DD',
-              suffixIcon: const Icon(Icons.calendar_today, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            readOnly: true,
-            onTap: () => _pickDate(context, (date) {
-              endDateController.text = dateFormat.format(date);
-              onEndDateChanged(date);
-            }),
-          ),
+        _buildDateField(
+          context: context,
+          isMobile: isMobile,
+          controller: endDateController,
+          labelText: null,
+          onDatePicked: (date) {
+            endDateController.text = dateFormat.format(date);
+            onEndDateChanged(date);
+          },
         ),
       ],
     );
+  }
+
+  /// 构建单个日期输入字段，移动端使用 [Expanded] 避免溢出。
+  Widget _buildDateField({
+    required BuildContext context,
+    required bool isMobile,
+    required TextEditingController controller,
+    required String? labelText,
+    required ValueChanged<DateTime> onDatePicked,
+  }) {
+    final field = TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: 'YYYY-MM-DD',
+        suffixIcon: const Icon(Icons.calendar_today, size: 20),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        isDense: true,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+      readOnly: true,
+      onTap: () => _pickDate(context, onDatePicked),
+    );
+
+    // 移动端用 Expanded 约束宽度，避免因无固定宽度导致溢出
+    if (isMobile) return Expanded(child: field);
+    return SizedBox(width: 140, child: field);
   }
 
   Widget _buildResetButton(BuildContext context, AppLocalizations l10n) {
