@@ -1,11 +1,11 @@
 // ignore_for_file: sort_constructors_first
 
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/experiment.dart';
 import '../models/experiment_message.dart';
 import '../services/ws_service.dart';
+import '../utils/error_mapping.dart';
 import 'services.dart';
 
 // ============================================================
@@ -196,47 +196,7 @@ class ExperimentListNotifier extends AsyncNotifier<List<Experiment>> {
 
   /// 将异常映射为用户可读的错误消息
   String _mapError(Object error) {
-    if (error is DioException) {
-      switch (error.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout:
-        case DioExceptionType.connectionError:
-          return '网络连接失败，请检查网络后重试';
-
-        case DioExceptionType.badResponse:
-          return _mapStatusCode(error.response?.statusCode);
-
-        default:
-          return '网络异常，请稍后重试';
-      }
-    }
-
-    return error.toString();
-  }
-
-  /// 将 HTTP 状态码映射为用户可读的消息
-  String _mapStatusCode(int? statusCode) {
-    switch (statusCode) {
-      case 400:
-        return '请求参数有误，请检查输入';
-      case 401:
-        return '登录已过期，请重新登录';
-      case 403:
-        return '没有权限执行此操作';
-      case 404:
-        return '请求的资源不存在';
-      case 409:
-        return '资源冲突，请检查是否已存在相同名称';
-      case 422:
-        return '数据验证失败，请检查输入';
-      case 500:
-      case 502:
-      case 503:
-        return '服务暂时不可用，请稍后再试';
-      default:
-        return '操作失败，请重试（错误码: $statusCode）';
-    }
+    return ErrorMapping.mapFallback(error);
   }
 }
 
@@ -465,47 +425,7 @@ class ExperimentControlNotifier extends AsyncNotifier<Experiment> {
     if (error is StateError) {
       return error.message;
     }
-    if (error is DioException) {
-      switch (error.type) {
-        case DioExceptionType.connectionTimeout:
-        case DioExceptionType.sendTimeout:
-        case DioExceptionType.receiveTimeout:
-        case DioExceptionType.connectionError:
-          return '网络连接失败，请检查网络后重试';
-
-        case DioExceptionType.badResponse:
-          return _mapStatusCode(error.response?.statusCode);
-
-        default:
-          return '网络异常，请稍后重试';
-      }
-    }
-
-    return error.toString();
-  }
-
-  /// 将 HTTP 状态码映射为用户可读的消息。
-  String _mapStatusCode(int? statusCode) {
-    switch (statusCode) {
-      case 400:
-        return '请求参数有误，请检查输入';
-      case 401:
-        return '登录已过期，请重新登录';
-      case 403:
-        return '没有权限执行此操作';
-      case 404:
-        return '试验不存在';
-      case 409:
-        return '资源冲突';
-      case 422:
-        return '数据验证失败，请检查输入';
-      case 500:
-      case 502:
-      case 503:
-        return '服务暂时不可用，请稍后再试';
-      default:
-        return '操作失败，请重试（错误码: $statusCode）';
-    }
+    return ErrorMapping.mapFallback(error);
   }
 }
 

@@ -34,6 +34,7 @@ class Experiment {
     this.methodId,
     required this.name,
     this.description,
+    this.errorMessage,
     required this.status,
     required this.ownerType,
     required this.ownerId,
@@ -52,6 +53,8 @@ class Experiment {
   final String? methodId;
   final String name;
   final String? description;
+  @JsonKey(name: 'error_message')
+  final String? errorMessage;
   final ExperimentStatus status;
   @JsonKey(name: 'owner_type')
   final String ownerType;
@@ -73,6 +76,7 @@ class Experiment {
     String? methodId,
     String? name,
     String? description,
+    String? errorMessage,
     ExperimentStatus? status,
     String? ownerType,
     String? ownerId,
@@ -87,6 +91,7 @@ class Experiment {
       methodId: methodId ?? this.methodId,
       name: name ?? this.name,
       description: description ?? this.description,
+      errorMessage: errorMessage ?? this.errorMessage,
       status: status ?? this.status,
       ownerType: ownerType ?? this.ownerType,
       ownerId: ownerId ?? this.ownerId,

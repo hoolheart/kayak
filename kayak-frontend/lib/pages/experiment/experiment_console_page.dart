@@ -11,6 +11,7 @@ import '../../models/experiment_message.dart';
 import '../../providers/experiment_provider.dart';
 import '../../providers/services.dart';
 import '../../services/ws_service.dart';
+import '../../utils/error_mapping.dart';
 import '../../widgets/async_value_widget.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/error_view.dart';
@@ -487,10 +488,16 @@ class _ExperimentConsolePageState
 
   void _handleStatusChange(StatusChangeData data) {
     // 更新试验状态
-    final newStatus = ExperimentStatus.values.firstWhere(
+    final newStatusIndex = ExperimentStatus.values.indexWhere(
       (e) => e.name.toUpperCase() == data.newStatus,
-      orElse: () => ExperimentStatus.idle,
     );
+    if (newStatusIndex == -1) {
+      debugPrint(
+        'Warning: unknown experiment status from WS: ${data.newStatus}',
+      );
+      return;
+    }
+    final newStatus = ExperimentStatus.values[newStatusIndex];
 
     // 通过 notifier 的 updateStatus 方法更新
     ref
@@ -533,6 +540,14 @@ class _ExperimentConsolePageState
     _pollTimer?.cancel();
     _pollTimer = null;
 
+    if (experiment.status == ExperimentStatus.completed ||
+        experiment.status == ExperimentStatus.aborted) {
+      // Do one final fetch to capture the last state change entry
+      // that may have been recorded at the moment of completion.
+      _fetchFinalHistory();
+      return;
+    }
+
     if (experiment.status != ExperimentStatus.running &&
         experiment.status != ExperimentStatus.paused) {
       return;
@@ -550,6 +565,19 @@ class _ExperimentConsolePageState
     });
   }
 
+  /// 在终止状态时执行一次最终历史拉取，确保最后一条状态变更被捕获。
+  Future<void> _fetchFinalHistory() async {
+    try {
+      final experimentService = ref.read(experimentServiceProvider);
+      final history = await experimentService.getHistory(widget.id);
+      if (mounted) {
+        _processHistory(history);
+      }
+    } catch (_) {
+      // 静默处理
+    }
+  }
+
   void _processHistory(List<StatusChange> history) {
     bool hasNew = false;
     for (final change in history) {
@@ -565,8 +593,11 @@ class _ExperimentConsolePageState
       hasNew = true;
     }
 
-    if (hasNew && _isAtBottom) {
-      _scrollToBottom();
+    if (hasNew && mounted) {
+      setState(() {});
+      if (_isAtBottom) {
+        _scrollToBottom();
+      }
     }
   }
 
@@ -598,11 +629,12 @@ class _ExperimentConsolePageState
   void _syncTimerState(Experiment experiment) {
     final wasRunning = _isTimerRunning;
     bool shouldRun = false;
+    Duration newElapsed = _elapsed;
 
     switch (experiment.status) {
       case ExperimentStatus.running:
         if (experiment.startedAt != null) {
-          _elapsed = DateTime.now().difference(experiment.startedAt!);
+          newElapsed = DateTime.now().difference(experiment.startedAt!);
           shouldRun = true;
         }
       case ExperimentStatus.paused:
@@ -611,12 +643,19 @@ class _ExperimentConsolePageState
       case ExperimentStatus.aborted:
         shouldRun = false;
         if (experiment.startedAt != null && experiment.endedAt != null) {
-          _elapsed = experiment.endedAt!.difference(experiment.startedAt!);
+          newElapsed = experiment.endedAt!.difference(experiment.startedAt!);
         }
       case ExperimentStatus.idle:
       case ExperimentStatus.loaded:
         shouldRun = false;
-        _elapsed = Duration.zero;
+        newElapsed = Duration.zero;
+    }
+
+    if (mounted) {
+      setState(() {
+        _elapsed = newElapsed;
+        _isTimerRunning = shouldRun;
+      });
     }
 
     if (shouldRun && !wasRunning) {
@@ -628,14 +667,21 @@ class _ExperimentConsolePageState
 
   void _startTimer() {
     _timer?.cancel();
-    _isTimerRunning = true;
     final experiment =
         ref.read(experimentControlProvider(widget.id)).asData?.value;
     final startedAt = experiment?.startedAt;
     if (startedAt == null) {
-      _elapsed = Duration.zero;
-      _isTimerRunning = false;
+      if (mounted) {
+        setState(() {
+          _elapsed = Duration.zero;
+          _isTimerRunning = false;
+        });
+      }
       return;
+    }
+
+    if (mounted) {
+      setState(() => _isTimerRunning = true);
     }
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -652,7 +698,9 @@ class _ExperimentConsolePageState
   void _stopTimer() {
     _timer?.cancel();
     _timer = null;
-    _isTimerRunning = false;
+    if (mounted) {
+      setState(() => _isTimerRunning = false);
+    }
   }
 
   // ============================================================
@@ -727,7 +775,11 @@ class _ExperimentConsolePageState
     } catch (e) {
       if (mounted) {
         _showToast('${loc.operationFailed}: $e');
-        ref.invalidate(experimentControlProvider(widget.id));
+        // Only invalidate on non-transient errors (auth, not found, conflict)
+        // to avoid discarding valid provider state on transient network issues.
+        if (ErrorMapping.shouldInvalidate(e)) {
+          ref.invalidate(experimentControlProvider(widget.id));
+        }
       }
     } finally {
       if (mounted) {
@@ -849,14 +901,6 @@ class _ExperimentConsolePageState
     final experimentAsync = ref.watch(experimentControlProvider(widget.id));
     final themeData = Theme.of(context);
     final colorScheme = themeData.colorScheme;
-
-    // 同步计时器状态
-    final exp = experimentAsync.asData?.value;
-    if (exp != null) {
-      _syncTimerState(exp);
-      _loadMethodName(exp.methodId);
-      _setupLogPolling(exp);
-    }
 
     return Scaffold(
       appBar: _buildAppBar(context, themeData, colorScheme, experimentAsync),
@@ -1599,7 +1643,7 @@ class _ExperimentConsolePageState
             isMonospace: true,
           ),
           // 错误消息（仅 ABORTED）
-          if (isAborted && experiment.description != null) ...[
+          if (isAborted && experiment.errorMessage != null) ...[
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1608,7 +1652,7 @@ class _ExperimentConsolePageState
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    experiment.description!,
+                    experiment.errorMessage!,
                     style: themeData.textTheme.bodySmall?.copyWith(
                       color: statusColor,
                     ),
