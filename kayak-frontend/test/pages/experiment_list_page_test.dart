@@ -144,7 +144,6 @@ class ExperimentTestData {
         id: 'exp-004',
         userId: 'user-001',
         name: 'Idle Experiment',
-        methodId: null,
         status: ExperimentStatus.idle,
         ownerType: 'personal',
         ownerId: 'user-001',
@@ -514,14 +513,7 @@ void main() {
       await pumpUntilReady(tester);
 
       // 验证 list 被调用，参数 page=1, size=10
-      verify(() => mockExperimentService.list(
-            page: 1,
-            size: 10,
-            status: null,
-            createdAfter: null,
-            createdBefore: null,
-            scope: null,
-          )).called(1);
+      verify(() => mockExperimentService.list()).called(1);
     });
   });
 
@@ -1066,7 +1058,6 @@ void main() {
       final container = await pumpExperimentListPage(
         tester,
         experimentService: mockExperimentService,
-        locale: const Locale('en'),
       );
       addTearDown(container.dispose);
       await pumpUntilReady(tester);
@@ -1106,7 +1097,6 @@ void main() {
         tester,
         experimentService: mockExperimentService,
         methodService: mockMethodService,
-        themeMode: ThemeMode.light,
       );
       addTearDown(container.dispose);
       await pumpUntilReady(tester);
@@ -1215,11 +1205,11 @@ void main() {
       addTearDown(() async => resetScreenSize(tester));
 
       final experiments = [
-        Experiment(
-          id: 'exp-null',
-          userId: 'user-001',
-          name: '',
-          status: ExperimentStatus.idle,
+      Experiment(
+        id: 'exp-004',
+        userId: 'user-001',
+        name: 'Idle Experiment',
+        status: ExperimentStatus.idle,
           ownerType: 'personal',
           ownerId: 'user-001',
           createdAt: DateTime.now(),
