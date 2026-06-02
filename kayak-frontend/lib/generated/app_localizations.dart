@@ -2041,6 +2041,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Note: Parameter values are for reference in this session only and will not be persisted in this version.'**
   String get paramsNotPersistedWarning;
+
+  /// Back button tooltip on experiment console
+  ///
+  /// In en, this message translates to:
+  /// **'Back to list'**
+  String get backToList;
+
+  /// Status label in experiment console
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get statusLabel;
+
+  /// Timer label for running experiments
+  ///
+  /// In en, this message translates to:
+  /// **'Elapsed'**
+  String get elapsedLabel;
+
+  /// Timer label when experiment is paused
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get elapsedPaused;
+
+  /// Method label in experiment info card
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get methodLabel;
+
+  /// Error title when experiment is not found
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment not found'**
+  String get experimentNotFound;
+
+  /// Error description when experiment is not found
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid experiment ID, please check the link or go back to the list'**
+  String get experimentNotFoundHint;
+
+  /// Error title when user lacks permission
+  ///
+  /// In en, this message translates to:
+  /// **'No permission to access this experiment'**
+  String get experimentNoPermission;
+
+  /// Load method button on experiment console
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get actionLoad;
+
+  /// Start experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get actionStart;
+
+  /// Pause experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get actionPause;
+
+  /// Resume experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get actionResume;
+
+  /// Stop experiment button
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get actionStop;
+
+  /// WebSocket disconnected status
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected'**
+  String get wsDisconnected;
+
+  /// WebSocket connecting status
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting...'**
+  String get wsConnecting;
+
+  /// WebSocket connected status
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get wsConnected;
+
+  /// WebSocket reconnecting status
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting'**
+  String get wsReconnecting;
+
+  /// WebSocket connection failed status
+  ///
+  /// In en, this message translates to:
+  /// **'Connection failed'**
+  String get wsFailed;
+
+  /// WebSocket reconnect button
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect'**
+  String get wsReconnect;
+
+  /// Empty log state title
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for logs...'**
+  String get logEmptyTitle;
+
+  /// Empty log state description
+  ///
+  /// In en, this message translates to:
+  /// **'Logs will appear when experiment starts'**
+  String get logEmptyHint;
+
+  /// Label for new logs floating button
+  ///
+  /// In en, this message translates to:
+  /// **'new logs'**
+  String get newLogsLabel;
+
+  /// Log level filter: show all
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAllLabel;
+
+  /// Clear logs button label
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearLogsLabel;
+
+  /// Stop confirmation button label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Stop'**
+  String get confirmStopAction;
+
+  /// Start experiment success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment started'**
+  String get experimentStarted;
+
+  /// Pause experiment success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment paused'**
+  String get experimentPaused;
+
+  /// Resume experiment success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment resumed'**
+  String get experimentResumed;
+
+  /// Load method success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Method loaded'**
+  String get methodLoaded;
+
+  /// Generic operation failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed'**
+  String get operationFailed;
+
+  /// Status subtitle when experiment is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment completed'**
+  String get statusCompletedHint;
+
+  /// Status subtitle when experiment is running
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment running'**
+  String get statusRunningHint;
+
+  /// Status subtitle when experiment is aborted
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment aborted'**
+  String get statusAbortedHint;
+
+  /// Start time label in completed info
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get startedLabel;
+
+  /// End time label in completed info
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get endedLabel;
+
+  /// Total duration label in completed info
+  ///
+  /// In en, this message translates to:
+  /// **'Total Duration'**
+  String get totalDurationLabel;
 }
 
 class _AppLocalizationsDelegate

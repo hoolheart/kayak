@@ -358,6 +358,20 @@ class ExperimentControlNotifier extends AsyncNotifier<Experiment> {
     return service.getHistory(_experimentId);
   }
 
+  /// 从 WebSocket 状态变更消息更新试验状态。
+  ///
+  /// 此方法用于在接收到 WS status_change 消息时，
+  /// 从外部更新 ExperimentControlNotifier 的状态，
+  /// 而无需重新从后端加载。
+  void updateStatus(ExperimentStatus newStatus, {DateTime? startedAt}) {
+    if (state.hasValue) {
+      state = AsyncData(state.value!.copyWith(
+        status: newStatus,
+        startedAt: startedAt ?? state.value!.startedAt,
+      ));
+    }
+  }
+
   /// 控制操作通用执行模式。
   ///
   /// 1. 校验状态合法性

@@ -1388,5 +1388,150 @@
   "paramsNotPersistedWarning": "Note: Parameter values are for reference in this session only and will not be persisted in this version.",
   "@paramsNotPersistedWarning": {
     "description": "Warning in Step 3 and Step 4 that parameters are not persisted yet"
+  },
+
+  "backToList": "Back to list",
+  "@backToList": {
+    "description": "Back button tooltip on experiment console"
+  },
+  "statusLabel": "Status",
+  "@statusLabel": {
+    "description": "Status label in experiment console"
+  },
+  "elapsedLabel": "Elapsed",
+  "@elapsedLabel": {
+    "description": "Timer label for running experiments"
+  },
+  "elapsedPaused": "Paused",
+  "@elapsedPaused": {
+    "description": "Timer label when experiment is paused"
+  },
+  "methodLabel": "Method",
+  "@methodLabel": {
+    "description": "Method label in experiment info card"
+  },
+  "experimentNotFound": "Experiment not found",
+  "@experimentNotFound": {
+    "description": "Error title when experiment is not found"
+  },
+  "experimentNotFoundHint": "Invalid experiment ID, please check the link or go back to the list",
+  "@experimentNotFoundHint": {
+    "description": "Error description when experiment is not found"
+  },
+  "experimentNoPermission": "No permission to access this experiment",
+  "@experimentNoPermission": {
+    "description": "Error title when user lacks permission"
+  },
+  "actionLoad": "Load",
+  "@actionLoad": {
+    "description": "Load method button on experiment console"
+  },
+  "actionStart": "Start",
+  "@actionStart": {
+    "description": "Start experiment button"
+  },
+  "actionPause": "Pause",
+  "@actionPause": {
+    "description": "Pause experiment button"
+  },
+  "actionResume": "Resume",
+  "@actionResume": {
+    "description": "Resume experiment button"
+  },
+  "actionStop": "Stop",
+  "@actionStop": {
+    "description": "Stop experiment button"
+  },
+  "wsDisconnected": "Disconnected",
+  "@wsDisconnected": {
+    "description": "WebSocket disconnected status"
+  },
+  "wsConnecting": "Connecting...",
+  "@wsConnecting": {
+    "description": "WebSocket connecting status"
+  },
+  "wsConnected": "Connected",
+  "@wsConnected": {
+    "description": "WebSocket connected status"
+  },
+  "wsReconnecting": "Reconnecting",
+  "@wsReconnecting": {
+    "description": "WebSocket reconnecting status"
+  },
+  "wsFailed": "Connection failed",
+  "@wsFailed": {
+    "description": "WebSocket connection failed status"
+  },
+  "wsReconnect": "Reconnect",
+  "@wsReconnect": {
+    "description": "WebSocket reconnect button"
+  },
+  "logEmptyTitle": "Waiting for logs...",
+  "@logEmptyTitle": {
+    "description": "Empty log state title"
+  },
+  "logEmptyHint": "Logs will appear when experiment starts",
+  "@logEmptyHint": {
+    "description": "Empty log state description"
+  },
+  "newLogsLabel": "new logs",
+  "@newLogsLabel": {
+    "description": "Label for new logs floating button"
+  },
+  "filterAllLabel": "All",
+  "@filterAllLabel": {
+    "description": "Log level filter: show all"
+  },
+  "clearLogsLabel": "Clear",
+  "@clearLogsLabel": {
+    "description": "Clear logs button label"
+  },
+  "confirmStopAction": "Confirm Stop",
+  "@confirmStopAction": {
+    "description": "Stop confirmation button label"
+  },
+  "experimentStarted": "Experiment started",
+  "@experimentStarted": {
+    "description": "Start experiment success toast"
+  },
+  "experimentPaused": "Experiment paused",
+  "@experimentPaused": {
+    "description": "Pause experiment success toast"
+  },
+  "experimentResumed": "Experiment resumed",
+  "@experimentResumed": {
+    "description": "Resume experiment success toast"
+  },
+  "methodLoaded": "Method loaded",
+  "@methodLoaded": {
+    "description": "Load method success toast"
+  },
+  "operationFailed": "Operation failed",
+  "@operationFailed": {
+    "description": "Generic operation failure toast"
+  },
+  "statusCompletedHint": "Experiment completed",
+  "@statusCompletedHint": {
+    "description": "Status subtitle when experiment is completed"
+  },
+  "statusRunningHint": "Experiment running",
+  "@statusRunningHint": {
+    "description": "Status subtitle when experiment is running"
+  },
+  "statusAbortedHint": "Experiment aborted",
+  "@statusAbortedHint": {
+    "description": "Status subtitle when experiment is aborted"
+  },
+  "startedLabel": "Started",
+  "@startedLabel": {
+    "description": "Start time label in completed info"
+  },
+  "endedLabel": "Ended",
+  "@endedLabel": {
+    "description": "End time label in completed info"
+  },
+  "totalDurationLabel": "Total Duration",
+  "@totalDurationLabel": {
+    "description": "Total duration label in completed info"
   }
 }

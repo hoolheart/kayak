@@ -1023,4 +1023,114 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get paramsNotPersistedWarning =>
       'Note: Parameter values are for reference in this session only and will not be persisted in this version.';
+
+  @override
+  String get backToList => 'Back to list';
+
+  @override
+  String get statusLabel => 'Status';
+
+  @override
+  String get elapsedLabel => 'Elapsed';
+
+  @override
+  String get elapsedPaused => 'Paused';
+
+  @override
+  String get methodLabel => 'Method';
+
+  @override
+  String get experimentNotFound => 'Experiment not found';
+
+  @override
+  String get experimentNotFoundHint =>
+      'Invalid experiment ID, please check the link or go back to the list';
+
+  @override
+  String get experimentNoPermission =>
+      'No permission to access this experiment';
+
+  @override
+  String get actionLoad => 'Load';
+
+  @override
+  String get actionStart => 'Start';
+
+  @override
+  String get actionPause => 'Pause';
+
+  @override
+  String get actionResume => 'Resume';
+
+  @override
+  String get actionStop => 'Stop';
+
+  @override
+  String get wsDisconnected => 'Disconnected';
+
+  @override
+  String get wsConnecting => 'Connecting...';
+
+  @override
+  String get wsConnected => 'Connected';
+
+  @override
+  String get wsReconnecting => 'Reconnecting';
+
+  @override
+  String get wsFailed => 'Connection failed';
+
+  @override
+  String get wsReconnect => 'Reconnect';
+
+  @override
+  String get logEmptyTitle => 'Waiting for logs...';
+
+  @override
+  String get logEmptyHint => 'Logs will appear when experiment starts';
+
+  @override
+  String get newLogsLabel => 'new logs';
+
+  @override
+  String get filterAllLabel => 'All';
+
+  @override
+  String get clearLogsLabel => 'Clear';
+
+  @override
+  String get confirmStopAction => 'Confirm Stop';
+
+  @override
+  String get experimentStarted => 'Experiment started';
+
+  @override
+  String get experimentPaused => 'Experiment paused';
+
+  @override
+  String get experimentResumed => 'Experiment resumed';
+
+  @override
+  String get methodLoaded => 'Method loaded';
+
+  @override
+  String get operationFailed => 'Operation failed';
+
+  @override
+  String get statusCompletedHint => 'Experiment completed';
+
+  @override
+  String get statusRunningHint => 'Experiment running';
+
+  @override
+  String get statusAbortedHint => 'Experiment aborted';
+
+  @override
+  String get startedLabel => 'Started';
+
+  @override
+  String get endedLabel => 'Ended';
+
+  @override
+  String get totalDurationLabel => 'Total Duration';
 }

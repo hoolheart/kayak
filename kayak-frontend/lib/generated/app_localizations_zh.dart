@@ -1007,4 +1007,112 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get paramsNotPersistedWarning => '注意：参数值仅供本次创建参考，当前版本暂不支持参数存储。';
+
+  @override
+  String get backToList => '返回列表';
+
+  @override
+  String get statusLabel => '状态';
+
+  @override
+  String get elapsedLabel => '已运行';
+
+  @override
+  String get elapsedPaused => '已暂停';
+
+  @override
+  String get methodLabel => '方法';
+
+  @override
+  String get experimentNotFound => '试验未找到';
+
+  @override
+  String get experimentNotFoundHint => '无效的试验 ID，请检查链接或返回列表';
+
+  @override
+  String get experimentNoPermission => '没有权限访问该试验';
+
+  @override
+  String get actionLoad => '载入';
+
+  @override
+  String get actionStart => '开始';
+
+  @override
+  String get actionPause => '暂停';
+
+  @override
+  String get actionResume => '继续';
+
+  @override
+  String get actionStop => '停止';
+
+  @override
+  String get wsDisconnected => '已断开';
+
+  @override
+  String get wsConnecting => '连接中...';
+
+  @override
+  String get wsConnected => '已连接';
+
+  @override
+  String get wsReconnecting => '重连中';
+
+  @override
+  String get wsFailed => '连接失败';
+
+  @override
+  String get wsReconnect => '重新连接';
+
+  @override
+  String get logEmptyTitle => '等待日志...';
+
+  @override
+  String get logEmptyHint => '试验开始后日志将显示在这里';
+
+  @override
+  String get newLogsLabel => '条新日志';
+
+  @override
+  String get filterAllLabel => '全部';
+
+  @override
+  String get clearLogsLabel => '清空日志';
+
+  @override
+  String get confirmStopAction => '确认停止';
+
+  @override
+  String get experimentStarted => '试验已开始';
+
+  @override
+  String get experimentPaused => '试验已暂停';
+
+  @override
+  String get experimentResumed => '试验已继续';
+
+  @override
+  String get methodLoaded => '方法已载入';
+
+  @override
+  String get operationFailed => '操作失败';
+
+  @override
+  String get statusCompletedHint => '试验已完成';
+
+  @override
+  String get statusRunningHint => '试验运行中';
+
+  @override
+  String get statusAbortedHint => '试验已中止';
+
+  @override
+  String get startedLabel => '开始时间';
+
+  @override
+  String get endedLabel => '结束时间';
+
+  @override
+  String get totalDurationLabel => '总运行时长';
 }

@@ -1388,5 +1388,150 @@
   "paramsNotPersistedWarning": "注意：参数值仅供本次创建参考，当前版本暂不支持参数存储。",
   "@paramsNotPersistedWarning": {
     "description": "步骤 3 和步骤 4 中提示参数暂不持久化的警告"
+  },
+
+  "backToList": "返回列表",
+  "@backToList": {
+    "description": "返回按钮在试验控制台的提示"
+  },
+  "statusLabel": "状态",
+  "@statusLabel": {
+    "description": "试验控制台状态标签"
+  },
+  "elapsedLabel": "已运行",
+  "@elapsedLabel": {
+    "description": "运行中试验的计时器标签"
+  },
+  "elapsedPaused": "已暂停",
+  "@elapsedPaused": {
+    "description": "暂停时计时器标签"
+  },
+  "methodLabel": "方法",
+  "@methodLabel": {
+    "description": "试验信息卡方法标签"
+  },
+  "experimentNotFound": "试验未找到",
+  "@experimentNotFound": {
+    "description": "试验未找到错误标题"
+  },
+  "experimentNotFoundHint": "无效的试验 ID，请检查链接或返回列表",
+  "@experimentNotFoundHint": {
+    "description": "试验未找到错误描述"
+  },
+  "experimentNoPermission": "没有权限访问该试验",
+  "@experimentNoPermission": {
+    "description": "无权限错误标题"
+  },
+  "actionLoad": "载入",
+  "@actionLoad": {
+    "description": "载入方法按钮"
+  },
+  "actionStart": "开始",
+  "@actionStart": {
+    "description": "开始试验按钮"
+  },
+  "actionPause": "暂停",
+  "@actionPause": {
+    "description": "暂停试验按钮"
+  },
+  "actionResume": "继续",
+  "@actionResume": {
+    "description": "继续试验按钮"
+  },
+  "actionStop": "停止",
+  "@actionStop": {
+    "description": "停止试验按钮"
+  },
+  "wsDisconnected": "已断开",
+  "@wsDisconnected": {
+    "description": "WebSocket 已断开状态"
+  },
+  "wsConnecting": "连接中...",
+  "@wsConnecting": {
+    "description": "WebSocket 连接中状态"
+  },
+  "wsConnected": "已连接",
+  "@wsConnected": {
+    "description": "WebSocket 已连接状态"
+  },
+  "wsReconnecting": "重连中",
+  "@wsReconnecting": {
+    "description": "WebSocket 重连中状态"
+  },
+  "wsFailed": "连接失败",
+  "@wsFailed": {
+    "description": "WebSocket 连接失败状态"
+  },
+  "wsReconnect": "重新连接",
+  "@wsReconnect": {
+    "description": "WebSocket 重新连接按钮"
+  },
+  "logEmptyTitle": "等待日志...",
+  "@logEmptyTitle": {
+    "description": "日志空状态标题"
+  },
+  "logEmptyHint": "试验开始后日志将显示在这里",
+  "@logEmptyHint": {
+    "description": "日志空状态描述"
+  },
+  "newLogsLabel": "条新日志",
+  "@newLogsLabel": {
+    "description": "新日志浮动按钮标签"
+  },
+  "filterAllLabel": "全部",
+  "@filterAllLabel": {
+    "description": "日志级别筛选：全部显示"
+  },
+  "clearLogsLabel": "清空日志",
+  "@clearLogsLabel": {
+    "description": "清空日志按钮"
+  },
+  "confirmStopAction": "确认停止",
+  "@confirmStopAction": {
+    "description": "停止确认按钮"
+  },
+  "experimentStarted": "试验已开始",
+  "@experimentStarted": {
+    "description": "开始试验成功提示"
+  },
+  "experimentPaused": "试验已暂停",
+  "@experimentPaused": {
+    "description": "暂停试验成功提示"
+  },
+  "experimentResumed": "试验已继续",
+  "@experimentResumed": {
+    "description": "继续试验成功提示"
+  },
+  "methodLoaded": "方法已载入",
+  "@methodLoaded": {
+    "description": "载入方法成功提示"
+  },
+  "operationFailed": "操作失败",
+  "@operationFailed": {
+    "description": "通用操作失败提示"
+  },
+  "statusCompletedHint": "试验已完成",
+  "@statusCompletedHint": {
+    "description": "完成状态副标题"
+  },
+  "statusRunningHint": "试验运行中",
+  "@statusRunningHint": {
+    "description": "运行中状态副标题"
+  },
+  "statusAbortedHint": "试验已中止",
+  "@statusAbortedHint": {
+    "description": "中止状态副标题"
+  },
+  "startedLabel": "开始时间",
+  "@startedLabel": {
+    "description": "完成信息的开始时间标签"
+  },
+  "endedLabel": "结束时间",
+  "@endedLabel": {
+    "description": "完成信息的结束时间标签"
+  },
+  "totalDurationLabel": "总运行时长",
+  "@totalDurationLabel": {
+    "description": "完成信息的总时长标签"
   }
 }
