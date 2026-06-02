@@ -1161,5 +1161,228 @@
   "methodNotSet": "—",
   "@methodNotSet": {
     "description": "Placeholder for no method set"
+  },
+
+  "createExperimentTitle": "Create Experiment",
+  "@createExperimentTitle": {
+    "description": "Experiment create page title"
+  },
+  "stepSelectWorkbench": "Select Workbench",
+  "@stepSelectWorkbench": {
+    "description": "Stepper step 1 label"
+  },
+  "stepSelectMethod": "Select Method",
+  "@stepSelectMethod": {
+    "description": "Stepper step 2 label"
+  },
+  "stepConfigureParams": "Configure Parameters",
+  "@stepConfigureParams": {
+    "description": "Stepper step 3 label"
+  },
+  "stepConfirm": "Confirm",
+  "@stepConfirm": {
+    "description": "Stepper step 4 label"
+  },
+  "stepWorkbenchShort": "Workbench",
+  "@stepWorkbenchShort": {
+    "description": "Stepper step 1 short label (mobile)"
+  },
+  "stepMethodShort": "Method",
+  "@stepMethodShort": {
+    "description": "Stepper step 2 short label (mobile)"
+  },
+  "stepParamsShort": "Parameters",
+  "@stepParamsShort": {
+    "description": "Stepper step 3 short label (mobile)"
+  },
+  "stepConfirmShort": "Confirm",
+  "@stepConfirmShort": {
+    "description": "Stepper step 4 short label (mobile)"
+  },
+  "selectWorkbenchTitle": "Select Workbench",
+  "@selectWorkbenchTitle": {
+    "description": "Step 1 section title"
+  },
+  "selectWorkbenchSubtitle": "Please select a workbench for this experiment",
+  "@selectWorkbenchSubtitle": {
+    "description": "Step 1 section subtitle"
+  },
+  "noWorkbenchesTitle": "No workbenches yet",
+  "@noWorkbenchesTitle": {
+    "description": "Step 1 empty state title"
+  },
+  "noWorkbenchesDescription": "Create your first workbench by clicking the button below",
+  "@noWorkbenchesDescription": {
+    "description": "Step 1 empty state description"
+  },
+  "createFirstWorkbench": "Create Your First Workbench",
+  "@createFirstWorkbench": {
+    "description": "Step 1 empty state action button"
+  },
+  "loadWorkbenchesFailed": "Failed to load workbenches",
+  "@loadWorkbenchesFailed": {
+    "description": "Step 1 error state title"
+  },
+  "loadWorkbenchesFailedHint": "Please check your network and try again",
+  "@loadWorkbenchesFailedHint": {
+    "description": "Step 1 error state hint"
+  },
+  "deviceCount": "{count} devices",
+  "@deviceCount": {
+    "description": "Device count on workbench card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "selectMethodTitle": "Select Method",
+  "@selectMethodTitle": {
+    "description": "Step 2 section title"
+  },
+  "selectMethodSubtitle": "Please select a method for this experiment",
+  "@selectMethodSubtitle": {
+    "description": "Step 2 section subtitle"
+  },
+  "noMethodsTitle": "No methods available",
+  "@noMethodsTitle": {
+    "description": "Step 2 empty state title"
+  },
+  "noMethodsDescription": "Please create an experiment method first",
+  "@noMethodsDescription": {
+    "description": "Step 2 empty state description"
+  },
+  "goToMethods": "Go to Methods",
+  "@goToMethods": {
+    "description": "Step 2 empty state action button"
+  },
+  "loadMethodsFailed": "Failed to load methods",
+  "@loadMethodsFailed": {
+    "description": "Step 2 error state title"
+  },
+  "loadMethodsFailedHint": "Please check your network and try again",
+  "@loadMethodsFailedHint": {
+    "description": "Step 2 error state hint"
+  },
+  "paramCount": "{count} parameters",
+  "@paramCount": {
+    "description": "Method parameter count on card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "configureParamsTitle": "Configure Parameters",
+  "@configureParamsTitle": {
+    "description": "Step 3 section title"
+  },
+  "configureParamsSubtitle": "Configure the parameters for the selected method",
+  "@configureParamsSubtitle": {
+    "description": "Step 3 section subtitle"
+  },
+  "noParamsRequired": "No parameters required",
+  "@noParamsRequired": {
+    "description": "Info banner when method has no parameters"
+  },
+  "noParamsHint": "Click Next to continue",
+  "@noParamsHint": {
+    "description": "Info banner hint text"
+  },
+  "confirmTitle": "Confirm",
+  "@confirmTitle": {
+    "description": "Step 4 section title"
+  },
+  "confirmSubtitle": "Please confirm the following information",
+  "@confirmSubtitle": {
+    "description": "Step 4 section subtitle"
+  },
+  "summaryWorkbench": "Workbench",
+  "@summaryWorkbench": {
+    "description": "Summary section label for workbench"
+  },
+  "summaryMethod": "Experiment Method",
+  "@summaryMethod": {
+    "description": "Summary section label for method"
+  },
+  "summaryParams": "Parameter Configuration",
+  "@summaryParams": {
+    "description": "Summary section label for parameters"
+  },
+  "createWarning": "The experiment will start running immediately after creation",
+  "@createWarning": {
+    "description": "Warning text before creation"
+  },
+  "nextStep": "Next",
+  "@nextStep": {
+    "description": "Next step button"
+  },
+  "previousStep": "Back",
+  "@previousStep": {
+    "description": "Previous step button"
+  },
+  "creating": "Creating...",
+  "@creating": {
+    "description": "Creating button loading state"
+  },
+  "createExperimentSuccess": "Experiment created successfully",
+  "@createExperimentSuccess": {
+    "description": "Create experiment success toast"
+  },
+  "createExperimentFailed": "Failed to create experiment: {reason}",
+  "@createExperimentFailed": {
+    "description": "Create experiment failure toast",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "fieldRequiredValidation": "This field is required",
+  "@fieldRequiredValidation": {
+    "description": "Validation error for required form field"
+  },
+  "mustBeInteger": "Must be an integer",
+  "@mustBeInteger": {
+    "description": "Integer type validation error"
+  },
+  "cannotBeLessThan": "Cannot be less than {min}",
+  "@cannotBeLessThan": {
+    "description": "Range validation: less than minimum",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "-40"
+      }
+    }
+  },
+  "cannotBeGreaterThan": "Cannot be greater than {max}",
+  "@cannotBeGreaterThan": {
+    "description": "Range validation: greater than maximum",
+    "placeholders": {
+      "max": {
+        "type": "String",
+        "example": "150"
+      }
+    }
+  },
+  "invalidFormat": "Invalid format",
+  "@invalidFormat": {
+    "description": "Generic format validation error"
+  },
+  "unnamedWorkbench": "Unnamed Workbench",
+  "@unnamedWorkbench": {
+    "description": "Fallback when workbench name is null"
+  },
+  "unnamedMethod": "Unnamed Method",
+  "@unnamedMethod": {
+    "description": "Fallback when method name is null"
+  },
+  "createTooltipIncomplete": "Please select a workbench and method first",
+  "@createTooltipIncomplete": {
+    "description": "Tooltip when create button is disabled"
   }
 }

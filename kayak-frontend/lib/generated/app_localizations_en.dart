@@ -858,4 +858,165 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get methodNotSet => '—';
+
+  @override
+  String get createExperimentTitle => 'Create Experiment';
+
+  @override
+  String get stepSelectWorkbench => 'Select Workbench';
+
+  @override
+  String get stepSelectMethod => 'Select Method';
+
+  @override
+  String get stepConfigureParams => 'Configure Parameters';
+
+  @override
+  String get stepConfirm => 'Confirm';
+
+  @override
+  String get stepWorkbenchShort => 'Workbench';
+
+  @override
+  String get stepMethodShort => 'Method';
+
+  @override
+  String get stepParamsShort => 'Parameters';
+
+  @override
+  String get stepConfirmShort => 'Confirm';
+
+  @override
+  String get selectWorkbenchTitle => 'Select Workbench';
+
+  @override
+  String get selectWorkbenchSubtitle =>
+      'Please select a workbench for this experiment';
+
+  @override
+  String get noWorkbenchesTitle => 'No workbenches yet';
+
+  @override
+  String get noWorkbenchesDescription =>
+      'Create your first workbench by clicking the button below';
+
+  @override
+  String get createFirstWorkbench => 'Create Your First Workbench';
+
+  @override
+  String get loadWorkbenchesFailed => 'Failed to load workbenches';
+
+  @override
+  String get loadWorkbenchesFailedHint =>
+      'Please check your network and try again';
+
+  @override
+  String deviceCount(int count) {
+    return '$count devices';
+  }
+
+  @override
+  String get selectMethodTitle => 'Select Method';
+
+  @override
+  String get selectMethodSubtitle =>
+      'Please select a method for this experiment';
+
+  @override
+  String get noMethodsTitle => 'No methods available';
+
+  @override
+  String get noMethodsDescription => 'Please create an experiment method first';
+
+  @override
+  String get goToMethods => 'Go to Methods';
+
+  @override
+  String get loadMethodsFailed => 'Failed to load methods';
+
+  @override
+  String get loadMethodsFailedHint => 'Please check your network and try again';
+
+  @override
+  String paramCount(int count) {
+    return '$count parameters';
+  }
+
+  @override
+  String get configureParamsTitle => 'Configure Parameters';
+
+  @override
+  String get configureParamsSubtitle =>
+      'Configure the parameters for the selected method';
+
+  @override
+  String get noParamsRequired => 'No parameters required';
+
+  @override
+  String get noParamsHint => 'Click Next to continue';
+
+  @override
+  String get confirmTitle => 'Confirm';
+
+  @override
+  String get confirmSubtitle => 'Please confirm the following information';
+
+  @override
+  String get summaryWorkbench => 'Workbench';
+
+  @override
+  String get summaryMethod => 'Experiment Method';
+
+  @override
+  String get summaryParams => 'Parameter Configuration';
+
+  @override
+  String get createWarning =>
+      'The experiment will start running immediately after creation';
+
+  @override
+  String get nextStep => 'Next';
+
+  @override
+  String get previousStep => 'Back';
+
+  @override
+  String get creating => 'Creating...';
+
+  @override
+  String get createExperimentSuccess => 'Experiment created successfully';
+
+  @override
+  String createExperimentFailed(String reason) {
+    return 'Failed to create experiment: $reason';
+  }
+
+  @override
+  String get fieldRequiredValidation => 'This field is required';
+
+  @override
+  String get mustBeInteger => 'Must be an integer';
+
+  @override
+  String cannotBeLessThan(String min) {
+    return 'Cannot be less than $min';
+  }
+
+  @override
+  String cannotBeGreaterThan(String max) {
+    return 'Cannot be greater than $max';
+  }
+
+  @override
+  String get invalidFormat => 'Invalid format';
+
+  @override
+  String get unnamedWorkbench => 'Unnamed Workbench';
+
+  @override
+  String get unnamedMethod => 'Unnamed Method';
+
+  @override
+  String get createTooltipIncomplete =>
+      'Please select a workbench and method first';
 }

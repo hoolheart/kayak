@@ -16,6 +16,27 @@ class MethodService {
 
   final ApiClient _client;
 
+  /// 获取方法列表
+  ///
+  /// 调用 `GET /api/v1/methods`。
+  ///
+  /// 返回 [List]<[Method]> 方法列表。
+  /// 如果请求失败，抛出 [DioException]。
+  Future<List<Method>> list() async {
+    final response = await _client.get(
+      '/api/v1/methods',
+    );
+
+    final apiResponse = ApiResponse<List<Method>>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => (json as List<dynamic>)
+          .map((e) => Method.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+    return apiResponse.data;
+  }
+
   /// 根据 ID 获取方法详情
   ///
   /// 调用 `GET /api/v1/methods/{id}`。

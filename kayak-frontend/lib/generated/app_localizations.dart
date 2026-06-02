@@ -1747,6 +1747,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'—'**
   String get methodNotSet;
+
+  /// Experiment create page title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Experiment'**
+  String get createExperimentTitle;
+
+  /// Stepper step 1 label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Workbench'**
+  String get stepSelectWorkbench;
+
+  /// Stepper step 2 label
+  ///
+  /// In en, this message translates to:
+  /// **'Select Method'**
+  String get stepSelectMethod;
+
+  /// Stepper step 3 label
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Parameters'**
+  String get stepConfigureParams;
+
+  /// Stepper step 4 label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get stepConfirm;
+
+  /// Stepper step 1 short label (mobile)
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench'**
+  String get stepWorkbenchShort;
+
+  /// Stepper step 2 short label (mobile)
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get stepMethodShort;
+
+  /// Stepper step 3 short label (mobile)
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get stepParamsShort;
+
+  /// Stepper step 4 short label (mobile)
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get stepConfirmShort;
+
+  /// Step 1 section title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Workbench'**
+  String get selectWorkbenchTitle;
+
+  /// Step 1 section subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a workbench for this experiment'**
+  String get selectWorkbenchSubtitle;
+
+  /// Step 1 empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No workbenches yet'**
+  String get noWorkbenchesTitle;
+
+  /// Step 1 empty state description
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first workbench by clicking the button below'**
+  String get noWorkbenchesDescription;
+
+  /// Step 1 empty state action button
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your First Workbench'**
+  String get createFirstWorkbench;
+
+  /// Step 1 error state title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load workbenches'**
+  String get loadWorkbenchesFailed;
+
+  /// Step 1 error state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network and try again'**
+  String get loadWorkbenchesFailedHint;
+
+  /// Device count on workbench card
+  ///
+  /// In en, this message translates to:
+  /// **'{count} devices'**
+  String deviceCount(int count);
+
+  /// Step 2 section title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Method'**
+  String get selectMethodTitle;
+
+  /// Step 2 section subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a method for this experiment'**
+  String get selectMethodSubtitle;
+
+  /// Step 2 empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No methods available'**
+  String get noMethodsTitle;
+
+  /// Step 2 empty state description
+  ///
+  /// In en, this message translates to:
+  /// **'Please create an experiment method first'**
+  String get noMethodsDescription;
+
+  /// Step 2 empty state action button
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Methods'**
+  String get goToMethods;
+
+  /// Step 2 error state title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load methods'**
+  String get loadMethodsFailed;
+
+  /// Step 2 error state hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network and try again'**
+  String get loadMethodsFailedHint;
+
+  /// Method parameter count on card
+  ///
+  /// In en, this message translates to:
+  /// **'{count} parameters'**
+  String paramCount(int count);
+
+  /// Step 3 section title
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Parameters'**
+  String get configureParamsTitle;
+
+  /// Step 3 section subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Configure the parameters for the selected method'**
+  String get configureParamsSubtitle;
+
+  /// Info banner when method has no parameters
+  ///
+  /// In en, this message translates to:
+  /// **'No parameters required'**
+  String get noParamsRequired;
+
+  /// Info banner hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Click Next to continue'**
+  String get noParamsHint;
+
+  /// Step 4 section title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmTitle;
+
+  /// Step 4 section subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm the following information'**
+  String get confirmSubtitle;
+
+  /// Summary section label for workbench
+  ///
+  /// In en, this message translates to:
+  /// **'Workbench'**
+  String get summaryWorkbench;
+
+  /// Summary section label for method
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment Method'**
+  String get summaryMethod;
+
+  /// Summary section label for parameters
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter Configuration'**
+  String get summaryParams;
+
+  /// Warning text before creation
+  ///
+  /// In en, this message translates to:
+  /// **'The experiment will start running immediately after creation'**
+  String get createWarning;
+
+  /// Next step button
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextStep;
+
+  /// Previous step button
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get previousStep;
+
+  /// Creating button loading state
+  ///
+  /// In en, this message translates to:
+  /// **'Creating...'**
+  String get creating;
+
+  /// Create experiment success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment created successfully'**
+  String get createExperimentSuccess;
+
+  /// Create experiment failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create experiment: {reason}'**
+  String createExperimentFailed(String reason);
+
+  /// Validation error for required form field
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequiredValidation;
+
+  /// Integer type validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Must be an integer'**
+  String get mustBeInteger;
+
+  /// Range validation: less than minimum
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be less than {min}'**
+  String cannotBeLessThan(String min);
+
+  /// Range validation: greater than maximum
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be greater than {max}'**
+  String cannotBeGreaterThan(String max);
+
+  /// Generic format validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid format'**
+  String get invalidFormat;
+
+  /// Fallback when workbench name is null
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed Workbench'**
+  String get unnamedWorkbench;
+
+  /// Fallback when method name is null
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed Method'**
+  String get unnamedMethod;
+
+  /// Tooltip when create button is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a workbench and method first'**
+  String get createTooltipIncomplete;
 }
 
 class _AppLocalizationsDelegate

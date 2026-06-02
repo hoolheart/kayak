@@ -850,4 +850,158 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get methodNotSet => '—';
+
+  @override
+  String get createExperimentTitle => '创建试验';
+
+  @override
+  String get stepSelectWorkbench => '选择工作台';
+
+  @override
+  String get stepSelectMethod => '选择方法';
+
+  @override
+  String get stepConfigureParams => '配置参数';
+
+  @override
+  String get stepConfirm => '确认创建';
+
+  @override
+  String get stepWorkbenchShort => '工作台';
+
+  @override
+  String get stepMethodShort => '方法';
+
+  @override
+  String get stepParamsShort => '参数';
+
+  @override
+  String get stepConfirmShort => '确认';
+
+  @override
+  String get selectWorkbenchTitle => '选择工作台';
+
+  @override
+  String get selectWorkbenchSubtitle => '请选择一个工作台用于本次试验';
+
+  @override
+  String get noWorkbenchesTitle => '您还没有工作台';
+
+  @override
+  String get noWorkbenchesDescription => '点击下方按钮创建您的第一个工作台';
+
+  @override
+  String get createFirstWorkbench => '创建第一个工作台';
+
+  @override
+  String get loadWorkbenchesFailed => '加载工作台列表失败';
+
+  @override
+  String get loadWorkbenchesFailedHint => '请检查网络后点击重试';
+
+  @override
+  String deviceCount(int count) {
+    return '$count 台设备';
+  }
+
+  @override
+  String get selectMethodTitle => '选择方法';
+
+  @override
+  String get selectMethodSubtitle => '请选择一个试验方法';
+
+  @override
+  String get noMethodsTitle => '暂无可用方法';
+
+  @override
+  String get noMethodsDescription => '请先创建试验方法';
+
+  @override
+  String get goToMethods => '前往方法管理';
+
+  @override
+  String get loadMethodsFailed => '加载方法列表失败';
+
+  @override
+  String get loadMethodsFailedHint => '请检查网络后点击重试';
+
+  @override
+  String paramCount(int count) {
+    return '$count 个参数';
+  }
+
+  @override
+  String get configureParamsTitle => '配置参数';
+
+  @override
+  String get configureParamsSubtitle => '请配置所选方法的参数';
+
+  @override
+  String get noParamsRequired => '该方法无需配置参数';
+
+  @override
+  String get noParamsHint => '点击下一步继续';
+
+  @override
+  String get confirmTitle => '确认创建';
+
+  @override
+  String get confirmSubtitle => '请确认以下信息无误';
+
+  @override
+  String get summaryWorkbench => '工作台';
+
+  @override
+  String get summaryMethod => '试验方法';
+
+  @override
+  String get summaryParams => '参数配置';
+
+  @override
+  String get createWarning => '创建后试验将立即开始运行';
+
+  @override
+  String get nextStep => '下一步';
+
+  @override
+  String get previousStep => '上一步';
+
+  @override
+  String get creating => '创建中...';
+
+  @override
+  String get createExperimentSuccess => '试验创建成功';
+
+  @override
+  String createExperimentFailed(String reason) {
+    return '创建试验失败：$reason';
+  }
+
+  @override
+  String get fieldRequiredValidation => '此字段为必填项';
+
+  @override
+  String get mustBeInteger => '必须为整数';
+
+  @override
+  String cannotBeLessThan(String min) {
+    return '不能小于 $min';
+  }
+
+  @override
+  String cannotBeGreaterThan(String max) {
+    return '不能大于 $max';
+  }
+
+  @override
+  String get invalidFormat => '格式不正确';
+
+  @override
+  String get unnamedWorkbench => '未命名工作台';
+
+  @override
+  String get unnamedMethod => '未命名方法';
+
+  @override
+  String get createTooltipIncomplete => '请先选择工作台和方法';
 }

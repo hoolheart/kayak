@@ -16,6 +16,9 @@ Method _$MethodFromJson(Map<String, dynamic> json) => Method(
   createdBy: json['created_by'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
   updatedAt: DateTime.parse(json['updated_at'] as String),
+  parameters: (json['parameters'] as List<dynamic>?)
+      ?.map((e) => MethodParameter.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$MethodToJson(Method instance) => <String, dynamic>{
@@ -28,6 +31,8 @@ Map<String, dynamic> _$MethodToJson(Method instance) => <String, dynamic>{
   'created_by': instance.createdBy,
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
+  if (instance.parameters != null)
+    'parameters': instance.parameters!.map((e) => e.toJson()).toList(),
 };
 
 MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
@@ -37,6 +42,13 @@ MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
       label: json['label'] as String?,
       defaultValue: json['default_value'],
       isRequired: json['required'] as bool? ?? false,
+      unit: json['unit'] as String?,
+      description: json['description'] as String?,
+      min: (json['min'] as num?)?.toDouble(),
+      max: (json['max'] as num?)?.toDouble(),
+      options: (json['options'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
     );
 
 Map<String, dynamic> _$MethodParameterToJson(MethodParameter instance) =>
@@ -46,4 +58,9 @@ Map<String, dynamic> _$MethodParameterToJson(MethodParameter instance) =>
       'label': instance.label,
       'default_value': instance.defaultValue,
       'required': instance.isRequired,
+      'unit': instance.unit,
+      'description': instance.description,
+      'min': instance.min,
+      'max': instance.max,
+      'options': instance.options,
     };

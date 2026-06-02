@@ -1161,5 +1161,228 @@
   "methodNotSet": "—",
   "@methodNotSet": {
     "description": "未设置方法占位符"
+  },
+
+  "createExperimentTitle": "创建试验",
+  "@createExperimentTitle": {
+    "description": "试验创建页面标题"
+  },
+  "stepSelectWorkbench": "选择工作台",
+  "@stepSelectWorkbench": {
+    "description": "步骤 1 标签"
+  },
+  "stepSelectMethod": "选择方法",
+  "@stepSelectMethod": {
+    "description": "步骤 2 标签"
+  },
+  "stepConfigureParams": "配置参数",
+  "@stepConfigureParams": {
+    "description": "步骤 3 标签"
+  },
+  "stepConfirm": "确认创建",
+  "@stepConfirm": {
+    "description": "步骤 4 标签"
+  },
+  "stepWorkbenchShort": "工作台",
+  "@stepWorkbenchShort": {
+    "description": "移动端步骤 1 短标签"
+  },
+  "stepMethodShort": "方法",
+  "@stepMethodShort": {
+    "description": "移动端步骤 2 短标签"
+  },
+  "stepParamsShort": "参数",
+  "@stepParamsShort": {
+    "description": "移动端步骤 3 短标签"
+  },
+  "stepConfirmShort": "确认",
+  "@stepConfirmShort": {
+    "description": "移动端步骤 4 短标签"
+  },
+  "selectWorkbenchTitle": "选择工作台",
+  "@selectWorkbenchTitle": {
+    "description": "步骤 1 小节标题"
+  },
+  "selectWorkbenchSubtitle": "请选择一个工作台用于本次试验",
+  "@selectWorkbenchSubtitle": {
+    "description": "步骤 1 小节副标题"
+  },
+  "noWorkbenchesTitle": "您还没有工作台",
+  "@noWorkbenchesTitle": {
+    "description": "步骤 1 空状态标题"
+  },
+  "noWorkbenchesDescription": "点击下方按钮创建您的第一个工作台",
+  "@noWorkbenchesDescription": {
+    "description": "步骤 1 空状态描述"
+  },
+  "createFirstWorkbench": "创建第一个工作台",
+  "@createFirstWorkbench": {
+    "description": "步骤 1 空状态操作按钮"
+  },
+  "loadWorkbenchesFailed": "加载工作台列表失败",
+  "@loadWorkbenchesFailed": {
+    "description": "步骤 1 错误状态标题"
+  },
+  "loadWorkbenchesFailedHint": "请检查网络后点击重试",
+  "@loadWorkbenchesFailedHint": {
+    "description": "步骤 1 错误状态提示"
+  },
+  "deviceCount": "{count} 台设备",
+  "@deviceCount": {
+    "description": "工作台卡片设备数量",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "selectMethodTitle": "选择方法",
+  "@selectMethodTitle": {
+    "description": "步骤 2 小节标题"
+  },
+  "selectMethodSubtitle": "请选择一个试验方法",
+  "@selectMethodSubtitle": {
+    "description": "步骤 2 小节副标题"
+  },
+  "noMethodsTitle": "暂无可用方法",
+  "@noMethodsTitle": {
+    "description": "步骤 2 空状态标题"
+  },
+  "noMethodsDescription": "请先创建试验方法",
+  "@noMethodsDescription": {
+    "description": "步骤 2 空状态描述"
+  },
+  "goToMethods": "前往方法管理",
+  "@goToMethods": {
+    "description": "步骤 2 空状态操作按钮"
+  },
+  "loadMethodsFailed": "加载方法列表失败",
+  "@loadMethodsFailed": {
+    "description": "步骤 2 错误状态标题"
+  },
+  "loadMethodsFailedHint": "请检查网络后点击重试",
+  "@loadMethodsFailedHint": {
+    "description": "步骤 2 错误状态提示"
+  },
+  "paramCount": "{count} 个参数",
+  "@paramCount": {
+    "description": "方法卡片参数数量",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "configureParamsTitle": "配置参数",
+  "@configureParamsTitle": {
+    "description": "步骤 3 小节标题"
+  },
+  "configureParamsSubtitle": "请配置所选方法的参数",
+  "@configureParamsSubtitle": {
+    "description": "步骤 3 小节副标题"
+  },
+  "noParamsRequired": "该方法无需配置参数",
+  "@noParamsRequired": {
+    "description": "无参数方法信息横幅"
+  },
+  "noParamsHint": "点击下一步继续",
+  "@noParamsHint": {
+    "description": "信息横幅提示文本"
+  },
+  "confirmTitle": "确认创建",
+  "@confirmTitle": {
+    "description": "步骤 4 小节标题"
+  },
+  "confirmSubtitle": "请确认以下信息无误",
+  "@confirmSubtitle": {
+    "description": "步骤 4 小节副标题"
+  },
+  "summaryWorkbench": "工作台",
+  "@summaryWorkbench": {
+    "description": "摘要区域工作台标签"
+  },
+  "summaryMethod": "试验方法",
+  "@summaryMethod": {
+    "description": "摘要区域方法标签"
+  },
+  "summaryParams": "参数配置",
+  "@summaryParams": {
+    "description": "摘要区域参数标签"
+  },
+  "createWarning": "创建后试验将立即开始运行",
+  "@createWarning": {
+    "description": "创建前警告文本"
+  },
+  "nextStep": "下一步",
+  "@nextStep": {
+    "description": "下一步按钮"
+  },
+  "previousStep": "上一步",
+  "@previousStep": {
+    "description": "上一步按钮"
+  },
+  "creating": "创建中...",
+  "@creating": {
+    "description": "创建按钮加载状态"
+  },
+  "createExperimentSuccess": "试验创建成功",
+  "@createExperimentSuccess": {
+    "description": "创建试验成功提示"
+  },
+  "createExperimentFailed": "创建试验失败：{reason}",
+  "@createExperimentFailed": {
+    "description": "创建试验失败提示",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "网络错误"
+      }
+    }
+  },
+  "fieldRequiredValidation": "此字段为必填项",
+  "@fieldRequiredValidation": {
+    "description": "必填字段验证错误消息"
+  },
+  "mustBeInteger": "必须为整数",
+  "@mustBeInteger": {
+    "description": "整数类型验证错误"
+  },
+  "cannotBeLessThan": "不能小于 {min}",
+  "@cannotBeLessThan": {
+    "description": "范围验证：低于最小值",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "example": "-40"
+      }
+    }
+  },
+  "cannotBeGreaterThan": "不能大于 {max}",
+  "@cannotBeGreaterThan": {
+    "description": "范围验证：超出最大值",
+    "placeholders": {
+      "max": {
+        "type": "String",
+        "example": "150"
+      }
+    }
+  },
+  "invalidFormat": "格式不正确",
+  "@invalidFormat": {
+    "description": "通用格式验证错误"
+  },
+  "unnamedWorkbench": "未命名工作台",
+  "@unnamedWorkbench": {
+    "description": "工作台名称为空时的降级显示"
+  },
+  "unnamedMethod": "未命名方法",
+  "@unnamedMethod": {
+    "description": "方法名称为空时的降级显示"
+  },
+  "createTooltipIncomplete": "请先选择工作台和方法",
+  "@createTooltipIncomplete": {
+    "description": "创建按钮禁用时的提示"
   }
 }

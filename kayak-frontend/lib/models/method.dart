@@ -3,6 +3,24 @@ import 'package:json_annotation/json_annotation.dart';
 part 'method.g.dart';
 
 // ============================================================
+// ParameterType — 参数类型枚举
+// ============================================================
+
+/// 支持的参数类型，用于动态表单输入控件映射。
+enum ParameterType {
+  @JsonValue('number')
+  number,
+  @JsonValue('integer')
+  integer,
+  @JsonValue('string')
+  string,
+  @JsonValue('boolean')
+  boolean,
+  @JsonValue('enum')
+  enum_,
+}
+
+// ============================================================
 // Method — 试验方法实体
 // ============================================================
 @JsonSerializable()
@@ -18,6 +36,7 @@ class Method {
     required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
+    this.parameters,
   });
 
   factory Method.fromJson(Map<String, dynamic> json) => _$MethodFromJson(json);
@@ -35,6 +54,12 @@ class Method {
   final DateTime createdAt;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+
+  /// 解析后的参数列表（可选）。
+  /// 当后端返回结构化的参数列表时使用，优先于手动解析 [parameterSchema]。
+  @JsonKey(name: 'parameters')
+  final List<MethodParameter>? parameters;
+
   Map<String, dynamic> toJson() => _$MethodToJson(this);
 
   Method copyWith({
@@ -47,6 +72,7 @@ class Method {
     String? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<MethodParameter>? parameters,
   }) {
     return Method(
       id: id ?? this.id,
@@ -58,13 +84,23 @@ class Method {
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      parameters: parameters ?? this.parameters,
     );
   }
 }
 
 // ============================================================
-// MethodParameter — 方法参数
+// MethodParameter — 方法参数定义
 // ============================================================
+
+/// 方法参数定义，用于动态生成参数配置表单。
+///
+/// 支持的参数类型：
+/// - `number`: 数值（double），使用 TextFormField + 数字键盘
+/// - `integer`: 整数，使用 TextFormField + 数字键盘
+/// - `string`: 字符串，使用 TextFormField
+/// - `boolean`: 布尔值，使用 Switch
+/// - `enum`: 枚举选择，使用 DropdownButtonFormField
 @JsonSerializable()
 class MethodParameter {
 
@@ -74,17 +110,48 @@ class MethodParameter {
     this.label,
     this.defaultValue,
     this.isRequired = false,
+    this.unit,
+    this.description,
+    this.min,
+    this.max,
+    this.options,
   });
 
   factory MethodParameter.fromJson(Map<String, dynamic> json) =>
       _$MethodParameterFromJson(json);
+
+  /// 参数键名（用于提交时的 key）。
   final String key;
+
+  /// 参数类型：number / integer / string / boolean / enum。
   final String type;
+
+  /// 显示标签（供 UI 展示的字段名）。
   final String? label;
+
+  /// 默认值。
   @JsonKey(name: 'default_value')
   final Object? defaultValue;
+
+  /// 是否必填。
   @JsonKey(name: 'required', defaultValue: false)
   final bool isRequired;
+
+  /// 单位（如 °C、分钟、MPa）。
+  final String? unit;
+
+  /// 参数描述/帮助文本。
+  final String? description;
+
+  /// 最小值（仅 number/integer 类型）。
+  final num? min;
+
+  /// 最大值（仅 number/integer 类型）。
+  final num? max;
+
+  /// 可选值列表（仅 enum 类型）。
+  final List<String>? options;
+
   Map<String, dynamic> toJson() => _$MethodParameterToJson(this);
 
   MethodParameter copyWith({
@@ -93,6 +160,11 @@ class MethodParameter {
     String? label,
     Object? defaultValue,
     bool? isRequired,
+    String? unit,
+    String? description,
+    num? min,
+    num? max,
+    List<String>? options,
   }) {
     return MethodParameter(
       key: key ?? this.key,
@@ -100,6 +172,11 @@ class MethodParameter {
       label: label ?? this.label,
       defaultValue: defaultValue ?? this.defaultValue,
       isRequired: isRequired ?? this.isRequired,
+      unit: unit ?? this.unit,
+      description: description ?? this.description,
+      min: min ?? this.min,
+      max: max ?? this.max,
+      options: options ?? this.options,
     );
   }
 }
