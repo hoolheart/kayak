@@ -30,6 +30,43 @@ pub type AppState = Arc<
     >,
 >;
 
+/// Request DTO for creating an experiment
+#[derive(Debug, serde::Deserialize)]
+pub struct CreateExperimentRequestBody {
+    /// Experiment name (required)
+    pub name: String,
+    /// Associated method ID (optional)
+    pub method_id: Option<Uuid>,
+    /// Experiment description (optional)
+    pub description: Option<String>,
+}
+
+/// Create experiment handler
+///
+/// POST /api/v1/experiments
+///
+/// Creates a new experiment in Idle state.
+pub async fn create_experiment(
+    State(handler): State<AppState>,
+    RequireAuth(user_ctx): RequireAuth,
+    Json(payload): Json<CreateExperimentRequestBody>,
+) -> Result<Json<ApiResponse<ExperimentControlDto>>, AppError> {
+    let result = handler
+        .create(
+            user_ctx.user_id,
+            payload.name,
+            payload.method_id,
+            payload.description,
+        )
+        .await
+        .map_err(|e| match e {
+            ExperimentControlError::Repository(msg) => AppError::DatabaseError(msg),
+            _ => AppError::InternalError(e.to_string()),
+        })?;
+
+    Ok(Json(ApiResponse::success(result)))
+}
+
 /// Request DTO for loading an experiment with a method
 #[derive(Debug, serde::Deserialize)]
 pub struct LoadExperimentRequest {

@@ -309,8 +309,8 @@ fn point_routes(point_service: Arc<dyn PointService>) -> Router<()> {
 
 // Re-export for use in tests or other modules
 pub use experiment_control::{
-    get_experiment_history, get_experiment_status, load_experiment, pause_experiment,
-    resume_experiment, start_experiment, stop_experiment,
+    create_experiment, get_experiment_history, get_experiment_status, load_experiment,
+    pause_experiment, resume_experiment, start_experiment, stop_experiment,
 };
 pub use user::{change_password, get_current_user, update_current_user};
 pub use workbench::{
@@ -345,6 +345,7 @@ fn experiment_control_routes(
     Router::new().nest(
         "/api/v1/experiments",
         Router::new()
+            .route("/", post(create_experiment))
             .route("/:id/load", post(load_experiment))
             .route("/:id/start", post(start_experiment))
             .route("/:id/pause", post(pause_experiment))

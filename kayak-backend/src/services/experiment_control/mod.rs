@@ -16,6 +16,7 @@ use crate::db::repository::experiment_repo::{
 };
 use crate::db::repository::method_repo::MethodRepository;
 use crate::db::repository::state_change_log_repo::StateChangeLogRepository;
+use crate::models::entities::experiment::{Experiment, ExperimentStatus};
 use crate::state_machine::{StateMachine, StateMachineError, StateMachineOperation};
 
 pub mod ws_manager;
@@ -189,6 +190,40 @@ where
             log_repo,
             ws_manager: Some(ws_manager),
         }
+    }
+
+    /// Create a new experiment in Idle state.
+    ///
+    /// Creates an experiment with the given name, optional method_id and description.
+    /// The experiment starts in Idle state and is owned by the creating user.
+    pub async fn create(
+        &self,
+        user_id: Uuid,
+        name: String,
+        method_id: Option<Uuid>,
+        description: Option<String>,
+    ) -> Result<ExperimentControlDto, ExperimentControlError> {
+        let now = Utc::now();
+        let experiment = Experiment {
+            id: Uuid::new_v4(),
+            user_id,
+            method_id,
+            name,
+            description,
+            status: ExperimentStatus::Idle,
+            owner_type: "personal".to_string(),
+            owner_id: user_id,
+            started_at: None,
+            ended_at: None,
+            created_at: now,
+            updated_at: now,
+        };
+        let created = self
+            .experiment_repo
+            .create(&experiment)
+            .await
+            .map_err(|e| ExperimentControlError::Repository(e.to_string()))?;
+        Ok(ExperimentControlDto::from_experiment(&created))
     }
 
     /// Verify that the user owns the experiment or is an admin.

@@ -69,6 +69,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterPage(),
       ),
 
+      // ---- 试验创建向导（全屏，无 AppShell，避免导航栏冲突） ----
+      GoRoute(
+        path: '/experiments/new',
+        name: 'experiment-create',
+        builder: (context, state) => const ExperimentCreatePage(),
+      ),
+
       // ---- 受保护路由（ShellRoute 包裹，共享 AppShell） ----
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),
@@ -107,13 +114,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: 'experiments',
             builder: (context, state) => const ExperimentListPage(),
           ),
-          // experiments/new 必须在 experiments/:id 之前注册
-          // 确保静态路径优先匹配，避免 new 被 :id 参数捕获
-          GoRoute(
-            path: '/experiments/new',
-            name: 'experiment-create',
-            builder: (context, state) => const ExperimentCreatePage(),
-          ),
+          // experiments/:id 在 /experiments 之后，/experiments/new 之前已作为顶层路由注册
           GoRoute(
             path: '/experiments/:id',
             name: 'experiment-console',
