@@ -202,14 +202,29 @@ where
         name: String,
         method_id: Option<Uuid>,
         description: Option<String>,
+        parameters: Option<serde_json::Value>,
     ) -> Result<ExperimentControlDto, ExperimentControlError> {
         let now = Utc::now();
+        // If parameters are provided, append them as JSON to the description
+        let merged_description = match (description, parameters) {
+            (Some(desc), Some(params)) => {
+                let params_json = serde_json::to_string(&params)
+                    .unwrap_or_else(|_| "{}".to_string());
+                Some(format!("{}\n---\nParameters: {}", desc, params_json))
+            }
+            (None, Some(params)) => {
+                let params_json = serde_json::to_string(&params)
+                    .unwrap_or_else(|_| "{}".to_string());
+                Some(format!("Parameters: {}", params_json))
+            }
+            (desc, None) => desc,
+        };
         let experiment = Experiment {
             id: Uuid::new_v4(),
             user_id,
             method_id,
             name,
-            description,
+            description: merged_description,
             status: ExperimentStatus::Idle,
             owner_type: "personal".to_string(),
             owner_id: user_id,

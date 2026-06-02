@@ -1384,5 +1384,9 @@
   "createTooltipIncomplete": "请先选择工作台和方法",
   "@createTooltipIncomplete": {
     "description": "创建按钮禁用时的提示"
+  },
+  "paramsNotPersistedWarning": "注意：参数值仅供本次创建参考，当前版本暂不支持参数存储。",
+  "@paramsNotPersistedWarning": {
+    "description": "步骤 3 和步骤 4 中提示参数暂不持久化的警告"
   }
 }

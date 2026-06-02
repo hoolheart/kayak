@@ -1004,4 +1004,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get createTooltipIncomplete => '请先选择工作台和方法';
+
+  @override
+  String get paramsNotPersistedWarning => '注意：参数值仅供本次创建参考，当前版本暂不支持参数存储。';
 }

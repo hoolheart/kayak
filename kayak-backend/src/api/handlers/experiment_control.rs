@@ -39,6 +39,8 @@ pub struct CreateExperimentRequestBody {
     pub method_id: Option<Uuid>,
     /// Experiment description (optional)
     pub description: Option<String>,
+    /// Method parameters as JSON key-value pairs (optional)
+    pub parameters: Option<serde_json::Value>,
 }
 
 /// Create experiment handler
@@ -57,6 +59,7 @@ pub async fn create_experiment(
             payload.name,
             payload.method_id,
             payload.description,
+            payload.parameters,
         )
         .await
         .map_err(|e| match e {

@@ -108,22 +108,26 @@ class Experiment {
 /// - name（必填）：试验名称
 /// - methodId（可选）：关联的方法 ID
 /// - description（可选）：试验描述
+/// - parameters（可选）：方法参数键值对
 class CreateExperimentRequest {
   const CreateExperimentRequest({
     required this.name,
     this.methodId,
     this.description,
+    this.parameters,
   });
 
   final String name;
   final String? methodId;
   final String? description;
+  final Map<String, dynamic>? parameters;
 
   factory CreateExperimentRequest.fromJson(Map<String, dynamic> json) {
     return CreateExperimentRequest(
       name: json['name'] as String,
       methodId: json['method_id'] as String?,
       description: json['description'] as String?,
+      parameters: json['parameters'] as Map<String, dynamic>?,
     );
   }
 
@@ -131,6 +135,9 @@ class CreateExperimentRequest {
     final data = <String, dynamic>{'name': name};
     if (methodId != null) data['method_id'] = methodId;
     if (description != null) data['description'] = description;
+    if (parameters != null && parameters!.isNotEmpty) {
+      data['parameters'] = parameters;
+    }
     return data;
   }
 }

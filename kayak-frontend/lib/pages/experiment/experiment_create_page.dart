@@ -55,8 +55,7 @@ class _ExperimentCreatePageState
   Workbench? _selectedWorkbench;
   Method? _selectedMethod;
   final Map<String, TextEditingController> _textControllers = {};
-  bool _autoStopValue = false;
-  String? _cycleModeValue;
+  final Map<String, dynamic> _paramValues = {};
   bool _isCreating = false;
 
   // ---------- 表单验证 ----------
@@ -167,18 +166,17 @@ class _ExperimentCreatePageState
   void _initializeParameterControllers() {
     _textControllers.clear();
     _fieldErrors.clear();
+    _paramValues.clear();
 
     final params = _selectedMethod?.parameters ?? [];
     for (final param in params) {
-      if (param.type == 'boolean') {
-        if (param.defaultValue is bool) {
-          _autoStopValue = param.defaultValue as bool;
-        }
-      } else if (param.type == 'enum') {
-        if (param.defaultValue is String) {
-          _cycleModeValue = param.defaultValue as String;
-        } else if (param.options != null && param.options!.isNotEmpty) {
-          _cycleModeValue = param.options!.first;
+      if (param.type == 'boolean' || param.type == 'enum') {
+        if (param.defaultValue != null) {
+          _paramValues[param.key] = param.defaultValue;
+        } else if (param.type == 'enum' &&
+            param.options != null &&
+            param.options!.isNotEmpty) {
+          _paramValues[param.key] = param.options!.first;
         }
       } else {
         final controller = TextEditingController(
@@ -255,11 +253,40 @@ class _ExperimentCreatePageState
     setState(() => _isCreating = true);
 
     try {
+      // Build parameters map from all parameter controls
+      final Map<String, dynamic> parameters = {};
+      final methodParams = _selectedMethod!.parameters ?? [];
+      for (final param in methodParams) {
+        if (param.type == 'boolean' || param.type == 'enum') {
+          if (_paramValues.containsKey(param.key)) {
+            parameters[param.key] = _paramValues[param.key];
+          }
+        } else {
+          final controller = _textControllers[param.key];
+          if (controller != null) {
+            final text = controller.text.trim();
+            if (text.isNotEmpty) {
+              // Parse number types to preserve numeric types
+              if (param.type == 'integer') {
+                final intVal = int.tryParse(text);
+                parameters[param.key] = intVal ?? text;
+              } else if (param.type == 'number') {
+                final numVal = num.tryParse(text);
+                parameters[param.key] = numVal ?? text;
+              } else {
+                parameters[param.key] = text;
+              }
+            }
+          }
+        }
+      }
+
       final service = ref.read(experimentServiceProvider);
       final experiment = await service.create(
         CreateExperimentRequest(
           name: '${_selectedWorkbench!.name} - ${_selectedMethod!.name}',
           methodId: _selectedMethod!.id,
+          parameters: parameters.isNotEmpty ? parameters : null,
         ),
       );
 
@@ -627,8 +654,11 @@ class _ExperimentCreatePageState
         const SizedBox(height: 24),
         if (params.isEmpty)
           _buildNoParamsBanner(l10n)
-        else
+        else ...[
           _buildParameterForm(params, isMobile),
+          const SizedBox(height: 16),
+          _buildParamsNotPersistedWarning(l10n),
+        ],
       ],
     );
   }
@@ -878,9 +908,9 @@ class _ExperimentCreatePageState
               ),
             ),
             Switch(
-              value: _autoStopValue,
+              value: _paramValues[param.key] as bool? ?? false,
               onChanged: (value) {
-                setState(() => _autoStopValue = value);
+                setState(() => _paramValues[param.key] = value);
               },
             ),
           ],
@@ -895,7 +925,7 @@ class _ExperimentCreatePageState
     String? errorText,
   ) {
     final options = param.options ?? <String>[];
-    final currentValue = _cycleModeValue ?? options.firstOrNull;
+    final currentValue = _paramValues[param.key] as String? ?? options.firstOrNull;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -934,7 +964,7 @@ class _ExperimentCreatePageState
             );
           }).toList(),
           onChanged: (value) {
-            setState(() => _cycleModeValue = value);
+            setState(() => _paramValues[param.key] = value);
           },
         ),
         if (param.description != null &&
@@ -973,6 +1003,10 @@ class _ExperimentCreatePageState
         ),
         const SizedBox(height: 24),
         _buildSummaryCard(l10n),
+        const SizedBox(height: 16),
+        if (_selectedMethod?.parameters != null &&
+            _selectedMethod!.parameters!.isNotEmpty)
+          _buildParamsNotPersistedWarning(l10n),
         const SizedBox(height: 16),
         _buildWarningText(l10n),
       ],
@@ -1078,9 +1112,11 @@ class _ExperimentCreatePageState
   String _formatParamValue(MethodParameter param, AppLocalizations l10n) {
     switch (param.type) {
       case 'boolean':
-        return _autoStopValue ? l10n.booleanTrue : l10n.booleanFalse;
+        return (_paramValues[param.key] as bool? ?? false)
+            ? l10n.booleanTrue
+            : l10n.booleanFalse;
       case 'enum':
-        return _cycleModeValue ?? '';
+        return _paramValues[param.key] as String? ?? '';
       default:
         final controller = _textControllers[param.key];
         final text = controller?.text ?? '';
@@ -1089,6 +1125,29 @@ class _ExperimentCreatePageState
         }
         return text;
     }
+  }
+
+  Widget _buildParamsNotPersistedWarning(AppLocalizations l10n) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.info_outline,
+          size: 16,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            l10n.paramsNotPersistedWarning,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
+                ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildWarningText(AppLocalizations l10n) {
@@ -1465,7 +1524,6 @@ class _SelectableWorkbenchCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -1519,13 +1577,6 @@ class _SelectableWorkbenchCard extends StatelessWidget {
                       size: 24,
                     ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.deviceCount(0), // We don't have deviceCount on Workbench model
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
               ),
               if (workbench.description != null &&
                   workbench.description!.isNotEmpty) ...[

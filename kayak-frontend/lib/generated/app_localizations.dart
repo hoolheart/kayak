@@ -2035,6 +2035,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select a workbench and method first'**
   String get createTooltipIncomplete;
+
+  /// Warning in Step 3 and Step 4 that parameters are not persisted yet
+  ///
+  /// In en, this message translates to:
+  /// **'Note: Parameter values are for reference in this session only and will not be persisted in this version.'**
+  String get paramsNotPersistedWarning;
 }
 
 class _AppLocalizationsDelegate

@@ -1384,5 +1384,9 @@
   "createTooltipIncomplete": "Please select a workbench and method first",
   "@createTooltipIncomplete": {
     "description": "Tooltip when create button is disabled"
+  },
+  "paramsNotPersistedWarning": "Note: Parameter values are for reference in this session only and will not be persisted in this version.",
+  "@paramsNotPersistedWarning": {
+    "description": "Warning in Step 3 and Step 4 that parameters are not persisted yet"
   }
 }

@@ -1019,4 +1019,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get createTooltipIncomplete =>
       'Please select a workbench and method first';
+
+  @override
+  String get paramsNotPersistedWarning =>
+      'Note: Parameter values are for reference in this session only and will not be persisted in this version.';
 }
