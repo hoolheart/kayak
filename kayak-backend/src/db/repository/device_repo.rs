@@ -47,6 +47,7 @@ pub trait DeviceRepository: Send + Sync {
     async fn delete(&self, id: Uuid) -> Result<(), DeviceRepositoryError>;
     async fn find_all_descendant_ids(&self, id: Uuid) -> Result<Vec<Uuid>, DeviceRepositoryError>;
     async fn find_children(&self, parent_id: Uuid) -> Result<Vec<Device>, DeviceRepositoryError>;
+    async fn count_by_workbench_id(&self, workbench_id: Uuid) -> Result<i64, DeviceRepositoryError>;
 }
 
 /// SQLx设备仓库实现
@@ -369,5 +370,16 @@ impl DeviceRepository for SqlxDeviceRepository {
             .await?;
 
         Ok(rows.into_iter().map(|r| r.to_entity()).collect())
+    }
+
+    async fn count_by_workbench_id(&self, workbench_id: Uuid) -> Result<i64, DeviceRepositoryError> {
+        let row: (i64,) = sqlx::query_as(
+            "SELECT COUNT(*) FROM devices WHERE workbench_id = ?",
+        )
+        .bind(workbench_id.to_string())
+        .fetch_one(&self.pool)
+        .await?;
+
+        Ok(row.0)
     }
 }

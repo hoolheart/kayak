@@ -987,17 +987,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get retryLoadStats => '重试';
-
-  @override
-  String get retryLoadRecent => '重试';
-
-  @override
-  String greetingWithName(String greeting, String username) {
-    return '$greeting，$username';
-  }
-
-  @override
   String get noWorkbenchesTitle => '您还没有工作台';
 
   @override

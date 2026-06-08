@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../generated/app_localizations.dart';
 import '../../../providers/auth_provider.dart';
-import 'greeting_text.dart';
+import 'greeting_text.dart' show getGreeting;
 
 /// 欢迎区域组件。
 ///
@@ -26,7 +26,7 @@ class WelcomeSection extends ConsumerWidget {
     final username = authState.asData?.value?.username;
 
     final now = DateTime.now();
-    final greeting = GreetingText.getGreeting(loc, time: now);
+    final greeting = getGreeting(loc, time: now);
 
     // 格式化日期
     final localeName = Localizations.localeOf(context).languageCode;
@@ -104,9 +104,7 @@ class _GreetingRow extends StatelessWidget {
               children: [
                 TextSpan(text: greeting),
                 const TextSpan(text: '，'),
-                TextSpan(
-                  text: username,
-                ),
+                TextSpan(text: username),
               ],
             ),
             style: style,

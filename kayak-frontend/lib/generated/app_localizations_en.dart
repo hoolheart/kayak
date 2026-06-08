@@ -997,17 +997,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get retryLoadStats => 'Retry';
-
-  @override
-  String get retryLoadRecent => 'Retry';
-
-  @override
-  String greetingWithName(String greeting, String username) {
-    return '$greeting, $username';
-  }
-
-  @override
   String get noWorkbenchesTitle => 'No workbenches yet';
 
   @override

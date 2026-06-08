@@ -7,7 +7,6 @@ part 'workbench.g.dart';
 // ============================================================
 @JsonSerializable()
 class Workbench {
-
   const Workbench({
     required this.id,
     required this.name,
@@ -17,6 +16,7 @@ class Workbench {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.deviceCount,
   });
 
   factory Workbench.fromJson(Map<String, dynamic> json) =>
@@ -33,6 +33,8 @@ class Workbench {
   final DateTime createdAt;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  @JsonKey(name: 'device_count', defaultValue: 0)
+  final int? deviceCount;
   Map<String, dynamic> toJson() => _$WorkbenchToJson(this);
 
   Workbench copyWith({
@@ -44,6 +46,7 @@ class Workbench {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? deviceCount,
   }) {
     return Workbench(
       id: id ?? this.id,
@@ -54,6 +57,7 @@ class Workbench {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      deviceCount: deviceCount ?? this.deviceCount,
     );
   }
 }
@@ -63,7 +67,6 @@ class Workbench {
 // ============================================================
 @JsonSerializable()
 class CreateWorkbenchRequest {
-
   const CreateWorkbenchRequest({
     required this.name,
     this.description,

@@ -1363,28 +1363,6 @@
       }
     }
   },
-  "retryLoadStats": "Retry",
-  "@retryLoadStats": {
-    "description": "Retry button for stats section"
-  },
-  "retryLoadRecent": "Retry",
-  "@retryLoadRecent": {
-    "description": "Retry button for recent workbenches section"
-  },
-  "greetingWithName": "{greeting}, {username}",
-  "@greetingWithName": {
-    "description": "Greeting text with username",
-    "placeholders": {
-      "greeting": {
-        "type": "String",
-        "example": "Good morning"
-      },
-      "username": {
-        "type": "String",
-        "example": "Alice"
-      }
-    }
-  },
   "noWorkbenchesTitle": "No workbenches yet",
   "@noWorkbenchesTitle": {
     "description": "Step 1 empty state title"

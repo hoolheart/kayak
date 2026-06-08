@@ -43,7 +43,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         final redirectParam = state.uri.queryParameters['redirect'];
         if (redirectParam != null && redirectParam.isNotEmpty) {
           final decoded = Uri.decodeComponent(redirectParam);
-          if (decoded.isNotEmpty && decoded != '/login' && decoded != '/register') {
+          if (decoded.isNotEmpty &&
+              decoded != '/login' &&
+              decoded != '/register') {
             return decoded;
           }
         }
@@ -82,10 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
 
       // ---- `/` 重定向到 `/dashboard` ----
-      GoRoute(
-        path: '/',
-        redirect: (context, state) => '/dashboard',
-      ),
+      GoRoute(path: '/', redirect: (context, state) => '/dashboard'),
 
       // ---- 受保护路由（ShellRoute 包裹，共享 AppShell） ----
       ShellRoute(
@@ -104,9 +103,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/workbenches/:id',
             name: 'workbench-detail',
-            builder: (context, state) => WorkbenchDetailPage(
-              id: state.pathParameters['id']!,
-            ),
+            builder: (context, state) =>
+                WorkbenchDetailPage(id: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/methods',
@@ -116,9 +114,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/methods/:id/edit',
             name: 'method-edit',
-            builder: (context, state) => MethodEditPage(
-              id: state.pathParameters['id'],
-            ),
+            builder: (context, state) =>
+                MethodEditPage(id: state.pathParameters['id']),
           ),
           GoRoute(
             path: '/experiments',
@@ -129,9 +126,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/experiments/:id',
             name: 'experiment-console',
-            builder: (context, state) => ExperimentConsolePage(
-              id: state.pathParameters['id']!,
-            ),
+            builder: (context, state) =>
+                ExperimentConsolePage(id: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/analysis',

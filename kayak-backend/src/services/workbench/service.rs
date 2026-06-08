@@ -3,6 +3,7 @@
 use super::{
     CreateWorkbenchEntity, PagedWorkbenchDto, UpdateWorkbenchEntity, WorkbenchDto, WorkbenchError,
 };
+use crate::db::repository::device_repo::DeviceRepository;
 use crate::db::repository::workbench_repo::WorkbenchRepository;
 use crate::models::entities::workbench::Workbench;
 use async_trait::async_trait;
@@ -44,11 +45,27 @@ pub trait WorkbenchService: Send + Sync {
 /// 工作台服务实现 (使用dyn trait进行依赖注入)
 pub struct WorkbenchServiceImpl {
     workbench_repo: Arc<dyn WorkbenchRepository>,
+    device_repo: Arc<dyn DeviceRepository>,
 }
 
 impl WorkbenchServiceImpl {
-    pub fn new(workbench_repo: Arc<dyn WorkbenchRepository>) -> Self {
-        Self { workbench_repo }
+    pub fn new(
+        workbench_repo: Arc<dyn WorkbenchRepository>,
+        device_repo: Arc<dyn DeviceRepository>,
+    ) -> Self {
+        Self {
+            workbench_repo,
+            device_repo,
+        }
+    }
+
+    /// Populate device_count for a single WorkbenchDto
+    async fn populate_device_count(&self, mut dto: WorkbenchDto) -> WorkbenchDto {
+        match self.device_repo.count_by_workbench_id(dto.id).await {
+            Ok(count) => dto.device_count = count,
+            Err(_) => dto.device_count = 0,
+        }
+        dto
     }
 
     /// 验证用户是否拥有工作台
@@ -104,7 +121,18 @@ impl WorkbenchService for WorkbenchServiceImpl {
             .await
             .map_err(|e| WorkbenchError::Internal(e.to_string()))?;
 
-        Ok(workbench.into())
+        let dto: WorkbenchDto = WorkbenchDto {
+            id: workbench.id,
+            name: workbench.name,
+            description: workbench.description,
+            owner_type: workbench.owner_type,
+            owner_id: workbench.owner_id,
+            status: workbench.status,
+            created_at: workbench.created_at,
+            updated_at: workbench.updated_at,
+            device_count: 0,
+        };
+        Ok(dto)
     }
 
     async fn get_workbench(
@@ -122,7 +150,20 @@ impl WorkbenchService for WorkbenchServiceImpl {
             .map_err(|e| WorkbenchError::Internal(e.to_string()))?;
 
         match workbench {
-            Some(wb) => Ok(wb.into()),
+            Some(wb) => {
+                let dto = WorkbenchDto {
+                    id: wb.id,
+                    name: wb.name,
+                    description: wb.description,
+                    owner_type: wb.owner_type,
+                    owner_id: wb.owner_id,
+                    status: wb.status,
+                    created_at: wb.created_at,
+                    updated_at: wb.updated_at,
+                    device_count: 0,
+                };
+                Ok(self.populate_device_count(dto).await)
+            }
             None => Err(WorkbenchError::NotFound),
         }
     }
@@ -153,8 +194,25 @@ impl WorkbenchService for WorkbenchServiceImpl {
 
         let total_pages = (total as f64 / size as f64).ceil() as i64;
 
+        // Populate device_count for each workbench
+        let mut items = Vec::with_capacity(workbenches.len());
+        for wb in workbenches {
+            let dto = WorkbenchDto {
+                id: wb.id,
+                name: wb.name,
+                description: wb.description,
+                owner_type: wb.owner_type,
+                owner_id: wb.owner_id,
+                status: wb.status,
+                created_at: wb.created_at,
+                updated_at: wb.updated_at,
+                device_count: 0,
+            };
+            items.push(self.populate_device_count(dto).await);
+        }
+
         Ok(PagedWorkbenchDto {
-            items: workbenches.into_iter().map(|w| w.into()).collect(),
+            items,
             page,
             size,
             total,
@@ -198,7 +256,18 @@ impl WorkbenchService for WorkbenchServiceImpl {
             .await
             .map_err(|e| WorkbenchError::Internal(e.to_string()))?;
 
-        Ok(workbench.into())
+        let dto = WorkbenchDto {
+            id: workbench.id,
+            name: workbench.name,
+            description: workbench.description,
+            owner_type: workbench.owner_type,
+            owner_id: workbench.owner_id,
+            status: workbench.status,
+            created_at: workbench.created_at,
+            updated_at: workbench.updated_at,
+            device_count: 0,
+        };
+        Ok(self.populate_device_count(dto).await)
     }
 
     async fn delete_workbench(

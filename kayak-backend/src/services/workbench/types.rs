@@ -1,6 +1,6 @@
 //! 工作台服务类型定义
 
-use crate::models::entities::workbench::{OwnerType, Workbench, WorkbenchStatus};
+use crate::models::entities::workbench::{OwnerType, WorkbenchStatus};
 use uuid::Uuid;
 
 /// 创建工作台实体
@@ -29,21 +29,7 @@ pub struct WorkbenchDto {
     pub status: WorkbenchStatus,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl From<Workbench> for WorkbenchDto {
-    fn from(wb: Workbench) -> Self {
-        Self {
-            id: wb.id,
-            name: wb.name,
-            description: wb.description,
-            owner_type: wb.owner_type,
-            owner_id: wb.owner_id,
-            status: wb.status,
-            created_at: wb.created_at,
-            updated_at: wb.updated_at,
-        }
-    }
+    pub device_count: i64,
 }
 
 /// 分页工作台DTO

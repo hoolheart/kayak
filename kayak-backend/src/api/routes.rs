@@ -92,19 +92,23 @@ pub fn create_router(pool: DbPool) -> Router<()> {
         password_hasher,
     ));
 
-    // 创建工作台服务
-    let workbench_repo = SqlxWorkbenchRepository::new(pool.clone());
-    let workbench_repo_for_device = workbench_repo.clone();
-    let workbench_repo_for_point = workbench_repo.clone();
-    let workbench_service: Arc<dyn WorkbenchService> =
-        Arc::new(WorkbenchServiceImpl::new(Arc::new(workbench_repo)));
-
-    // 创建设备管理器
-    let device_manager = create_device_manager();
-
     // 创建设备仓储
     let device_repo: Arc<dyn crate::db::repository::device_repo::DeviceRepository> =
         Arc::new(SqlxDeviceRepository::new(pool.clone()));
+
+    // 创建工作台服务（需要 device_repo 来获取设备数量）
+    let workbench_repo = SqlxWorkbenchRepository::new(pool.clone());
+    let workbench_repo_for_device = workbench_repo.clone();
+    let workbench_repo_for_point = workbench_repo.clone();
+    let workbench_service: Arc<dyn WorkbenchService> = Arc::new(
+        WorkbenchServiceImpl::new(
+            Arc::new(workbench_repo),
+            device_repo.clone(),
+        ),
+    );
+
+    // 创建设备管理器
+    let device_manager = create_device_manager();
     let point_repo: Arc<dyn crate::db::repository::point_repo::PointRepository> =
         Arc::new(SqlxPointRepository::new(pool.clone()));
 

@@ -15,7 +15,6 @@ final dashboardServiceProvider = Provider<DashboardService>((ref) {
   return DashboardService(
     workbenchService: ref.read(workbenchServiceProvider),
     experimentService: ref.read(experimentServiceProvider),
-    deviceService: ref.read(deviceServiceProvider),
   );
 });
 
@@ -33,8 +32,7 @@ final dashboardServiceProvider = Provider<DashboardService>((ref) {
 /// ```dart
 /// final statsAsync = ref.watch(dashboardStatsProvider);
 /// ```
-final dashboardStatsProvider =
-    FutureProvider<DashboardData>((ref) async {
+final dashboardStatsProvider = FutureProvider<DashboardData>((ref) async {
   final service = ref.read(dashboardServiceProvider);
   return service.loadDashboardData();
 });
@@ -52,8 +50,9 @@ final dashboardStatsProvider =
 /// ```dart
 /// final recentAsync = ref.watch(dashboardRecentProvider);
 /// ```
-final dashboardRecentProvider =
-    FutureProvider<List<WorkbenchSummary>>((ref) async {
+final dashboardRecentProvider = FutureProvider<List<WorkbenchSummary>>((
+  ref,
+) async {
   final service = ref.read(dashboardServiceProvider);
   return service.loadRecentWorkbenches();
 });

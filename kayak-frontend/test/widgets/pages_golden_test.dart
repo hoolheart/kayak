@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/models/common.dart';
-import 'package:kayak_frontend/models/device.dart';
 import 'package:kayak_frontend/models/experiment.dart';
 import 'package:kayak_frontend/models/workbench.dart';
 import 'package:kayak_frontend/pages/auth/login_page.dart';
@@ -18,7 +17,6 @@ import 'package:kayak_frontend/services/api_client.dart';
 import 'package:kayak_frontend/services/auth_interceptor.dart';
 import 'package:kayak_frontend/services/auth_service.dart';
 import 'package:kayak_frontend/services/dashboard_service.dart';
-import 'package:kayak_frontend/services/device_service.dart';
 import 'package:kayak_frontend/services/error_interceptor.dart';
 import 'package:kayak_frontend/services/experiment_service.dart';
 import 'package:kayak_frontend/services/token_storage.dart';
@@ -27,18 +25,18 @@ import 'package:kayak_frontend/services/workbench_service.dart';
 /// Mock WorkbenchService that returns empty data for testing.
 class _MockWorkbenchService extends WorkbenchService {
   _MockWorkbenchService()
-      : super(
-          ApiClient(
-            baseUrl: 'http://localhost:8080',
-            authInterceptor: AuthInterceptor(
-              AuthService(
-                baseUrl: 'http://localhost:8080',
-                storage: TokenStorage(),
-              ),
+    : super(
+        ApiClient(
+          baseUrl: 'http://localhost:8080',
+          authInterceptor: AuthInterceptor(
+            AuthService(
+              baseUrl: 'http://localhost:8080',
+              storage: TokenStorage(),
             ),
-            errorInterceptor: ErrorInterceptor(),
           ),
-        );
+          errorInterceptor: ErrorInterceptor(),
+        ),
+      );
 
   @override
   Future<PaginatedResponse<Workbench>> list({
@@ -58,18 +56,18 @@ class _MockWorkbenchService extends WorkbenchService {
 /// Mock ExperimentService that returns empty data for testing.
 class _MockExperimentService extends ExperimentService {
   _MockExperimentService()
-      : super(
-          ApiClient(
-            baseUrl: 'http://localhost:8080',
-            authInterceptor: AuthInterceptor(
-              AuthService(
-                baseUrl: 'http://localhost:8080',
-                storage: TokenStorage(),
-              ),
+    : super(
+        ApiClient(
+          baseUrl: 'http://localhost:8080',
+          authInterceptor: AuthInterceptor(
+            AuthService(
+              baseUrl: 'http://localhost:8080',
+              storage: TokenStorage(),
             ),
-            errorInterceptor: ErrorInterceptor(),
           ),
-        );
+          errorInterceptor: ErrorInterceptor(),
+        ),
+      );
 
   @override
   Future<PaginatedResponse<Experiment>> list({
@@ -89,36 +87,13 @@ class _MockExperimentService extends ExperimentService {
   }
 }
 
-/// Mock DeviceService that returns empty data for testing.
-class _MockDeviceService extends DeviceService {
-  _MockDeviceService()
-      : super(
-          ApiClient(
-            baseUrl: 'http://localhost:8080',
-            authInterceptor: AuthInterceptor(
-              AuthService(
-                baseUrl: 'http://localhost:8080',
-                storage: TokenStorage(),
-              ),
-            ),
-            errorInterceptor: ErrorInterceptor(),
-          ),
-        );
-
-  @override
-  Future<List<Device>> listByWorkbench(String workbenchId) async {
-    return <Device>[];
-  }
-}
-
 /// Mock DashboardService that returns empty dashboard data.
 class _MockDashboardService extends DashboardService {
   _MockDashboardService()
-      : super(
-          workbenchService: _MockWorkbenchService(),
-          experimentService: _MockExperimentService(),
-          deviceService: _MockDeviceService(),
-        );
+    : super(
+        workbenchService: _MockWorkbenchService(),
+        experimentService: _MockExperimentService(),
+      );
 
   @override
   Future<DashboardData> loadDashboardData() async {
@@ -154,9 +129,7 @@ Widget createTestApp(Widget home) {
 void main() {
   testWidgets('LoginPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const LoginPage()),
-    );
+    await tester.pumpWidget(createTestApp(const LoginPage()));
     await tester.pump();
 
     // Verify the page renders with the app title
@@ -165,21 +138,15 @@ void main() {
 
   testWidgets('RegisterPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const RegisterPage()),
-    );
+    await tester.pumpWidget(createTestApp(const RegisterPage()));
     await tester.pump();
     expect(find.text('Kayak'), findsOneWidget);
   });
 
   testWidgets('DashboardPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const DashboardPage()),
-    );
-    // Pump enough to advance past the 300ms skeleton delay
-    await tester.pump(const Duration(milliseconds: 500));
-    // Pump again to let the UI settle (providers will attempt to load)
+    await tester.pumpWidget(createTestApp(const DashboardPage()));
+    // Pump to let the UI settle (providers will attempt to load)
     await tester.pump();
     await tester.pump();
     // Verify the dashboard page rendered
@@ -188,9 +155,7 @@ void main() {
 
   testWidgets('WorkbenchListPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const WorkbenchListPage()),
-    );
+    await tester.pumpWidget(createTestApp(const WorkbenchListPage()));
     // Pump once to render initial frame (page may be in loading or error state
     // since no API mock is provided in this test).
     await tester.pump();
@@ -200,18 +165,14 @@ void main() {
 
   testWidgets('ExperimentListPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const ExperimentListPage()),
-    );
+    await tester.pumpWidget(createTestApp(const ExperimentListPage()));
     await tester.pumpAndSettle();
     expect(find.text('Experiment List'), findsOneWidget);
   });
 
   testWidgets('SettingsPage screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
-    await tester.pumpWidget(
-      createTestApp(const SettingsPage()),
-    );
+    await tester.pumpWidget(createTestApp(const SettingsPage()));
     await tester.pump();
     // Note: SettingsPage uses authProvider which may show loading state
     // in test environment without auth service overrides.

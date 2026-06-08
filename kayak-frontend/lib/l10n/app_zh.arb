@@ -1363,28 +1363,6 @@
       }
     }
   },
-  "retryLoadStats": "重试",
-  "@retryLoadStats": {
-    "description": "统计区域重试按钮"
-  },
-  "retryLoadRecent": "重试",
-  "@retryLoadRecent": {
-    "description": "最近工作台区域重试按钮"
-  },
-  "greetingWithName": "{greeting}，{username}",
-  "@greetingWithName": {
-    "description": "带用户名的问候文本",
-    "placeholders": {
-      "greeting": {
-        "type": "String",
-        "example": "早上好"
-      },
-      "username": {
-        "type": "String",
-        "example": "Alice"
-      }
-    }
-  },
   "noWorkbenchesTitle": "您还没有工作台",
   "@noWorkbenchesTitle": {
     "description": "步骤 1 空状态标题"

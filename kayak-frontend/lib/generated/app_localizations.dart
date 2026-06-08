@@ -1994,24 +1994,6 @@ abstract class AppLocalizations {
   /// **'{count} devices'**
   String deviceCountWithUnit(int count);
 
-  /// Retry button for stats section
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retryLoadStats;
-
-  /// Retry button for recent workbenches section
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retryLoadRecent;
-
-  /// Greeting text with username
-  ///
-  /// In en, this message translates to:
-  /// **'{greeting}, {username}'**
-  String greetingWithName(String greeting, String username);
-
   /// Step 1 empty state title
   ///
   /// In en, this message translates to:

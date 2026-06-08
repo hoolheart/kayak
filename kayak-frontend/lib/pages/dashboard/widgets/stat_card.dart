@@ -60,6 +60,15 @@ class _StatCardState extends State<StatCard>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reset animation on re-visit (when widget is re-inserted into tree)
+    _hasAnimated = false;
+    _controller.reset();
+    _startAnimation();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -110,22 +119,22 @@ class _StatCardState extends State<StatCard>
             AnimatedBuilder(
               animation: _animation,
               builder: (context, child) {
-                final displayValue =
-                    (_animation.value * widget.value).round();
+                final displayValue = (_animation.value * widget.value).round();
                 final formattedValue = _formatNumber(displayValue);
                 final useLargeFont = widget.value >= 10000;
                 return Text(
                   displayValue > 0 || _animation.value > 0
                       ? formattedValue
                       : '0',
-                  style: (useLargeFont
-                          ? textTheme.headlineMedium
-                          : textTheme.displayLarge)
-                      ?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w300,
-                    fontSize: useLargeFont ? 36.0 : numberSize,
-                  ),
+                  style:
+                      (useLargeFont
+                              ? textTheme.headlineMedium
+                              : textTheme.displayLarge)
+                          ?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w300,
+                            fontSize: useLargeFont ? 36.0 : numberSize,
+                          ),
                 );
               },
             ),
@@ -133,12 +142,9 @@ class _StatCardState extends State<StatCard>
             // 标签
             Text(
               widget.label,
-              style: (widget.compact
-                      ? textTheme.bodySmall
-                      : textTheme.bodyMedium)
-                  ?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+              style:
+                  (widget.compact ? textTheme.bodySmall : textTheme.bodyMedium)
+                      ?.copyWith(color: colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
           ],

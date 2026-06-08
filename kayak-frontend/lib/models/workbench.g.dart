@@ -15,6 +15,7 @@ Workbench _$WorkbenchFromJson(Map<String, dynamic> json) => Workbench(
   status: json['status'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
   updatedAt: DateTime.parse(json['updated_at'] as String),
+  deviceCount: (json['device_count'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$WorkbenchToJson(Workbench instance) => <String, dynamic>{
@@ -26,6 +27,7 @@ Map<String, dynamic> _$WorkbenchToJson(Workbench instance) => <String, dynamic>{
   'status': instance.status,
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
+  'device_count': instance.deviceCount,
 };
 
 CreateWorkbenchRequest _$CreateWorkbenchRequestFromJson(
