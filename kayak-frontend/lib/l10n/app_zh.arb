@@ -1689,5 +1689,416 @@
   "totalDurationLabel": "总运行时长",
   "@totalDurationLabel": {
     "description": "完成信息的总时长标签"
+  },
+
+  "methodEmptyTitle": "暂无方法",
+  "@methodEmptyTitle": {
+    "description": "方法列表空状态标题"
+  },
+  "methodEmptyDescription": "点击下方按钮创建您的第一个方法",
+  "@methodEmptyDescription": {
+    "description": "方法列表空状态描述"
+  },
+  "methodEmptyAction": "创建第一个方法",
+  "@methodEmptyAction": {
+    "description": "方法列表空状态操作按钮"
+  },
+  "methodSearchHint": "搜索方法名称或描述...",
+  "@methodSearchHint": {
+    "description": "方法搜索栏提示文本"
+  },
+  "methodSearchNoResults": "未找到匹配的方法",
+  "@methodSearchNoResults": {
+    "description": "搜索无结果消息"
+  },
+  "methodSearchNoResultsHint": "请尝试其他关键词",
+  "@methodSearchNoResultsHint": {
+    "description": "搜索无结果提示"
+  },
+  "methodClearSearch": "清除搜索",
+  "@methodClearSearch": {
+    "description": "清除搜索按钮"
+  },
+  "methodCreateNew": "新建方法",
+  "@methodCreateNew": {
+    "description": "新建方法按钮标签"
+  },
+  "methodCreateTitle": "创建方法",
+  "@methodCreateTitle": {
+    "description": "创建方法页面标题"
+  },
+  "methodEditTitle": "编辑方法",
+  "@methodEditTitle": {
+    "description": "编辑方法页面标题"
+  },
+  "methodNameLabel": "方法名称 *",
+  "@methodNameLabel": {
+    "description": "方法名称字段标签"
+  },
+  "methodNameHint": "请输入方法名称",
+  "@methodNameHint": {
+    "description": "方法名称字段提示"
+  },
+  "methodNameRequired": "请输入方法名称（至少 2 个字符）",
+  "@methodNameRequired": {
+    "description": "方法名称验证错误"
+  },
+  "methodDescriptionLabel": "方法描述",
+  "@methodDescriptionLabel": {
+    "description": "方法描述字段标签"
+  },
+  "methodDescriptionHint": "请输入方法描述（选填）",
+  "@methodDescriptionHint": {
+    "description": "方法描述字段提示"
+  },
+  "methodProcessDefinitionTitle": "过程定义 (JSON)",
+  "@methodProcessDefinitionTitle": {
+    "description": "过程定义区域标题"
+  },
+  "methodParameterListTitle": "参数列表",
+  "@methodParameterListTitle": {
+    "description": "参数列表区域标题"
+  },
+  "methodNoParameters": "暂无参数",
+  "@methodNoParameters": {
+    "description": "空参数状态"
+  },
+  "methodAddParameter": "添加参数",
+  "@methodAddParameter": {
+    "description": "添加参数按钮"
+  },
+  "methodAddFirstParameter": "添加第一个参数",
+  "@methodAddFirstParameter": {
+    "description": "空状态添加第一个参数按钮"
+  },
+  "methodEditParameterTitle": "编辑参数",
+  "@methodEditParameterTitle": {
+    "description": "编辑参数对话框标题"
+  },
+  "methodAddParameterTitle": "添加参数",
+  "@methodAddParameterTitle": {
+    "description": "添加参数对话框标题"
+  },
+  "methodParamKey": "参数键 *",
+  "@methodParamKey": {
+    "description": "参数键字段标签"
+  },
+  "methodParamKeyHint": "仅允许字母、数字和下划线",
+  "@methodParamKeyHint": {
+    "description": "参数键字段提示"
+  },
+  "methodParamKeyRequired": "请输入参数键",
+  "@methodParamKeyRequired": {
+    "description": "参数键必填验证错误"
+  },
+  "methodParamKeyInvalid": "参数键只能包含字母、数字和下划线，且不能以数字开头",
+  "@methodParamKeyInvalid": {
+    "description": "参数键格式验证错误"
+  },
+  "methodParamKeyExists": "参数键已存在",
+  "@methodParamKeyExists": {
+    "description": "参数键唯一性验证错误"
+  },
+  "methodParamLabel": "显示标签",
+  "@methodParamLabel": {
+    "description": "参数标签字段标签"
+  },
+  "methodParamLabelHint": "默认等于参数键",
+  "@methodParamLabelHint": {
+    "description": "参数标签字段提示"
+  },
+  "methodParamType": "参数类型 *",
+  "@methodParamType": {
+    "description": "参数类型字段标签"
+  },
+  "methodParamRequired": "必填",
+  "@methodParamRequired": {
+    "description": "必填切换标签"
+  },
+  "methodParamUnit": "单位",
+  "@methodParamUnit": {
+    "description": "单位字段标签"
+  },
+  "methodParamUnitHint": "如 kN、°C、s",
+  "@methodParamUnitHint": {
+    "description": "单位字段提示"
+  },
+  "methodParamMin": "最小值",
+  "@methodParamMin": {
+    "description": "最小值字段标签"
+  },
+  "methodParamMax": "最大值",
+  "@methodParamMax": {
+    "description": "最大值字段标签"
+  },
+  "methodParamDefaultValue": "默认值",
+  "@methodParamDefaultValue": {
+    "description": "默认值字段标签"
+  },
+  "methodParamDescription": "描述",
+  "@methodParamDescription": {
+    "description": "参数描述字段标签"
+  },
+  "methodParamDescriptionHint": "参数说明（选填）",
+  "@methodParamDescriptionHint": {
+    "description": "参数描述字段提示"
+  },
+  "methodParamEnumOptions": "枚举选项",
+  "@methodParamEnumOptions": {
+    "description": "枚举选项字段标签"
+  },
+  "methodParamEnumHint": "输入选项后点击添加",
+  "@methodParamEnumHint": {
+    "description": "枚举选项字段提示"
+  },
+  "methodColumnKey": "参数键",
+  "@methodColumnKey": {
+    "description": "表格列标题：参数键"
+  },
+  "methodColumnLabel": "显示标签",
+  "@methodColumnLabel": {
+    "description": "表格列标题：显示标签"
+  },
+  "methodColumnType": "类型",
+  "@methodColumnType": {
+    "description": "表格列标题：类型"
+  },
+  "methodColumnRequired": "必填",
+  "@methodColumnRequired": {
+    "description": "表格列标题：必填"
+  },
+  "methodColumnDefaultValue": "默认值",
+  "@methodColumnDefaultValue": {
+    "description": "表格列标题：默认值"
+  },
+  "methodColumnUnit": "单位",
+  "@methodColumnUnit": {
+    "description": "表格列标题：单位"
+  },
+  "methodColumnDescription": "描述",
+  "@methodColumnDescription": {
+    "description": "表格列标题：描述"
+  },
+  "methodColumnActions": "操作",
+  "@methodColumnActions": {
+    "description": "表格列标题：操作"
+  },
+  "methodParamCount": "{count} 个参数",
+  "@methodParamCount": {
+    "description": "卡片和表头参数数量",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "methodParamCountZero": "0 个参数",
+  "@methodParamCountZero": {
+    "description": "零参数显示"
+  },
+  "methodJsonValid": "JSON 格式正确",
+  "@methodJsonValid": {
+    "description": "JSON 验证有效标签"
+  },
+  "methodJsonInvalid": "JSON 格式错误",
+  "@methodJsonInvalid": {
+    "description": "JSON 验证无效标签"
+  },
+  "methodJsonFormatError": "JSON 格式无效",
+  "@methodJsonFormatError": {
+    "description": "JSON 格式错误面向用户的消息"
+  },
+  "methodLineCount": "行数: {lines} | 字符数: {chars}",
+  "@methodLineCount": {
+    "description": "JSON 编辑器行数和字符数",
+    "placeholders": {
+      "lines": {
+        "type": "int",
+        "example": "5"
+      },
+      "chars": {
+        "type": "int",
+        "example": "120"
+      }
+    }
+  },
+  "methodValidate": "验证",
+  "@methodValidate": {
+    "description": "验证按钮标签"
+  },
+  "methodValidateSuccess": "方法定义有效",
+  "@methodValidateSuccess": {
+    "description": "验证成功提示"
+  },
+  "methodValidateFailed": "验证失败：{error}",
+  "@methodValidateFailed": {
+    "description": "验证失败提示",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "缺少 Start 节点"
+      }
+    }
+  },
+  "methodValidateInvalidJson": "JSON 格式错误，请先修正",
+  "@methodValidateInvalidJson": {
+    "description": "JSON 无效时点击验证按钮的提示"
+  },
+  "methodSave": "保存",
+  "@methodSave": {
+    "description": "保存按钮标签"
+  },
+  "methodSaving": "保存中...",
+  "@methodSaving": {
+    "description": "保存按钮加载状态"
+  },
+  "methodCreateSuccess": "创建成功",
+  "@methodCreateSuccess": {
+    "description": "创建成功提示"
+  },
+  "methodUpdateSuccess": "保存成功",
+  "@methodUpdateSuccess": {
+    "description": "更新成功提示"
+  },
+  "methodSaveFailed": "保存失败：{error}",
+  "@methodSaveFailed": {
+    "description": "保存失败提示",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "网络错误"
+      }
+    }
+  },
+  "methodDeleteTitle": "删除方法？",
+  "@methodDeleteTitle": {
+    "description": "删除确认对话框标题"
+  },
+  "methodDeleteDescription": "确定要删除方法「{name}」吗？此操作不可撤销，关联的试验记录不受影响。",
+  "@methodDeleteDescription": {
+    "description": "删除确认对话框描述",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "拉伸试验"
+      }
+    }
+  },
+  "methodDeleteSuccess": "方法已删除",
+  "@methodDeleteSuccess": {
+    "description": "删除成功提示"
+  },
+  "methodDeleteFailed": "删除失败：{error}",
+  "@methodDeleteFailed": {
+    "description": "删除失败提示",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "网络错误"
+      }
+    }
+  },
+  "methodUnsavedTitle": "有未保存的更改",
+  "@methodUnsavedTitle": {
+    "description": "未保存变更对话框标题"
+  },
+  "methodUnsavedDescription": "离开此页面将丢失未保存的更改。是否继续？",
+  "@methodUnsavedDescription": {
+    "description": "未保存变更对话框描述"
+  },
+  "methodDiscardAndLeave": "继续离开",
+  "@methodDiscardAndLeave": {
+    "description": "放弃修改并离开按钮"
+  },
+  "methodStayOnPage": "留在页面",
+  "@methodStayOnPage": {
+    "description": "留在页面按钮"
+  },
+  "methodLoadFailed": "方法加载失败",
+  "@methodLoadFailed": {
+    "description": "方法加载错误标题"
+  },
+  "methodTypeNumber": "数值",
+  "@methodTypeNumber": {
+    "description": "参数类型：数值"
+  },
+  "methodTypeInteger": "整数",
+  "@methodTypeInteger": {
+    "description": "参数类型：整数"
+  },
+  "methodTypeString": "字符串",
+  "@methodTypeString": {
+    "description": "参数类型：字符串"
+  },
+  "methodTypeBoolean": "布尔",
+  "@methodTypeBoolean": {
+    "description": "参数类型：布尔"
+  },
+  "methodTypeEnum": "枚举",
+  "@methodTypeEnum": {
+    "description": "参数类型：枚举"
+  },
+  "methodMaxLessThanMin": "最大值不能小于最小值",
+  "@methodMaxLessThanMin": {
+    "description": "最大值小于最小值验证错误"
+  },
+  "methodRequiredPrefix": "必填: {value}",
+  "@methodRequiredPrefix": {
+    "description": "卡片列表必填指示前缀",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "●"
+      }
+    }
+  },
+  "methodDefaultWithUnit": "默认值: {value} {unit}",
+  "@methodDefaultWithUnit": {
+    "description": "卡片列表带单位的默认值",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "25"
+      },
+      "unit": {
+        "type": "String",
+        "example": "°C"
+      }
+    }
+  },
+  "methodDefaultNoUnit": "默认值: {value}",
+  "@methodDefaultNoUnit": {
+    "description": "卡片列表不带单位的默认值",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "true"
+      }
+    }
+  },
+  "methodValidating": "验证中...",
+  "@methodValidating": {
+    "description": "验证按钮加载状态"
+  },
+  "methodDeleteConfirmDelete": "删除",
+  "@methodDeleteConfirmDelete": {
+    "description": "删除确认按钮"
+  },
+  "methodNetworkError": "网络连接失败，请检查网络后重试",
+  "@methodNetworkError": {
+    "description": "方法列表网络错误消息"
+  },
+  "methodNetworkErrorRetry": "网络异常，请稍后重试",
+  "@methodNetworkErrorRetry": {
+    "description": "通用网络错误消息"
+  },
+  "methodOperationFailed": "操作失败，请重试",
+  "@methodOperationFailed": {
+    "description": "默认操作失败消息"
+  },
+  "methodConflict": "资源冲突，请检查是否已存在相同名称的方法",
+  "@methodConflict": {
+    "description": "方法冲突错误消息"
   }
 }

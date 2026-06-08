@@ -1217,4 +1217,283 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get totalDurationLabel => '总运行时长';
+
+  @override
+  String get methodEmptyTitle => '暂无方法';
+
+  @override
+  String get methodEmptyDescription => '点击下方按钮创建您的第一个方法';
+
+  @override
+  String get methodEmptyAction => '创建第一个方法';
+
+  @override
+  String get methodSearchHint => '搜索方法名称或描述...';
+
+  @override
+  String get methodSearchNoResults => '未找到匹配的方法';
+
+  @override
+  String get methodSearchNoResultsHint => '请尝试其他关键词';
+
+  @override
+  String get methodClearSearch => '清除搜索';
+
+  @override
+  String get methodCreateNew => '新建方法';
+
+  @override
+  String get methodCreateTitle => '创建方法';
+
+  @override
+  String get methodEditTitle => '编辑方法';
+
+  @override
+  String get methodNameLabel => '方法名称 *';
+
+  @override
+  String get methodNameHint => '请输入方法名称';
+
+  @override
+  String get methodNameRequired => '请输入方法名称（至少 2 个字符）';
+
+  @override
+  String get methodDescriptionLabel => '方法描述';
+
+  @override
+  String get methodDescriptionHint => '请输入方法描述（选填）';
+
+  @override
+  String get methodProcessDefinitionTitle => '过程定义 (JSON)';
+
+  @override
+  String get methodParameterListTitle => '参数列表';
+
+  @override
+  String get methodNoParameters => '暂无参数';
+
+  @override
+  String get methodAddParameter => '添加参数';
+
+  @override
+  String get methodAddFirstParameter => '添加第一个参数';
+
+  @override
+  String get methodEditParameterTitle => '编辑参数';
+
+  @override
+  String get methodAddParameterTitle => '添加参数';
+
+  @override
+  String get methodParamKey => '参数键 *';
+
+  @override
+  String get methodParamKeyHint => '仅允许字母、数字和下划线';
+
+  @override
+  String get methodParamKeyRequired => '请输入参数键';
+
+  @override
+  String get methodParamKeyInvalid => '参数键只能包含字母、数字和下划线，且不能以数字开头';
+
+  @override
+  String get methodParamKeyExists => '参数键已存在';
+
+  @override
+  String get methodParamLabel => '显示标签';
+
+  @override
+  String get methodParamLabelHint => '默认等于参数键';
+
+  @override
+  String get methodParamType => '参数类型 *';
+
+  @override
+  String get methodParamRequired => '必填';
+
+  @override
+  String get methodParamUnit => '单位';
+
+  @override
+  String get methodParamUnitHint => '如 kN、°C、s';
+
+  @override
+  String get methodParamMin => '最小值';
+
+  @override
+  String get methodParamMax => '最大值';
+
+  @override
+  String get methodParamDefaultValue => '默认值';
+
+  @override
+  String get methodParamDescription => '描述';
+
+  @override
+  String get methodParamDescriptionHint => '参数说明（选填）';
+
+  @override
+  String get methodParamEnumOptions => '枚举选项';
+
+  @override
+  String get methodParamEnumHint => '输入选项后点击添加';
+
+  @override
+  String get methodColumnKey => '参数键';
+
+  @override
+  String get methodColumnLabel => '显示标签';
+
+  @override
+  String get methodColumnType => '类型';
+
+  @override
+  String get methodColumnRequired => '必填';
+
+  @override
+  String get methodColumnDefaultValue => '默认值';
+
+  @override
+  String get methodColumnUnit => '单位';
+
+  @override
+  String get methodColumnDescription => '描述';
+
+  @override
+  String get methodColumnActions => '操作';
+
+  @override
+  String methodParamCount(int count) {
+    return '$count 个参数';
+  }
+
+  @override
+  String get methodParamCountZero => '0 个参数';
+
+  @override
+  String get methodJsonValid => 'JSON 格式正确';
+
+  @override
+  String get methodJsonInvalid => 'JSON 格式错误';
+
+  @override
+  String get methodJsonFormatError => 'JSON 格式无效';
+
+  @override
+  String methodLineCount(int lines, int chars) {
+    return '行数: $lines | 字符数: $chars';
+  }
+
+  @override
+  String get methodValidate => '验证';
+
+  @override
+  String get methodValidateSuccess => '方法定义有效';
+
+  @override
+  String methodValidateFailed(String error) {
+    return '验证失败：$error';
+  }
+
+  @override
+  String get methodValidateInvalidJson => 'JSON 格式错误，请先修正';
+
+  @override
+  String get methodSave => '保存';
+
+  @override
+  String get methodSaving => '保存中...';
+
+  @override
+  String get methodCreateSuccess => '创建成功';
+
+  @override
+  String get methodUpdateSuccess => '保存成功';
+
+  @override
+  String methodSaveFailed(String error) {
+    return '保存失败：$error';
+  }
+
+  @override
+  String get methodDeleteTitle => '删除方法？';
+
+  @override
+  String methodDeleteDescription(String name) {
+    return '确定要删除方法「$name」吗？此操作不可撤销，关联的试验记录不受影响。';
+  }
+
+  @override
+  String get methodDeleteSuccess => '方法已删除';
+
+  @override
+  String methodDeleteFailed(String error) {
+    return '删除失败：$error';
+  }
+
+  @override
+  String get methodUnsavedTitle => '有未保存的更改';
+
+  @override
+  String get methodUnsavedDescription => '离开此页面将丢失未保存的更改。是否继续？';
+
+  @override
+  String get methodDiscardAndLeave => '继续离开';
+
+  @override
+  String get methodStayOnPage => '留在页面';
+
+  @override
+  String get methodLoadFailed => '方法加载失败';
+
+  @override
+  String get methodTypeNumber => '数值';
+
+  @override
+  String get methodTypeInteger => '整数';
+
+  @override
+  String get methodTypeString => '字符串';
+
+  @override
+  String get methodTypeBoolean => '布尔';
+
+  @override
+  String get methodTypeEnum => '枚举';
+
+  @override
+  String get methodMaxLessThanMin => '最大值不能小于最小值';
+
+  @override
+  String methodRequiredPrefix(String value) {
+    return '必填: $value';
+  }
+
+  @override
+  String methodDefaultWithUnit(String value, String unit) {
+    return '默认值: $value $unit';
+  }
+
+  @override
+  String methodDefaultNoUnit(String value) {
+    return '默认值: $value';
+  }
+
+  @override
+  String get methodValidating => '验证中...';
+
+  @override
+  String get methodDeleteConfirmDelete => '删除';
+
+  @override
+  String get methodNetworkError => '网络连接失败，请检查网络后重试';
+
+  @override
+  String get methodNetworkErrorRetry => '网络异常，请稍后重试';
+
+  @override
+  String get methodOperationFailed => '操作失败，请重试';
+
+  @override
+  String get methodConflict => '资源冲突，请检查是否已存在相同名称的方法';
 }

@@ -1,14 +1,13 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../generated/app_localizations.dart';
 import '../../models/method.dart';
 import '../../providers/method_provider.dart';
 import '../../providers/services.dart';
-import '../../widgets/confirm_dialog.dart';
 import '../../widgets/error_view.dart';
 import '../../widgets/toast.dart';
 
@@ -136,10 +135,10 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
         _isJsonValid = true;
         _jsonErrorMessage = null;
       });
-    } on FormatException catch (e) {
+    } on FormatException {
       setState(() {
         _isJsonValid = false;
-        _jsonErrorMessage = 'JSON 格式错误：${e.message}';
+        _jsonErrorMessage = AppLocalizations.of(context)!.methodJsonFormatError;
       });
     }
   }
@@ -157,7 +156,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     }
   }
 
-  /// 构建参数 schema
+  /// 构建参数 schema（发送到后端）
   Map<String, dynamic> _buildParameterSchema() {
     final properties = <String, dynamic>{};
     final required = <String>[];
@@ -198,7 +197,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     if (!nameValid) {
       Toast.show(
         context: context,
-        message: '请输入方法名称（至少 2 个字符）',
+        message: AppLocalizations.of(context)!.methodNameRequired,
         type: ToastType.error,
       );
       return false;
@@ -214,18 +213,22 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     if (_isSaving) return;
     setState(() => _isSaving = true);
 
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final processDefinition = _parseJson(_jsonController.text);
       if (processDefinition == null) {
         Toast.show(
           context: context,
-          message: 'JSON 格式无效',
+          message: l10n.methodJsonFormatError,
           type: ToastType.error,
         );
         setState(() => _isSaving = false);
         return;
       }
 
+      // 发送到后端：后端只接受 parameter_schema（JSON Schema 格式）
+      // parameters 列表是本地状态，用于驱动参数表 UI，不发送到后端
       final data = <String, dynamic>{
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim().isEmpty
@@ -233,7 +236,6 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
             : _descriptionController.text.trim(),
         'process_definition': processDefinition,
         'parameter_schema': _buildParameterSchema(),
-        'parameters': _parameters.map((p) => p.toJson()).toList(),
       };
 
       if (_isCreateMode) {
@@ -243,7 +245,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
         if (!mounted) return;
         Toast.show(
           context: context,
-          message: '创建成功',
+          message: l10n.methodCreateSuccess,
           type: ToastType.success,
         );
         if (!mounted) return;
@@ -255,7 +257,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
         if (!mounted) return;
         Toast.show(
           context: context,
-          message: '保存成功',
+          message: l10n.methodUpdateSuccess,
           type: ToastType.success,
         );
         if (!mounted) return;
@@ -265,7 +267,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
       if (!mounted) return;
       Toast.show(
         context: context,
-        message: '保存失败：$e',
+        message: l10n.methodSaveFailed(e.toString()),
         type: ToastType.error,
       );
     } finally {
@@ -277,11 +279,13 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
 
   /// 验证方法定义
   Future<void> _validateMethod() async {
+    final l10n = AppLocalizations.of(context)!;
+
     _validateJson();
     if (!_isJsonValid) {
       Toast.show(
         context: context,
-        message: 'JSON 格式错误，请先修正',
+        message: l10n.methodValidateInvalidJson,
         type: ToastType.error,
       );
       return;
@@ -294,7 +298,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
       if (processDefinition == null) {
         Toast.show(
           context: context,
-          message: 'JSON 格式无效',
+          message: l10n.methodJsonFormatError,
           type: ToastType.error,
         );
         setState(() => _isValidating = false);
@@ -308,7 +312,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
         if (!mounted) return;
         Toast.show(
           context: context,
-          message: '方法定义有效',
+          message: l10n.methodValidateSuccess,
           type: ToastType.success,
         );
       } else {
@@ -316,8 +320,8 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
         Toast.show(
           context: context,
           message: result.errors.isNotEmpty
-              ? result.errors.join('\n')
-              : '方法定义无效',
+              ? l10n.methodValidateFailed(result.errors.join('\n'))
+              : l10n.methodValidateFailed(l10n.methodJsonInvalid),
           type: ToastType.error,
         );
       }
@@ -325,7 +329,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
       if (!mounted) return;
       Toast.show(
         context: context,
-        message: '验证失败：$e',
+        message: l10n.methodValidateFailed(e.toString()),
         type: ToastType.error,
       );
     } finally {
@@ -335,45 +339,47 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     }
   }
 
-  /// 处理返回确认
+  /// 处理返回确认（标准 Flutter showDialog 模式，避免 Completer 反模式）
   Future<bool> _confirmLeave() async {
     if (!_isDirty) return true;
-
-    // Use a completer to bridge the dialog callbacks
-    final completer = Completer<bool>();
-    final dialogResult = ConfirmDialog.show(
+    final result = await showDialog<bool>(
       context: context,
-      title: '有未保存的更改',
-      description: '离开此页面将丢失未保存的更改。是否继续？',
-      onConfirm: () {
-        completer.complete(true);
+      barrierDismissible: false,
+      builder: (ctx) {
+        final dialogL10n = AppLocalizations.of(ctx)!;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text(dialogL10n.methodUnsavedTitle),
+          content: Text(dialogL10n.methodUnsavedDescription),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(dialogL10n.methodStayOnPage),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(dialogL10n.methodDiscardAndLeave),
+            ),
+          ],
+        );
       },
-      onCancel: () {
-        completer.complete(false);
-      },
-      confirmLabel: '继续离开',
-      cancelLabel: '留在页面',
     );
-
-    unawaited(dialogResult.then((_) {
-      if (!completer.isCompleted) {
-        completer.complete(false);
-      }
-    }));
-
-    return completer.future;
+    return result ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     // 加载状态
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(_isCreateMode ? '创建方法' : '编辑方法'),
+          title: Text(_isCreateMode ? l10n.methodCreateTitle : l10n.methodEditTitle),
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -383,10 +389,10 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     if (_loadError != null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(_isCreateMode ? '创建方法' : '编辑方法'),
+          title: Text(_isCreateMode ? l10n.methodCreateTitle : l10n.methodEditTitle),
         ),
         body: ErrorView(
-          title: '方法加载失败',
+          title: l10n.methodLoadFailed,
           description: _loadError,
           onRetry: () {
             setState(() {
@@ -428,7 +434,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
               }
             },
           ),
-          title: Text(_isCreateMode ? '创建方法' : '编辑方法'),
+          title: Text(_isCreateMode ? l10n.methodCreateTitle : l10n.methodEditTitle),
           actions: [
             // 验证状态标签
             if (_isJsonValid && _isDirty)
@@ -441,7 +447,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                     color: colorScheme.primary,
                   ),
                   label: Text(
-                    '格式正确',
+                    l10n.methodJsonValid,
                     style: TextStyle(
                       color: colorScheme.primary,
                       fontSize: 12,
@@ -464,7 +470,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                     color: colorScheme.error,
                   ),
                   label: Text(
-                    '格式错误',
+                    l10n.methodJsonInvalid,
                     style: TextStyle(
                       color: colorScheme.error,
                       fontSize: 12,
@@ -491,7 +497,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('保存'),
+                    : Text(l10n.methodSave),
               ),
             ),
           ],
@@ -507,19 +513,20 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // === 基本信息 ===
-                    const _SectionHeader(title: '基本信息'),
+                    _SectionHeader(title: l10n.basicInfo),
                     const SizedBox(height: 8),
                     TextFormField(
+                      key: const Key('method-name-field'),
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: '方法名称 *',
-                        hintText: '请输入方法名称',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.methodNameLabel,
+                        hintText: l10n.methodNameHint,
+                        border: const OutlineInputBorder(),
                       ),
                       maxLength: 64,
                       validator: (value) {
                         if (value == null || value.trim().length < 2) {
-                          return '请输入方法名称（至少 2 个字符）';
+                          return l10n.methodNameRequired;
                         }
                         return null;
                       },
@@ -527,11 +534,12 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      key: const Key('method-description-field'),
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: '方法描述',
-                        hintText: '请输入方法描述（选填）',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.methodDescriptionLabel,
+                        hintText: l10n.methodDescriptionHint,
+                        border: const OutlineInputBorder(),
                         alignLabelWithHint: true,
                       ),
                       maxLines: 3,
@@ -544,7 +552,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
 
                     // === 过程定义 (JSON) ===
                     _SectionHeader(
-                      title: '过程定义 (JSON)',
+                      title: l10n.methodProcessDefinitionTitle,
                       trailing: _isJsonValid && _jsonController.text.isNotEmpty
                           ? Icon(Icons.check_circle,
                               size: 18, color: colorScheme.primary)
@@ -555,6 +563,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                     ),
                     const SizedBox(height: 8),
                     _JsonEditor(
+                      key: const Key('method-json-editor'),
                       controller: _jsonController,
                       isValid: _isJsonValid,
                       errorMessage: _jsonErrorMessage,
@@ -568,11 +577,11 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
 
                     // === 参数列表 ===
                     _SectionHeader(
-                      title: '参数列表',
+                      title: l10n.methodParameterListTitle,
                       trailing: TextButton.icon(
                         onPressed: _showParameterDialog,
                         icon: const Icon(Icons.add, size: 18),
-                        label: const Text('添加参数'),
+                        label: Text(l10n.methodAddParameter),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -590,7 +599,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                '暂无参数',
+                                l10n.methodNoParameters,
                                 style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
@@ -598,7 +607,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                               const SizedBox(height: 4),
                               TextButton(
                                 onPressed: _showParameterDialog,
-                                child: const Text('添加第一个参数'),
+                                child: Text(l10n.methodAddFirstParameter),
                               ),
                             ],
                           ),
@@ -626,6 +635,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         OutlinedButton(
+                          key: const Key('method-validate'),
                           onPressed: _isValidating ? null : _validateMethod,
                           child: _isValidating
                               ? const SizedBox(
@@ -635,10 +645,11 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                                     strokeWidth: 2,
                                   ),
                                 )
-                              : const Text('验证'),
+                              : Text(l10n.methodValidate),
                         ),
                         const SizedBox(width: 8),
                         FilledButton(
+                          key: const Key('method-save'),
                           onPressed: canSave ? _save : null,
                           child: _isSaving
                               ? const SizedBox(
@@ -649,7 +660,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text('保存'),
+                              : Text(l10n.methodSave),
                         ),
                       ],
                     ),
@@ -701,12 +712,15 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
               final isNumberType =
                   paramType == 'number' || paramType == 'integer';
               final isBooleanType = paramType == 'boolean';
+              final dialogL10n = AppLocalizations.of(ctx)!;
 
               return AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                title: Text(isEditing ? '编辑参数' : '添加参数'),
+                title: Text(isEditing
+                    ? dialogL10n.methodEditParameterTitle
+                    : dialogL10n.methodAddParameterTitle),
                 content: SingleChildScrollView(
                   child: SizedBox(
                     width: 560,
@@ -718,26 +732,28 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                         children: [
                           // 参数键
                           TextFormField(
+                            key: const Key('param-key-field'),
                             controller: keyController,
-                            decoration: const InputDecoration(
-                              labelText: '参数键 *',
-                              hintText: '仅允许字母、数字和下划线',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: dialogL10n.methodParamKey,
+                              hintText: dialogL10n.methodParamKeyHint,
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return '请输入参数键';
+                                return dialogL10n.methodParamKeyRequired;
                               }
-                              final regex = RegExp(r'^[a-zA-Z_][a-zA-Z0-9_]*$');
+                              final regex =
+                                  RegExp(r'^[a-zA-Z_][a-zA-Z0-9_]*$');
                               if (!regex.hasMatch(value)) {
-                                return '参数键只能包含字母、数字和下划线，且不能以数字开头';
+                                return dialogL10n.methodParamKeyInvalid;
                               }
                               // 唯一性校验
                               if (!isEditing) {
                                 final exists = _parameters
                                     .any((p) => p.key == value);
                                 if (exists) {
-                                  return '参数键已存在';
+                                  return dialogL10n.methodParamKeyExists;
                                 }
                               } else {
                                 final exists = _parameters
@@ -747,7 +763,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                                         e.value.key == value &&
                                         e.key != index);
                                 if (exists) {
-                                  return '参数键已存在';
+                                  return dialogL10n.methodParamKeyExists;
                                 }
                               }
                               return null;
@@ -757,11 +773,12 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
 
                           // 显示标签
                           TextFormField(
+                            key: const Key('param-label-field'),
                             controller: labelController,
-                            decoration: const InputDecoration(
-                              labelText: '显示标签',
-                              hintText: '默认等于参数键',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: dialogL10n.methodParamLabel,
+                              hintText: dialogL10n.methodParamLabelHint,
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -772,31 +789,32 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                             children: [
                               Expanded(
                                 child: DropdownButtonFormField<String>(
+                                  key: ValueKey('param-type-$paramType'),
                                   initialValue: paramType,
-                                  decoration: const InputDecoration(
-                                    labelText: '参数类型 *',
-                                    border: OutlineInputBorder(),
+                                  decoration: InputDecoration(
+                                    labelText: dialogL10n.methodParamType,
+                                    border: const OutlineInputBorder(),
                                   ),
-                                  items: const [
+                                  items: [
                                     DropdownMenuItem(
                                       value: 'number',
-                                      child: Text('数值'),
+                                      child: Text(dialogL10n.methodTypeNumber),
                                     ),
                                     DropdownMenuItem(
                                       value: 'integer',
-                                      child: Text('整数'),
+                                      child: Text(dialogL10n.methodTypeInteger),
                                     ),
                                     DropdownMenuItem(
                                       value: 'string',
-                                      child: Text('字符串'),
+                                      child: Text(dialogL10n.methodTypeString),
                                     ),
                                     DropdownMenuItem(
                                       value: 'boolean',
-                                      child: Text('布尔'),
+                                      child: Text(dialogL10n.methodTypeBoolean),
                                     ),
                                     DropdownMenuItem(
                                       value: 'enum',
-                                      child: Text('枚举'),
+                                      child: Text(dialogL10n.methodTypeEnum),
                                     ),
                                   ],
                                   onChanged: (value) {
@@ -809,7 +827,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                               const SizedBox(width: 16),
                               Expanded(
                                 child: SwitchListTile(
-                                  title: const Text('必填'),
+                                  title: Text(dialogL10n.methodParamRequired),
                                   value: isRequired,
                                   contentPadding: EdgeInsets.zero,
                                   onChanged: (value) {
@@ -826,11 +844,12 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                           // 单位（仅 number/integer）
                           if (isNumberType)
                             TextFormField(
+                              key: const Key('param-unit-field'),
                               controller: unitController,
-                              decoration: const InputDecoration(
-                                labelText: '单位',
-                                hintText: '如 kN、°C、s',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                labelText: dialogL10n.methodParamUnit,
+                                hintText: dialogL10n.methodParamUnitHint,
+                                border: const OutlineInputBorder(),
                               ),
                             )
                           else if (isEnumType)
@@ -847,10 +866,11 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                               children: [
                                 Expanded(
                                   child: TextFormField(
+                                    key: const Key('param-min-field'),
                                     controller: minController,
-                                    decoration: const InputDecoration(
-                                      labelText: '最小值',
-                                      border: OutlineInputBorder(),
+                                    decoration: InputDecoration(
+                                      labelText: dialogL10n.methodParamMin,
+                                      border: const OutlineInputBorder(),
                                     ),
                                     keyboardType: TextInputType.number,
                                   ),
@@ -858,23 +878,25 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: TextFormField(
+                                    key: const Key('param-max-field'),
                                     controller: maxController,
-                                    decoration: const InputDecoration(
-                                      labelText: '最大值',
-                                      border: OutlineInputBorder(),
+                                    decoration: InputDecoration(
+                                      labelText: dialogL10n.methodParamMax,
+                                      border: const OutlineInputBorder(),
                                     ),
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
                                       if (value != null &&
                                           value.isNotEmpty &&
                                           minController.text.isNotEmpty) {
-                                        final min =
-                                            double.tryParse(minController.text);
+                                        final min = double.tryParse(
+                                            minController.text);
                                         final max = double.tryParse(value);
                                         if (min != null &&
                                             max != null &&
                                             max < min) {
-                                          return '最大值不能小于最小值';
+                                          return dialogL10n
+                                              .methodMaxLessThanMin;
                                         }
                                       }
                                       return null;
@@ -890,7 +912,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                           // 默认值
                           if (isBooleanType)
                             SwitchListTile(
-                              title: const Text('默认值'),
+                              title: Text(dialogL10n.methodParamDefaultValue),
                               value: defaultValueController.text == 'true',
                               contentPadding: EdgeInsets.zero,
                               onChanged: (value) {
@@ -902,13 +924,14 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                             )
                           else if (isEnumType)
                             DropdownButtonFormField<String>(
+                              key: ValueKey('enum-default-${defaultValueController.text}'),
                               initialValue: enumOptions.value.contains(
                                       defaultValueController.text)
                                   ? defaultValueController.text
                                   : null,
-                              decoration: const InputDecoration(
-                                labelText: '默认值',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                labelText: dialogL10n.methodParamDefaultValue,
+                                border: const OutlineInputBorder(),
                               ),
                               items: enumOptions.value
                                   .map(
@@ -927,9 +950,9 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                           else
                             TextFormField(
                               controller: defaultValueController,
-                              decoration: const InputDecoration(
-                                labelText: '默认值',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                labelText: dialogL10n.methodParamDefaultValue,
+                                border: const OutlineInputBorder(),
                               ),
                               keyboardType: isNumberType
                                   ? TextInputType.number
@@ -941,10 +964,10 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                           // 描述
                           TextFormField(
                             controller: descriptionController,
-                            decoration: const InputDecoration(
-                              labelText: '描述',
-                              hintText: '参数说明（选填）',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: dialogL10n.methodParamDescription,
+                              hintText: dialogL10n.methodParamDescriptionHint,
+                              border: const OutlineInputBorder(),
                               alignLabelWithHint: true,
                             ),
                             maxLines: 2,
@@ -958,7 +981,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text('取消'),
+                    child: Text(dialogL10n.cancel),
                   ),
                   FilledButton(
                     onPressed: () {
@@ -999,7 +1022,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
 
                       Navigator.of(ctx).pop();
                     },
-                    child: const Text('保存'),
+                    child: Text(dialogL10n.save),
                   ),
                 ],
               );
@@ -1018,6 +1041,7 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
     required TextEditingController inputController,
     required void Function(VoidCallback) setDialogState,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return [
       const SizedBox(height: 16),
       Row(
@@ -1025,10 +1049,10 @@ class _MethodEditPageState extends ConsumerState<MethodEditPage> {
           Expanded(
             child: TextFormField(
               controller: inputController,
-              decoration: const InputDecoration(
-                labelText: '枚举选项',
-                hintText: '输入选项后点击添加',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.methodParamEnumOptions,
+                hintText: l10n.methodParamEnumHint,
+                border: const OutlineInputBorder(),
               ),
             ),
           ),
@@ -1133,6 +1157,7 @@ class _SectionHeader extends StatelessWidget {
 /// JSON 编辑器
 class _JsonEditor extends StatefulWidget {
   const _JsonEditor({
+    super.key,
     required this.controller,
     required this.isValid,
     this.errorMessage,
@@ -1167,6 +1192,7 @@ class _JsonEditorState extends State<_JsonEditor> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -1234,7 +1260,10 @@ class _JsonEditorState extends State<_JsonEditor> {
               children: [
                 // 统计信息
                 Text(
-                  '行数: ${'\n'.allMatches(widget.controller.text).length + 1} | 字符数: ${widget.controller.text.length}',
+                  l10n.methodLineCount(
+                    ('\n'.allMatches(widget.controller.text).length + 1),
+                    widget.controller.text.length,
+                  ),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -1257,8 +1286,8 @@ class _JsonEditorState extends State<_JsonEditor> {
                       const SizedBox(width: 4),
                       Text(
                         widget.isValid
-                            ? 'JSON 格式正确'
-                            : (widget.errorMessage ?? 'JSON 格式错误'),
+                            ? l10n.methodJsonValid
+                            : (widget.errorMessage ?? l10n.methodJsonInvalid),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: widget.isValid
                               ? colorScheme.primary
@@ -1319,6 +1348,7 @@ class _ParameterTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -1327,20 +1357,21 @@ class _ParameterTable extends StatelessWidget {
         dataRowMinHeight: 48,
         dataRowMaxHeight: 52,
         columnSpacing: 16,
-        columns: const [
-          DataColumn(label: Text('参数键')),
-          DataColumn(label: Text('显示标签')),
-          DataColumn(label: Text('类型')),
-          DataColumn(label: Text('必填')),
-          DataColumn(label: Text('默认值')),
-          DataColumn(label: Text('单位')),
-          DataColumn(label: Text('描述')),
-          DataColumn(label: Text('操作')),
+        columns: [
+          DataColumn(label: Text(l10n.methodColumnKey)),
+          DataColumn(label: Text(l10n.methodColumnLabel)),
+          DataColumn(label: Text(l10n.methodColumnType)),
+          DataColumn(label: Text(l10n.methodColumnRequired)),
+          DataColumn(label: Text(l10n.methodColumnDefaultValue)),
+          DataColumn(label: Text(l10n.methodColumnUnit)),
+          DataColumn(label: Text(l10n.methodColumnDescription)),
+          DataColumn(label: Text(l10n.methodColumnActions)),
         ],
         rows: parameters.asMap().entries.map((entry) {
           final index = entry.key;
           final param = entry.value;
           return DataRow(
+            key: ValueKey('param-row-$index'),
             cells: [
               DataCell(Text(param.key,
                   style: const TextStyle(fontFamily: 'RobotoMono'))),
@@ -1372,9 +1403,10 @@ class _ParameterTable extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
+                      key: Key('param-edit-$index'),
                       icon: Icon(Icons.edit_outlined,
                           size: 18, color: colorScheme.primary),
-                      tooltip: '编辑',
+                      tooltip: l10n.edit,
                       onPressed: () => onEdit(index),
                       constraints: const BoxConstraints(
                         minWidth: 32,
@@ -1383,9 +1415,10 @@ class _ParameterTable extends StatelessWidget {
                       padding: EdgeInsets.zero,
                     ),
                     IconButton(
+                      key: Key('param-delete-$index'),
                       icon: Icon(Icons.delete_outlined,
                           size: 18, color: colorScheme.error),
-                      tooltip: '删除',
+                      tooltip: l10n.delete,
                       onPressed: () => onDelete(index),
                       constraints: const BoxConstraints(
                         minWidth: 32,
@@ -1413,6 +1446,7 @@ class _TypeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     Color bgColor;
     Color textColor;
@@ -1423,22 +1457,22 @@ class _TypeChip extends StatelessWidget {
       case 'integer':
         bgColor = colorScheme.primaryContainer;
         textColor = colorScheme.onPrimaryContainer;
-        label = type == 'number' ? '数值' : '整数';
+        label = type == 'number' ? l10n.methodTypeNumber : l10n.methodTypeInteger;
         break;
       case 'string':
         bgColor = colorScheme.tertiaryContainer;
         textColor = colorScheme.onTertiaryContainer;
-        label = '字符串';
+        label = l10n.methodTypeString;
         break;
       case 'boolean':
         bgColor = colorScheme.secondaryContainer;
         textColor = colorScheme.onSecondaryContainer;
-        label = '布尔';
+        label = l10n.methodTypeBoolean;
         break;
       case 'enum':
         bgColor = colorScheme.primaryContainer;
         textColor = colorScheme.onPrimaryContainer;
-        label = '枚举';
+        label = l10n.methodTypeEnum;
         break;
       default:
         bgColor = colorScheme.surfaceContainerHighest;
@@ -1480,12 +1514,14 @@ class _ParameterCardList extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: parameters.asMap().entries.map((entry) {
         final index = entry.key;
         final param = entry.value;
         return Card(
+          key: Key('param-card-$index'),
           margin: const EdgeInsets.only(bottom: 8),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -1498,12 +1534,13 @@ class _ParameterCardList extends StatelessWidget {
                       child: Text(
                         '${param.label ?? param.key} (${param.key})',
                         style: textTheme.titleSmall,
+
                       ),
                     ),
                     IconButton(
                       icon: Icon(Icons.edit_outlined,
                           size: 18, color: colorScheme.primary),
-                      tooltip: '编辑',
+                      tooltip: l10n.edit,
                       onPressed: () => onEdit(index),
                       constraints: const BoxConstraints(
                         minWidth: 44,
@@ -1514,7 +1551,7 @@ class _ParameterCardList extends StatelessWidget {
                     IconButton(
                       icon: Icon(Icons.delete_outlined,
                           size: 18, color: colorScheme.error),
-                      tooltip: '删除',
+                      tooltip: l10n.delete,
                       onPressed: () => onDelete(index),
                       constraints: const BoxConstraints(
                         minWidth: 44,
@@ -1530,7 +1567,7 @@ class _ParameterCardList extends StatelessWidget {
                     _TypeChip(type: param.type),
                     const SizedBox(width: 8),
                     Text(
-                      '必填: ${param.isRequired ? "●" : "○"}',
+                      l10n.methodRequiredPrefix(param.isRequired ? '●' : '○'),
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -1539,7 +1576,14 @@ class _ParameterCardList extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '默认值: ${param.defaultValue?.toString() ?? "-"}${param.unit != null ? " ${param.unit}" : ""}',
+                  param.unit != null
+                      ? l10n.methodDefaultWithUnit(
+                          param.defaultValue?.toString() ?? '-',
+                          param.unit!,
+                        )
+                      : l10n.methodDefaultNoUnit(
+                          param.defaultValue?.toString() ?? '-',
+                        ),
                   style: textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

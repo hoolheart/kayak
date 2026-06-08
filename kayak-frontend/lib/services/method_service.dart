@@ -135,6 +135,9 @@ class MethodService {
 }
 
 /// 验证结果模型
+///
+/// 简单的 2 字段响应对象。注意：如果未来增加更多字段，
+/// 建议迁移到 freezed + json_serializable 以保持与项目中其他模型一致。
 class ValidationResult {
   const ValidationResult({
     required this.valid,

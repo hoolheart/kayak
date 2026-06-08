@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,11 +32,20 @@ class MethodListPage extends ConsumerStatefulWidget {
 
 class _MethodListPageState extends ConsumerState<MethodListPage> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void dispose() {
     _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      ref.read(methodListProvider.notifier).search(value);
+    });
   }
 
   @override
@@ -46,7 +57,8 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
       appBar: AppBar(
         title: Text(l10n.methodList),
         actions: [
-          _BuildMethodButton(
+          _CreateMethodButton(
+            key: const Key('method-create'),
             onPressed: () => context.push('/methods/new/edit'),
           ),
         ],
@@ -55,10 +67,9 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
         children: [
           // 搜索栏
           _SearchBar(
+            key: const Key('method-search'),
             controller: _searchController,
-            onChanged: (value) {
-              ref.read(methodListProvider.notifier).search(value);
-            },
+            onChanged: _onSearchChanged,
           ),
           // 内容区
           Expanded(
@@ -97,39 +108,41 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
   }
 
   Widget _buildEmpty(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return EmptyView(
       icon: Icons.science_outlined,
-      title: '暂无方法',
-      description: '点击下方按钮创建您的第一个方法',
+      title: l10n.methodEmptyTitle,
+      description: l10n.methodEmptyDescription,
       actionButton: FilledButton.icon(
         onPressed: () => context.push('/methods/new/edit'),
         icon: const Icon(Icons.add),
-        label: const Text('创建第一个方法'),
+        label: Text(l10n.methodEmptyAction),
       ),
     );
   }
 
   Widget _buildSearchEmpty(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return EmptyView(
       icon: Icons.search_off,
-      title: '未找到匹配的方法',
-      description: '请尝试其他关键词',
+      title: l10n.methodSearchNoResults,
+      description: l10n.methodSearchNoResultsHint,
       actionButton: TextButton(
         onPressed: () {
           _searchController.clear();
           ref.read(methodListProvider.notifier).search('');
         },
-        child: const Text('清除搜索'),
+        child: Text(l10n.methodClearSearch),
       ),
     );
   }
 
   Future<void> _confirmDelete(BuildContext context, Method method) async {
+    final l10n = AppLocalizations.of(context)!;
     await ConfirmDialog.show(
       context: context,
-      title: '删除方法？',
-      description:
-          '确定要删除方法「${method.name}」吗？此操作不可撤销，关联的试验记录不受影响。',
+      title: l10n.methodDeleteTitle,
+      description: l10n.methodDeleteDescription(method.name),
       onConfirm: () {
         ref
             .read(methodListProvider.notifier)
@@ -138,7 +151,7 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
           if (context.mounted) {
             Toast.show(
               context: context,
-              message: '方法已删除',
+              message: l10n.methodDeleteSuccess,
               type: ToastType.success,
             );
           }
@@ -146,7 +159,7 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
           if (context.mounted) {
             Toast.show(
               context: context,
-              message: '删除失败：$error',
+              message: l10n.methodDeleteFailed(error.toString()),
               type: ToastType.error,
             );
           }
@@ -163,38 +176,46 @@ class _MethodListPageState extends ConsumerState<MethodListPage> {
 // ============================================================
 
 /// 新建方法按钮（响应式：桌面显示文字+图标，移动仅图标）
-class _BuildMethodButton extends StatelessWidget {
-  const _BuildMethodButton({required this.onPressed});
+class _CreateMethodButton extends StatelessWidget {
+  const _CreateMethodButton({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
+    final l10n = AppLocalizations.of(context)!;
 
-    if (isMobile) {
-      return IconButton(
-        icon: const Icon(Icons.add),
-        tooltip: '新建方法',
-        onPressed: onPressed,
-      );
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // constraints.maxWidth is the available width from the parent
+        // AppBar actions row — infer mobile if very narrow
+        final isMobile = constraints.maxWidth < 80;
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: FilledButton.icon(
-        onPressed: onPressed,
-        icon: const Icon(Icons.add, size: 18),
-        label: const Text('新建方法'),
-      ),
+        if (isMobile) {
+          return IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: l10n.methodCreateNew,
+            onPressed: onPressed,
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: FilledButton.icon(
+            onPressed: onPressed,
+            icon: const Icon(Icons.add, size: 18),
+            label: Text(l10n.methodCreateNew),
+          ),
+        );
+      },
     );
   }
 }
 
 /// 搜索栏
-class _SearchBar extends StatelessWidget {
+class _SearchBar extends StatefulWidget {
   const _SearchBar({
+    super.key,
     required this.controller,
     required this.onChanged,
   });
@@ -203,8 +224,35 @@ class _SearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChanged);
+    _hasText = widget.controller.text.isNotEmpty;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    setState(() {
+      _hasText = widget.controller.text.isNotEmpty;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -217,23 +265,23 @@ class _SearchBar extends StatelessWidget {
         ),
       ),
       child: TextField(
-        controller: controller,
-        onChanged: onChanged,
+        controller: widget.controller,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
-          hintText: '搜索方法名称或描述...',
+          hintText: l10n.methodSearchHint,
           prefixIcon: Icon(
             Icons.search,
             color: colorScheme.onSurfaceVariant,
           ),
-          suffixIcon: controller.text.isNotEmpty
+          suffixIcon: _hasText
               ? IconButton(
                   icon: Icon(
                     Icons.clear,
                     color: colorScheme.onSurfaceVariant,
                   ),
                   onPressed: () {
-                    controller.clear();
-                    onChanged('');
+                    widget.controller.clear();
+                    widget.onChanged('');
                   },
                 )
               : null,
@@ -264,19 +312,19 @@ class _MethodGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount = screenWidth < 600
-        ? 1
-        : screenWidth < 1024
-            ? 2
-            : 3;
-
     return LayoutBuilder(
       builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth < 600
+            ? 1
+            : constraints.maxWidth < 1024
+                ? 2
+                : 3;
+
         // 计算卡片宽度：网格总宽度减去间距后除以列数
         const gap = 16.0;
-        final cardWidth = (constraints.maxWidth - gap * (crossAxisCount + 1)) /
-            crossAxisCount;
+        final cardWidth =
+            (constraints.maxWidth - gap * (crossAxisCount + 1)) /
+                crossAxisCount;
         final childAspectRatio = cardWidth / 184;
 
         return GridView.builder(
@@ -290,6 +338,7 @@ class _MethodGrid extends StatelessWidget {
           itemCount: methods.length,
           itemBuilder: (context, index) {
             return _MethodCard(
+              key: Key('method-card-${methods[index].id}'),
               method: methods[index],
               onEdit: () => onEdit(methods[index]),
               onDelete: () => onDelete(methods[index]),
@@ -304,6 +353,7 @@ class _MethodGrid extends StatelessWidget {
 /// 方法卡片
 class _MethodCard extends StatelessWidget {
   const _MethodCard({
+    super.key,
     required this.method,
     required this.onEdit,
     required this.onDelete,
@@ -337,6 +387,7 @@ class _MethodCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -369,14 +420,14 @@ class _MethodCard extends StatelessWidget {
                   _CardActionButton(
                     icon: Icons.edit_outlined,
                     color: colorScheme.primary,
-                    tooltip: '编辑',
+                    tooltip: l10n.edit,
                     onTap: onEdit,
                   ),
                   const SizedBox(width: 4),
                   _CardActionButton(
                     icon: Icons.delete_outlined,
                     color: colorScheme.error,
-                    tooltip: '删除',
+                    tooltip: l10n.delete,
                     onTap: onDelete,
                   ),
                 ],
@@ -404,6 +455,7 @@ class _MethodCard extends StatelessWidget {
                   // 参数数量徽章
                   if (_parameterCount > 0)
                     Container(
+                      key: Key('method-param-count-${method.id}'),
                       height: 28,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
@@ -420,7 +472,7 @@ class _MethodCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '$_parameterCount 参数',
+                            l10n.methodParamCount(_parameterCount),
                             style: textTheme.labelSmall?.copyWith(
                               color: colorScheme.onPrimaryContainer,
                             ),
@@ -430,6 +482,7 @@ class _MethodCard extends StatelessWidget {
                     )
                   else
                     Container(
+                      key: Key('method-param-count-${method.id}'),
                       height: 28,
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       decoration: BoxDecoration(
@@ -438,7 +491,7 @@ class _MethodCard extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          '0 参数',
+                          l10n.methodParamCountZero,
                           style: textTheme.labelSmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
@@ -502,28 +555,33 @@ class _MethodListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final crossAxisCount = screenWidth < 600
-        ? 1
-        : screenWidth < 1024
-            ? 2
-            : 3;
-    final skeletonCount = screenWidth < 600 ? 3 : (screenWidth < 1024 ? 4 : 6);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = constraints.maxWidth;
+        final crossAxisCount = screenWidth < 600
+            ? 1
+            : screenWidth < 1024
+                ? 2
+                : 3;
+        final skeletonCount =
+            screenWidth < 600 ? 3 : (screenWidth < 1024 ? 4 : 6);
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GridView.builder(
-        itemCount: skeletonCount,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: 2.0,
-        ),
-        itemBuilder: (context, index) {
-          return const _SkeletonMethodCard();
-        },
-      ),
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: GridView.builder(
+            itemCount: skeletonCount,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 2.0,
+            ),
+            itemBuilder: (context, index) {
+              return const _SkeletonMethodCard();
+            },
+          ),
+        );
+      },
     );
   }
 }
