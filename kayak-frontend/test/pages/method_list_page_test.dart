@@ -34,7 +34,7 @@ class MethodTestData {
         createdAt: DateTime(2026, 6, 1, 10, 30),
         updatedAt: DateTime(2026, 6, 1, 10, 30),
         parameters: [
-          MethodParameter(
+          const MethodParameter(
             key: 'temperature',
             type: 'number',
             label: 'Temperature',
@@ -54,8 +54,8 @@ class MethodTestData {
         parameterSchema: const {'type': 'object', 'properties': {}},
         version: 1,
         createdBy: 'user-001',
-        createdAt: DateTime(2026, 6, 2, 14, 0),
-        updatedAt: DateTime(2026, 6, 2, 14, 0),
+        createdAt: DateTime(2026, 6, 2, 14),
+        updatedAt: DateTime(2026, 6, 2, 14),
       );
 
   static Method fatigueA() => Method(
@@ -68,8 +68,8 @@ class MethodTestData {
         parameterSchema: const {'type': 'object', 'properties': {}},
         version: 1,
         createdBy: 'user-001',
-        createdAt: DateTime(2026, 6, 3, 9, 0),
-        updatedAt: DateTime(2026, 6, 3, 9, 0),
+        createdAt: DateTime(2026, 6, 3, 9),
+        updatedAt: DateTime(2026, 6, 3, 9),
       );
 
   static Method fatigueB() => Method(
@@ -82,8 +82,8 @@ class MethodTestData {
         parameterSchema: const {'type': 'object', 'properties': {}},
         version: 1,
         createdBy: 'user-001',
-        createdAt: DateTime(2026, 6, 4, 11, 0),
-        updatedAt: DateTime(2026, 6, 4, 11, 0),
+        createdAt: DateTime(2026, 6, 4, 11),
+        updatedAt: DateTime(2026, 6, 4, 11),
       );
 
   static Method thermal() => Method(

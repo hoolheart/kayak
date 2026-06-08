@@ -119,8 +119,8 @@ Method createTestMethod({
         : const {'type': 'object', 'properties': {}},
     version: 1,
     createdBy: 'user-001',
-    createdAt: DateTime(2026, 6, 1, 10, 0),
-    updatedAt: DateTime(2026, 6, 1, 10, 0),
+    createdAt: DateTime(2026, 6, 1, 10),
+    updatedAt: DateTime(2026, 6, 1, 10),
     parameters: parameters,
   );
 }
@@ -207,11 +207,9 @@ void main() {
       addTearDown(() async => resetScreenSize(tester));
 
       final method = createTestMethod(
-        id: 'method-001',
-        name: 'Tensile Test Standard',
         description: 'ASTM D638 standard',
         parameters: [
-          MethodParameter(
+          const MethodParameter(
             key: 'temperature',
             type: 'number',
             isRequired: true,
