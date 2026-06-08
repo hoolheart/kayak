@@ -47,6 +47,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    // 延迟初始化用户名字段：initState 中 Provider 尚未就绪，
+    // 因此使用 addPostFrameCallback 等第一帧构建完成后执行。
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = ref.read(authProvider).asData?.value;
+      if (user?.username != null && _usernameController.text.isEmpty) {
+        _usernameController.text = user!.username!;
+      }
+    });
   }
 
   @override
@@ -154,17 +162,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         case DioExceptionType.badResponse:
           switch (error.response?.statusCode) {
             case 400:
-              return '请求格式不正确，请检查输入';
+              return _l10n.errorBadRequest;
             case 401:
-              return '登录已过期，请重新登录';
+              return _l10n.sessionExpired;
             case 422:
-              return '输入数据格式不正确';
+              return _l10n.errorValidation;
             case 500:
             case 502:
             case 503:
-              return '服务暂时不可用，请稍后重试';
+              return _l10n.errorServer;
             default:
-              return '操作失败，请重试';
+              return _l10n.errorDefault;
           }
 
         default:
@@ -191,12 +199,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     final authState = ref.watch(authProvider);
     final user = authState.asData?.value;
-
-    // 同步用户名字段：初始加载时 ref.listen 不触发初始回调，
-    // 因此在 build 中直接读取 authState 的初始值同步到编辑器
-    if (user?.username != null && _usernameController.text.isEmpty) {
-      _usernameController.text = user!.username!;
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -624,28 +626,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
             const Divider(height: 24),
             // 语言选择 DropdownButton
-            DropdownButtonFormField<String>(
-              key: ValueKey(locale.languageCode),
-              initialValue: locale.languageCode,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.translate),
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              ),
-              items: const [
-                DropdownMenuItem(
-                  value: 'en',
-                  child: Text('English'),
-                ),
-                DropdownMenuItem(
-                  value: 'zh',
-                  child: Text('中文'),
-                ),
-              ],
+            // 使用 key 重建 _LanguageDropdown wrapper（轻量级）以响应外部 locale 变化，
+            // 内层 DropdownButtonFormField 通过 initialValue 设置当前值。
+            _LanguageDropdown(
+              key: ValueKey('lang_${locale.languageCode}'),
+              locale: locale,
               onChanged: (value) {
-                if (value != null) {
-                  ref.read(localeProvider.notifier).setLocale(Locale(value));
-                }
+                ref.read(localeProvider.notifier).setLocale(Locale(value));
               },
             ),
           ],
@@ -788,6 +775,76 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ============================================================
+// _LanguageDropdown — 受控的语言下拉组件
+//
+// 使用 didUpdateWidget 响应外部 locale 变化，避免通过
+// key: ValueKey 强制重建整个 widget 的 workaround。
+// ============================================================
+class _LanguageDropdown extends StatefulWidget {
+  const _LanguageDropdown({
+    super.key,
+    required this.locale,
+    required this.onChanged,
+  });
+
+  final Locale locale;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_LanguageDropdown> createState() => _LanguageDropdownState();
+}
+
+class _LanguageDropdownState extends State<_LanguageDropdown> {
+  late String _selectedLanguage;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedLanguage = widget.locale.languageCode;
+  }
+
+  @override
+  void didUpdateWidget(_LanguageDropdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.locale.languageCode != oldWidget.locale.languageCode) {
+      setState(() {
+        _selectedLanguage = widget.locale.languageCode;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: _selectedLanguage,
+      decoration: const InputDecoration(
+        prefixIcon: Icon(Icons.translate),
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      items: const [
+        DropdownMenuItem(
+          value: 'en',
+          child: Text('English'),
+        ),
+        DropdownMenuItem(
+          value: 'zh',
+          child: Text('中文'),
+        ),
+      ],
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            _selectedLanguage = value;
+          });
+          widget.onChanged(value);
+        }
+      },
     );
   }
 }
