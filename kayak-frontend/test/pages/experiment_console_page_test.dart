@@ -31,7 +31,7 @@ class MockAuthService extends Mock implements AuthService {}
 // ============================================================
 
 class ConsoleTestData {
-  static final baseTime = DateTime(2026, 6, 2, 10, 0, 0);
+  static final baseTime = DateTime(2026, 6, 2, 10);
 
   static Experiment createExperiment({
     String id = 'exp-001',
@@ -1341,8 +1341,6 @@ void main() {
       // Create completed experiment with null startedAt and endedAt
       final edgeExp = ConsoleTestData.createExperiment(
         status: ExperimentStatus.completed,
-        startedAt: null,
-        endedAt: null,
       );
 
       setupStandardMocks(
