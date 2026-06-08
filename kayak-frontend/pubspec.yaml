@@ -30,6 +30,7 @@ dependencies:
 
   # ==================== 数据序列化 ====================
   json_annotation: ^4.12.0
+  freezed_annotation: ^3.1.0
 
   # ==================== 图表与数据可视化 ====================
   fl_chart: ^1.2.0
@@ -45,6 +46,7 @@ dev_dependencies:
   # 代码生成工具
   build_runner: ^2.4.15
   json_serializable: ^6.9.4
+  freezed: ^3.1.0
   riverpod_generator: ^4.0.0
 
   # 测试工具

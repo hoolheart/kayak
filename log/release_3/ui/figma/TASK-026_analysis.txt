@@ -1,0 +1,576 @@
+# TASK-026 Figma 原型 — 数据分析与可视化 UI
+
+> **任务**: TASK-026  
+> **页面**: 数据分析页 (`/analysis`)  
+> **设计师**: sw-anna  
+> **日期**: 2026-06-08  
+> **Figma 文件**: `kayak-analysis-page.fig`  
+> **原型链接**: [figma://Kayak/TASK-026-Analysis](figma://Kayak/TASK-026-Analysis)
+
+---
+
+## 1. Figma 文件结构
+
+### 页面 (Pages)
+
+```
+📁 TASK-026 数据分析页
+├── 📄 00-Cover (封面)
+├── 📄 01-Design-Tokens (设计令牌)
+├── 📄 02-Desktop-Light (桌面端 - 浅色主题)
+├── 📄 03-Desktop-Dark (桌面端 - 深色主题)
+├── 📄 04-Tablet (平板 - 中屏)
+├── 📄 05-Mobile (移动端 - 小屏)
+├── 📄 06-States-&-Interactions (状态与交互)
+└── 📄 07-Components (组件库)
+```
+
+### 02-Desktop-Light 画板列表
+
+| 画板名称 | 尺寸 | 内容 |
+|----------|------|------|
+| `Desktop-1440-Initial` | 1440×900 | 初始空状态 |
+| `Desktop-1440-Loading` | 1440×900 | 加载中状态 |
+| `Desktop-1440-With-Data` | 1440×900 | 有数据 (3条曲线) |
+| `Desktop-1440-With-Table` | 1440×900 | 有数据 + 数据表格 |
+| `Desktop-1440-Error` | 1440×900 | 错误状态 |
+| `Desktop-1440-Tooltip` | 1440×900 | 悬停提示框 |
+| `Desktop-1440-Zoomed` | 1440×900 | 缩放后的图表 |
+
+### 03-Desktop-Dark 画板列表
+
+| 画板名称 | 尺寸 | 内容 |
+|----------|------|------|
+| `Desktop-Dark-Initial` | 1440×900 | 初始空状态 |
+| `Desktop-Dark-With-Data` | 1440×900 | 有数据 (4条曲线) |
+| `Desktop-Dark-With-Table` | 1440×900 | 有数据 + 数据表格 |
+
+### 04-Tablet 画板列表
+
+| 画板名称 | 尺寸 | 内容 |
+|----------|------|------|
+| `Tablet-1024-Initial` | 1024×768 | 初始状态 |
+| `Tablet-1024-With-Data` | 1024×768 | 有数据 |
+
+### 05-Mobile 画板列表
+
+| 画板名称 | 尺寸 | 内容 |
+|----------|------|------|
+| `Mobile-375-Initial` | 375×812 | 初始状态 |
+| `Mobile-375-With-Data` | 375×812 | 有数据 |
+| `Mobile-375-Scrolling` | 375×812 | 滚动中 (图表区域) |
+
+### 06-States-&-Interactions 画板列表
+
+| 画板名称 | 内容 |
+|----------|------|
+| `State-Dropdown-Open` | 试验下拉框展开 |
+| `State-Point-Selected-4` | 4个测点已选 (其余禁用) |
+| `State-Time-Custom` | 自定义时间选择器 |
+| `State-Loading-Button` | 加载按钮 loading 状态 |
+| `Interaction-Chart-Hover` | 图表悬停 + Tooltip |
+| `Interaction-Legend-Toggle` | 图例点击隐藏曲线 |
+| `Interaction-Zoom-Pan` | 缩放/平移示意 |
+
+### 07-Components 画板列表
+
+| 画板名称 | 内容 |
+|----------|------|
+| `Comp-ControlPanel` | 控制面板组件 |
+| `Comp-ChartArea` | 图表区域组件 |
+| `Comp-Tooltip` | 提示框组件 |
+| `Comp-DataTable` | 数据表格组件 |
+| `Comp-EmptyStates` | 各种空状态 |
+| `Comp-ErrorStates` | 各种错误状态 |
+
+---
+
+## 2. 设计令牌 (Figma Variables)
+
+### 颜色变量 (Colors)
+
+```
+Primitives:
+  --blue-600: #1976D2
+  --blue-200: #90CAF9
+  --blue-100: #BBDEFB
+  --blue-50: #E3F2FD
+  --red-600: #E53935
+  --red-400: #EF5350
+  --green-600: #43A047
+  --green-400: #66BB6A
+  --orange-600: #FB8C00
+  --orange-400: #FFA726
+  --purple-600: #8E24AA
+  --purple-400: #AB47BC
+  --cyan-600: #00ACC1
+  --cyan-400: #26C6DA
+
+Semantic (Light):
+  --primary: #1976D2
+  --on-primary: #FFFFFF
+  --surface: #FFFFFF
+  --surface-variant: #EFF3FA
+  --background: #FDFCFF
+  --on-surface: #1A1C1E
+  --on-surface-variant: #44474E
+  --outline: #74777F
+  --outline-variant: #C4C6D0
+  --error: #BA1A1A
+  --chart-grid: #C4C6D0
+  --chart-axis-label: #44474E
+
+Semantic (Dark):
+  --primary: #90CAF9
+  --on-primary: #003258
+  --surface: #1A1C1E
+  --surface-variant: #43474E
+  --background: #1A1C1E
+  --on-surface: #E3E2E6
+  --on-surface-variant: #C4C6CF
+  --outline: #8E9099
+  --outline-variant: #44474E
+  --error: #FFB4AB
+  --chart-grid: #44474E
+  --chart-axis-label: #C4C6CF
+```
+
+### 间距变量 (Spacing)
+
+```
+--space-xs: 4px
+--space-sm: 8px
+--space-md: 16px
+--space-lg: 24px
+--space-xl: 32px
+--space-xxl: 48px
+```
+
+### 排版变量 (Typography)
+
+```
+Font Family: Roboto (Google Fonts)
+
+--title-large: 22px / 500 / 28px line-height
+--title-medium: 16px / 500 / 24px line-height
+--title-small: 14px / 500 / 20px line-height
+--body-large: 16px / 400 / 24px line-height
+--body-medium: 14px / 400 / 20px line-height
+--body-small: 12px / 400 / 16px line-height
+--label-large: 14px / 500 / 20px line-height
+--label-medium: 12px / 500 / 16px line-height
+```
+
+---
+
+## 3. 关键画板详细说明
+
+### 3.1 Desktop-1440-Initial (初始空状态)
+
+```
+画板尺寸: 1440×900
+背景: --background (#FDFCFF)
+
+结构:
+├── NavigationRail (左侧, 72px宽)
+│   └── [App导航, 非本页重点]
+│
+├── ControlPanel (左侧, 350px宽)
+│   ├── Padding: 16px
+│   ├── 标签 "试验" (label-medium, --on-surface-variant)
+│   ├── Dropdown (56px高, 占位符 "请选择试验")
+│   ├── Divider (16px spacing)
+│   ├── 标签 "设备"
+│   ├── Dropdown (禁用状态, 占位符 "请先选择试验", 38% opacity)
+│   ├── Divider
+│   ├── 标签 "测点 (最多选择 4 条)"
+│   ├── 占位文字 "请先选择设备" (body-medium, --on-surface-variant, 居中)
+│   ├── Divider
+│   ├── 标签 "时间范围"
+│   ├── SegmentedButton (3项: "1小时" / "24小时" / "全部")
+│   ├── 自定义时间 (禁用, 38% opacity)
+│   ├── Divider
+│   ├── 标签 "降采样"
+│   ├── 数值 "当前: 1,000 点" (body-medium)
+│   ├── Slider (禁用)
+│   ├── Divider
+│   ├── FilledButton "加载数据" (禁用, 38% opacity, 48px高)
+│   ├── OutlinedButton "重置视图" (禁用, 38% opacity)
+│   └── Switch "数据表格" (禁用)
+│
+├── ChartArea (右侧, flex)
+│   ├── Padding: 16px
+│   └── EmptyView (居中)
+│       ├── Icon: show_chart (48px, --on-surface-variant)
+│       ├── Title: "请选择试验、设备和测点后加载数据" (title-medium)
+│       └── 垂直居中, 最小高度 400px
+└──
+```
+
+### 3.2 Desktop-1440-With-Data (有数据 - 浅色主题)
+
+```
+画板尺寸: 1440×900
+背景: --background
+
+结构:
+├── ControlPanel (350px, 已配置状态)
+│   ├── Dropdown "温度循环测试" (已选)
+│   ├── Dropdown "温度传感器-01" (已选)
+│   ├── 复选框列表:
+│   │   ├── ☑ 🔴 温度 (℃)
+│   │   ├── ☑ 🟢 压力 (Pa)
+│   │   ├── ☑ 🔵 湿度 (%)
+│   │   └── ☐ 🟡 流量 (m³/h)
+│   ├── SegmentedButton [1小时] 高亮选中
+│   ├── Slider 值: 1,000
+│   └── 按钮 "加载数据" (可用状态)
+│
+├── ChartArea
+│   ├── Legend (顶部)
+│   │   └── Wrap: 🔴温度(℃) 🟢压力(Pa) 🔵湿度(%)
+│   ├── LineChart (主体)
+│   │   ├── 背景: transparent
+│   │   ├── 网格线: 1px dashed, --chart-grid
+│   │   ├── X轴: 时间标签 (body-small, --chart-axis-label)
+│   │   ├── Y轴: 数值标签 + "温度 (℃)" 标题
+│   │   ├── 曲线1 (温度): #E53935, 2px, 圆点3px
+│   │   ├── 曲线2 (压力): #43A047, 2px
+│   │   ├── 曲线3 (湿度): #1E88E5, 2px
+│   │   └── 内边距: left 60, bottom 40, top 16, right 16
+│   └──
+└──
+```
+
+### 3.3 Desktop-1440-With-Table (有数据 + 数据表格)
+
+```
+画板尺寸: 1440×900
+背景: --background
+
+结构:
+├── ControlPanel (350px)
+│   └── Switch "数据表格" = true (开启)
+│
+├── ChartArea (上侧, 约 60% 高度)
+│   └── LineChart (同 3.2)
+│
+├── DataTable (下侧, 约 40% 高度, 250px)
+│   ├── 顶部边框: 1px --outline-variant
+│   ├── 表头行 (48px高, --surface-variant 背景)
+│   │   ├── 时间戳 (左对齐, label-medium, 加粗)
+│   │   ├── 温度(℃) (右对齐)
+│   │   ├── 压力(Pa) (右对齐)
+│   │   └── 湿度(%) (右对齐)
+│   ├── 数据行 (48px高, 交替 --surface / --surface-variant)
+│   │   ├── 14:30:01 | 23.50 | 1013.25 | 45.20
+│   │   ├── 14:30:02 | 23.51 | 1013.27 | 45.18
+│   │   └── ... (共 15-20 行可见)
+│   └── 垂直滚动条 (右侧)
+└──
+```
+
+### 3.4 Desktop-1440-Tooltip (悬停提示框)
+
+```
+在 Desktop-1440-With-Data 基础上叠加:
+
+Tooltip 位置: 鼠标悬停点上方偏右
+Tooltip 样式:
+├── 背景: --surface (#FFFFFF)
+├── 阴影: elevation 2 (0 2px 8px rgba(0,0,0,0.15))
+├── 圆角: 8px
+├── 内边距: 12px 16px
+├── 最大宽度: 280px
+│
+├── 时间: "14:30:05" (title-medium, --on-surface)
+├── 分隔线: 1px --outline-variant, margin 8px 0
+│
+├── 数据项1: 🔴 温度: 23.50 ℃
+│   ├── ColorDot: 10px, #E53935
+│   ├── 名称: "温度:" (body-small, --on-surface)
+│   ├── 值: "23.50" (body-small, 加粗, #E53935)
+│   └── 单位: "℃" (body-small, --on-surface-variant)
+│
+├── 数据项2: 🟢 压力: 1013.25 Pa
+│   └── (同上结构, 颜色 #43A047)
+│
+└── 数据项3: 🔵 湿度: 45.20 %
+    └── (同上结构, 颜色 #1E88E5)
+```
+
+### 3.5 Desktop-Dark-With-Data (深色主题)
+
+```
+画板尺寸: 1440×900
+背景: --background-dark (#1A1C1E)
+
+与浅色版本的区别:
+├── ControlPanel
+│   ├── 背景: --surface-dark
+│   ├── 文字: --on-surface-dark
+│   ├── 禁用项: 38% opacity
+│   └── 选中项: --primary-dark (#90CAF9)
+│
+├── ChartArea
+│   ├── 背景: --surface-dark
+│   ├── 网格线: --chart-grid-dark (#44474E)
+│   ├── 坐标轴标签: --chart-axis-label-dark (#C4C6CF)
+│   ├── 曲线1 (温度): #EF5350 (提亮)
+│   ├── 曲线2 (压力): #66BB6A (提亮)
+│   └── 曲线3 (湿度): #42A5F5 (提亮)
+│
+└── Tooltip
+    ├── 背景: --surface-dark
+    └── 文字: --on-surface-dark
+```
+
+### 3.6 Desktop-1440-Error (错误状态)
+
+```
+在 ChartArea 中显示:
+
+ErrorView:
+├── 图标: error_outline (48px, --on-surface-variant)
+├── 标题: "加载数据失败" (title-medium, --on-surface)
+├── 描述: "服务器错误，请稍后重试" (body-medium, --on-surface-variant)
+├── 间距: 图标→标题 24px, 标题→描述 8px, 描述→按钮 24px
+└── 按钮: "重新加载" (FilledButton, Primary, 40px高)
+```
+
+---
+
+## 4. 交互原型 (Prototyping)
+
+### 4.1 用户流程 1: 选择数据并加载
+
+```
+[Desktop-1440-Initial]
+  → 点击试验 Dropdown
+    → [State-Dropdown-Open] (下拉框展开, 显示试验列表)
+      → 选择"温度循环测试"
+        → [Desktop-1440-Initial] (设备 Dropdown 变为可用)
+          → 点击设备 Dropdown
+            → 选择"温度传感器-01"
+              → [Desktop-1440-Initial] (测点复选框出现)
+                → 勾选"温度"
+                  → 勾选"压力"
+                    → 勾选"湿度"
+                      → [State-Point-Selected-4] (4个已选)
+                        → 点击"加载数据"
+                          → [Desktop-1440-Loading] (300ms)
+                            → [Desktop-1440-With-Data] (图表淡入)
+```
+
+### 4.2 用户流程 2: 查看数据表格
+
+```
+[Desktop-1440-With-Data]
+  → 开启"数据表格" Switch
+    → [Desktop-1440-With-Table] (表格从底部展开, 200ms 动画)
+      → 滚动表格
+        → 表格内容滚动, 表头 sticky
+          → 关闭"数据表格" Switch
+            → [Desktop-1440-With-Data] (表格收起)
+```
+
+### 4.3 用户流程 3: 图表交互
+
+```
+[Desktop-1440-With-Data]
+  → 鼠标悬停图表
+    → [Desktop-1440-Tooltip] (显示 Tooltip)
+      → 移动鼠标
+        → Tooltip 跟随移动, 内容实时更新
+          → 滚轮放大
+            → [Desktop-1440-Zoomed] (X轴范围缩小)
+              → 拖拽平移
+                → 图表左右移动
+                  → 点击图例"压力"
+                    → 压力曲线隐藏, 图例项变灰
+```
+
+---
+
+## 5. 组件规格 (Figma Components)
+
+### 5.1 ControlPanel (组件)
+
+```
+Variant 1: Default (未配置)
+Variant 2: Experiment Selected
+Variant 3: Device Selected
+Variant 4: Points Selected (1-4)
+Variant 5: Loading Data
+```
+
+### 5.2 LineChart (组件)
+
+```
+Variant 1: Empty (无数据)
+Variant 2: Loading (骨架)
+Variant 3: 1 Curve
+Variant 4: 2 Curves
+Variant 5: 3 Curves
+Variant 6: 4 Curves
+Variant 7: Error
+```
+
+### 5.3 ChartTooltip (组件)
+
+```
+Variant 1: 1 Point
+Variant 2: 2 Points
+Variant 3: 3 Points
+Variant 4: 4 Points
+```
+
+### 5.4 DataTable (组件)
+
+```
+Variant 1: Empty
+Variant 2: 3 Columns
+Variant 3: 4 Columns
+Variant 4: Scrolling
+```
+
+---
+
+## 6. 响应式断点
+
+### 桌面端 (> 1200px)
+- 控制面板: 350px 固定宽, 左侧
+- 图表区域: flex 剩余宽度
+- 数据表格: 全宽, 图表下方
+
+### 平板端 (600-1200px)
+- 控制面板: 280px 固定宽, 左侧
+- 图表区域: flex 剩余宽度
+- 测点复选框: 保持垂直列表
+- 图例: 可能换行
+
+### 移动端 (< 600px)
+- 控制面板: 全宽, 顶部
+- 图表区域: 全宽, 最小高度 400px
+- 测点复选框: Wrap 布局 (2列)
+- 操作按钮: 水平并排
+- 数据表格: 全宽, 可横向滚动
+- 图例: 可折叠或简化
+
+---
+
+## 7. 导出规格
+
+### 图标 (SVG)
+- show_chart
+- inbox
+- error_outline
+- refresh
+- calendar_today
+- table_chart
+- zoom_out_map
+- timeline
+
+### 截图 (PNG @2x)
+- Desktop-1440-Initial
+- Desktop-1440-With-Data
+- Desktop-1440-With-Table
+- Desktop-1440-Tooltip
+- Desktop-Dark-With-Data
+- Mobile-375-With-Data
+
+---
+
+## 8. 设计决策记录
+
+### 决策 1: 控制面板固定宽度而非可拖拽
+- **原因**: 简化实现, 350px 足够容纳所有控件
+- **替代方案**: 可拖拽调整宽度 (Grafana 风格) — 放到未来版本
+
+### 决策 2: 测点颜色固定分配
+- **原因**: 保持颜色稳定, 用户形成颜色-测点关联记忆
+- **分配方式**: 按顺序固定 (#1红, #2绿, #3蓝, #4橙)
+
+### 决策 3: 单 Y 轴而非多 Y 轴
+- **原因**: fl_chart 1.2.0 多 Y 轴支持有限, 简化实现
+- **注意**: 如果测点数值范围差异极大, 小数值曲线可能不可见
+
+### 决策 4: 降采样使用对数刻度滑块
+- **原因**: 100-10,000 范围大, 线性滑块低频区分辨率低
+- **实现**: slider 线性映射到对数值
+
+### 决策 5: 图表交互仅支持桌面端滚轮/拖拽
+- **原因**: 移动端触摸交互 (双指缩放/单指平移) 需要额外实现
+- **移动端降级**: 显示完整数据范围, 不支持缩放平移
+
+### 决策 6: 数据表格默认隐藏
+- **原因**: 最大化图表区域, 用户按需查看原始数据
+- **记忆**: 用户的显示/隐藏偏好可本地存储
+
+---
+
+## 9. 与开发团队的交接说明
+
+### fl_chart 1.2.0 关键配置
+
+```dart
+LineChartData(
+  gridData: FlGridData(
+    show: true,
+    drawVerticalLine: true,
+    horizontalInterval: 1,
+    verticalInterval: 1,
+    getDrawingHorizontalLine: (value) => FlLine(
+      color: Colors.grey.withOpacity(0.3),
+      strokeWidth: 1,
+    ),
+    getDrawingVerticalLine: (value) => FlLine(
+      color: Colors.grey.withOpacity(0.3),
+      strokeWidth: 1,
+    ),
+  ),
+  titlesData: FlTitlesData(
+    bottomTitles: AxisTitles(
+      sideTitles: SideTitles(
+        showTitles: true,
+        getTitlesWidget: (value, meta) {
+          // 时间格式化
+        },
+      ),
+    ),
+  ),
+  lineTouchData: LineTouchData(
+    touchTooltipData: LineTouchTooltipData(
+      tooltipRoundedRadius: 8,
+      getTooltipItems: (touchedSpots) {
+        // 自定义 tooltip
+      },
+    ),
+  ),
+)
+```
+
+### 缩放平移实现建议
+
+使用 `fl_chart` 的 `minX`, `maxX` 属性控制可见范围:
+- 滚轮事件 → 调整 `minX` / `maxX` (以鼠标位置为中心)
+- 拖拽事件 → 平移 `minX` / `maxX`
+- 重置按钮 → 恢复初始范围
+
+### 性能注意事项
+
+- 超过 5000 数据点时隐藏数据点圆点
+- 使用 `LineChartBarData.dotData.show = false` 提升性能
+- 考虑使用 `LineChartBarData.preventCurveOverShooting = true`
+
+---
+
+**Figma 原型完成**
+
+- 文件路径: `log/release_3/ui/figma/kayak-analysis-page.fig`
+- 原型链接: `figma://Kayak/TASK-026-Analysis`
+- 版本: 1.0
+- 日期: 2026-06-08
+- 设计师: sw-anna
+
+如有任何设计实现问题，请联系 sw-anna 进行设计澄清。

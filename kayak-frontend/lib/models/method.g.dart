@@ -31,8 +31,7 @@ Map<String, dynamic> _$MethodToJson(Method instance) => <String, dynamic>{
   'created_by': instance.createdBy,
   'created_at': instance.createdAt.toIso8601String(),
   'updated_at': instance.updatedAt.toIso8601String(),
-  if (instance.parameters != null)
-    'parameters': instance.parameters!.map((e) => e.toJson()).toList(),
+  'parameters': instance.parameters,
 };
 
 MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
@@ -44,8 +43,8 @@ MethodParameter _$MethodParameterFromJson(Map<String, dynamic> json) =>
       isRequired: json['required'] as bool? ?? false,
       unit: json['unit'] as String?,
       description: json['description'] as String?,
-      min: (json['min'] as num?)?.toDouble(),
-      max: (json['max'] as num?)?.toDouble(),
+      min: json['min'] as num?,
+      max: json['max'] as num?,
       options: (json['options'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),

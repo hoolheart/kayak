@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../services/analysis_service.dart';
 import '../services/api_client.dart';
 import '../services/auth_interceptor.dart';
 import '../services/auth_service.dart';
@@ -124,6 +125,14 @@ final experimentServiceProvider = Provider<ExperimentService>((ref) {
 /// ```
 final methodServiceProvider = Provider<MethodService>((ref) {
   return MethodService(ref.read(apiClientProvider));
+});
+
+/// AnalysisService 的 Riverpod Provider
+///
+/// 提供全局唯一的 [AnalysisService] 实例。
+/// 依赖 [apiClientProvider] 用于 HTTP 请求。
+final analysisServiceProvider = Provider<AnalysisService>((ref) {
+  return AnalysisService(ref.read(apiClientProvider));
 });
 
 /// WsService 的 Riverpod Provider
