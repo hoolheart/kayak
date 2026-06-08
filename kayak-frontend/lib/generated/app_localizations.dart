@@ -2959,6 +2959,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resource conflict, please check if a method with the same name already exists'**
   String get methodConflict;
+
+  /// Appearance section title in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// Theme option to follow system preference
+  ///
+  /// In en, this message translates to:
+  /// **'Follow System'**
+  String get followSystem;
+
+  /// Light theme mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get light;
+
+  /// Dark theme mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get dark;
+
+  /// Language section title in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// About section title in settings
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// Version label in about section
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get versionLabel;
+
+  /// App description in about section
+  ///
+  /// In en, this message translates to:
+  /// **'A scientific experiment data acquisition and analysis platform for chromatography and spectroscopy.'**
+  String get appDescription;
+
+  /// Technical info section title
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Information'**
+  String get techInfoTitle;
+
+  /// Backend tech info
+  ///
+  /// In en, this message translates to:
+  /// **'Backend: Rust {version}'**
+  String techInfoBackend(String version);
+
+  /// Frontend tech info
+  ///
+  /// In en, this message translates to:
+  /// **'Frontend: Flutter {version}'**
+  String techInfoFrontend(String version);
 }
 
 class _AppLocalizationsDelegate

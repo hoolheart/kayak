@@ -2100,5 +2100,61 @@
   "methodConflict": "资源冲突，请检查是否已存在相同名称的方法",
   "@methodConflict": {
     "description": "方法冲突错误消息"
+  },
+  "appearance": "外观",
+  "@appearance": {
+    "description": "设置页面外观区域标题"
+  },
+  "followSystem": "跟随系统",
+  "@followSystem": {
+    "description": "跟随系统主题选项"
+  },
+  "light": "浅色",
+  "@light": {
+    "description": "浅色主题模式选项"
+  },
+  "dark": "深色",
+  "@dark": {
+    "description": "深色主题模式选项"
+  },
+  "language": "语言",
+  "@language": {
+    "description": "设置页面语言区域标题"
+  },
+  "about": "关于",
+  "@about": {
+    "description": "设置页面关于区域标题"
+  },
+  "versionLabel": "版本",
+  "@versionLabel": {
+    "description": "关于区域的版本标签"
+  },
+  "appDescription": "面向色谱与光谱分析的科学实验数据采集与分析平台。",
+  "@appDescription": {
+    "description": "应用描述"
+  },
+  "techInfoTitle": "技术信息",
+  "@techInfoTitle": {
+    "description": "技术信息区域标题"
+  },
+  "techInfoBackend": "后端：Rust {version}",
+  "@techInfoBackend": {
+    "description": "后端技术信息",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.75"
+      }
+    }
+  },
+  "techInfoFrontend": "前端：Flutter {version}",
+  "@techInfoFrontend": {
+    "description": "前端技术信息",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "3.19"
+      }
+    }
   }
 }

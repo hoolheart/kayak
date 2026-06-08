@@ -7,14 +7,18 @@ import '../../generated/app_localizations.dart';
 import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/services.dart';
+import '../../providers/settings_provider.dart';
 
 // ============================================================
-// SettingsPage — 个人资料页面
+// SettingsPage — 设置页面
 //
 // 功能：
 // 1. 显示当前用户信息（用户名、邮箱、注册时间）
 // 2. 编辑用户名（调用 PUT /api/v1/users/me）
 // 3. 修改密码（调用 POST /api/v1/users/me/password）
+// 4. 外观设置（跟随系统/浅色/深色）
+// 5. 语言设置（English/中文）
+// 6. 关于信息（版本、描述、技术信息）
 // ============================================================
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -241,6 +245,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                   // ---- 修改密码卡片 ----
                   _buildPasswordCard(context),
+                  const SizedBox(height: 24),
+
+                  // ---- 外观卡片 ----
+                  _buildAppearanceCard(context),
+                  const SizedBox(height: 24),
+
+                  // ---- 语言卡片 ----
+                  _buildLanguageCard(context),
+                  const SizedBox(height: 24),
+
+                  // ---- 关于卡片 ----
+                  _buildAboutCard(context),
                 ],
               ),
             ),
@@ -513,6 +529,224 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // 外观卡片 — SegmentedButton
+  // ============================================================
+  Widget _buildAppearanceCard(BuildContext context) {
+    final themeMode = ref.watch(themeModeProvider);
+    final isWide = MediaQuery.of(context).size.width >= 600;
+
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(isWide ? 24 : 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 区域标题
+            Row(
+              children: [
+                Icon(Icons.palette_outlined,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  _l10n.appearance,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            // 主题选择 SegmentedButton
+            SegmentedButton<ThemeMode>(
+              segments: [
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.system,
+                  icon: const Icon(Icons.brightness_auto),
+                  label: Text(_l10n.followSystem),
+                ),
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.light,
+                  icon: const Icon(Icons.light_mode),
+                  label: Text(_l10n.light),
+                ),
+                ButtonSegment<ThemeMode>(
+                  value: ThemeMode.dark,
+                  icon: const Icon(Icons.dark_mode),
+                  label: Text(_l10n.dark),
+                ),
+              ],
+              selected: {themeMode},
+              onSelectionChanged: (selected) {
+                ref.read(themeModeProvider.notifier).setTheme(selected.first);
+              },
+              showSelectedIcon: false,
+              style: const ButtonStyle(
+                visualDensity: VisualDensity.comfortable,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // 语言卡片 — DropdownButton
+  // ============================================================
+  Widget _buildLanguageCard(BuildContext context) {
+    final locale = ref.watch(localeProvider);
+    final isWide = MediaQuery.of(context).size.width >= 600;
+
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(isWide ? 24 : 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 区域标题
+            Row(
+              children: [
+                Icon(Icons.language,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  _l10n.language,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            // 语言选择 DropdownButton
+            DropdownButtonFormField<String>(
+              key: ValueKey(locale.languageCode),
+              initialValue: locale.languageCode,
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.translate),
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text('English'),
+                ),
+                DropdownMenuItem(
+                  value: 'zh',
+                  child: Text('中文'),
+                ),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(localeProvider.notifier).setLocale(Locale(value));
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================
+  // 关于卡片
+  // ============================================================
+  Widget _buildAboutCard(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width >= 600;
+
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(isWide ? 24 : 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 区域标题
+            Row(
+              children: [
+                Icon(Icons.info_outline,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  _l10n.about,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+
+            // 应用名称和版本
+            Row(
+              children: [
+                const Icon(Icons.kayaking, size: 20),
+                const SizedBox(width: 12),
+                Text(
+                  'Kayak',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'v3.0.0',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // 应用描述
+            Text(
+              _l10n.appDescription,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+            const SizedBox(height: 16),
+
+            // 技术信息
+            Text(
+              _l10n.techInfoTitle,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 8),
+
+            _buildInfoRow(
+              context,
+              icon: Icons.dns_outlined,
+              label: _l10n.techInfoBackend('1.75+'),
+              value: 'Axum, SQLite, HDF5',
+            ),
+            const SizedBox(height: 8),
+
+            _buildInfoRow(
+              context,
+              icon: Icons.phone_android_outlined,
+              label: _l10n.techInfoFrontend('3.19+'),
+              value: 'Riverpod, GoRouter, Material 3',
+            ),
+          ],
+        ),
       ),
     );
   }

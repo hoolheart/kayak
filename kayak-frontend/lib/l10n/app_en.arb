@@ -2100,5 +2100,61 @@
   "methodConflict": "Resource conflict, please check if a method with the same name already exists",
   "@methodConflict": {
     "description": "Conflict error message"
+  },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Appearance section title in settings"
+  },
+  "followSystem": "Follow System",
+  "@followSystem": {
+    "description": "Theme option to follow system preference"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light theme mode option"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme mode option"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language section title in settings"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About section title in settings"
+  },
+  "versionLabel": "Version",
+  "@versionLabel": {
+    "description": "Version label in about section"
+  },
+  "appDescription": "A scientific experiment data acquisition and analysis platform for chromatography and spectroscopy.",
+  "@appDescription": {
+    "description": "App description in about section"
+  },
+  "techInfoTitle": "Technical Information",
+  "@techInfoTitle": {
+    "description": "Technical info section title"
+  },
+  "techInfoBackend": "Backend: Rust {version}",
+  "@techInfoBackend": {
+    "description": "Backend tech info",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.75"
+      }
+    }
+  },
+  "techInfoFrontend": "Frontend: Flutter {version}",
+  "@techInfoFrontend": {
+    "description": "Frontend tech info",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "3.19"
+      }
+    }
   }
 }

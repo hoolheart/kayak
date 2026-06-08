@@ -1522,4 +1522,42 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get methodConflict =>
       'Resource conflict, please check if a method with the same name already exists';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get followSystem => 'Follow System';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get versionLabel => 'Version';
+
+  @override
+  String get appDescription =>
+      'A scientific experiment data acquisition and analysis platform for chromatography and spectroscopy.';
+
+  @override
+  String get techInfoTitle => 'Technical Information';
+
+  @override
+  String techInfoBackend(String version) {
+    return 'Backend: Rust $version';
+  }
+
+  @override
+  String techInfoFrontend(String version) {
+    return 'Frontend: Flutter $version';
+  }
 }

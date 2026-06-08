@@ -1496,4 +1496,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get methodConflict => '资源冲突，请检查是否已存在相同名称的方法';
+
+  @override
+  String get appearance => '外观';
+
+  @override
+  String get followSystem => '跟随系统';
+
+  @override
+  String get light => '浅色';
+
+  @override
+  String get dark => '深色';
+
+  @override
+  String get language => '语言';
+
+  @override
+  String get about => '关于';
+
+  @override
+  String get versionLabel => '版本';
+
+  @override
+  String get appDescription => '面向色谱与光谱分析的科学实验数据采集与分析平台。';
+
+  @override
+  String get techInfoTitle => '技术信息';
+
+  @override
+  String techInfoBackend(String version) {
+    return '后端：Rust $version';
+  }
+
+  @override
+  String techInfoFrontend(String version) {
+    return '前端：Flutter $version';
+  }
 }
