@@ -1,0 +1,736 @@
+# TASK-024 Figma 原型设计 — 首页仪表盘 Dashboard
+
+> **文件**: TASK-024_dashboard.fig (文本原型描述)  
+> **设计师**: sw-anna  
+> **日期**: 2026-06-08  
+> **版本**: 1.0  
+> **屏幕总数**: 18 个画板  
+> **主题**: Material 3 (Light + Dark)  
+> **路由**: `/` (fallback) / `/dashboard`
+
+---
+
+## 设计系统引用
+
+### 颜色 (ColorScheme.fromSeed, seed: #1976D2)
+
+| Token | Light | Dark |
+|-------|-------|------|
+| Primary | #1976D2 | #90CAF9 |
+| On Primary | #FFFFFF | #003354 |
+| Primary Container | #D1E4FF | #004A7F |
+| On Primary Container | #004377 | #D1E4FF |
+| Surface | #FFFFFF | #1A1C1E |
+| Surface Container Low | #F1F4F9 | #1D2023 |
+| Surface Container High | #E3E7EC | #2A2D30 |
+| Background | #FDFCFF | #1A1C1E |
+| Outline | #74777F | #8E9199 |
+| Outline Variant | #C4C6D0 | #44474E |
+| On Surface | #1A1C1E | #E3E2E6 |
+| On Surface Variant | #44474E | #C4C6CF |
+| Error | #BA1A1A | #FFB4AB |
+| On Error | #FFFFFF | #690005 |
+| Success | #4CAF50 | #81C784 |
+
+### 字体 (Typography)
+
+| Token | Size | Weight | Letter Spacing | Line Height |
+|-------|------|--------|----------------|-------------|
+| Headline Small | 24px | 400 | 0px | 32px |
+| Title Large | 22px | 500 | 0px | 28px |
+| Title Medium | 16px | 500 | 0.15px | 24px |
+| Body Large | 16px | 400 | 0.5px | 24px |
+| Body Medium | 14px | 400 | 0.25px | 20px |
+| Body Small | 12px | 400 | 0.4px | 16px |
+| Label Large | 14px | 500 | 0.1px | 20px |
+| Display Large | 57px | 400 | -0.25px | 64px |
+
+### 间距 (Spacing)
+
+| Token | Value |
+|-------|-------|
+| spaceXs | 4px |
+| spaceSm | 8px |
+| spaceMd | 16px |
+| spaceLg | 24px |
+| spaceXl | 32px |
+| spaceXxl | 48px |
+
+### 圆角 (Border Radius)
+
+| Token | Value |
+|-------|-------|
+| radiusSmall | 4px |
+| radiusMedium | 8px |
+| radiusLarge | 12px |
+| radiusCircular | 50% |
+
+---
+
+## 画板列表
+
+### 画板 1: 完整仪表盘 — 有数据 (Desktop Light)
+
+**尺寸**: 1440×900px  
+**背景**: Background (#FDFCFF)
+
+**页面结构**:
+```
+Frame: Desktop / Dashboard Full
+├── AppShell (NavigationRail, extended, 220px width)
+│   └── Selected: Dashboard (index 0)
+│
+└── Main Content Area (padding: spaceXl 32px, max-width: 1200px, centered)
+    ├── Welcome Section
+    │   ├── Text: "早上好，Alice" (Headline Small, On Surface)
+    │   ├── Text: "2026年6月8日 星期一" (Body Large, On Surface Variant)
+    │   └── Padding: top spaceXl, bottom spaceLg
+    │
+    ├── Quick Actions Grid (4 columns, gap: spaceMd)
+    │   ├── Quick Card 1: 试验控制台
+    │   │   ├── Icon: biotech (32px, Primary)
+    │   │   ├── Text: "试验控制台" (Title Medium, On Surface)
+    │   │   └── Subtitle: "管理和运行试验" (Body Small, On Surface Variant)
+    │   ├── Quick Card 2: 试验方法
+    │   │   ├── Icon: science (32px, Primary)
+    │   │   ├── Text: "试验方法" (Title Medium, On Surface)
+    │   │   └── Subtitle: "配置标准方法" (Body Small, On Surface Variant)
+    │   ├── Quick Card 3: 工作台管理
+    │   │   ├── Icon: build (32px, Primary)
+    │   │   ├── Text: "工作台管理" (Title Medium, On Surface)
+    │   │   └── Subtitle: "管理工作台和设备" (Body Small, On Surface Variant)
+    │   └── Quick Card 4: 数据分析
+    │       ├── Icon: analytics (32px, Primary)
+    │       ├── Text: "数据分析" (Title Medium, On Surface)
+    │       └── Subtitle: "查看试验数据" (Body Small, On Surface Variant)
+    │
+    ├── Stats Overview Row (3 columns, gap: spaceMd, margin-top: spaceLg)
+    │   ├── Stat Card 1: 工作台
+    │   │   ├── Icon: build_outlined (28px, On Surface Variant)
+    │   │   ├── Number: "5" (Display Large, Primary, 48px)
+    │   │   └── Label: "工作台" (Body Medium, On Surface Variant)
+    │   ├── Stat Card 2: 设备
+    │   │   ├── Icon: memory_outlined (28px, On Surface Variant)
+    │   │   ├── Number: "12" (Display Large, Primary, 48px)
+    │   │   └── Label: "设备" (Body Medium, On Surface Variant)
+    │   └── Stat Card 3: 试验
+    │       ├── Icon: biotech_outlined (28px, On Surface Variant)
+    │       ├── Number: "8" (Display Large, Primary, 48px)
+    │       └── Label: "试验" (Body Medium, On Surface Variant)
+    │
+    └── Recent Workbenches Section (margin-top: spaceLg)
+        ├── Section Header Row
+        │   ├── Text: "最近工作台" (Title Large, On Surface)
+        │   └── Link: "查看全部 →" (Body Medium, Primary)
+        │
+        └── Recent Workbench Cards (horizontal scroll, gap: spaceMd)
+            ├── Workbench Card 1
+            │   ├── Name: "温度实验室" (Title Medium, On Surface)
+            │   ├── Device Count: "5 台设备" (Body Small, On Surface Variant)
+            │   └── Updated: "3 天前" (Body Small, On Surface Variant at 60%)
+            ├── Workbench Card 2
+            │   ├── Name: "振动测试台" (Title Medium, On Surface)
+            │   ├── Device Count: "3 台设备" (Body Small, On Surface Variant)
+            │   └── Updated: "1 周前" (Body Small, On Surface Variant at 60%)
+            ├── Workbench Card 3
+            │   ├── Name: "压力测试区" (Title Medium, On Surface)
+            │   ├── Device Count: "4 台设备" (Body Small, On Surface Variant)
+            │   └── Updated: "2 周前" (Body Small, On Surface Variant at 60%)
+            └── Workbench Card 4
+                ├── Name: "湿度实验室" (Title Medium, On Surface)
+                ├── Device Count: "0 台设备" (Body Small, On Surface Variant)
+                └── Updated: "1 个月前" (Body Small, On Surface Variant at 60%)
+```
+
+**Quick Action Card 规格**:
+| 属性 | 值 |
+|------|-----|
+| 背景 | Surface |
+| 边框 | 1px Outline Variant |
+| 圆角 | radiusLarge (12px) |
+| 内边距 | spaceLg (24px) |
+| 图标容器 | 48×48px, Primary Container background, radiusMedium |
+| 图标颜色 | Primary |
+| 图标尺寸 | 28px |
+| 标题上边距 | spaceSm (8px) |
+| 标题样式 | Title Medium, On Surface |
+| 副标题上边距 | spaceXs (4px) |
+| 副标题样式 | Body Small, On Surface Variant |
+| Hover | Elevation 2, 边框色变为 Primary at 30% |
+| Pressed | Scale 0.98, Elevation 1 |
+| Focus | 2px Primary outline |
+
+**Stat Card 规格**:
+| 属性 | 值 |
+|------|-----|
+| 背景 | Surface Container Low |
+| 圆角 | radiusLarge (12px) |
+| 内边距 | spaceLg (24px) |
+| 最小高度 | 120px |
+| 布局 | 垂直居中, Column |
+| 图标颜色 | On Surface Variant |
+| 数字样式 | 48px, Primary, FontWeight.w300 |
+| 数字上边距 | spaceSm (8px) |
+| 标签样式 | Body Medium, On Surface Variant |
+| 标签上边距 | spaceXs (4px) |
+
+**Recent Workbench Card 规格**:
+| 属性 | 值 |
+|------|-----|
+| 宽度 | 240px (固定) |
+| 背景 | Surface |
+| 边框 | 1px Outline Variant |
+| 圆角 | radiusLarge (12px) |
+| 内边距 | spaceMd (16px) |
+| 图标 | build (24px, On Surface Variant) |
+| 名称样式 | Title Medium, On Surface |
+| 设备数样式 | Body Small, On Surface Variant |
+| 时间样式 | Body Small, On Surface Variant at 60% |
+| Hover | Elevation 2, 左边框 3px Primary |
+| Pressed | Scale 0.98 |
+
+---
+
+### 画板 2: 完整仪表盘 — 骨架屏 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Main Content Area
+├── Welcome Section (Skeleton)
+│   ├── ShimmerBlock: 200×32px (greeting text)
+│   └── ShimmerBlock: 160×20px (date text, margin-top: 8px)
+│
+├── Quick Actions Grid (4 skeleton cards)
+│   └── Each: 48×48px circle + 100×16px title + 80×14px subtitle
+│
+├── Stats Overview Row (3 skeleton stat cards)
+│   └── Each: 28×28px icon + 48×48px number + 60×16px label
+│
+└── Recent Workbenches Section
+    ├── ShimmerBlock: 120×24px (section title)
+    └── 4 horizontal card skeletons
+        └── Each: 240×100px, with title + 2 lines
+```
+
+---
+
+### 画板 3: 完整仪表盘 — 空状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stats Overview Row
+├── Stat Card 1: "0" (工作台)
+├── Stat Card 2: "0" (设备)
+└── Stat Card 3: "0" (试验)
+
+Recent Workbenches Section
+└── EmptyView (compact)
+    ├── Icon: build_outlined (40px, On Surface Variant at 60%)
+    ├── Text: "还没有工作台" (Title Medium, On Surface)
+    ├── Text: "创建您的第一个工作台开始使用" (Body Small, On Surface Variant)
+    └── Button: "创建第一个工作台" (FilledButton, Primary, compact)
+```
+
+---
+
+### 画板 4: 完整仪表盘 — 统计区域错误 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome Section: 正常显示 ("早上好，Alice")
+Quick Actions: 正常显示 4 张卡片
+
+Stats Overview Row
+└── ErrorView (compact)
+    ├── Icon: error_outline_outlined (32px)
+    ├── Text: "加载统计数据失败" (Title Medium)
+    ├── Text: "请检查网络后重试" (Body Small)
+    └── Button: "重试" (FilledButton, compact)
+
+Recent Workbenches Section: 正常显示 4 张卡片
+```
+
+---
+
+### 画板 5: 完整仪表盘 — 最近工作台区域错误 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome Section: 正常显示
+Quick Actions: 正常显示
+Stats Overview: 正常显示 (5, 12, 8)
+
+Recent Workbenches Section
+└── ErrorView (compact)
+    ├── Icon: error_outline_outlined (32px)
+    ├── Text: "加载工作台列表失败" (Title Medium)
+    ├── Text: "请检查网络后重试" (Body Small)
+    └── Button: "重试" (FilledButton, compact)
+```
+
+---
+
+### 画板 6: 完整仪表盘 — 全部区域错误 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome Section: 正常显示 (用户信息来自 Auth Provider)
+Quick Actions: 正常显示 (静态内容)
+
+Stats Overview Row
+└── ErrorView (compact) + 重试按钮
+
+Recent Workbenches Section
+└── ErrorView (compact) + 重试按钮
+```
+
+> 关键原则：按区域独立容错，一个区域失败不影响其他区域。
+
+---
+
+### 画板 7: 完整仪表盘 — 大数值 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stats Overview Row
+├── Stat Card 1: "9,999" (工作台)
+├── Stat Card 2: "50,000" (设备)
+└── Stat Card 3: "100,000" (试验)
+
+> 数字使用千位分隔符，字号自适应缩小至 36px 防止溢出
+```
+
+---
+
+### 画板 8: 移动端 — 完整仪表盘 (Mobile Light)
+
+**尺寸**: 375×812px (iPhone 14 proportions)
+**背景**: Background
+
+**图层结构**:
+```
+Frame: Mobile / Dashboard Full
+├── AppShell (BottomNavigationBar, Dashboard selected)
+│   └── 底部导航栏: 首页 / 工作台 / 方法 / 试验 / 分析 / 设置
+│
+└── Main Content Area (padding: spaceMd 16px, scrollable)
+    ├── Welcome Section
+    │   ├── Text: "早上好，Alice" (Headline Small, 20px)
+    │   └── Text: "2026年6月8日 星期一" (Body Medium)
+    │
+    ├── Quick Actions Grid (2 columns, gap: spaceSm)
+    │   ├── Quick Card 1: 试验控制台 (compact)
+    │   ├── Quick Card 2: 试验方法
+    │   ├── Quick Card 3: 工作台管理
+    │   └── Quick Card 4: 数据分析
+    │   > 每张卡片内边距 spaceMd (16px)，图标 24px
+    │
+    ├── Stats Overview Row (flex wrap, gap: spaceSm)
+    │   ├── Stat Card 1: 工作台 (flex: 1, min-width: 100px)
+    │   ├── Stat Card 2: 设备 (flex: 1)
+    │   └── Stat Card 3: 试验 (flex: 1)
+    │   > 数字 36px，卡片内边距 spaceMd
+    │
+    └── Recent Workbenches Section
+        ├── Section Header
+        │   ├── Text: "最近工作台" (Title Medium)
+        │   └── Link: "查看全部 →" (Body Small, Primary)
+        └── Workbench Cards (horizontal scroll)
+            ├── Card 1: 温度实验室 (180px width)
+            ├── Card 2: 振动测试台 (180px width)
+            ├── Card 3: 压力测试区 (180px width)
+            └── Card 4: 湿度实验室 (180px width)
+```
+
+---
+
+### 画板 9: 移动端 — 骨架屏 (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+Quick Actions: 2×2 grid skeletons (each ~160×80px)
+Stats: 3 stacked skeleton stat cards (full width, 80px height)
+Recent Workbenches: horizontal scroll skeleton cards (180×80px)
+```
+
+---
+
+### 画板 10: 移动端 — 空状态 (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+Stats: 三个 "0"
+Recent Workbenches: EmptyView compact
+```
+
+---
+
+### 画板 11: 平板 — 完整仪表盘 (Tablet Light)
+
+**尺寸**: 768×1024px
+
+**差异**:
+```
+AppShell: NavigationRail (collapsed, 72px width)
+
+Quick Actions: 2 columns (gap: spaceMd)
+Stats: 3 columns (horizontal)
+Recent Workbenches: 3 visible cards (200px width each)
+
+Content padding: spaceLg (24px)
+```
+
+---
+
+### 画板 12: 深色主题 — 完整仪表盘 (Desktop Dark)
+
+**尺寸**: 1440×900px
+**背景**: Background Dark (#1A1C1E)
+
+**关键差异**:
+```
+All Surface colors → Dark Surface
+All On Surface → Light text (#E3E2E6)
+Quick Cards: Surface Dark, Outline Variant Dark border
+Stat Cards: Surface Container Low Dark
+Primary: #90CAF9
+Primary Container: #004A7F
+Error: #FFB4AB
+```
+
+---
+
+### 画板 13: 深色主题 — 骨架屏 (Desktop Dark)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Skeleton shimmer: base color Surface Container Highest Dark at 30%
+Animation: Surface Container Highest Dark at 60%
+```
+
+---
+
+### 画板 14: 深色主题 — 错误状态 (Desktop Dark)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+ErrorView: icon On Surface Variant Dark, text On Surface Dark
+Background: Surface Dark
+```
+
+---
+
+### 画板 15: 英文界面 — 完整仪表盘 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+Welcome: "Good morning, Alice"
+Date: "Monday, June 8, 2026"
+
+Quick Actions:
+  1. "Experiment Console" / "Manage and run experiments"
+  2. "Methods" / "Configure standard methods"
+  3. "Workbenches" / "Manage workbenches and devices"
+  4. "Data Analysis" / "View experiment data"
+
+Stats:
+  "Workbenches" / "5"
+  "Devices" / "12"
+  "Experiments" / "8"
+
+Recent Workbenches:
+  "Recent Workbenches"
+  "View all →"
+  Card 1: "Temperature Lab" / "5 devices" / "3 days ago"
+  Card 2: "Vibration Bench" / "3 devices" / "1 week ago"
+  Card 3: "Pressure Zone" / "4 devices" / "2 weeks ago"
+  Card 4: "Humidity Lab" / "0 devices" / "1 month ago"
+```
+
+---
+
+### 画板 16: 下午时段问候 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome: "下午好，Alice" (12:00-17:59)
+```
+
+---
+
+### 画板 17: 晚间时段问候 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome: "晚上好，Alice" (18:00-05:59)
+```
+
+---
+
+### 画板 18: 零数据首次使用 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Welcome: "早上好，Alice"
+Stats:
+  Workbenches: "0"
+  Devices: "0"
+  Experiments: "0"
+Recent Workbenches:
+  EmptyView with CTA:
+    Icon: build_outlined
+    Title: "还没有工作台"
+    Description: "创建您的第一个工作台，开始管理设备和运行试验"
+    Button: "创建第一个工作台" → /workbenches
+```
+
+---
+
+## 组件库 (Figma Components)
+
+### Component: QuickActionCard
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| State | Default | Surface, 1px Outline Variant, elevation 1 |
+| State | Hover | Elevation 2, border Primary at 30% |
+| State | Pressed | Scale 0.98, Elevation 1 |
+| State | Focus | 2px Primary outline |
+| State | Disabled | 38% opacity |
+| Size | Desktop | min-width: 240px, height: auto |
+| Size | Mobile | min-width: 140px, compact padding |
+
+**Overrides**:
+- Icon: IconData (default 32px Desktop / 24px Mobile)
+- Title: String (Title Medium)
+- Subtitle: String (Body Small)
+- Route: String (navigation target)
+
+### Component: StatCard
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| Background | Default | Surface Container Low |
+| Size | Desktop | min-width: 200px, min-height: 120px |
+| Size | Mobile | flex: 1, min-height: 100px |
+| Number | Default | 48px, Primary, FontWeight.w300 |
+| Number | Large (>9999) | 36px, Primary, FontWeight.w300 |
+
+**Overrides**:
+- Icon: IconData (28px Desktop / 24px Mobile)
+- Number: String
+- Label: String (Body Medium)
+- Format: "number" | "thousands"
+
+### Component: RecentWorkbenchCard
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| State | Default | Surface, 1px Outline Variant |
+| State | Hover | Elevation 2, left border 3px Primary |
+| State | Pressed | Scale 0.98 |
+| Size | Desktop | 240px width |
+| Size | Tablet | 200px width |
+| Size | Mobile | 180px width |
+
+**Overrides**:
+- Name: String
+- DeviceCount: String (e.g., "5 台设备")
+- UpdatedAt: String (relative time)
+- WorkbenchId: String (navigation target)
+
+### Component: WelcomeSection
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| Time | Morning | "早上好" (06:00-11:59) |
+| Time | Afternoon | "下午好" (12:00-17:59) |
+| Time | Evening | "晚上好" (18:00-05:59) |
+| Username | Present | "{greeting}，{username}" |
+| Username | Empty | "{greeting}" (no comma) |
+
+**Overrides**:
+- Greeting: String
+- Username: String (optional, null-safe)
+- Date: String (localized format)
+
+---
+
+## 原型交互 (Prototype)
+
+### 交互流 1: 首次加载 → 数据展示
+
+```
+画板 2 (Skeleton Loading)
+  → 自动 (After Delay 1.5s, simulate API)
+  → 画板 1 (Full Data)
+```
+
+### 交互流 2: 快捷操作导航
+
+```
+画板 1 (Dashboard)
+  → 点击 "试验控制台" 卡片
+  → 导航到 /experiments
+
+画板 1 (Dashboard)
+  → 点击 "试验方法" 卡片
+  → 导航到 /methods
+
+画板 1 (Dashboard)
+  → 点击 "工作台管理" 卡片
+  → 导航到 /workbenches
+
+画板 1 (Dashboard)
+  → 点击 "数据分析" 卡片
+  → 导航到 /analysis
+```
+
+### 交互流 3: 最近工作台导航
+
+```
+画板 1 (Dashboard)
+  → 点击 "温度实验室" 卡片
+  → 导航到 /workbenches/{id}
+
+画板 1 (Dashboard)
+  → 点击 "查看全部 →"
+  → 导航到 /workbenches
+```
+
+### 交互流 4: 错误 → 重试
+
+```
+画板 4 (Stats Error)
+  → 点击 "重试" 按钮
+  → 按钮变为 Loading 状态 (200ms)
+  → 画板 2 (Skeleton, 仅统计区域)
+  → 自动 (After Delay 1s)
+  → 画板 1 (Full Data)
+```
+
+### 交互流 5: 空状态引导
+
+```
+画板 18 (Zero Data)
+  → 点击 "创建第一个工作台"
+  → 导航到 /workbenches
+```
+
+---
+
+## 标注与说明
+
+### 响应式行为标注
+
+**Desktop (> 1200px)**:
+```
+- NavigationRail: extended, 220px width
+- Content: max-width 1200px, centered
+- Quick Actions: 4 columns grid
+- Stats: 3 columns, horizontal
+- Recent Workbenches: 4 cards, 240px each
+- Padding: 32px
+```
+
+**Tablet (600-1200px)**:
+```
+- NavigationRail: collapsed (72px) or extended toggle
+- Content: full width, adaptive
+- Quick Actions: 2 columns grid
+- Stats: 3 columns (or 2 + 1 wrap)
+- Recent Workbenches: 3 visible, 200px each
+- Padding: 24px
+```
+
+**Mobile (< 600px)**:
+```
+- BottomNavigationBar: 6 items
+- Content: full width
+- Quick Actions: 2 columns (compact cards)
+- Stats: flex wrap, 3 cards min-width 100px
+- Recent Workbenches: horizontal scroll, 180px each
+- Padding: 16px
+```
+
+### 无障碍标注
+
+- **Welcome Section**: aria-label="欢迎区域，{greeting}，{username}，{date}"
+- **Quick Cards**: Semantics label="{title}，{subtitle}，点击进入"
+- **Stat Cards**: aria-label="{label}，数量 {number}"
+- **Recent Workbench Cards**: aria-label="{name}，{device_count}，最近活动 {updated_at}"
+- **最小触摸目标**: 所有卡片和按钮 ≥ 48×48dp
+- **颜色对比度**: 文字 ≥ 4.5:1, 大文字 ≥ 3:1
+
+### 性能标注
+
+- **骨架屏**: 使用现有 Skeleton 组件，shimmer 动画 GPU 加速
+- **卡片网格**: 使用 Wrap + ConstrainedBox，避免重排
+- **数字动画**: 数据加载完成后，数字从 0 计数动画到目标值 (600ms, ease-out)
+- **区域独立加载**: 每个区域独立请求，避免瀑布等待
+
+### 按区域独立容错策略
+
+```
+Region: Welcome
+  - Data Source: Auth Provider (cached)
+  - Error Behavior: 回退为仅显示日期，无用户名
+  - Loading Behavior: 文字骨架
+
+Region: Quick Actions
+  - Data Source: Static (no API)
+  - Error Behavior: N/A (始终显示)
+  - Loading Behavior: 卡片骨架
+
+Region: Stats Overview
+  - Data Source: GET /api/v1/workbenches, /api/v1/experiments
+  - Error Behavior: ErrorView + 本区域重试按钮
+  - Loading Behavior: 数字卡片骨架
+  - Empty Behavior: 显示 "0"
+
+Region: Recent Workbenches
+  - Data Source: GET /api/v1/workbenches?page=1&size=4
+  - Error Behavior: ErrorView + 本区域重试按钮
+  - Loading Behavior: 水平卡片骨架
+  - Empty Behavior: EmptyView + 创建引导按钮
+```
+
+---
+
+## 版本历史
+
+| 日期 | 版本 | 修订人 | 说明 |
+|------|------|--------|------|
+| 2026-06-08 | 1.0 | sw-anna | 初始版本，包含 18 个画板，覆盖完整仪表盘设计 |
+
+---
+
+**Figma 原型描述结束**

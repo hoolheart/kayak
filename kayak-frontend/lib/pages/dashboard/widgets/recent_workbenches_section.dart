@@ -85,11 +85,7 @@ class RecentWorkbenchesSection extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Icon(
-                Icons.arrow_forward,
-                size: 16,
-                color: colorScheme.primary,
-              ),
+              Icon(Icons.arrow_forward, size: 16, color: colorScheme.primary),
             ],
           ),
         ),

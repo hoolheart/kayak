@@ -173,9 +173,10 @@ class ExperimentConsoleSkeleton extends StatelessWidget {
               color: colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
                 buildShimmer(width: 60, height: 12),
                 const SizedBox(height: 4),
                 buildShimmer(width: 120, height: 16),
@@ -201,20 +202,21 @@ class ExperimentConsoleSkeleton extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          Row(
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
             children: [
               buildShimmer(width: 100, height: 40),
-              const SizedBox(width: 16),
               buildShimmer(width: 100, height: 40),
-              const SizedBox(width: 16),
               buildShimmer(width: 100, height: 40),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
             children: [
               buildShimmer(width: 100, height: 40),
-              const SizedBox(width: 16),
               buildShimmer(width: 100, height: 40),
             ],
           ),
@@ -252,7 +254,7 @@ class ExperimentConsoleSkeleton extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: List.generate(8, (i) => Padding(
+                children: List.generate(5, (i) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     children: [
@@ -1218,7 +1220,7 @@ class _ExperimentConsolePageState
           const SizedBox(height: 24),
           // 控制按钮组
           _buildControlButtons(
-            context, themeData, colorScheme, experiment, isMobile,
+            context, themeData, colorScheme, experiment, screenWidth,
           ),
           const SizedBox(height: 32),
           // 状态显示
@@ -1340,9 +1342,11 @@ class _ExperimentConsolePageState
     ThemeData themeData,
     ColorScheme colorScheme,
     Experiment experiment,
-    bool isMobile,
+    double screenWidth,
   ) {
     final loc = AppLocalizations.of(context)!;
+    final isMobile = screenWidth < 600;
+    final isDesktop = screenWidth >= 1200;
     final btnHeight = isMobile ? 48.0 : 40.0;
     final minWidth = isMobile ? 80.0 : 100.0;
 
@@ -1432,6 +1436,16 @@ class _ExperimentConsolePageState
       );
     }
 
+    if (!isDesktop) {
+      // Tablet (600-1200px): wrap buttons to avoid overflow
+      return Wrap(
+        spacing: 12,
+        runSpacing: 10,
+        children: [loadBtn, startBtn, pauseBtn, resumeBtn, stopBtn],
+      );
+    }
+
+    // Desktop (>= 1200px): two-row layout
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

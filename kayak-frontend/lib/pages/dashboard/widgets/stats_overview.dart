@@ -35,7 +35,10 @@ class StatsOverview extends ConsumerWidget {
   }
 
   Widget _buildContent(
-      BuildContext context, DashboardData data, bool isCompact) {
+    BuildContext context,
+    DashboardData data,
+    bool isCompact,
+  ) {
     final gap = isCompact ? 8.0 : 16.0;
 
     if (isCompact) {
@@ -110,11 +113,7 @@ class StatsOverview extends ConsumerWidget {
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(right: index < 2 ? gap : 0),
-            child: _buildStatSkeleton(
-              colorScheme,
-              containerPadding,
-              minHeight,
-            ),
+            child: _buildStatSkeleton(colorScheme, containerPadding, minHeight),
           ),
         );
       }),

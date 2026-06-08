@@ -1,0 +1,761 @@
+# TASK-022 Figma 原型设计 — 试验创建流程
+
+> **文件**: TASK-022_experiment_create.fig (文本原型描述)  
+> **设计师**: sw-anna  
+> **日期**: 2026-06-02  
+> **版本**: 1.0  
+> **屏幕总数**: 22 个画板  
+> **主题**: Material 3 (Light + Dark)
+
+---
+
+## 设计系统引用
+
+### 颜色 (ColorScheme.fromSeed, seed: #1976D2)
+
+| Token | Light | Dark |
+|-------|-------|------|
+| Primary | #1976D2 | #90CAF9 |
+| On Primary | #FFFFFF | #003354 |
+| Primary Container | #D1E4FF | #004A7F |
+| On Primary Container | #004377 | #D1E4FF |
+| Surface | #FFFFFF | #1A1C1E |
+| Surface Container Low | #F1F4F9 | #1D2023 |
+| Surface Container High | #E3E7EC | #2A2D30 |
+| Background | #FDFCFF | #1A1C1E |
+| Outline | #74777F | #8E9199 |
+| Outline Variant | #C4C6D0 | #44474E |
+| On Surface | #1A1C1E | #E3E2E6 |
+| On Surface Variant | #44474E | #C4C6CF |
+| Error | #BA1A1A | #FFB4AB |
+| On Error | #FFFFFF | #690005 |
+| Success | #4CAF50 | #81C784 |
+
+### 字体 (Typography)
+
+| Token | Size | Weight | Letter Spacing | Line Height |
+|-------|------|--------|----------------|-------------|
+| Title Large | 22px | 500 | 0px | 28px |
+| Title Medium | 16px | 500 | 0.15px | 24px |
+| Body Large | 16px | 400 | 0.5px | 24px |
+| Body Medium | 14px | 400 | 0.25px | 20px |
+| Body Small | 12px | 400 | 0.4px | 16px |
+| Label Large | 14px | 500 | 0.1px | 20px |
+
+### 间距 (Spacing)
+
+| Token | Value |
+|-------|-------|
+| spaceXs | 4px |
+| spaceSm | 8px |
+| spaceMd | 16px |
+| spaceLg | 24px |
+| spaceXl | 32px |
+
+### 圆角 (Border Radius)
+
+| Token | Value |
+|-------|-------|
+| radiusSmall | 4px |
+| radiusMedium | 8px |
+| radiusLarge | 12px |
+| radiusCircular | 50% |
+
+---
+
+## 画板列表
+
+### 画板 1: 步骤 1 — 加载中 (Desktop Light)
+
+**尺寸**: 1440×900px  
+**背景**: Background (#FDFCFF)
+
+**图层结构**:
+```
+Frame: Desktop / Step 1 Loading
+├── AppBar (56px height, Surface fill)
+│   ├── Icon: arrow_back (24px, On Surface)
+│   ├── Text: "创建试验" (Title Large, On Surface, center)
+│   └── Bottom Border: 1px Outline Variant
+├── Content Area (centered, max-width: 960px)
+│   ├── Stepper (height: 72px, Surface Container Low, radiusLarge)
+│   │   ├── Step 1: Circle "1" (32px, Primary Container, On Primary Container) + "选择工作台" (Body Medium, w600, On Surface)
+│   │   ├── Connector: 48px width, 2px height, Primary color
+│   │   ├── Step 2: Circle "2" (32px, Surface, Outline) + "选择方法" (Body Medium, On Surface Variant at 38%)
+│   │   ├── Connector: 48px width, 1px height, Outline Variant
+│   │   ├── Step 3: Circle "3" (32px, Surface, Outline) + "配置参数" (Body Medium, On Surface Variant at 38%)
+│   │   ├── Connector: 48px width, 1px height, Outline Variant
+│   │   └── Step 4: Circle "4" (32px, Surface, Outline) + "确认创建" (Body Medium, On Surface Variant at 38%)
+│   ├── Section Title: "选择工作台" (Title Medium, On Surface, padding-top: spaceLg)
+│   ├── Section Subtitle: "请选择一个工作台用于本次试验" (Body Small, On Surface Variant, padding-top: spaceSm)
+│   └── Skeleton Grid (3 cards)
+│       ├── Card Skeleton 1 (280×120px, Surface Container High, radiusLarge)
+│       │   ├── Circle placeholder (40px, shimmer)
+│       │   ├── Title placeholder (60% width, 16px, shimmer)
+│       │   └── Subtitle placeholder (40% width, 14px, shimmer)
+│       ├── Card Skeleton 2 (280×120px)
+│       └── Card Skeleton 3 (280×120px)
+└── Bottom Bar (64px, Surface, top border 1px Outline Variant)
+    └── Next Button: "下一步" (FilledButton, disabled, width: 120px, align: right)
+```
+
+---
+
+### 画板 2: 步骤 1 — 有数据 (Desktop Light)
+
+**尺寸**: 1440×900px  
+**背景**: Background (#FDFCFF)
+
+**与画板 1 差异**:
+```
+Content Area
+├── Stepper (same, Step 1 active)
+├── Section Title & Subtitle
+└── Workbench Card Grid (3 columns, gap: spaceMd)
+    ├── Workbench Card 1: "温度实验室" (Selected)
+    │   ├── Background: Primary Container (#D1E4FF)
+    │   ├── Border: 2px Primary (#1976D2)
+    │   ├── Icon: build (40px, Primary Container with Primary icon)
+    │   ├── Row: Text "温度实验室" (Title Medium) + Icon check_circle (24px, Primary)
+    │   ├── Text "5 台设备" (Body Small, On Surface Variant)
+    │   └── Text "用于温度相关测试" (Body Small, On Surface Variant, 2 lines max)
+    ├── Workbench Card 2: "振动测试台" (Default)
+    │   ├── Background: Surface (#FFFFFF)
+    │   ├── Border: 1px Outline Variant
+    │   ├── Icon: build (40px, Surface Container High)
+    │   ├── Text "振动测试台" (Title Medium, On Surface)
+    │   └── Text "3 台设备" (Body Small, On Surface Variant)
+    └── Workbench Card 3: "压力测试区" (Default)
+        ├── Text "压力测试区"
+        └── Text "0 台设备"
+
+Bottom Bar
+├── Next Button: "下一步" (FilledButton, enabled, Primary background)
+└── Back Button: hidden (Step 1)
+```
+
+---
+
+### 画板 3: 步骤 1 — 空状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area
+├── Stepper (same)
+├── Section Title & Subtitle
+└── EmptyView
+    ├── Icon: build_outlined (48px, On Surface Variant at 60%)
+    ├── Text "您还没有工作台" (Title Medium, On Surface)
+    ├── Text "点击下方按钮创建您的第一个工作台" (Body Medium, On Surface Variant)
+    └── Button: "创建第一个工作台" (ElevatedButton, Primary)
+```
+
+---
+
+### 画板 4: 步骤 1 — 错误状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area
+├── Stepper (same)
+├── Section Title & Subtitle
+└── ErrorView
+    ├── Icon: error_outline_outlined (48px, On Surface Variant)
+    ├── Text "加载工作台列表失败" (Title Medium, On Surface)
+    ├── Text "请检查网络后点击重试" (Body Medium, On Surface Variant)
+    └── Button: "重新加载" (FilledButton)
+```
+
+---
+
+### 画板 5: 步骤 1 — 已选择工作台 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**与画板 2 相同**（展示选中状态，用于截图对比）
+
+---
+
+### 画板 6: 步骤 2 — 加载中 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stepper
+├── Step 1: check_circle (24px, Primary) + "选择工作台" (Body Medium, Primary)
+├── Connector: Primary color (2px)
+├── Step 2: Circle "2" (32px, Primary Container, w600) + "选择方法" (Body Medium, w600, On Surface)
+├── Connector: Outline Variant
+├── Step 3: disabled
+└── Step 4: disabled
+
+Content Area
+├── Section Title: "选择方法"
+├── Section Subtitle: "请选择一个试验方法"
+└── Method Card Skeletons (3 cards)
+
+Bottom Bar
+├── Back Button: "上一步" (OutlinedButton)
+└── Next Button: "下一步" (disabled)
+```
+
+---
+
+### 画板 7: 步骤 2 — 有数据 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stepper (Step 1 completed, Step 2 active)
+
+Content Area
+├── Section Title: "选择方法"
+├── Section Subtitle
+└── Method Card Grid (3 columns)
+    ├── Method Card 1: "标准热循环" (Selected)
+    │   ├── Background: Primary Container, Border: 2px Primary
+    │   ├── Icon: science (40px, Primary Container with Primary)
+    │   ├── Row: "标准热循环" + check_circle (24px, Primary)
+    │   ├── Text "按照标准温度循环曲线进行测试" (Body Small, 2 lines)
+    │   └── Text "5 个参数" (Body Small, On Surface Variant)
+    ├── Method Card 2: "恒定压力测试" (Default)
+    │   └── Text "在恒定压力下持续监测设备状态"
+    └── Method Card 3: "振动耐久测试" (Default)
+        └── Text "模拟振动环境进行耐久性测试"
+
+Bottom Bar
+├── Back Button: "上一步"
+└── Next Button: "下一步" (enabled)
+```
+
+---
+
+### 画板 8: 步骤 2 — 空状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area
+└── EmptyView
+    ├── Icon: science_outlined (48px)
+    ├── Text "暂无可用方法"
+    ├── Text "请先创建试验方法"
+    └── Button: "前往方法管理" (TextButton)
+```
+
+---
+
+### 画板 9: 步骤 2 — 已选择方法 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**与画板 7 相同**（展示选中状态）
+
+---
+
+### 画板 10: 步骤 3 — 参数表单 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stepper
+├── Step 1: check_circle + Primary
+├── Connector: Primary
+├── Step 2: check_circle + Primary
+├── Connector: Primary
+├── Step 3: Circle "3" (Primary Container, w6) + "配置参数" (w6)
+├── Connector: Outline Variant
+└── Step 4: disabled
+
+Content Area
+├── Section Title: "配置参数"
+├── Section Subtitle: "请配置所选方法的参数"
+└── Parameter Form (2-column layout on desktop)
+    ├── Field 1: "目标温度" (number, required)
+    │   ├── Label Row: "目标温度" + " *" (Error) + " °C" (On Surface Variant)
+    │   ├── TextFormField: "85.0" (default value)
+    │   │   ├── Border: 1px Outline, radiusMedium
+    │   │   ├── Focused: 2px Primary
+    │   │   └── Keyboard: number with decimal
+    │   ├── Helper: "测试目标温度" (Body Small, On Surface Variant)
+    │   └── Error: (empty, valid)
+    │
+    ├── Field 2: "持续时间" (integer, required)
+    │   ├── Label: "持续时间" + " *" + " 分钟"
+    │   ├── TextFormField: "30"
+    │   └── Helper: "单个循环持续时间"
+    │
+    ├── Field 3: "循环次数" (integer, optional)
+    │   ├── Label: "循环次数" + " 次"
+    │   ├── TextFormField: "10"
+    │   └── Helper: "总循环次数"
+    │
+    ├── Field 4: "自动停止" (boolean)
+    │   ├── Label: "自动停止"
+    │   ├── Row: Text "达到条件后自动停止测试" (Body Small) + Switch (value: true)
+    │   │   └── Switch: Primary track when on
+    │   └── Helper: (none)
+    │
+    └── Field 5: "循环模式" (enum, required)
+        ├── Label: "循环模式" + " *"
+        ├── DropdownButtonFormField: "standard" (default)
+        │   ├── Options: "standard" / "rapid" / "gradual"
+        │   ├── Border: 1px Outline
+        │   └── Dropdown icon: arrow_drop_down
+        └── Helper: "温度循环模式"
+
+Bottom Bar
+├── Back Button: "上一步"
+└── Next Button: "下一步" (enabled, all valid)
+```
+
+---
+
+### 画板 11: 步骤 3 — 参数验证错误 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area (same layout)
+└── Parameter Form
+    ├── Field 1: "目标温度"
+    │   ├── TextFormField: "200" (user input, invalid)
+    │   ├── Border: 2px Error
+    │   └── Error Text: "不能大于 150°C" (Body Small, Error color)
+    │
+    └── Field 2: "持续时间"
+        ├── TextFormField: "" (empty, required)
+        ├── Border: 2px Error
+        └── Error Text: "此字段为必填项" (Body Small, Error color)
+
+Bottom Bar
+└── Next Button: "下一步" (disabled, validation failed)
+```
+
+---
+
+### 画板 12: 步骤 3 — 无参数方法 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area
+├── Section Title: "配置参数"
+├── Section Subtitle
+└── Info Banner
+    ├── Background: Primary Container at 30% opacity
+    ├── Border: 1px Primary at 50%
+    ├── Radius: radiusLarge
+    ├── Padding: spaceLg
+    ├── Icon: info_outline (24px, Primary)
+    ├── Text "该方法无需配置参数" (Body Large, On Surface)
+    └── Text "点击下一步继续" (Body Small, On Surface Variant)
+
+Bottom Bar
+├── Back Button: "上一步"
+└── Next Button: "下一步" (enabled)
+```
+
+---
+
+### 画板 13: 步骤 4 — 确认预览 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Stepper
+├── Step 1: check_circle (Primary)
+├── Connector: Primary
+├── Step 2: check_circle (Primary)
+├── Connector: Primary
+├── Step 3: check_circle (Primary)
+├── Connector: Primary
+└── Step 4: Circle "4" (Primary Container, w6) + "确认创建" (w6)
+
+Content Area
+├── Section Title: "确认创建"
+├── Section Subtitle: "请确认以下信息无误"
+├── Summary Card (Surface Container Low, radiusLarge, padding: spaceLg)
+│   ├── Workbench Section
+│   │   ├── Label: "工作台" (Body Small, On Surface Variant)
+│   │   └── Value: "温度实验室" (Body Large, On Surface)
+│   ├── Divider (1px Outline Variant, margin: spaceMd vertical)
+│   ├── Method Section
+│   │   ├── Label: "试验方法" (Body Small, On Surface Variant)
+│   │   └── Value: "标准热循环" (Body Large, On Surface)
+│   ├── Divider
+│   └── Parameters Section
+│       ├── Label: "参数配置" (Body Small, On Surface Variant)
+│       └── Parameter List
+│           ├── Row: "目标温度 = 85.0 °C" (Body Medium)
+│           ├── Row: "持续时间 = 30 分钟" (Body Medium)
+│           ├── Row: "循环次数 = 10 次" (Body Medium)
+│           ├── Row: "自动停止 = 开启" (Body Medium)
+│           └── Row: "循环模式 = standard" (Body Medium)
+│
+└── Warning Text (Body Small, On Surface Variant, italic)
+    └── "创建后试验将立即开始运行"
+
+Bottom Bar
+├── Back Button: "上一步"
+└── Create Button: "创建试验" (FilledButton, Primary, icon: add)
+    └── Width: 160px
+```
+
+---
+
+### 画板 14: 步骤 4 — 创建按钮禁用 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area (showing incomplete state for demo)
+└── Summary Card (partial - missing method)
+
+Bottom Bar
+└── Create Button: "创建试验" (FilledButton, disabled, tooltip: "请先选择工作台和方法")
+```
+
+---
+
+### 画板 15: 创建成功 Toast (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**基于画板 13，叠加 Toast**:
+```
+Toast (position: bottom-center, margin-bottom: 80px)
+├── Background: Surface Container High (with 95% opacity)
+├── Border Radius: radiusSmall
+├── Padding: spaceMd horizontal, spaceSm vertical
+├── Elevation: 3
+├── Shadow: 0 2px 8px rgba(0,0,0,0.15)
+├── Icon: check_circle (20px, Success)
+├── Text: "试验创建成功" (Body Medium, On Surface)
+└── Action: "查看" (TextButton, Primary)
+```
+
+---
+
+### 画板 16: 移动端 — 步骤 1 (Mobile Light)
+
+**尺寸**: 375×812px (iPhone 14 proportions)
+**背景**: Background
+
+**图层结构**:
+```
+Frame: Mobile / Step 1
+├── AppBar (64px, Surface)
+│   ├── Icon: arrow_back (24px)
+│   └── Text: "创建试验" (Title Large)
+├── Content Area (padding: spaceMd 16px)
+│   ├── Stepper (height: 56px, compact)
+│   │   ├── Step 1: Circle "1" (28px, Primary Container) + "工作台" (short label)
+│   │   ├── Connector: 24px, Primary
+│   │   ├── Step 2: Circle "2" (28px, disabled)
+│   │   ├── Connector: 24px, Outline Variant
+│   │   ├── Step 3: Circle "3" (28px, disabled)
+│   │   ├── Connector: 24px, Outline Variant
+│   │   └── Step 4: Circle "4" (28px, disabled)
+│   ├── Section Title: "选择工作台" (Title Medium)
+│   └── Workbench Cards (1 column, full width)
+│       ├── Card 1: "温度实验室" (full width, padding: spaceSm)
+│       ├── Card 2: "振动测试台"
+│       └── Card 3: "压力测试区"
+└── Bottom Bar (64px, Surface, top border)
+    └── Next Button: "下一步" (FilledButton, full width, disabled)
+```
+
+---
+
+### 画板 17: 移动端 — 步骤 2 (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+Stepper (Step 1: check, Step 2: active)
+Content Area: Method Cards (1 column)
+Bottom Bar
+├── Back Button: "上一步" (OutlinedButton, full width, stacked below)
+└── Next Button: "下一步" (FilledButton, full width, on top)
+```
+
+---
+
+### 画板 18: 移动端 — 步骤 3 (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+Stepper (Steps 1-2: check, Step 3: active)
+Content Area: Parameter Form (single column)
+└── Fields stacked vertically, full width
+
+Bottom Bar (stacked)
+├── Next Button (top, full width)
+└── Back Button (bottom, full width)
+```
+
+---
+
+### 画板 19: 深色主题 — 步骤 1 (Desktop Dark)
+
+**尺寸**: 1440×900px
+**背景**: Background Dark (#1A1C1E)
+
+**关键差异**:
+```
+All Surface colors → Dark Surface
+All On Surface → Light text (#E3E2E6)
+Selected Card: Primary Container Dark (#004A7F)
+Selected Border: Primary Dark (#90CAF9)
+Stepper: Surface Container Low Dark
+Input Border: Outline Dark
+```
+
+---
+
+### 画板 20: 深色主题 — 步骤 3 (Desktop Dark)
+
+**尺寸**: 1440×900px
+
+**展示参数表单在深色主题下的表现**:
+```
+Input fields: Surface fill, Outline border
+Focused: Primary Dark border
+Error: Error Dark border
+Dropdown: Surface fill
+Switch: Primary Dark track when on
+```
+
+---
+
+### 画板 21: 英文界面 — 步骤 1 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+AppBar: "Create Experiment"
+Stepper:
+  Step 1: "Select Workbench"
+  Step 2: "Select Method"
+  Step 3: "Configure Parameters"
+  Step 4: "Confirm"
+Section Title: "Select Workbench"
+Section Subtitle: "Please select a workbench for this experiment"
+Card: "Temperature Lab" + "5 devices"
+Bottom:
+  Back: "Back"
+  Next: "Next"
+```
+
+---
+
+### 画板 22: 英文界面 — 步骤 3 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+Section Title: "Configure Parameters"
+Field Labels:
+  "Target Temperature" + " *" + " °C"
+  "Duration" + " *" + " minutes"
+  "Cycle Count" + " times"
+  "Auto Stop"
+  "Cycle Mode" + " *"
+Helpers:
+  "Target temperature for testing"
+  "Duration of a single cycle"
+  "Total number of cycles"
+  "Automatically stop when conditions are met"
+  "Temperature cycle mode"
+Error: "Cannot be greater than 150°C"
+Bottom:
+  Back: "Back"
+  Next: "Next"
+```
+
+---
+
+## 组件库 (Figma Components)
+
+### Component: SelectableCard
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| State | Default | Surface, 1px Outline Variant |
+| State | Hover | Elevation 2, Outline at 50% Primary |
+| State | Selected | Primary Container, 2px Primary |
+| Size | Desktop | 280px min-width |
+| Size | Mobile | 100% width |
+
+**Overrides**:
+- Icon: IconData
+- Title: String
+- Subtitle: String
+- Description: String (optional, 2 lines max)
+- Selected: Boolean
+
+### Component: ParameterField
+
+| Variant | Type | Input Widget |
+|---------|------|-------------|
+| Type | number | TextFormField (decimal) |
+| Type | integer | TextFormField (no decimal) |
+| Type | string | TextFormField (text) |
+| Type | boolean | Switch |
+| Type | enum | DropdownButtonFormField |
+
+**Overrides**:
+- Label: String
+- Unit: String (optional)
+- Description: String (optional)
+- Required: Boolean
+- DefaultValue: String
+- ErrorText: String (optional)
+- Min/Max: Number (optional)
+
+### Component: StepperHeader
+
+| Variant | State | Visual |
+|---------|-------|--------|
+| Step | Inactive | Circle + Outline, text muted |
+| Step | Active | Primary Container circle, bold text |
+| Step | Completed | check_circle icon, Primary text |
+| Step | Disabled | 38% opacity |
+
+---
+
+## 原型交互 (Prototype)
+
+### 交互流 1: 完整创建流程
+
+```
+画板 1 (Step 1 Loading)
+  → 自动 (After Delay 1s)
+  → 画板 2 (Step 1 Data)
+
+画板 2 (Step 1 Data)
+  → 点击 "温度实验室" 卡片
+  → 画板 5 (Step 1 Selected)
+  → 点击 "下一步"
+  → 画板 6 (Step 2 Loading)
+
+画板 6 (Step 2 Loading)
+  → 自动 (After Delay 1s)
+  → 画板 7 (Step 2 Data)
+
+画板 7 (Step 2 Data)
+  → 点击 "标准热循环" 卡片
+  → 画板 9 (Step 2 Selected)
+  → 点击 "下一步"
+  → 画板 10 (Step 3 Form)
+
+画板 10 (Step 3 Form)
+  → 输入 "200" 到目标温度
+  → 画板 11 (Step 3 Error)
+  → 清空持续时间
+  → 画板 11 (Step 3 Error - 多字段)
+  → 修正输入
+  → 画板 10 (Step 3 Valid)
+  → 点击 "下一步"
+  → 画板 13 (Step 4 Confirm)
+
+画板 13 (Step 4 Confirm)
+  → 点击 "创建试验"
+  → 按钮 Loading 状态 (200ms)
+  → 画板 15 (Success Toast)
+  → 自动 (After Delay 2s)
+  → 导航到实验详情 (外部链接)
+```
+
+### 交互流 2: 步骤回退
+
+```
+画板 10 (Step 3)
+  → 点击 "上一步"
+  → 画板 9 (Step 2, 方法保持选中)
+  → 点击 "上一步"
+  → 画板 5 (Step 1, 工作台保持选中)
+  → 点击 Step 1 在 Stepper 上
+  → 画板 5 (Step 1)
+```
+
+### 交互流 3: 空状态引导
+
+```
+画板 3 (Step 1 Empty)
+  → 点击 "创建第一个工作台"
+  → 导航到 /workbenches (外部)
+
+画板 8 (Step 2 Empty)
+  → 点击 "前往方法管理"
+  → 导航到 /methods (外部)
+```
+
+---
+
+## 标注与说明
+
+### 响应式行为标注
+
+在所有 Desktop 画板右下角添加标注:
+```
+Breakpoint: > 1200px
+- Stepper: Full labels
+- Cards: 2-3 columns
+- Form: 2 columns
+- Buttons: Inline
+```
+
+在所有 Mobile 画板右下角添加标注:
+```
+Breakpoint: < 600px
+- Stepper: Short labels
+- Cards: 1 column
+- Form: 1 column
+- Buttons: Stacked full-width
+```
+
+### 无障碍标注
+
+- 所有交互元素最小触摸目标: 48×48dp
+- 颜色对比度: 文字 ≥ 4.5:1, 大文字 ≥ 3:1
+- 步骤指示器: aria-label 描述当前步骤
+- 表单字段: label 与 input 正确关联
+- 错误提示: role="alert" 自动播报
+
+### 性能标注
+
+- 步骤切换动画: 使用 Fade + Slide, GPU 加速
+- 骨架屏 shimmer: 使用 ShaderMask, 避免布局抖动
+- 卡片网格: 使用 Wrap + ConstrainedBox, 避免重排
+- 表单验证: 防抖 300ms, 避免频繁验证
+
+---
+
+## 版本历史
+
+| 日期 | 版本 | 修订人 | 说明 |
+|------|------|--------|------|
+| 2026-06-02 | 1.0 | sw-anna | 初始版本，包含 22 个画板 |
+
+---
+
+**Figma 原型描述结束**

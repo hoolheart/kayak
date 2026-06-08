@@ -1,0 +1,1017 @@
+# TASK-023 Figma 原型设计 — 试验控制台
+
+> **文件**: TASK-023_experiment_console.fig (文本原型描述)  
+> **设计师**: sw-anna  
+> **日期**: 2026-06-02  
+> **版本**: 1.0  
+> **屏幕总数**: 28 个画板  
+> **主题**: Material 3 (Light + Dark)
+
+---
+
+## 设计系统引用
+
+### 颜色 (ColorScheme.fromSeed, seed: #1976D2)
+
+| Token | Light | Dark |
+|-------|-------|------|
+| Primary | #1976D2 | #90CAF9 |
+| On Primary | #FFFFFF | #003354 |
+| Primary Container | #D1E4FF | #004A7F |
+| On Primary Container | #004377 | #D1E4FF |
+| Success | #2E7D32 | #81C784 |
+| On Success | #FFFFFF | #003300 |
+| Warning | #ED6C02 | #FFB74D |
+| On Warning | #FFFFFF | #331800 |
+| Error | #BA1A1A | #FFB4AB |
+| On Error | #FFFFFF | #690005 |
+| Error Container | #FFDAD6 | #93000A |
+| On Error Container | #410002 | #FFDAD6 |
+| Surface | #FFFFFF | #1A1C1E |
+| Surface Container Low | #F1F4F9 | #1D2023 |
+| Surface Container High | #E3E7EC | #2A2D30 |
+| Background | #FDFCFF | #1A1C1E |
+| Outline | #74777F | #8E9199 |
+| Outline Variant | #C4C6D0 | #44474E |
+| On Surface | #1A1C1E | #E3E2E6 |
+| On Surface Variant | #44474E | #C4C6CF |
+
+### 字体 (Typography)
+
+| Token | Size | Weight | Letter Spacing | Line Height |
+|-------|------|--------|----------------|-------------|
+| Headline Small | 32px | 600 | 0px | 40px |
+| Title Large | 22px | 500 | 0px | 28px |
+| Title Medium | 16px | 500 | 0.15px | 24px |
+| Body Large | 16px | 400 | 0.5px | 24px |
+| Body Medium | 14px | 400 | 0.25px | 20px |
+| Body Small | 12px | 400 | 0.4px | 16px |
+| Label Large | 14px | 500 | 0.1px | 20px |
+
+### 间距 (Spacing)
+
+| Token | Value |
+|-------|-------|
+| spaceXs | 4px |
+| spaceSm | 8px |
+| spaceMd | 16px |
+| spaceLg | 24px |
+| spaceXl | 32px |
+
+### 圆角 (Border Radius)
+
+| Token | Value |
+|-------|-------|
+| radiusSmall | 4px |
+| radiusMedium | 8px |
+| radiusLarge | 12px |
+| radiusCircular | 50% |
+
+---
+
+## 画板列表
+
+---
+
+### 画板 1: RUNNING 状态 — 完整布局 (Desktop Light)
+
+**尺寸**: 1440×900px  
+**背景**: Background (#FDFCFF)
+
+**图层结构**:
+```
+Frame: Desktop / RUNNING State
+├── AppBar (56px height, Surface fill, bottom border 1px Outline Variant)
+│   ├── Back Button: Icon arrow_back (24px, On Surface), 48×48dp touch target
+│   ├── Text: "温度循环测试" (Title Medium, On Surface, max-width 400px)
+│   ├── StatusBadge: Chip "RUNNING" (Success at 15% bg, Success text, 脉冲动画)
+│   │   └── 脉冲: Opacity 1.0→0.6→1.0 + Scale 1.0→1.05→1.0, 2000ms infinite
+│   └── WS Indicator: Row (right aligned, padding-right: spaceMd)
+│       ├── Dot: 10px circle, Success (#2E7D32)
+│       ├── SizedBox(4px)
+│       └── Text: "已连接" (Body Small, Success)
+│
+├── Content Area (padding: spaceLg 24px, Row, gap: spaceLg)
+│   ├── Control Panel (width: 38%, min 400px, Surface, radiusLarge, elevation 1)
+│   │   ├── padding: spaceLg
+│   │   ├── Info Card (Surface Container Low, radiusLarge, padding: spaceLg)
+│   │   │   ├── Row 1:
+│   │   │   │   ├── Label: "工作台" (Body Small, On Surface Variant)
+│   │   │   │   └── Value: "温度实验室" (Body Large, On Surface)
+│   │   │   ├── Divider (1px Outline Variant, margin: spaceMd vertical)
+│   │   │   ├── Row 2:
+│   │   │   │   ├── Label: "方法" (Body Small, On Surface Variant)
+│   │   │   │   └── Value: "标准热循环" (Body Large, On Surface)
+│   │   │   ├── Divider
+│   │   │   └── Row 3:
+│   │   │       ├── Label: "创建时间" (Body Small, On Surface Variant)
+│   │   │       └── Value: "2026-06-02 09:30" (Body Medium, On Surface)
+│   │   │
+│   │   ├── Button Group (padding-top: spaceLg)
+│   │   │   ├── Row 1:
+│   │   │   │   ├── [载入] FilledButton (disabled, 38% opacity, height 40px, min-width 100px)
+│   │   │   │   ├── SizedBox(16px)
+│   │   │   │   ├── [开始] FilledButton (disabled, 38% opacity)
+│   │   │   │   ├── SizedBox(16px)
+│   │   │   │   └── [暂停] FilledButton (enabled, Warning bg #ED6C02, height 40px)
+│   │   │   └── Row 2 (padding-top: spaceMd):
+│   │   │       ├── [继续] FilledButton (disabled, 38% opacity)
+│   │   │       ├── SizedBox(16px)
+│   │   │       └── [停止] FilledButton (enabled, Error Container bg #FFDAD6, On Error Container text)
+│   │   │
+│   │   ├── Status Display (padding-top: spaceXl, center)
+│   │   │   ├── Label: "状态" (Body Small, On Surface Variant)
+│   │   │   ├── SizedBox(8px)
+│   │   │   ├── Text: "RUNNING" (32px, w600, Success #2E7D32)
+│   │   │   └── Subtext: "试验运行中" (Body Small, On Surface Variant)
+│   │   │
+│   │   └── Timer (padding-top: spaceLg, center)
+│   │       ├── Label: "已运行" (Body Small, On Surface Variant)
+│   │       ├── SizedBox(8px)
+│   │       └── Value: "02:15:32" (36px, w500, monospace, On Surface #1A1C1E)
+│   │
+│   └── Log Viewer (flex: 1, Surface, radiusLarge, elevation 1)
+│       ├── Log List (padding: spaceMd, flex: 1, scrollable)
+│       │   ├── Entry 1: "[INFO]  14:30:01  试验开始"
+│       │   │   ├── Level: "[INFO]" (monospace 13px, Primary, bg Primary at 8%, radiusSmall, min-width 52px)
+│       │   │   ├── Timestamp: "14:30:01" (monospace 13px, On Surface Variant)
+│       │   │   └── Message: "试验开始" (monospace 13px, On Surface)
+│       │   ├── Entry 2: "[INFO]  14:30:02  设备连接成功"
+│       │   ├── Entry 3: "[WARN]  14:31:15  温度偏高: 85.3°C"
+│       │   │   └── Level: "[WARN]" (monospace 13px, Warning, bg Warning at 8%)
+│       │   ├── Entry 4: "[INFO]  14:32:00  进入阶段2"
+│       │   └── Entry 5: "[ERROR] 14:32:45  传感器超时"
+│       │       └── Level: "[ERROR]" (monospace 13px, Error, bg Error at 12%, w600)
+│       │
+│       └── Log Control Bar (height 48px, Surface Container Low, top border 1px Outline Variant)
+│           ├── Filter Dropdown: "全部 ▼" (Body Small, Surface bg, 1px Outline, radiusSmall)
+│           ├── Spacer
+│           └── Clear Button: TextButton "清空日志" + Icon clear_all (18px)
+│
+└── Responsive Annotation (bottom-right corner, On Surface Variant at 50%)
+    └── Text: "Breakpoint: ≥1200px | Desktop | 左右分栏 38:62"
+```
+
+---
+
+### 画板 2: IDLE 状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── StatusBadge: "IDLE" (Surface Variant bg, On Surface Variant text, 无动画)
+
+Control Panel:
+├── Button Group:
+│   ├── Row 1:
+│   │   ├── [载入] FilledButton (enabled, Primary)
+│   │   ├── [开始] (disabled)
+│   │   └── [暂停] (disabled)
+│   └── Row 2:
+│       ├── [继续] (disabled)
+│       └── [停止] (disabled)
+├── Status Display:
+│   └── Text: "IDLE" (32px, w600, On Surface Variant #44474E)
+│   └── 无 Subtext
+└── Timer: 不显示 (整个 Timer Section 隐藏)
+
+Log Viewer:
+└── Empty State (center)
+    ├── Icon: terminal_outlined (40px, On Surface Variant at 40%)
+    ├── SizedBox(16px)
+    ├── Text: "等待日志..." (Body Medium, On Surface Variant)
+    └── Subtext: "试验开始后日志将显示在这里" (Body Small, On Surface Variant at 60%)
+```
+
+---
+
+### 画板 3: LOADED 状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── StatusBadge: "LOADED" (Primary at 15% bg, Primary text, 无动画)
+
+Control Panel:
+├── Button Group:
+│   ├── [载入] (disabled)
+│   ├── [开始] (enabled, Primary)
+│   └── [暂停] (disabled)
+│   └── [继续] (disabled)
+│   └── [停止] (disabled)
+├── Status Display:
+│   └── Text: "LOADED" (32px, Primary #1976D2)
+└── Timer: 不显示
+```
+
+---
+
+### 画板 4: PAUSED 状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── StatusBadge: "PAUSED" (Warning at 15% bg, Warning text, 无动画)
+
+Control Panel:
+├── Button Group:
+│   ├── [载入] (disabled)
+│   ├── [开始] (disabled)
+│   ├── [暂停] (disabled)
+│   ├── [继续] (enabled, Primary)
+│   └── [停止] (enabled, Error Container)
+├── Status Display:
+│   └── Text: "PAUSED" (32px, Warning #ED6C02)
+└── Timer:
+    └── Value: "00:45:18" (36px, On Surface Variant) — 冻结颜色
+    └── Label: "已暂停" / "Paused"
+```
+
+---
+
+### 画板 5: COMPLETED 状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── StatusBadge: "COMPLETED" (Success at 15% bg, Success text, 无动画)
+
+Control Panel:
+├── Button Group: 全部 disabled (38% opacity)
+├── Status Display:
+│   └── Text: "COMPLETED" (32px, Success #2E7D32)
+│   └── Subtext: "试验已完成" (Body Small, Success)
+├── Timer: 不显示 (替换为以下)
+└── Completed Info (padding-top: spaceLg)
+    ├── Row: "开始时间" → "2026-06-02 14:30"
+    ├── Row: "结束时间" → "2026-06-02 14:45"
+    └── Row: "总运行时长" → "00:15:30" (monospace)
+```
+
+---
+
+### 画板 6: ABORTED 状态 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── StatusBadge: "ABORTED" (Error at 15% bg, Error text, 无动画)
+
+Control Panel:
+├── Button Group: 全部 disabled
+├── Status Display:
+│   └── Text: "ABORTED" (32px, Error #BA1A1A)
+│   └── Subtext: "试验已中止" (Body Small, Error)
+├── Completed Info:
+│   ├── "开始时间" → "2026-06-02 14:30"
+│   ├── "结束时间" → "2026-06-02 14:32"
+│   ├── "总运行时长" → "00:02:15"
+│   └── Error Message (padding-top: spaceMd):
+│       ├── Icon: error_outline (16px, Error)
+│       └── Text: "传感器连接超时" (Body Small, Error)
+```
+
+---
+
+### 画板 7: 页面加载中 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+AppBar:
+└── 试验名称显示骨架: 200px shimmer bar (16px height)
+└── StatusBadge: 骨架圆角矩形 (60×28px, shimmer)
+└── WS Indicator: "连接中..." (Body Small, Warning)
+    └── Dot: 10px, Warning, 闪烁动画
+
+Control Panel:
+├── Info Card 骨架:
+│   ├── 3 行: Label shimmer (60px) + Value shimmer (120px)
+│   └── 2 条 Divider shimmer
+├── Button Group: 全部 disabled 骨架
+├── Status Display: 骨架 (120×40px, shimmer)
+└── Timer: 骨架 (150×40px, shimmer)
+
+Log Viewer:
+└── Log List 骨架: 8 行日志条目 shimmer
+    └── 每行: Level tag shimmer (52×20px) + Timestamp shimmer (60×16px) + Message shimmer (200×16px)
+```
+
+---
+
+### 画板 8: 操作 Loading 状态 — 暂停按钮 (Desktop Light)
+
+**基于画板 1 (RUNNING)**:
+
+**差异**:
+```
+Control Panel:
+└── Button Group:
+    └── [暂停] FilledButton:
+        ├── 文字隐藏
+        ├── CircularProgressIndicator (20px, strokeWidth 2, white)
+        └── 按钮保持 Warning bg
+    └── [停止] FilledButton: disabled (操作进行中全部禁用)
+```
+
+---
+
+### 画板 9: 停止确认对话框 (Desktop Light)
+
+**基于画板 1，叠加对话框**:
+
+```
+Scrim (fullscreen, Background at 60% opacity)
+└── Dialog (center, 400px wide, Surface, radiusLarge)
+    ├── padding: spaceXl top/horizontal, spaceLg bottom
+    ├── Title Row:
+    │   ├── Icon: warning_amber (20px, Error)
+    │   ├── SizedBox(8px)
+    │   └── Text: "确认停止试验?" (Title Medium, On Surface)
+    ├── SizedBox(8px)
+    ├── Description:
+    │   └── Text: "确定要停止当前试验吗？此操作不可撤销。" (Body Medium, On Surface Variant)
+    ├── SizedBox(32px)
+    └── Button Row (right aligned)
+        ├── [取消] TextButton "取消" (Primary)
+        └── [确认停止] FilledButton "确认停止" (Error bg #BA1A1A, On Error text)
+```
+
+---
+
+### 画板 10: 日志筛选 — 仅 INFO (Desktop Light)
+
+**基于画板 1**:
+
+**差异**:
+```
+Log Control Bar:
+└── Filter Dropdown: "INFO ▼" (Body Small, Primary text)
+
+Log List:
+├── Entry 1: "[INFO] 14:30:01 试验开始" ✅
+├── Entry 2: "[INFO] 14:30:02 设备连接成功" ✅
+├── Entry 3: "[WARN] 14:31:15 温度偏高..." ❌ (隐藏)
+├── Entry 4: "[INFO] 14:32:00 进入阶段2" ✅
+└── Entry 5: "[ERROR] 14:32:45 传感器超时" ❌ (隐藏)
+```
+
+---
+
+### 画板 11: 手动上滚 + 新日志浮动按钮 (Desktop Light)
+
+**基于画板 1**:
+
+**差异**:
+```
+Log List:
+└── 滚动位置: 不在底部 (显示前 3 条日志，后 2 条在下方不可见区域)
+
+Floating Button (bottom-right of Log List, margin: spaceMd):
+└── ElevatedButton / FilledButton.tonal
+    ├── Background: Primary Container (#D1E4FF)
+    ├── Border Radius: radiusCircular (pill)
+    ├── Elevation: 2
+    ├── Icon: arrow_downward (18px, On Primary Container)
+    ├── SizedBox(4px)
+    └── Text: "2 条新日志" (Body Small, On Primary Container)
+```
+
+---
+
+### 画板 12: WS 连接中 (Desktop Light)
+
+**基于画板 1 (RUNNING)**:
+
+**差异**:
+```
+AppBar:
+└── WS Indicator:
+    ├── Dot: 10px, Warning (#ED6C02), 闪烁动画 (opacity 0.4→1.0→0.4, 1000ms)
+    └── Text: "连接中..." (Body Small, Warning)
+```
+
+---
+
+### 画板 13: WS 重连中 (Desktop Light)
+
+**基于画板 1**:
+
+**差异**:
+```
+AppBar:
+└── WS Indicator:
+    ├── Dot: 10px, Warning, 闪烁动画
+    └── Text: "重连中(2/5)" (Body Small, Warning)
+```
+
+---
+
+### 画板 14: WS 连接失败 (Desktop Light)
+
+**基于画板 1**:
+
+**差异**:
+```
+AppBar:
+└── WS Indicator:
+    ├── Dot: 10px, Error (#BA1A1A)
+    ├── Text: "连接失败" (Body Small, Error)
+    └── Reconnect Button: TextButton "重新连接" + refresh icon (18px, Primary)
+```
+
+---
+
+### 画板 15: 深色主题 — RUNNING (Desktop Dark)
+
+**尺寸**: 1440×900px  
+**背景**: Background Dark (#1A1C1E)
+
+**关键差异**:
+```
+所有 Surface → Dark Surface (#1A1C1E)
+所有 On Surface → Light text (#E3E2E6)
+所有 Primary → Primary Dark (#90CAF9)
+所有 Success → Success Dark (#81C784)
+所有 Warning → Warning Dark (#FFB74D)
+所有 Error → Error Dark (#FFB4AB)
+
+Control Panel:
+├── Info Card: Surface Container Low Dark (#1D2023)
+├── Status "RUNNING": Success Dark (#81C784)
+├── Timer: On Surface Dark (#E3E2E6)
+└── 按钮禁用: 38% opacity
+
+Log Viewer:
+├── Log Entry INFO: Primary Dark (#90CAF9)
+├── Log Entry WARN: Warning Dark (#FFB74D)
+├── Log Entry ERROR: Error Dark (#FFB4AB), w600
+└── Log Control Bar: Surface Container Low Dark
+```
+
+---
+
+### 画板 16: 深色主题 — PAUSED (Desktop Dark)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Status "PAUSED": Warning Dark (#FFB74D)
+Timer 冻结色: On Surface Variant Dark (#C4C6CF)
+```
+
+---
+
+### 画板 17: 深色主题 — ABORTED (Desktop Dark)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Status "ABORTED": Error Dark (#FFB4AB)
+Error Message: Error Dark
+```
+
+---
+
+### 画板 18: 移动端 — RUNNING (Mobile Light)
+
+**尺寸**: 375×812px (iPhone 14 proportions)  
+**背景**: Background
+
+**图层结构**:
+```
+Frame: Mobile / RUNNING State
+├── AppBar (64px, Surface)
+│   ├── Back Button (48×48dp, arrow_back)
+│   ├── Text: "温度循环测试" (Title Medium, max-width 120px, ellipsis)
+│   ├── StatusBadge: "RUNNING" (紧凑型, Success, 脉冲)
+│   └── WS Dot Only: 10px Success dot (省略文字)
+│
+├── Control Panel (padding: spaceMd 16px, Surface, 顶部圆角 radiusLarge)
+│   ├── Info Card (Surface Container Low, radiusLarge, padding: spaceMd)
+│   │   ├── "工作台": "温度实验室"
+│   │   ├── Divider
+│   │   ├── "方法": "标准热循环"
+│   │   ├── Divider
+│   │   └── "创建时间": "2026-06-02 09:30"
+│   │
+│   ├── Button Group (padding-top: spaceMd)
+│   │   └── Wrap (spacing: spaceSm, runSpacing: spaceSm)
+│   │       ├── [载入] FilledButton (disabled, height 48px, min-width 80px)
+│   │       ├── [开始] (disabled, height 48px)
+│   │       ├── [暂停] (enabled, Warning, height 48px)
+│   │       ├── [继续] (disabled, height 48px)
+│   │       └── [停止] (enabled, Error Container, height 48px)
+│   │
+│   ├── Status Display (padding-top: spaceLg, center)
+│   │   └── "RUNNING" (28px, w600, Success)
+│   │
+│   └── Timer (padding-top: spaceMd, center)
+│       └── "02:15:32" (32px, monospace, On Surface)
+│
+├── Log Viewer (flex: 1, Surface, margin-top: spaceMd)
+│   ├── Log List (padding: spaceSm, min-height: 300px)
+│   │   ├── 3-4 条日志条目 (monospace 12px)
+│   │   └── 级别标签: "[INFO]" 等 (min-width 48px)
+│   └── Log Control Bar (height 48px)
+│       ├── Filter: "全部 ▼" (compact)
+│       └── Clear: "清空" (TextButton, compact)
+│
+└── Responsive Annotation:
+    └── "Breakpoint: <600px | Mobile | 上下堆叠"
+```
+
+---
+
+### 画板 19: 移动端 — IDLE (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+AppBar StatusBadge: "IDLE" (灰色, 紧凑)
+
+Control Panel:
+├── [载入] enabled
+├── 其他按钮 disabled
+├── Status: "IDLE" (28px, On Surface Variant)
+└── Timer: 隐藏
+
+Log Viewer:
+└── Empty State (center)
+    ├── terminal_outlined (36px)
+    ├── "等待日志..."
+    └── "试验开始后日志将显示在这里"
+```
+
+---
+
+### 画板 20: 移动端 — PAUSED (Mobile Light)
+
+**尺寸**: 375×812px
+
+**差异**:
+```
+AppBar StatusBadge: "PAUSED" (Warning)
+
+Control Panel:
+├── [继续] enabled (Primary)
+├── [停止] enabled (Error Container)
+├── Status: "PAUSED" (28px, Warning)
+└── Timer: "00:45:18" (32px, On Surface Variant)
+```
+
+---
+
+### 画板 21: 平板 — RUNNING (Tablet Light)
+
+**尺寸**: 1024×768px  
+**背景**: Background
+
+**差异**:
+```
+Content Area:
+├── Control Panel (width: 40%, min 320px)
+│   ├── 按钮水平双行
+│   ├── Status: "RUNNING" (30px)
+│   └── Timer: "02:15:32" (34px)
+└── Log Viewer (flex: 1)
+
+Responsive Annotation: "Breakpoint: 600-1200px | Tablet | 左右分栏 40:60"
+```
+
+---
+
+### 画板 22: 英文界面 — RUNNING (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+AppBar:
+├── "Temperature Cycle Test" (Title Medium)
+├── StatusBadge: "RUNNING"
+└── WS: "Connected" (Success)
+
+Control Panel:
+├── "Workbench": "Temperature Lab"
+├── "Method": "Standard Thermal Cycle"
+├── "Created": "2026-06-02 09:30"
+├── Buttons: "Load" | "Start" | "Pause" | "Resume" | "Stop"
+├── Status Label: "Status"
+├── Status: "RUNNING"
+├── Subtext: "Experiment running"
+├── Timer Label: "Elapsed"
+└── Timer: "02:15:32"
+
+Log Control Bar:
+├── Filter: "All ▼"
+└── Clear: "Clear"
+
+Logs:
+├── "[INFO]  14:30:01  Experiment started"
+├── "[INFO]  14:30:02  Device connected"
+├── "[WARN]  14:31:15  Temperature high: 85.3°C"
+└── "[ERROR] 14:32:45  Sensor timeout"
+```
+
+---
+
+### 画板 23: 英文界面 — IDLE (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+StatusBadge: "IDLE"
+Buttons: "Load" enabled, others disabled
+Status: "IDLE"
+Timer: hidden
+Log Empty: "Waiting for logs..." / "Logs will appear when experiment starts"
+```
+
+---
+
+### 画板 24: 英文界面 — COMPLETED (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**文本内容**:
+```
+StatusBadge: "COMPLETED"
+Status: "COMPLETED"
+Subtext: "Experiment completed"
+Completed Info:
+├── "Started": "2026-06-02 14:30"
+├── "Ended": "2026-06-02 14:45"
+└── "Total Duration": "00:15:30"
+```
+
+---
+
+### 画板 25: 错误状态 — 试验未找到 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Content Area:
+└── ErrorView (fullscreen center)
+    ├── Icon: error_outline (48px, On Surface Variant)
+    ├── SizedBox(24px)
+    ├── Text: "试验未找到" (Title Medium, On Surface)
+    ├── SizedBox(8px)
+    ├── Text: "无效的试验 ID，请检查链接或返回列表" (Body Medium, On Surface Variant)
+    ├── SizedBox(24px)
+    └── Button: "返回列表" (FilledButton) → /experiments
+```
+
+---
+
+### 画板 26: 大量日志 + 性能标注 (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**差异**:
+```
+Log List:
+└── 1000+ 条日志 (使用 ListView.builder 虚拟滚动标注)
+    └── Performance Note: "使用 ListView.builder + itemCount 虚拟滚动"
+    └── Max visible: 保留最近 1000 条
+
+Performance Annotation (bottom-left corner):
+└── Text: "Performance: ListView.builder | Web ≥30fps | Max 1000 entries"
+```
+
+---
+
+### 画板 27: 超小屏 — RUNNING (<400px)
+
+**尺寸**: 360×640px
+
+**差异**:
+```
+AppBar:
+├── 试验名称: "温度循环..." (截断至8字符)
+└── WS: 仅显示圆点 (无文字)
+
+Control Panel:
+├── 按钮: 2×3 网格排列 (Wrap, spacing 8px)
+├── 按钮文字可能缩短: "载入"→"载"
+└── 日志级别标签: "[I]" / "[W]" / "[E]" (单字母缩写)
+
+Timer: "02:15:32" (28px)
+```
+
+---
+
+### 画板 28: 状态历史时间线 — COMPLETED (Desktop Light)
+
+**尺寸**: 1440×900px
+
+**基于画板 5 (COMPLETED)**:
+
+**差异**:
+```
+Control Panel (扩展):
+├── 原有内容 (Info, Buttons disabled, Status, Completed Info)
+├── Divider (padding-top: spaceLg)
+└── History Timeline Section
+    ├── Title: "状态历史" / "Status History" (Title Medium, On Surface)
+    ├── SizedBox(16px)
+    └── Timeline Entries (Column)
+        ├── Entry 1 (latest, top):
+        │   ├── Dot: 8px, Success
+        │   ├── Time: "14:45" (Body Small, On Surface Variant)
+        │   ├── Text: "RUNNING → COMPLETED" (Body Medium, Success)
+        │   └── Sub: "stop · user-001" (Body Small, On Surface Variant)
+        ├── Connector: 1px, Outline Variant, height 24px
+        ├── Entry 2:
+        │   ├── Dot: 8px, Warning
+        │   ├── Time: "14:40"
+        │   ├── Text: "RUNNING → PAUSED" (Body Medium, Warning)
+        │   └── Sub: "pause · user-001"
+        ├── Connector
+        ├── Entry 3:
+        │   ├── Dot: 8px, Success
+        │   ├── Time: "14:30"
+        │   ├── Text: "LOADED → RUNNING" (Body Medium, Success)
+        │   └── Sub: "start · user-001"
+        ├── Connector
+        ├── Entry 4:
+        │   ├── Dot: 8px, Primary
+        │   ├── Time: "14:25"
+        │   ├── Text: "IDLE → LOADED" (Body Medium, Primary)
+        │   └── Sub: "load · user-001"
+        └── Connector
+        └── Entry 5 (bottom):
+            ├── Dot: 8px, On Surface Variant
+            ├── Time: "14:20"
+            ├── Text: "Created" / "创建" (Body Medium, On Surface Variant)
+            └── Sub: "user-001"
+```
+
+---
+
+## 组件库 (Figma Components)
+
+### Component: StatusBadge
+
+| Variant | Property | Value |
+|---------|----------|-------|
+| State | idle | Surface Variant bg, On Surface Variant text |
+| State | loaded | Primary at 15% bg, Primary text |
+| State | running | Success at 15% bg, Success text, 脉冲动画 |
+| State | paused | Warning at 15% bg, Warning text |
+| State | completed | Success at 15% bg, Success text |
+| State | aborted | Error at 15% bg, Error text |
+| Size | desktop | 高度 32px, padding 0 12px |
+| Size | mobile | 高度 28px, padding 0 8px, 紧凑型 |
+
+**Overrides:**
+- Text: String
+- State: Enum (idle/loaded/running/paused/completed/aborted)
+- Animated: Boolean (仅 running)
+
+### Component: ControlButton
+
+| Variant | Type | Style |
+|---------|------|-------|
+| Type | load | FilledButton, Primary |
+| Type | start | FilledButton, Primary |
+| Type | pause | FilledButton, Warning |
+| Type | resume | FilledButton, Primary |
+| Type | stop | FilledButton, Error Container bg |
+| State | enabled | 100% opacity |
+| State | disabled | 38% opacity |
+| State | loading | CircularProgressIndicator |
+| Size | desktop | height 40px, min-width 100px |
+| Size | mobile | height 48px, min-width 80px |
+
+**Overrides:**
+- Type: Enum
+- State: Enum
+- Text: String
+- Icon: IconData
+
+### Component: LogEntry
+
+| Variant | Level | Color |
+|---------|-------|-------|
+| Level | debug | On Surface Variant |
+| Level | info | Primary |
+| Level | warn | Warning |
+| Level | error | Error, w600 |
+
+**Overrides:**
+- Level: Enum
+- Timestamp: String
+- Message: String
+- Wrapped: Boolean (长消息)
+
+### Component: TimerDisplay
+
+| Variant | State | Color |
+|---------|-------|-------|
+| State | running | On Surface |
+| State | paused | On Surface Variant |
+| State | completed | On Surface Variant |
+
+**Overrides:**
+- Value: String (HH:MM:SS)
+- State: Enum
+- Visible: Boolean
+
+### Component: WsIndicator
+
+| Variant | State | Dot Color | Text |
+|---------|-------|-----------|------|
+| State | disconnected | Error | "已断开" |
+| State | connecting | Warning (闪烁) | "连接中..." |
+| State | connected | Success | "已连接" |
+| State | reconnecting | Warning (闪烁) | "重连中(N/5)" |
+| State | failed | Error | "连接失败" |
+
+**Overrides:**
+- State: Enum
+- Attempt: Number (重连计数)
+- ShowText: Boolean (移动端可能仅显示圆点)
+
+---
+
+## 原型交互 (Prototype)
+
+### 交互流 1: 完整试验生命周期
+
+```
+画板 7 (Loading)
+  → 自动 (After Delay 1s)
+  → 画板 2 (IDLE)
+
+画板 2 (IDLE)
+  → 点击 [载入] 按钮
+  → 画板 8 (载入 Loading)
+  → 自动 (After Delay 800ms)
+  → 画板 3 (LOADED)
+
+画板 3 (LOADED)
+  → 点击 [开始] 按钮
+  → 画板 8 (开始 Loading)
+  → 自动 (After Delay 800ms)
+  → 画板 1 (RUNNING)
+
+画板 1 (RUNNING)
+  → 点击 [暂停] 按钮
+  → 画板 8 (暂停 Loading)
+  → 自动 (After Delay 800ms)
+  → 画板 4 (PAUSED)
+
+画板 4 (PAUSED)
+  → 点击 [继续] 按钮
+  → 画板 8 (继续 Loading)
+  → 自动 (After Delay 800ms)
+  → 画板 1 (RUNNING)
+
+画板 1 (RUNNING)
+  → 点击 [停止] 按钮
+  → 画板 9 (确认对话框)
+  → 点击 [确认停止]
+  → 画板 8 (停止 Loading)
+  → 自动 (After Delay 800ms)
+  → 画板 5 (COMPLETED)
+```
+
+### 交互流 2: WS 断线重连
+
+```
+画板 1 (RUNNING, connected)
+  → WS 断开 (模拟)
+  → 画板 13 (重连中 1/5)
+  → 自动 (After Delay 1s, 重连失败)
+  → 画板 13 (重连中 2/5)
+  → 自动 (After Delay 2s, 重连成功)
+  → 画板 1 (RUNNING, connected)
+
+画板 1 (RUNNING, connected)
+  → WS 断开
+   → 画板 13 (重连中... 循环至 5/5)
+  → 自动 (After Delay, 全部失败)
+  → 画板 14 (连接失败)
+  → 点击 [重新连接]
+  → 画板 12 (连接中)
+  → 自动 (After Delay 800ms, 成功)
+  → 画板 1 (RUNNING, connected)
+```
+
+### 交互流 3: 日志交互
+
+```
+画板 1 (RUNNING, 日志在底部)
+  → 用户向上滚动日志
+  → 画板 11 (显示浮动按钮 "2 条新日志")
+  → 点击浮动按钮
+  → 平滑滚动到底部
+  → 画板 1 (浮动按钮消失)
+
+画板 1
+  → 点击 Filter Dropdown
+  → 选择 "INFO"
+  → 画板 10 (仅显示 INFO 日志)
+  → 点击 Filter Dropdown
+  → 选择 "全部"
+  → 画板 1 (显示所有日志)
+
+画板 1
+  → 点击 [清空日志]
+  → 日志清空
+  → 显示空状态
+  → [清空] 按钮变为 disabled
+```
+
+### 交互流 4: 主题/语言切换
+
+```
+画板 1 (Light)
+  → 切换 Dark Theme
+  → 画板 15 (Dark)
+
+画板 1 (中文)
+  → 切换 English
+  → 画板 22 (English RUNNING)
+```
+
+---
+
+## 标注与说明
+
+### 响应式行为标注
+
+在所有 Desktop 画板右下角添加:
+```
+Breakpoint: ≥1200px
+- Layout: 左右分栏 38:62
+- Panel: radiusLarge, elevation 1
+- Buttons: 水平双行
+- Timer: 36px monospace
+```
+
+在所有 Tablet 画板右下角添加:
+```
+Breakpoint: 600-1200px
+- Layout: 左右分栏 40:60
+- Panel: radiusLarge, elevation 1
+- Buttons: 水平，空间不足换行
+```
+
+在所有 Mobile 画板右下角添加:
+```
+Breakpoint: <600px
+- Layout: 上下堆叠
+- Panel: 顶部，自适应高度
+- Buttons: Wrap 排列，min 48px height
+- Timer: 32px monospace
+```
+
+### 无障碍标注
+
+- 所有交互元素最小触摸目标: 48×48dp
+- 颜色对比度: 文字 ≥4.5:1, 大文字 ≥3:1
+- 状态徽章: aria-label 描述当前状态
+- 按钮: aria-disabled 反映禁用状态
+- 日志区: role="log", aria-live="polite"
+- 确认对话框: aria-modal="true", 焦点限制在对话框内
+- 计时器: aria-label="已运行时长 2小时15分32秒"
+
+### 性能标注
+
+- 日志列表: 使用 ListView.builder + itemCount
+- 最大保留日志: 1000 条 (滚动性能)
+- 计时器更新: Timer.periodic(Duration(seconds: 1))
+- 页面 dispose: 取消 Timer, 断开 WS
+- 骨架屏: ShaderMask shimmer, 避免布局抖动
+- 脉冲动画: 使用 AnimatedBuilder, 避免重建整个 Widget
+
+---
+
+## 版本历史
+
+| 日期 | 版本 | 修订人 | 说明 |
+|------|------|--------|------|
+| 2026-06-02 | 1.0 | sw-anna | 初始版本，包含 28 个画板，覆盖 6 种状态、3 种主题、3 种断点 |
+
+---
+
+**Figma 原型描述结束**

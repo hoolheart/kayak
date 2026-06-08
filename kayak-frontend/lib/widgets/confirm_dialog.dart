@@ -206,8 +206,11 @@ class ConfirmDialog extends StatelessWidget {
                       ),
                     ],
                   )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
+                : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       TextButton(
                         onPressed: () {
@@ -216,7 +219,6 @@ class ConfirmDialog extends StatelessWidget {
                         },
                         child: Text(cancelText),
                       ),
-                      const SizedBox(width: 8),
                       FilledButton(
                         onPressed: () {
                           onConfirm();

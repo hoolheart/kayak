@@ -71,9 +71,7 @@ class _RecentWorkbenchCardState extends State<RecentWorkbenchCard> {
             decoration: BoxDecoration(
               color: colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.outlineVariant,
-              ),
+              border: Border.all(color: colorScheme.outlineVariant),
               boxShadow: [
                 if (_isHovered)
                   BoxShadow(
@@ -115,12 +113,11 @@ class _RecentWorkbenchCardState extends State<RecentWorkbenchCard> {
                       // 名称
                       Text(
                         wb.name,
-                        style: (widget.compact
-                                ? textTheme.bodyLarge
-                                : textTheme.titleMedium)
-                            ?.copyWith(
-                          color: colorScheme.onSurface,
-                        ),
+                        style:
+                            (widget.compact
+                                    ? textTheme.bodyLarge
+                                    : textTheme.titleMedium)
+                                ?.copyWith(color: colorScheme.onSurface),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
