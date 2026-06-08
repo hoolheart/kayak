@@ -67,10 +67,15 @@ class RecentWorkbenchesSection extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          loc.recentWorkbenches,
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
+        // Expanded 防止标题文字过长时将"查看全部"挤出屏幕
+        Expanded(
+          child: Text(
+            loc.recentWorkbenches,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         TextButton(

@@ -27,7 +27,9 @@ export 'analysis_state.dart';
 class AnalysisNotifier extends Notifier<AnalysisState> {
   @override
   AnalysisState build() {
-    _loadExperiments();
+    // 使用微任务延迟加载，避免在 build() 中同步设置 state
+    // 导致 Riverpod 未初始化错误
+    Future.microtask(_loadExperiments);
     return const AnalysisState();
   }
 

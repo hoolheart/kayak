@@ -57,7 +57,8 @@ class QuickActionsGrid extends StatelessWidget {
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: gap,
             mainAxisSpacing: gap,
-            childAspectRatio: isCompact ? 1.3 : 1.5,
+            // 移动端用更小的宽高比（=更高的卡片），为文字留出空间
+            childAspectRatio: isCompact ? 1.15 : 1.5,
           ),
           itemCount: _cards.length,
           itemBuilder: (context, index) {

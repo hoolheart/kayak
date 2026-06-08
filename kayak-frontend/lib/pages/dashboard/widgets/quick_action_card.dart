@@ -123,24 +123,28 @@ class _QuickActionCardState extends State<QuickActionCard> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // 标题
-                        Text(
-                          widget.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
+                        // 标题（Flexible 防止极端窄屏溢出）
+                        Flexible(
+                          child: Text(
+                            widget.title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        // 副标题
-                        Text(
-                          widget.subtitle,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
+                        // 副标题（Flexible 防止极端窄屏溢出）
+                        Flexible(
+                          child: Text(
+                            widget.subtitle,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
