@@ -1236,4 +1236,290 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totalDurationLabel => 'Total Duration';
+
+  @override
+  String get methodEmptyTitle => 'No methods yet';
+
+  @override
+  String get methodEmptyDescription =>
+      'Create your first method by clicking the button below';
+
+  @override
+  String get methodEmptyAction => 'Create First Method';
+
+  @override
+  String get methodSearchHint => 'Search method name or description...';
+
+  @override
+  String get methodSearchNoResults => 'No matching methods found';
+
+  @override
+  String get methodSearchNoResultsHint => 'Try different keywords';
+
+  @override
+  String get methodClearSearch => 'Clear search';
+
+  @override
+  String get methodCreateNew => 'New Method';
+
+  @override
+  String get methodCreateTitle => 'Create Method';
+
+  @override
+  String get methodEditTitle => 'Edit Method';
+
+  @override
+  String get methodNameLabel => 'Method Name *';
+
+  @override
+  String get methodNameHint => 'Please enter method name';
+
+  @override
+  String get methodNameRequired =>
+      'Method name is required (at least 2 characters)';
+
+  @override
+  String get methodDescriptionLabel => 'Description';
+
+  @override
+  String get methodDescriptionHint => 'Description (optional)';
+
+  @override
+  String get methodProcessDefinitionTitle => 'Process Definition (JSON)';
+
+  @override
+  String get methodParameterListTitle => 'Parameters';
+
+  @override
+  String get methodNoParameters => 'No parameters yet';
+
+  @override
+  String get methodAddParameter => 'Add Parameter';
+
+  @override
+  String get methodAddFirstParameter => 'Add First Parameter';
+
+  @override
+  String get methodEditParameterTitle => 'Edit Parameter';
+
+  @override
+  String get methodAddParameterTitle => 'Add Parameter';
+
+  @override
+  String get methodParamKey => 'Parameter Key *';
+
+  @override
+  String get methodParamKeyHint => 'Letters, numbers, and underscores only';
+
+  @override
+  String get methodParamKeyRequired => 'Please enter a parameter key';
+
+  @override
+  String get methodParamKeyInvalid =>
+      'Key can only contain letters, numbers, and underscores, and cannot start with a number';
+
+  @override
+  String get methodParamKeyExists => 'Parameter key already exists';
+
+  @override
+  String get methodParamLabel => 'Display Label';
+
+  @override
+  String get methodParamLabelHint => 'Defaults to parameter key';
+
+  @override
+  String get methodParamType => 'Parameter Type *';
+
+  @override
+  String get methodParamRequired => 'Required';
+
+  @override
+  String get methodParamUnit => 'Unit';
+
+  @override
+  String get methodParamUnitHint => 'e.g. kN, °C, s';
+
+  @override
+  String get methodParamMin => 'Min Value';
+
+  @override
+  String get methodParamMax => 'Max Value';
+
+  @override
+  String get methodParamDefaultValue => 'Default Value';
+
+  @override
+  String get methodParamDescription => 'Description';
+
+  @override
+  String get methodParamDescriptionHint => 'Parameter description (optional)';
+
+  @override
+  String get methodParamEnumOptions => 'Enum Options';
+
+  @override
+  String get methodParamEnumHint => 'Enter option and click add';
+
+  @override
+  String get methodColumnKey => 'Key';
+
+  @override
+  String get methodColumnLabel => 'Label';
+
+  @override
+  String get methodColumnType => 'Type';
+
+  @override
+  String get methodColumnRequired => 'Required';
+
+  @override
+  String get methodColumnDefaultValue => 'Default';
+
+  @override
+  String get methodColumnUnit => 'Unit';
+
+  @override
+  String get methodColumnDescription => 'Description';
+
+  @override
+  String get methodColumnActions => 'Actions';
+
+  @override
+  String methodParamCount(int count) {
+    return '$count parameters';
+  }
+
+  @override
+  String get methodParamCountZero => '0 parameters';
+
+  @override
+  String get methodJsonValid => 'Valid JSON';
+
+  @override
+  String get methodJsonInvalid => 'Invalid JSON';
+
+  @override
+  String get methodJsonFormatError => 'Invalid JSON format';
+
+  @override
+  String methodLineCount(int lines, int chars) {
+    return 'Lines: $lines | Chars: $chars';
+  }
+
+  @override
+  String get methodValidate => 'Validate';
+
+  @override
+  String get methodValidateSuccess => 'Method definition is valid';
+
+  @override
+  String methodValidateFailed(String error) {
+    return 'Validation failed: $error';
+  }
+
+  @override
+  String get methodValidateInvalidJson =>
+      'JSON format error, please fix it first';
+
+  @override
+  String get methodSave => 'Save';
+
+  @override
+  String get methodSaving => 'Saving...';
+
+  @override
+  String get methodCreateSuccess => 'Method created successfully';
+
+  @override
+  String get methodUpdateSuccess => 'Method saved successfully';
+
+  @override
+  String methodSaveFailed(String error) {
+    return 'Failed to save: $error';
+  }
+
+  @override
+  String get methodDeleteTitle => 'Delete method?';
+
+  @override
+  String methodDeleteDescription(String name) {
+    return 'Are you sure you want to delete \"$name\"? This action cannot be undone. Associated experiment records will not be affected.';
+  }
+
+  @override
+  String get methodDeleteSuccess => 'Method deleted';
+
+  @override
+  String methodDeleteFailed(String error) {
+    return 'Delete failed: $error';
+  }
+
+  @override
+  String get methodUnsavedTitle => 'Unsaved changes';
+
+  @override
+  String get methodUnsavedDescription =>
+      'You have unsaved changes. Are you sure you want to leave?';
+
+  @override
+  String get methodDiscardAndLeave => 'Discard and leave';
+
+  @override
+  String get methodStayOnPage => 'Stay on page';
+
+  @override
+  String get methodLoadFailed => 'Failed to load method';
+
+  @override
+  String get methodTypeNumber => 'Number';
+
+  @override
+  String get methodTypeInteger => 'Integer';
+
+  @override
+  String get methodTypeString => 'String';
+
+  @override
+  String get methodTypeBoolean => 'Boolean';
+
+  @override
+  String get methodTypeEnum => 'Enum';
+
+  @override
+  String get methodMaxLessThanMin => 'Maximum cannot be less than minimum';
+
+  @override
+  String methodRequiredPrefix(String value) {
+    return 'Required: $value';
+  }
+
+  @override
+  String methodDefaultWithUnit(String value, String unit) {
+    return 'Default: $value $unit';
+  }
+
+  @override
+  String methodDefaultNoUnit(String value) {
+    return 'Default: $value';
+  }
+
+  @override
+  String get methodValidating => 'Validating...';
+
+  @override
+  String get methodDeleteConfirmDelete => 'Delete';
+
+  @override
+  String get methodNetworkError =>
+      'Network connection failed, please check and retry';
+
+  @override
+  String get methodNetworkErrorRetry => 'Network error, please retry later';
+
+  @override
+  String get methodOperationFailed => 'Operation failed, please retry';
+
+  @override
+  String get methodConflict =>
+      'Resource conflict, please check if a method with the same name already exists';
 }

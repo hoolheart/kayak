@@ -2437,6 +2437,528 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total Duration'**
   String get totalDurationLabel;
+
+  /// Method list empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'No methods yet'**
+  String get methodEmptyTitle;
+
+  /// Method list empty state description
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first method by clicking the button below'**
+  String get methodEmptyDescription;
+
+  /// Method list empty state action button
+  ///
+  /// In en, this message translates to:
+  /// **'Create First Method'**
+  String get methodEmptyAction;
+
+  /// Method search bar hint text
+  ///
+  /// In en, this message translates to:
+  /// **'Search method name or description...'**
+  String get methodSearchHint;
+
+  /// Search no results message
+  ///
+  /// In en, this message translates to:
+  /// **'No matching methods found'**
+  String get methodSearchNoResults;
+
+  /// Search no results hint
+  ///
+  /// In en, this message translates to:
+  /// **'Try different keywords'**
+  String get methodSearchNoResultsHint;
+
+  /// Clear search button
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get methodClearSearch;
+
+  /// Create method button label
+  ///
+  /// In en, this message translates to:
+  /// **'New Method'**
+  String get methodCreateNew;
+
+  /// Create method page title
+  ///
+  /// In en, this message translates to:
+  /// **'Create Method'**
+  String get methodCreateTitle;
+
+  /// Edit method page title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Method'**
+  String get methodEditTitle;
+
+  /// Method name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Method Name *'**
+  String get methodNameLabel;
+
+  /// Method name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter method name'**
+  String get methodNameHint;
+
+  /// Method name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Method name is required (at least 2 characters)'**
+  String get methodNameRequired;
+
+  /// Method description field label
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get methodDescriptionLabel;
+
+  /// Method description field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get methodDescriptionHint;
+
+  /// Process definition section title
+  ///
+  /// In en, this message translates to:
+  /// **'Process Definition (JSON)'**
+  String get methodProcessDefinitionTitle;
+
+  /// Parameter list section title
+  ///
+  /// In en, this message translates to:
+  /// **'Parameters'**
+  String get methodParameterListTitle;
+
+  /// Empty parameter state
+  ///
+  /// In en, this message translates to:
+  /// **'No parameters yet'**
+  String get methodNoParameters;
+
+  /// Add parameter button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Parameter'**
+  String get methodAddParameter;
+
+  /// Add first parameter button in empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Add First Parameter'**
+  String get methodAddFirstParameter;
+
+  /// Edit parameter dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Parameter'**
+  String get methodEditParameterTitle;
+
+  /// Add parameter dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Add Parameter'**
+  String get methodAddParameterTitle;
+
+  /// Parameter key field label
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter Key *'**
+  String get methodParamKey;
+
+  /// Parameter key field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Letters, numbers, and underscores only'**
+  String get methodParamKeyHint;
+
+  /// Parameter key required validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a parameter key'**
+  String get methodParamKeyRequired;
+
+  /// Parameter key format validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Key can only contain letters, numbers, and underscores, and cannot start with a number'**
+  String get methodParamKeyInvalid;
+
+  /// Parameter key uniqueness validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter key already exists'**
+  String get methodParamKeyExists;
+
+  /// Parameter label field label
+  ///
+  /// In en, this message translates to:
+  /// **'Display Label'**
+  String get methodParamLabel;
+
+  /// Parameter label field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Defaults to parameter key'**
+  String get methodParamLabelHint;
+
+  /// Parameter type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter Type *'**
+  String get methodParamType;
+
+  /// Required toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get methodParamRequired;
+
+  /// Unit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get methodParamUnit;
+
+  /// Unit field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. kN, °C, s'**
+  String get methodParamUnitHint;
+
+  /// Minimum value field label
+  ///
+  /// In en, this message translates to:
+  /// **'Min Value'**
+  String get methodParamMin;
+
+  /// Maximum value field label
+  ///
+  /// In en, this message translates to:
+  /// **'Max Value'**
+  String get methodParamMax;
+
+  /// Default value field label
+  ///
+  /// In en, this message translates to:
+  /// **'Default Value'**
+  String get methodParamDefaultValue;
+
+  /// Parameter description field label
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get methodParamDescription;
+
+  /// Parameter description field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Parameter description (optional)'**
+  String get methodParamDescriptionHint;
+
+  /// Enum options field label
+  ///
+  /// In en, this message translates to:
+  /// **'Enum Options'**
+  String get methodParamEnumOptions;
+
+  /// Enum options field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter option and click add'**
+  String get methodParamEnumHint;
+
+  /// Table column header: parameter key
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get methodColumnKey;
+
+  /// Table column header: parameter label
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get methodColumnLabel;
+
+  /// Table column header: parameter type
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get methodColumnType;
+
+  /// Table column header: required
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get methodColumnRequired;
+
+  /// Table column header: default value
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get methodColumnDefaultValue;
+
+  /// Table column header: unit
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get methodColumnUnit;
+
+  /// Table column header: description
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get methodColumnDescription;
+
+  /// Table column header: actions
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get methodColumnActions;
+
+  /// Parameter count on card and table header
+  ///
+  /// In en, this message translates to:
+  /// **'{count} parameters'**
+  String methodParamCount(int count);
+
+  /// Zero parameter count display
+  ///
+  /// In en, this message translates to:
+  /// **'0 parameters'**
+  String get methodParamCountZero;
+
+  /// JSON validation valid label
+  ///
+  /// In en, this message translates to:
+  /// **'Valid JSON'**
+  String get methodJsonValid;
+
+  /// JSON validation invalid label
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid JSON'**
+  String get methodJsonInvalid;
+
+  /// JSON format error user-facing message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid JSON format'**
+  String get methodJsonFormatError;
+
+  /// JSON editor line and char count
+  ///
+  /// In en, this message translates to:
+  /// **'Lines: {lines} | Chars: {chars}'**
+  String methodLineCount(int lines, int chars);
+
+  /// Validate button label
+  ///
+  /// In en, this message translates to:
+  /// **'Validate'**
+  String get methodValidate;
+
+  /// Validation success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Method definition is valid'**
+  String get methodValidateSuccess;
+
+  /// Validation failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Validation failed: {error}'**
+  String methodValidateFailed(String error);
+
+  /// Validate button clicked when JSON is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'JSON format error, please fix it first'**
+  String get methodValidateInvalidJson;
+
+  /// Save button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get methodSave;
+
+  /// Save button loading state
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get methodSaving;
+
+  /// Create success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Method created successfully'**
+  String get methodCreateSuccess;
+
+  /// Update success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Method saved successfully'**
+  String get methodUpdateSuccess;
+
+  /// Save failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save: {error}'**
+  String methodSaveFailed(String error);
+
+  /// Delete confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete method?'**
+  String get methodDeleteTitle;
+
+  /// Delete confirmation dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{name}\"? This action cannot be undone. Associated experiment records will not be affected.'**
+  String methodDeleteDescription(String name);
+
+  /// Delete success toast
+  ///
+  /// In en, this message translates to:
+  /// **'Method deleted'**
+  String get methodDeleteSuccess;
+
+  /// Delete failure toast
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {error}'**
+  String methodDeleteFailed(String error);
+
+  /// Unsaved changes dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Unsaved changes'**
+  String get methodUnsavedTitle;
+
+  /// Unsaved changes dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. Are you sure you want to leave?'**
+  String get methodUnsavedDescription;
+
+  /// Discard and leave button
+  ///
+  /// In en, this message translates to:
+  /// **'Discard and leave'**
+  String get methodDiscardAndLeave;
+
+  /// Stay on page button
+  ///
+  /// In en, this message translates to:
+  /// **'Stay on page'**
+  String get methodStayOnPage;
+
+  /// Method load error title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load method'**
+  String get methodLoadFailed;
+
+  /// Parameter type: number
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get methodTypeNumber;
+
+  /// Parameter type: integer
+  ///
+  /// In en, this message translates to:
+  /// **'Integer'**
+  String get methodTypeInteger;
+
+  /// Parameter type: string
+  ///
+  /// In en, this message translates to:
+  /// **'String'**
+  String get methodTypeString;
+
+  /// Parameter type: boolean
+  ///
+  /// In en, this message translates to:
+  /// **'Boolean'**
+  String get methodTypeBoolean;
+
+  /// Parameter type: enum
+  ///
+  /// In en, this message translates to:
+  /// **'Enum'**
+  String get methodTypeEnum;
+
+  /// Max less than min validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum cannot be less than minimum'**
+  String get methodMaxLessThanMin;
+
+  /// Required indicator prefix in card list
+  ///
+  /// In en, this message translates to:
+  /// **'Required: {value}'**
+  String methodRequiredPrefix(String value);
+
+  /// Default value with unit in card list
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {value} {unit}'**
+  String methodDefaultWithUnit(String value, String unit);
+
+  /// Default value without unit in card list
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {value}'**
+  String methodDefaultNoUnit(String value);
+
+  /// Validate button loading state
+  ///
+  /// In en, this message translates to:
+  /// **'Validating...'**
+  String get methodValidating;
+
+  /// Delete confirmation button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get methodDeleteConfirmDelete;
+
+  /// Network error message in method provider
+  ///
+  /// In en, this message translates to:
+  /// **'Network connection failed, please check and retry'**
+  String get methodNetworkError;
+
+  /// Generic network error message
+  ///
+  /// In en, this message translates to:
+  /// **'Network error, please retry later'**
+  String get methodNetworkErrorRetry;
+
+  /// Default operation failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed, please retry'**
+  String get methodOperationFailed;
+
+  /// Conflict error message
+  ///
+  /// In en, this message translates to:
+  /// **'Resource conflict, please check if a method with the same name already exists'**
+  String get methodConflict;
 }
 
 class _AppLocalizationsDelegate

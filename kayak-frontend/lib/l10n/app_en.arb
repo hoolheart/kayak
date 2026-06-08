@@ -1689,5 +1689,416 @@
   "totalDurationLabel": "Total Duration",
   "@totalDurationLabel": {
     "description": "Total duration label in completed info"
+  },
+
+  "methodEmptyTitle": "No methods yet",
+  "@methodEmptyTitle": {
+    "description": "Method list empty state title"
+  },
+  "methodEmptyDescription": "Create your first method by clicking the button below",
+  "@methodEmptyDescription": {
+    "description": "Method list empty state description"
+  },
+  "methodEmptyAction": "Create First Method",
+  "@methodEmptyAction": {
+    "description": "Method list empty state action button"
+  },
+  "methodSearchHint": "Search method name or description...",
+  "@methodSearchHint": {
+    "description": "Method search bar hint text"
+  },
+  "methodSearchNoResults": "No matching methods found",
+  "@methodSearchNoResults": {
+    "description": "Search no results message"
+  },
+  "methodSearchNoResultsHint": "Try different keywords",
+  "@methodSearchNoResultsHint": {
+    "description": "Search no results hint"
+  },
+  "methodClearSearch": "Clear search",
+  "@methodClearSearch": {
+    "description": "Clear search button"
+  },
+  "methodCreateNew": "New Method",
+  "@methodCreateNew": {
+    "description": "Create method button label"
+  },
+  "methodCreateTitle": "Create Method",
+  "@methodCreateTitle": {
+    "description": "Create method page title"
+  },
+  "methodEditTitle": "Edit Method",
+  "@methodEditTitle": {
+    "description": "Edit method page title"
+  },
+  "methodNameLabel": "Method Name *",
+  "@methodNameLabel": {
+    "description": "Method name field label"
+  },
+  "methodNameHint": "Please enter method name",
+  "@methodNameHint": {
+    "description": "Method name field hint"
+  },
+  "methodNameRequired": "Method name is required (at least 2 characters)",
+  "@methodNameRequired": {
+    "description": "Method name validation error"
+  },
+  "methodDescriptionLabel": "Description",
+  "@methodDescriptionLabel": {
+    "description": "Method description field label"
+  },
+  "methodDescriptionHint": "Description (optional)",
+  "@methodDescriptionHint": {
+    "description": "Method description field hint"
+  },
+  "methodProcessDefinitionTitle": "Process Definition (JSON)",
+  "@methodProcessDefinitionTitle": {
+    "description": "Process definition section title"
+  },
+  "methodParameterListTitle": "Parameters",
+  "@methodParameterListTitle": {
+    "description": "Parameter list section title"
+  },
+  "methodNoParameters": "No parameters yet",
+  "@methodNoParameters": {
+    "description": "Empty parameter state"
+  },
+  "methodAddParameter": "Add Parameter",
+  "@methodAddParameter": {
+    "description": "Add parameter button"
+  },
+  "methodAddFirstParameter": "Add First Parameter",
+  "@methodAddFirstParameter": {
+    "description": "Add first parameter button in empty state"
+  },
+  "methodEditParameterTitle": "Edit Parameter",
+  "@methodEditParameterTitle": {
+    "description": "Edit parameter dialog title"
+  },
+  "methodAddParameterTitle": "Add Parameter",
+  "@methodAddParameterTitle": {
+    "description": "Add parameter dialog title"
+  },
+  "methodParamKey": "Parameter Key *",
+  "@methodParamKey": {
+    "description": "Parameter key field label"
+  },
+  "methodParamKeyHint": "Letters, numbers, and underscores only",
+  "@methodParamKeyHint": {
+    "description": "Parameter key field hint"
+  },
+  "methodParamKeyRequired": "Please enter a parameter key",
+  "@methodParamKeyRequired": {
+    "description": "Parameter key required validation error"
+  },
+  "methodParamKeyInvalid": "Key can only contain letters, numbers, and underscores, and cannot start with a number",
+  "@methodParamKeyInvalid": {
+    "description": "Parameter key format validation error"
+  },
+  "methodParamKeyExists": "Parameter key already exists",
+  "@methodParamKeyExists": {
+    "description": "Parameter key uniqueness validation error"
+  },
+  "methodParamLabel": "Display Label",
+  "@methodParamLabel": {
+    "description": "Parameter label field label"
+  },
+  "methodParamLabelHint": "Defaults to parameter key",
+  "@methodParamLabelHint": {
+    "description": "Parameter label field hint"
+  },
+  "methodParamType": "Parameter Type *",
+  "@methodParamType": {
+    "description": "Parameter type field label"
+  },
+  "methodParamRequired": "Required",
+  "@methodParamRequired": {
+    "description": "Required toggle label"
+  },
+  "methodParamUnit": "Unit",
+  "@methodParamUnit": {
+    "description": "Unit field label"
+  },
+  "methodParamUnitHint": "e.g. kN, °C, s",
+  "@methodParamUnitHint": {
+    "description": "Unit field hint"
+  },
+  "methodParamMin": "Min Value",
+  "@methodParamMin": {
+    "description": "Minimum value field label"
+  },
+  "methodParamMax": "Max Value",
+  "@methodParamMax": {
+    "description": "Maximum value field label"
+  },
+  "methodParamDefaultValue": "Default Value",
+  "@methodParamDefaultValue": {
+    "description": "Default value field label"
+  },
+  "methodParamDescription": "Description",
+  "@methodParamDescription": {
+    "description": "Parameter description field label"
+  },
+  "methodParamDescriptionHint": "Parameter description (optional)",
+  "@methodParamDescriptionHint": {
+    "description": "Parameter description field hint"
+  },
+  "methodParamEnumOptions": "Enum Options",
+  "@methodParamEnumOptions": {
+    "description": "Enum options field label"
+  },
+  "methodParamEnumHint": "Enter option and click add",
+  "@methodParamEnumHint": {
+    "description": "Enum options field hint"
+  },
+  "methodColumnKey": "Key",
+  "@methodColumnKey": {
+    "description": "Table column header: parameter key"
+  },
+  "methodColumnLabel": "Label",
+  "@methodColumnLabel": {
+    "description": "Table column header: parameter label"
+  },
+  "methodColumnType": "Type",
+  "@methodColumnType": {
+    "description": "Table column header: parameter type"
+  },
+  "methodColumnRequired": "Required",
+  "@methodColumnRequired": {
+    "description": "Table column header: required"
+  },
+  "methodColumnDefaultValue": "Default",
+  "@methodColumnDefaultValue": {
+    "description": "Table column header: default value"
+  },
+  "methodColumnUnit": "Unit",
+  "@methodColumnUnit": {
+    "description": "Table column header: unit"
+  },
+  "methodColumnDescription": "Description",
+  "@methodColumnDescription": {
+    "description": "Table column header: description"
+  },
+  "methodColumnActions": "Actions",
+  "@methodColumnActions": {
+    "description": "Table column header: actions"
+  },
+  "methodParamCount": "{count} parameters",
+  "@methodParamCount": {
+    "description": "Parameter count on card and table header",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "methodParamCountZero": "0 parameters",
+  "@methodParamCountZero": {
+    "description": "Zero parameter count display"
+  },
+  "methodJsonValid": "Valid JSON",
+  "@methodJsonValid": {
+    "description": "JSON validation valid label"
+  },
+  "methodJsonInvalid": "Invalid JSON",
+  "@methodJsonInvalid": {
+    "description": "JSON validation invalid label"
+  },
+  "methodJsonFormatError": "Invalid JSON format",
+  "@methodJsonFormatError": {
+    "description": "JSON format error user-facing message"
+  },
+  "methodLineCount": "Lines: {lines} | Chars: {chars}",
+  "@methodLineCount": {
+    "description": "JSON editor line and char count",
+    "placeholders": {
+      "lines": {
+        "type": "int",
+        "example": "5"
+      },
+      "chars": {
+        "type": "int",
+        "example": "120"
+      }
+    }
+  },
+  "methodValidate": "Validate",
+  "@methodValidate": {
+    "description": "Validate button label"
+  },
+  "methodValidateSuccess": "Method definition is valid",
+  "@methodValidateSuccess": {
+    "description": "Validation success toast"
+  },
+  "methodValidateFailed": "Validation failed: {error}",
+  "@methodValidateFailed": {
+    "description": "Validation failure toast",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Missing start node"
+      }
+    }
+  },
+  "methodValidateInvalidJson": "JSON format error, please fix it first",
+  "@methodValidateInvalidJson": {
+    "description": "Validate button clicked when JSON is invalid"
+  },
+  "methodSave": "Save",
+  "@methodSave": {
+    "description": "Save button label"
+  },
+  "methodSaving": "Saving...",
+  "@methodSaving": {
+    "description": "Save button loading state"
+  },
+  "methodCreateSuccess": "Method created successfully",
+  "@methodCreateSuccess": {
+    "description": "Create success toast"
+  },
+  "methodUpdateSuccess": "Method saved successfully",
+  "@methodUpdateSuccess": {
+    "description": "Update success toast"
+  },
+  "methodSaveFailed": "Failed to save: {error}",
+  "@methodSaveFailed": {
+    "description": "Save failure toast",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "methodDeleteTitle": "Delete method?",
+  "@methodDeleteTitle": {
+    "description": "Delete confirmation dialog title"
+  },
+  "methodDeleteDescription": "Are you sure you want to delete \"{name}\"? This action cannot be undone. Associated experiment records will not be affected.",
+  "@methodDeleteDescription": {
+    "description": "Delete confirmation dialog description",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Tensile Test"
+      }
+    }
+  },
+  "methodDeleteSuccess": "Method deleted",
+  "@methodDeleteSuccess": {
+    "description": "Delete success toast"
+  },
+  "methodDeleteFailed": "Delete failed: {error}",
+  "@methodDeleteFailed": {
+    "description": "Delete failure toast",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Network error"
+      }
+    }
+  },
+  "methodUnsavedTitle": "Unsaved changes",
+  "@methodUnsavedTitle": {
+    "description": "Unsaved changes dialog title"
+  },
+  "methodUnsavedDescription": "You have unsaved changes. Are you sure you want to leave?",
+  "@methodUnsavedDescription": {
+    "description": "Unsaved changes dialog description"
+  },
+  "methodDiscardAndLeave": "Discard and leave",
+  "@methodDiscardAndLeave": {
+    "description": "Discard and leave button"
+  },
+  "methodStayOnPage": "Stay on page",
+  "@methodStayOnPage": {
+    "description": "Stay on page button"
+  },
+  "methodLoadFailed": "Failed to load method",
+  "@methodLoadFailed": {
+    "description": "Method load error title"
+  },
+  "methodTypeNumber": "Number",
+  "@methodTypeNumber": {
+    "description": "Parameter type: number"
+  },
+  "methodTypeInteger": "Integer",
+  "@methodTypeInteger": {
+    "description": "Parameter type: integer"
+  },
+  "methodTypeString": "String",
+  "@methodTypeString": {
+    "description": "Parameter type: string"
+  },
+  "methodTypeBoolean": "Boolean",
+  "@methodTypeBoolean": {
+    "description": "Parameter type: boolean"
+  },
+  "methodTypeEnum": "Enum",
+  "@methodTypeEnum": {
+    "description": "Parameter type: enum"
+  },
+  "methodMaxLessThanMin": "Maximum cannot be less than minimum",
+  "@methodMaxLessThanMin": {
+    "description": "Max less than min validation error"
+  },
+  "methodRequiredPrefix": "Required: {value}",
+  "@methodRequiredPrefix": {
+    "description": "Required indicator prefix in card list",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "●"
+      }
+    }
+  },
+  "methodDefaultWithUnit": "Default: {value} {unit}",
+  "@methodDefaultWithUnit": {
+    "description": "Default value with unit in card list",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "25"
+      },
+      "unit": {
+        "type": "String",
+        "example": "°C"
+      }
+    }
+  },
+  "methodDefaultNoUnit": "Default: {value}",
+  "@methodDefaultNoUnit": {
+    "description": "Default value without unit in card list",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "true"
+      }
+    }
+  },
+  "methodValidating": "Validating...",
+  "@methodValidating": {
+    "description": "Validate button loading state"
+  },
+  "methodDeleteConfirmDelete": "Delete",
+  "@methodDeleteConfirmDelete": {
+    "description": "Delete confirmation button"
+  },
+  "methodNetworkError": "Network connection failed, please check and retry",
+  "@methodNetworkError": {
+    "description": "Network error message in method provider"
+  },
+  "methodNetworkErrorRetry": "Network error, please retry later",
+  "@methodNetworkErrorRetry": {
+    "description": "Generic network error message"
+  },
+  "methodOperationFailed": "Operation failed, please retry",
+  "@methodOperationFailed": {
+    "description": "Default operation failure message"
+  },
+  "methodConflict": "Resource conflict, please check if a method with the same name already exists",
+  "@methodConflict": {
+    "description": "Conflict error message"
   }
 }
