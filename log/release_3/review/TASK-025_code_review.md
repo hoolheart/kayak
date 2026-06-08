@@ -280,30 +280,40 @@ The implementation is **functionally solid** — the core UX flow (list → crea
 
 ---
 
-## Approval
+## Re-review（2026-06-08，commit: `59dd33e`）
 
-- [ ] All issues resolved
-- [ ] Code meets standards (l10n required)
-- [ ] **NOT APPROVED** — changes required
+| # | Severity | Issue | Status | Notes |
+|---|----------|-------|--------|-------|
+| 1 | CRITICAL | l10n integration | ✅ RESOLVED | All 100+ strings moved to ARB files (`app_en.arb` / `app_zh.arb`). Generated files present. |
+| 2 | HIGH | DropdownButtonFormField `initialValue` | ✅ RESOLVED | Fixed via `ValueKey('param-type-$paramType')` — forces widget recreation on type change, functionally equivalent to `value` approach. |
+| 3 | HIGH | No tests | ✅ RESOLVED | `method_list_page_test.dart` (445 lines, 8 test groups) + `method_edit_page_test.dart` (550 lines, 7 test groups). Covers all P0 test cases from the spec. |
+| 4 | HIGH | `_confirmLeave` Completer pattern | ✅ RESOLVED | Replaced with standard `showDialog<bool>` + `barrierDismissible: false`. Eliminates `Completer` anti-pattern. |
+| 5 | HIGH | `parameter_schema` + `parameters` duplication | ✅ RESOLVED | Removed `parameters` from backend payload. Added comment documenting `parameter_schema` as authoritative. |
+| 6 | MEDIUM | FormatException message leak | ✅ RESOLVED | Replaced with l10n key `methodJsonFormatError`. |
+| 7 | MEDIUM | Search debounce | ✅ RESOLVED | 300ms debounce via `Timer` in `_onSearchChanged()`. |
+| 8 | MEDIUM | `_SearchBar` reactivity | ✅ RESOLVED | Converted to `StatefulWidget` with `TextEditingController.addListener`. |
+| 9 | MEDIUM | MediaQuery in `_BuildMethodButton` | ✅ RESOLVED | Replaced with `LayoutBuilder`, renamed to `_CreateMethodButton`. |
+| 10 | MEDIUM | `ValidationResult` freezed | ✅ RESOLVED | Documented rationale (simple 2-field object) with future migration note. |
+| 11 | LOW | Widget keys for testability | ✅ RESOLVED | Keys added to all interactive widgets (search, create, cards, form fields, save, validate, parameter dialog fields). |
+| 12 | LOW | `_BuildMethodButton` naming | ✅ RESOLVED | Renamed to `_CreateMethodButton`. |
 
-### Required Fixes Before Merge
+### Quality Re-checks
 
-1. **CRITICAL**: Implement l10n for all strings (Issue 1)
-2. **HIGH**: Fix `DropdownButtonFormField` `initialValue` → `value` (Issue 2)
-3. **HIGH**: Add widget tests at minimum covering P0 test cases (Issue 3)
-4. **HIGH**: Simplify `_confirmLeave` or fix `ConfirmDialog.show` return type (Issue 4)
-5. **HIGH**: Clarify/consolidate `parameter_schema` + `parameters` duplication (Issue 5)
-6. **MEDIUM**: Fix `FormatException` message leak (Issue 6)
-7. **MEDIUM**: Implement search debounce (Issue 7)
-8. **MEDIUM**: Make `_SearchBar` reactive to controller changes (Issue 8)
-
-### Recommended (Can Defer to Subsequent Sprint)
-
-9. **MEDIUM**: Use `LayoutBuilder` consistently (Issue 9)
-10. **MEDIUM**: Convert `ValidationResult` to freezed (Issue 10)
-11. **LOW**: Add widget keys for testability (Issue 11)
-12. **LOW**: Rename `_BuildMethodButton` (Issue 12)
+- [x] **No compiler errors** — `flutter analyze` passes
+- [x] **No compiler warnings** — zero warnings
+- [x] **No lint errors** — zero errors
+- [x] **Tests exist** — 995 lines of widget tests covering P0 test cases
+- [x] **l10n complete** — 100+ method-related ARB keys in both en/zh
+- [x] **Info-level only** — 12 `info`-level lint suggestions in test files (redundant defaults, const constructors), all in test code — non-blocking
 
 ---
 
-> **Next step**: sw-tom to address all Critical and High issues, implement tests, then resubmit for re-review.
+## Approval
+
+- [x] All issues resolved
+- [x] Code meets standards (l10n ✓, tests ✓, architecture compliance ✓)
+- [x] **APPROVED** — ready for merge
+
+---
+
+> **Re-review summary**: All 12 issues (1 CRITICAL + 4 HIGH + 5 MEDIUM + 2 LOW) have been addressed in commit `59dd33e`. The l10n architecture violation is fully resolved with method-specific ARB keys. Widget tests cover all P0 scenarios. The code is clean (zero errors, zero warnings) with only minor info-level style suggestions in test files. **Merge approved.**
