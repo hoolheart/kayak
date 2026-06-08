@@ -1207,6 +1207,184 @@
   "@selectWorkbenchSubtitle": {
     "description": "步骤 1 小节副标题"
   },
+  "goodMorning": "早上好",
+  "@goodMorning": {
+    "description": "早晨问候语 (06:00-11:59)"
+  },
+  "goodAfternoon": "下午好",
+  "@goodAfternoon": {
+    "description": "下午问候语 (12:00-17:59)"
+  },
+  "goodEvening": "晚上好",
+  "@goodEvening": {
+    "description": "晚间问候语 (18:00-05:59)"
+  },
+  "quickActionExperimentConsole": "试验控制台",
+  "@quickActionExperimentConsole": {
+    "description": "快捷操作卡片标题：试验控制台"
+  },
+  "quickActionExperimentConsoleSub": "管理和运行试验",
+  "@quickActionExperimentConsoleSub": {
+    "description": "快捷操作卡片副标题：试验控制台"
+  },
+  "quickActionMethods": "试验方法",
+  "@quickActionMethods": {
+    "description": "快捷操作卡片标题：试验方法"
+  },
+  "quickActionMethodsSub": "配置标准方法",
+  "@quickActionMethodsSub": {
+    "description": "快捷操作卡片副标题：试验方法"
+  },
+  "quickActionWorkbenches": "工作台管理",
+  "@quickActionWorkbenches": {
+    "description": "快捷操作卡片标题：工作台管理"
+  },
+  "quickActionWorkbenchesSub": "管理工作台和设备",
+  "@quickActionWorkbenchesSub": {
+    "description": "快捷操作卡片副标题：工作台管理"
+  },
+  "quickActionDataAnalysis": "数据分析",
+  "@quickActionDataAnalysis": {
+    "description": "快捷操作卡片标题：数据分析"
+  },
+  "quickActionDataAnalysisSub": "查看试验数据",
+  "@quickActionDataAnalysisSub": {
+    "description": "快捷操作卡片副标题：数据分析"
+  },
+  "statsWorkbenchesLabel": "工作台",
+  "@statsWorkbenchesLabel": {
+    "description": "统计概览标签：工作台"
+  },
+  "statsDevicesLabel": "设备",
+  "@statsDevicesLabel": {
+    "description": "统计概览标签：设备"
+  },
+  "statsExperimentsLabel": "试验",
+  "@statsExperimentsLabel": {
+    "description": "统计概览标签：试验"
+  },
+  "recentWorkbenches": "最近工作台",
+  "@recentWorkbenches": {
+    "description": "最近工作台区域标题"
+  },
+  "viewAll": "查看全部",
+  "@viewAll": {
+    "description": "查看全部链接文本"
+  },
+  "justNow": "刚刚",
+  "@justNow": {
+    "description": "相对时间：不到 1 分钟前"
+  },
+  "minutesAgo": "{count} 分钟前",
+  "@minutesAgo": {
+    "description": "相对时间：N 分钟前",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "hoursAgo": "{count} 小时前",
+  "@hoursAgo": {
+    "description": "相对时间：N 小时前",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "daysAgo": "{count} 天前",
+  "@daysAgo": {
+    "description": "相对时间：N 天前",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "weeksAgo": "{count} 周前",
+  "@weeksAgo": {
+    "description": "相对时间：N 周前",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "monthsAgo": "{count} 个月前",
+  "@monthsAgo": {
+    "description": "相对时间：N 个月前",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "dashboardStatsError": "加载统计数据失败",
+  "@dashboardStatsError": {
+    "description": "统计概览区域错误标题"
+  },
+  "dashboardStatsErrorHint": "请检查网络后重试",
+  "@dashboardStatsErrorHint": {
+    "description": "统计概览区域错误描述"
+  },
+  "dashboardRecentError": "加载工作台列表失败",
+  "@dashboardRecentError": {
+    "description": "最近工作台区域错误标题"
+  },
+  "dashboardRecentErrorHint": "请检查网络后重试",
+  "@dashboardRecentErrorHint": {
+    "description": "最近工作台区域错误描述"
+  },
+  "dashboardRecentEmpty": "还没有工作台",
+  "@dashboardRecentEmpty": {
+    "description": "最近工作台空状态标题"
+  },
+  "dashboardRecentEmptyHint": "创建您的第一个工作台开始使用",
+  "@dashboardRecentEmptyHint": {
+    "description": "最近工作台空状态描述"
+  },
+  "dashboardRecentEmptyAction": "创建第一个工作台",
+  "@dashboardRecentEmptyAction": {
+    "description": "最近工作台空状态操作按钮"
+  },
+  "deviceCountWithUnit": "{count} 台设备",
+  "@deviceCountWithUnit": {
+    "description": "工作台卡片设备数量标签",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "retryLoadStats": "重试",
+  "@retryLoadStats": {
+    "description": "统计区域重试按钮"
+  },
+  "retryLoadRecent": "重试",
+  "@retryLoadRecent": {
+    "description": "最近工作台区域重试按钮"
+  },
+  "greetingWithName": "{greeting}，{username}",
+  "@greetingWithName": {
+    "description": "带用户名的问候文本",
+    "placeholders": {
+      "greeting": {
+        "type": "String",
+        "example": "早上好"
+      },
+      "username": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
   "noWorkbenchesTitle": "您还没有工作台",
   "@noWorkbenchesTitle": {
     "description": "步骤 1 空状态标题"

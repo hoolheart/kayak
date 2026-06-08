@@ -885,6 +885,119 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectWorkbenchSubtitle => '请选择一个工作台用于本次试验';
 
   @override
+  String get goodMorning => '早上好';
+
+  @override
+  String get goodAfternoon => '下午好';
+
+  @override
+  String get goodEvening => '晚上好';
+
+  @override
+  String get quickActionExperimentConsole => '试验控制台';
+
+  @override
+  String get quickActionExperimentConsoleSub => '管理和运行试验';
+
+  @override
+  String get quickActionMethods => '试验方法';
+
+  @override
+  String get quickActionMethodsSub => '配置标准方法';
+
+  @override
+  String get quickActionWorkbenches => '工作台管理';
+
+  @override
+  String get quickActionWorkbenchesSub => '管理工作台和设备';
+
+  @override
+  String get quickActionDataAnalysis => '数据分析';
+
+  @override
+  String get quickActionDataAnalysisSub => '查看试验数据';
+
+  @override
+  String get statsWorkbenchesLabel => '工作台';
+
+  @override
+  String get statsDevicesLabel => '设备';
+
+  @override
+  String get statsExperimentsLabel => '试验';
+
+  @override
+  String get recentWorkbenches => '最近工作台';
+
+  @override
+  String get viewAll => '查看全部';
+
+  @override
+  String get justNow => '刚刚';
+
+  @override
+  String minutesAgo(int count) {
+    return '$count 分钟前';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '$count 小时前';
+  }
+
+  @override
+  String daysAgo(int count) {
+    return '$count 天前';
+  }
+
+  @override
+  String weeksAgo(int count) {
+    return '$count 周前';
+  }
+
+  @override
+  String monthsAgo(int count) {
+    return '$count 个月前';
+  }
+
+  @override
+  String get dashboardStatsError => '加载统计数据失败';
+
+  @override
+  String get dashboardStatsErrorHint => '请检查网络后重试';
+
+  @override
+  String get dashboardRecentError => '加载工作台列表失败';
+
+  @override
+  String get dashboardRecentErrorHint => '请检查网络后重试';
+
+  @override
+  String get dashboardRecentEmpty => '还没有工作台';
+
+  @override
+  String get dashboardRecentEmptyHint => '创建您的第一个工作台开始使用';
+
+  @override
+  String get dashboardRecentEmptyAction => '创建第一个工作台';
+
+  @override
+  String deviceCountWithUnit(int count) {
+    return '$count 台设备';
+  }
+
+  @override
+  String get retryLoadStats => '重试';
+
+  @override
+  String get retryLoadRecent => '重试';
+
+  @override
+  String greetingWithName(String greeting, String username) {
+    return '$greeting，$username';
+  }
+
+  @override
   String get noWorkbenchesTitle => '您还没有工作台';
 
   @override

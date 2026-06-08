@@ -1814,6 +1814,204 @@ abstract class AppLocalizations {
   /// **'Please select a workbench for this experiment'**
   String get selectWorkbenchSubtitle;
 
+  /// Morning greeting (06:00-11:59)
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get goodMorning;
+
+  /// Afternoon greeting (12:00-17:59)
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get goodAfternoon;
+
+  /// Evening greeting (18:00-05:59)
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get goodEvening;
+
+  /// Quick action card title: experiment console
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment Console'**
+  String get quickActionExperimentConsole;
+
+  /// Quick action card subtitle: experiment console
+  ///
+  /// In en, this message translates to:
+  /// **'Manage and run experiments'**
+  String get quickActionExperimentConsoleSub;
+
+  /// Quick action card title: methods
+  ///
+  /// In en, this message translates to:
+  /// **'Methods'**
+  String get quickActionMethods;
+
+  /// Quick action card subtitle: methods
+  ///
+  /// In en, this message translates to:
+  /// **'Configure standard methods'**
+  String get quickActionMethodsSub;
+
+  /// Quick action card title: workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'Workbenches'**
+  String get quickActionWorkbenches;
+
+  /// Quick action card subtitle: workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'Manage workbenches and devices'**
+  String get quickActionWorkbenchesSub;
+
+  /// Quick action card title: data analysis
+  ///
+  /// In en, this message translates to:
+  /// **'Data Analysis'**
+  String get quickActionDataAnalysis;
+
+  /// Quick action card subtitle: data analysis
+  ///
+  /// In en, this message translates to:
+  /// **'View experiment data'**
+  String get quickActionDataAnalysisSub;
+
+  /// Stats overview label: workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'Workbenches'**
+  String get statsWorkbenchesLabel;
+
+  /// Stats overview label: devices
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get statsDevicesLabel;
+
+  /// Stats overview label: experiments
+  ///
+  /// In en, this message translates to:
+  /// **'Experiments'**
+  String get statsExperimentsLabel;
+
+  /// Recent workbenches section header
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Workbenches'**
+  String get recentWorkbenches;
+
+  /// View all link text
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// Relative time: less than 1 minute ago
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// Relative time: N minutes ago
+  ///
+  /// In en, this message translates to:
+  /// **'{count} minutes ago'**
+  String minutesAgo(int count);
+
+  /// Relative time: N hours ago
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hours ago'**
+  String hoursAgo(int count);
+
+  /// Relative time: N days ago
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String daysAgo(int count);
+
+  /// Relative time: N weeks ago
+  ///
+  /// In en, this message translates to:
+  /// **'{count} weeks ago'**
+  String weeksAgo(int count);
+
+  /// Relative time: N months ago
+  ///
+  /// In en, this message translates to:
+  /// **'{count} months ago'**
+  String monthsAgo(int count);
+
+  /// Error title for stats overview section
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load statistics'**
+  String get dashboardStatsError;
+
+  /// Error description for stats overview section
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network and retry'**
+  String get dashboardStatsErrorHint;
+
+  /// Error title for recent workbenches section
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load workbenches'**
+  String get dashboardRecentError;
+
+  /// Error description for recent workbenches section
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network and retry'**
+  String get dashboardRecentErrorHint;
+
+  /// Empty state title for recent workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'No workbenches yet'**
+  String get dashboardRecentEmpty;
+
+  /// Empty state description for recent workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first workbench to get started'**
+  String get dashboardRecentEmptyHint;
+
+  /// Empty state action button for recent workbenches
+  ///
+  /// In en, this message translates to:
+  /// **'Create Your First Workbench'**
+  String get dashboardRecentEmptyAction;
+
+  /// Device count label on workbench card
+  ///
+  /// In en, this message translates to:
+  /// **'{count} devices'**
+  String deviceCountWithUnit(int count);
+
+  /// Retry button for stats section
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryLoadStats;
+
+  /// Retry button for recent workbenches section
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryLoadRecent;
+
+  /// Greeting text with username
+  ///
+  /// In en, this message translates to:
+  /// **'{greeting}, {username}'**
+  String greetingWithName(String greeting, String username);
+
   /// Step 1 empty state title
   ///
   /// In en, this message translates to:

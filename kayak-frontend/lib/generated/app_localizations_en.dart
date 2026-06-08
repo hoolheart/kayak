@@ -894,6 +894,120 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please select a workbench for this experiment';
 
   @override
+  String get goodMorning => 'Good morning';
+
+  @override
+  String get goodAfternoon => 'Good afternoon';
+
+  @override
+  String get goodEvening => 'Good evening';
+
+  @override
+  String get quickActionExperimentConsole => 'Experiment Console';
+
+  @override
+  String get quickActionExperimentConsoleSub => 'Manage and run experiments';
+
+  @override
+  String get quickActionMethods => 'Methods';
+
+  @override
+  String get quickActionMethodsSub => 'Configure standard methods';
+
+  @override
+  String get quickActionWorkbenches => 'Workbenches';
+
+  @override
+  String get quickActionWorkbenchesSub => 'Manage workbenches and devices';
+
+  @override
+  String get quickActionDataAnalysis => 'Data Analysis';
+
+  @override
+  String get quickActionDataAnalysisSub => 'View experiment data';
+
+  @override
+  String get statsWorkbenchesLabel => 'Workbenches';
+
+  @override
+  String get statsDevicesLabel => 'Devices';
+
+  @override
+  String get statsExperimentsLabel => 'Experiments';
+
+  @override
+  String get recentWorkbenches => 'Recent Workbenches';
+
+  @override
+  String get viewAll => 'View all';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String minutesAgo(int count) {
+    return '$count minutes ago';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '$count hours ago';
+  }
+
+  @override
+  String daysAgo(int count) {
+    return '$count days ago';
+  }
+
+  @override
+  String weeksAgo(int count) {
+    return '$count weeks ago';
+  }
+
+  @override
+  String monthsAgo(int count) {
+    return '$count months ago';
+  }
+
+  @override
+  String get dashboardStatsError => 'Failed to load statistics';
+
+  @override
+  String get dashboardStatsErrorHint => 'Please check your network and retry';
+
+  @override
+  String get dashboardRecentError => 'Failed to load workbenches';
+
+  @override
+  String get dashboardRecentErrorHint => 'Please check your network and retry';
+
+  @override
+  String get dashboardRecentEmpty => 'No workbenches yet';
+
+  @override
+  String get dashboardRecentEmptyHint =>
+      'Create your first workbench to get started';
+
+  @override
+  String get dashboardRecentEmptyAction => 'Create Your First Workbench';
+
+  @override
+  String deviceCountWithUnit(int count) {
+    return '$count devices';
+  }
+
+  @override
+  String get retryLoadStats => 'Retry';
+
+  @override
+  String get retryLoadRecent => 'Retry';
+
+  @override
+  String greetingWithName(String greeting, String username) {
+    return '$greeting, $username';
+  }
+
+  @override
   String get noWorkbenchesTitle => 'No workbenches yet';
 
   @override

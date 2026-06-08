@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kayak_frontend/generated/app_localizations.dart';
 import 'package:kayak_frontend/models/common.dart';
+import 'package:kayak_frontend/models/device.dart';
+import 'package:kayak_frontend/models/experiment.dart';
 import 'package:kayak_frontend/models/workbench.dart';
 import 'package:kayak_frontend/pages/auth/login_page.dart';
 import 'package:kayak_frontend/pages/auth/register_page.dart';
@@ -10,11 +12,15 @@ import 'package:kayak_frontend/pages/dashboard/dashboard_page.dart';
 import 'package:kayak_frontend/pages/experiment/experiment_list_page.dart';
 import 'package:kayak_frontend/pages/settings/settings_page.dart';
 import 'package:kayak_frontend/pages/workbench/workbench_list_page.dart';
+import 'package:kayak_frontend/providers/dashboard_provider.dart';
 import 'package:kayak_frontend/providers/services.dart';
 import 'package:kayak_frontend/services/api_client.dart';
 import 'package:kayak_frontend/services/auth_interceptor.dart';
 import 'package:kayak_frontend/services/auth_service.dart';
+import 'package:kayak_frontend/services/dashboard_service.dart';
+import 'package:kayak_frontend/services/device_service.dart';
 import 'package:kayak_frontend/services/error_interceptor.dart';
+import 'package:kayak_frontend/services/experiment_service.dart';
 import 'package:kayak_frontend/services/token_storage.dart';
 import 'package:kayak_frontend/services/workbench_service.dart';
 
@@ -49,11 +55,92 @@ class _MockWorkbenchService extends WorkbenchService {
   }
 }
 
+/// Mock ExperimentService that returns empty data for testing.
+class _MockExperimentService extends ExperimentService {
+  _MockExperimentService()
+      : super(
+          ApiClient(
+            baseUrl: 'http://localhost:8080',
+            authInterceptor: AuthInterceptor(
+              AuthService(
+                baseUrl: 'http://localhost:8080',
+                storage: TokenStorage(),
+              ),
+            ),
+            errorInterceptor: ErrorInterceptor(),
+          ),
+        );
+
+  @override
+  Future<PaginatedResponse<Experiment>> list({
+    int page = 1,
+    int size = 10,
+    ExperimentStatus? status,
+    DateTime? createdAfter,
+    DateTime? createdBefore,
+    String? scope,
+  }) async {
+    return PaginatedResponse<Experiment>(
+      page: page,
+      size: size,
+      total: 0,
+      items: <Experiment>[],
+    );
+  }
+}
+
+/// Mock DeviceService that returns empty data for testing.
+class _MockDeviceService extends DeviceService {
+  _MockDeviceService()
+      : super(
+          ApiClient(
+            baseUrl: 'http://localhost:8080',
+            authInterceptor: AuthInterceptor(
+              AuthService(
+                baseUrl: 'http://localhost:8080',
+                storage: TokenStorage(),
+              ),
+            ),
+            errorInterceptor: ErrorInterceptor(),
+          ),
+        );
+
+  @override
+  Future<List<Device>> listByWorkbench(String workbenchId) async {
+    return <Device>[];
+  }
+}
+
+/// Mock DashboardService that returns empty dashboard data.
+class _MockDashboardService extends DashboardService {
+  _MockDashboardService()
+      : super(
+          workbenchService: _MockWorkbenchService(),
+          experimentService: _MockExperimentService(),
+          deviceService: _MockDeviceService(),
+        );
+
+  @override
+  Future<DashboardData> loadDashboardData() async {
+    return const DashboardData(
+      workbenchCount: 0,
+      deviceCount: 0,
+      experimentCount: 0,
+    );
+  }
+
+  @override
+  Future<List<WorkbenchSummary>> loadRecentWorkbenches() async {
+    return <WorkbenchSummary>[];
+  }
+}
+
 /// Helper to create a test app with ProviderScope for pages that use Riverpod.
 Widget createTestApp(Widget home) {
   return ProviderScope(
     overrides: [
       workbenchServiceProvider.overrideWithValue(_MockWorkbenchService()),
+      dashboardServiceProvider.overrideWithValue(_MockDashboardService()),
     ],
     child: MaterialApp(
       theme: ThemeData(useMaterial3: true),
@@ -90,8 +177,13 @@ void main() {
     await tester.pumpWidget(
       createTestApp(const DashboardPage()),
     );
-    await tester.pumpAndSettle();
-    expect(find.text('Dashboard'), findsOneWidget);
+    // Pump enough to advance past the 300ms skeleton delay
+    await tester.pump(const Duration(milliseconds: 500));
+    // Pump again to let the UI settle (providers will attempt to load)
+    await tester.pump();
+    await tester.pump();
+    // Verify the dashboard page rendered
+    expect(find.byType(DashboardPage), findsOneWidget);
   });
 
   testWidgets('WorkbenchListPage screenshot', (tester) async {

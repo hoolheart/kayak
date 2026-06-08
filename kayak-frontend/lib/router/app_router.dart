@@ -50,6 +50,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/dashboard';
       }
 
+      // 已登录 + 访问 `/` → 重定向到 `/dashboard`
+      if (loggedIn && state.matchedLocation == '/') {
+        return '/dashboard';
+      }
+
       // 其他情况 → 不重定向
       return null;
     },
@@ -74,6 +79,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/experiments/new',
         name: 'experiment-create',
         builder: (context, state) => const ExperimentCreatePage(),
+      ),
+
+      // ---- `/` 重定向到 `/dashboard` ----
+      GoRoute(
+        path: '/',
+        redirect: (context, state) => '/dashboard',
       ),
 
       // ---- 受保护路由（ShellRoute 包裹，共享 AppShell） ----

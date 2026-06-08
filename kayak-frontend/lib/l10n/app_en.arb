@@ -1207,6 +1207,184 @@
   "@selectWorkbenchSubtitle": {
     "description": "Step 1 section subtitle"
   },
+  "goodMorning": "Good morning",
+  "@goodMorning": {
+    "description": "Morning greeting (06:00-11:59)"
+  },
+  "goodAfternoon": "Good afternoon",
+  "@goodAfternoon": {
+    "description": "Afternoon greeting (12:00-17:59)"
+  },
+  "goodEvening": "Good evening",
+  "@goodEvening": {
+    "description": "Evening greeting (18:00-05:59)"
+  },
+  "quickActionExperimentConsole": "Experiment Console",
+  "@quickActionExperimentConsole": {
+    "description": "Quick action card title: experiment console"
+  },
+  "quickActionExperimentConsoleSub": "Manage and run experiments",
+  "@quickActionExperimentConsoleSub": {
+    "description": "Quick action card subtitle: experiment console"
+  },
+  "quickActionMethods": "Methods",
+  "@quickActionMethods": {
+    "description": "Quick action card title: methods"
+  },
+  "quickActionMethodsSub": "Configure standard methods",
+  "@quickActionMethodsSub": {
+    "description": "Quick action card subtitle: methods"
+  },
+  "quickActionWorkbenches": "Workbenches",
+  "@quickActionWorkbenches": {
+    "description": "Quick action card title: workbenches"
+  },
+  "quickActionWorkbenchesSub": "Manage workbenches and devices",
+  "@quickActionWorkbenchesSub": {
+    "description": "Quick action card subtitle: workbenches"
+  },
+  "quickActionDataAnalysis": "Data Analysis",
+  "@quickActionDataAnalysis": {
+    "description": "Quick action card title: data analysis"
+  },
+  "quickActionDataAnalysisSub": "View experiment data",
+  "@quickActionDataAnalysisSub": {
+    "description": "Quick action card subtitle: data analysis"
+  },
+  "statsWorkbenchesLabel": "Workbenches",
+  "@statsWorkbenchesLabel": {
+    "description": "Stats overview label: workbenches"
+  },
+  "statsDevicesLabel": "Devices",
+  "@statsDevicesLabel": {
+    "description": "Stats overview label: devices"
+  },
+  "statsExperimentsLabel": "Experiments",
+  "@statsExperimentsLabel": {
+    "description": "Stats overview label: experiments"
+  },
+  "recentWorkbenches": "Recent Workbenches",
+  "@recentWorkbenches": {
+    "description": "Recent workbenches section header"
+  },
+  "viewAll": "View all",
+  "@viewAll": {
+    "description": "View all link text"
+  },
+  "justNow": "Just now",
+  "@justNow": {
+    "description": "Relative time: less than 1 minute ago"
+  },
+  "minutesAgo": "{count} minutes ago",
+  "@minutesAgo": {
+    "description": "Relative time: N minutes ago",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "hoursAgo": "{count} hours ago",
+  "@hoursAgo": {
+    "description": "Relative time: N hours ago",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "daysAgo": "{count} days ago",
+  "@daysAgo": {
+    "description": "Relative time: N days ago",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "weeksAgo": "{count} weeks ago",
+  "@weeksAgo": {
+    "description": "Relative time: N weeks ago",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "monthsAgo": "{count} months ago",
+  "@monthsAgo": {
+    "description": "Relative time: N months ago",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "dashboardStatsError": "Failed to load statistics",
+  "@dashboardStatsError": {
+    "description": "Error title for stats overview section"
+  },
+  "dashboardStatsErrorHint": "Please check your network and retry",
+  "@dashboardStatsErrorHint": {
+    "description": "Error description for stats overview section"
+  },
+  "dashboardRecentError": "Failed to load workbenches",
+  "@dashboardRecentError": {
+    "description": "Error title for recent workbenches section"
+  },
+  "dashboardRecentErrorHint": "Please check your network and retry",
+  "@dashboardRecentErrorHint": {
+    "description": "Error description for recent workbenches section"
+  },
+  "dashboardRecentEmpty": "No workbenches yet",
+  "@dashboardRecentEmpty": {
+    "description": "Empty state title for recent workbenches"
+  },
+  "dashboardRecentEmptyHint": "Create your first workbench to get started",
+  "@dashboardRecentEmptyHint": {
+    "description": "Empty state description for recent workbenches"
+  },
+  "dashboardRecentEmptyAction": "Create Your First Workbench",
+  "@dashboardRecentEmptyAction": {
+    "description": "Empty state action button for recent workbenches"
+  },
+  "deviceCountWithUnit": "{count} devices",
+  "@deviceCountWithUnit": {
+    "description": "Device count label on workbench card",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "retryLoadStats": "Retry",
+  "@retryLoadStats": {
+    "description": "Retry button for stats section"
+  },
+  "retryLoadRecent": "Retry",
+  "@retryLoadRecent": {
+    "description": "Retry button for recent workbenches section"
+  },
+  "greetingWithName": "{greeting}, {username}",
+  "@greetingWithName": {
+    "description": "Greeting text with username",
+    "placeholders": {
+      "greeting": {
+        "type": "String",
+        "example": "Good morning"
+      },
+      "username": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
   "noWorkbenchesTitle": "No workbenches yet",
   "@noWorkbenchesTitle": {
     "description": "Step 1 empty state title"
