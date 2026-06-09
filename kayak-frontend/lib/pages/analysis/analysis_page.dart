@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/settings_provider.dart';
 import 'widgets/chart_area.dart';
 import 'widgets/control_panel.dart';
 import 'widgets/data_table_panel.dart';
@@ -20,6 +21,9 @@ class AnalysisPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch locale to force page rebuild when language changes.
+    ref.watch(localeProvider);
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth > 1200;
     final isTablet = screenWidth > 600;

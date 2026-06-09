@@ -57,7 +57,7 @@ class _RecentWorkbenchCardState extends State<RecentWorkbenchCard> {
         : Matrix4.identity();
 
     return Semantics(
-      label: '${wb.name}，${deviceCountText ?? ''}，$relativeTime',
+      label: '${wb.name}, ${deviceCountText ?? ''}, $relativeTime',
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),

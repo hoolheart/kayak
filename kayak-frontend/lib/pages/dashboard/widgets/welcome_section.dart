@@ -103,7 +103,7 @@ class _GreetingRow extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(text: greeting),
-                const TextSpan(text: '，'),
+                const TextSpan(text: ', '),
                 TextSpan(text: username),
               ],
             ),

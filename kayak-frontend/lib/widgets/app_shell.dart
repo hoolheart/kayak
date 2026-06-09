@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../generated/app_localizations.dart';
+import '../providers/settings_provider.dart';
 
 /// 导航项定义
 class _NavItem {
@@ -74,6 +75,11 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch locale to force rebuild when language changes.
+    // This ensures NavigationRail/NavigationBar labels are re-read
+    // from AppLocalizations with the current locale.
+    ref.watch(localeProvider);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth < 600) {

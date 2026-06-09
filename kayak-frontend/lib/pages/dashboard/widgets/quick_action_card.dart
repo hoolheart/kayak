@@ -66,7 +66,7 @@ class _QuickActionCardState extends State<QuickActionCard> {
 
     return Semantics(
       label:
-          '${widget.title}，${widget.subtitle}，${AppLocalizations.of(context)!.viewAll}',
+          '${widget.title}, ${widget.subtitle}, ${AppLocalizations.of(context)!.viewAll}',
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),

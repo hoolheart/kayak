@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/settings_provider.dart';
 import 'widgets/quick_actions_grid.dart';
 import 'widgets/recent_workbenches_section.dart';
 import 'widgets/stats_overview.dart';
@@ -17,11 +19,15 @@ import 'widgets/welcome_section.dart';
 /// 4. 最近工作台 — 来自 Workbench API（独立 loading/error）
 ///
 /// 路由: `/dashboard` (ShellRoute 内) 或 `/` (重定向)
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch themeMode to force rebuild when theme changes,
+    // ensuring the page background reflects the current theme.
+    ref.watch(themeModeProvider);
+
     final screenWidth = MediaQuery.of(context).size.width;
     final isCompact = screenWidth < 600;
     final padding = isCompact ? 16.0 : (screenWidth < 1200 ? 24.0 : 32.0);

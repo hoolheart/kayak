@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayak_frontend/generated/app_localizations.dart';
+import 'package:kayak_frontend/providers/settings_provider.dart';
 import 'package:kayak_frontend/widgets/app_shell.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 GoRouter _createTestRouter({required Widget child}) {
   return GoRouter(
@@ -22,30 +25,41 @@ GoRouter _createTestRouter({required Widget child}) {
   );
 }
 
+Future<ProviderScope> _createApp({required Widget child}) async {
+  SharedPreferences.setMockInitialValues({});
+  final prefs = await SharedPreferences.getInstance();
+
+  return ProviderScope(
+    overrides: [
+      sharedPreferencesProvider.overrideWithValue(prefs),
+    ],
+    child: MaterialApp.router(
+      theme: ThemeData(useMaterial3: true),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: _createTestRouter(
+        child: child,
+      ),
+    ),
+  );
+}
+
 void main() {
   testWidgets('AppShell desktop layout screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1400, 900));
 
-    const localizationDelegates = [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ];
-    const supportedLocales = AppLocalizations.supportedLocales;
-
-    await tester.pumpWidget(
-      MaterialApp.router(
-        theme: ThemeData(useMaterial3: true),
-        localizationsDelegates: localizationDelegates,
-        supportedLocales: supportedLocales,
-        routerConfig: _createTestRouter(
-          child: const Scaffold(
-            body: Center(child: Text('Content Area')),
-          ),
-        ),
+    final app = await _createApp(
+      child: const Scaffold(
+        body: Center(child: Text('Content Area')),
       ),
     );
+
+    await tester.pumpWidget(app);
     await tester.pumpAndSettle();
 
     // Verify AppShell renders
@@ -56,26 +70,13 @@ void main() {
   testWidgets('AppShell mobile layout screenshot', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
 
-    const localizationDelegates = [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ];
-    const supportedLocales = AppLocalizations.supportedLocales;
-
-    await tester.pumpWidget(
-      MaterialApp.router(
-        theme: ThemeData(useMaterial3: true),
-        localizationsDelegates: localizationDelegates,
-        supportedLocales: supportedLocales,
-        routerConfig: _createTestRouter(
-          child: const Scaffold(
-            body: Center(child: Text('Content Area')),
-          ),
-        ),
+    final app = await _createApp(
+      child: const Scaffold(
+        body: Center(child: Text('Content Area')),
       ),
     );
+
+    await tester.pumpWidget(app);
     await tester.pumpAndSettle();
 
     // Mobile should show BottomNavigationBar
