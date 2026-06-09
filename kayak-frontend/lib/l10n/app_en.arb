@@ -2156,5 +2156,174 @@
         "example": "3.19"
       }
     }
+  },
+
+  "analysisDevice": "Device",
+  "@analysisDevice": {
+    "description": "Analysis page: device dropdown label"
+  },
+  "analysisDeviceHint": "Please select a device",
+  "@analysisDeviceHint": {
+    "description": "Analysis page: device dropdown hint"
+  },
+  "analysisSelectDeviceFirst": "Please select an experiment first",
+  "@analysisSelectDeviceFirst": {
+    "description": "Analysis page: device disabled placeholder"
+  },
+  "analysisNoDevice": "No devices under this workbench",
+  "@analysisNoDevice": {
+    "description": "Analysis page: no devices available"
+  },
+  "analysisSelectPoints": "Points (max {max} selected)",
+  "@analysisSelectPoints": {
+    "description": "Analysis page: points section label",
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "analysisSelectPointFirst": "Please select a device first",
+  "@analysisSelectPointFirst": {
+    "description": "Analysis page: points disabled hint"
+  },
+  "analysisNoPoints": "No points for this device",
+  "@analysisNoPoints": {
+    "description": "Analysis page: no points available"
+  },
+  "analysisSelectedCount": "Selected: {selected}/4",
+  "@analysisSelectedCount": {
+    "description": "Analysis page: selected points count",
+    "placeholders": {
+      "selected": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "analysisPointMaxToast": "Maximum 4 curves can be selected",
+  "@analysisPointMaxToast": {
+    "description": "Analysis page: max points toast message"
+  },
+  "analysisTimeRange": "Time Range",
+  "@analysisTimeRange": {
+    "description": "Analysis page: time range section label"
+  },
+  "analysisTimeRange1h": "1 Hour",
+  "@analysisTimeRange1h": {
+    "description": "Analysis page: 1 hour preset button"
+  },
+  "analysisTimeRange24h": "24 Hours",
+  "@analysisTimeRange24h": {
+    "description": "Analysis page: 24 hours preset button"
+  },
+  "analysisTimeRangeAll": "All",
+  "@analysisTimeRangeAll": {
+    "description": "Analysis page: all time preset button"
+  },
+  "analysisStartTime": "Start",
+  "@analysisStartTime": {
+    "description": "Analysis page: start time field label"
+  },
+  "analysisEndTime": "End",
+  "@analysisEndTime": {
+    "description": "Analysis page: end time field label"
+  },
+  "analysisSelectTime": "Select time",
+  "@analysisSelectTime": {
+    "description": "Analysis page: select time placeholder"
+  },
+  "analysisDownsample": "Downsample",
+  "@analysisDownsample": {
+    "description": "Analysis page: downsample section label"
+  },
+  "analysisDownsampleCurrent": "Current: {count} points",
+  "@analysisDownsampleCurrent": {
+    "description": "Analysis page: current downsample count",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "1,000"
+      }
+    }
+  },
+  "analysisLoadData": "Load Data",
+  "@analysisLoadData": {
+    "description": "Analysis page: load data button"
+  },
+  "analysisResetView": "Reset View",
+  "@analysisResetView": {
+    "description": "Analysis page: reset chart view button"
+  },
+  "analysisDataTable": "Data Table",
+  "@analysisDataTable": {
+    "description": "Analysis page: data table toggle label"
+  },
+  "analysisDataTableRows": "Showing {displayed} of {total} rows",
+  "@analysisDataTableRows": {
+    "description": "Analysis page: data table row count",
+    "placeholders": {
+      "displayed": {
+        "type": "int",
+        "example": "100"
+      },
+      "total": {
+        "type": "int",
+        "example": "5000"
+      }
+    }
+  },
+  "analysisColumnTimestamp": "Timestamp",
+  "@analysisColumnTimestamp": {
+    "description": "Analysis page: data table timestamp column"
+  },
+  "analysisChartEmptyTitle": "Select experiment, device and points then load data",
+  "@analysisChartEmptyTitle": {
+    "description": "Analysis page: chart empty state title"
+  },
+  "analysisChartEmptyDesc": "Select from the left panel and click Load Data",
+  "@analysisChartEmptyDesc": {
+    "description": "Analysis page: chart empty state description"
+  },
+  "analysisChartNoData": "No data in selected range",
+  "@analysisChartNoData": {
+    "description": "Analysis page: chart no data title"
+  },
+  "analysisChartNoDataHint": "Try adjusting time range or selecting different points",
+  "@analysisChartNoDataHint": {
+    "description": "Analysis page: chart no data hint"
+  },
+  "analysisChartLoadFailed": "Failed to load data",
+  "@analysisChartLoadFailed": {
+    "description": "Analysis page: chart load failed title"
+  },
+  "analysisTimeRangeStartBeforeEnd": "Start time must be before end time",
+  "@analysisTimeRangeStartBeforeEnd": {
+    "description": "Analysis page: time range validation error"
+  },
+  "analysisTimeRangeMaxExceeded": "Time range cannot exceed 30 days",
+  "@analysisTimeRangeMaxExceeded": {
+    "description": "Analysis page: time range max exceeded"
+  },
+  "analysisTimeRangeFutureStart": "Start time cannot be in the future",
+  "@analysisTimeRangeFutureStart": {
+    "description": "Analysis page: future start time error"
+  },
+  "analysisTimeRangeFutureEnd": "End time cannot be in the future",
+  "@analysisTimeRangeFutureEnd": {
+    "description": "Analysis page: future end time error"
+  },
+  "analysisSelectExperiment": "Select Experiment",
+  "@analysisSelectExperiment": {
+    "description": "Analysis page: experiment dropdown hint"
+  },
+  "analysisNoExperiments": "No completed or aborted experiments",
+  "@analysisNoExperiments": {
+    "description": "Analysis page: no experiments available"
+  },
+  "analysisExperiment": "Experiment",
+  "@analysisExperiment": {
+    "description": "Analysis page: experiment dropdown label"
   }
 }

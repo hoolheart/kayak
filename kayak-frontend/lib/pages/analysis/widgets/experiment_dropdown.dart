@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../models/experiment.dart';
 import '../../../providers/analysis_provider.dart';
 import '../../../widgets/async_value_widget.dart';
@@ -15,6 +16,7 @@ class ExperimentDropdown extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -23,7 +25,7 @@ class ExperimentDropdown extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '试验',
+          loc.analysisExperiment,
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -37,7 +39,7 @@ class ExperimentDropdown extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Text(
-                '暂无已完成或中止的试验',
+                loc.analysisNoExperiments,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -46,7 +48,7 @@ class ExperimentDropdown extends ConsumerWidget {
           ),
           dataBuilder: (experiments) {
             return _buildDropdown(context, experiments, state, notifier,
-                textTheme, colorScheme);
+                textTheme, colorScheme, loc);
           },
         ),
       ],
@@ -60,6 +62,7 @@ class ExperimentDropdown extends ConsumerWidget {
     AnalysisNotifier notifier,
     TextTheme textTheme,
     ColorScheme colorScheme,
+    AppLocalizations loc,
   ) {
     return Container(
       decoration: BoxDecoration(
@@ -71,13 +74,13 @@ class ExperimentDropdown extends ConsumerWidget {
         child: DropdownButton<String>(
           value: state.selectedExperimentId,
           isExpanded: true,
-          hint: const Text('请选择试验'),
+          hint: Text(loc.analysisSelectExperiment),
           isDense: true,
           items: experiments.map((experiment) {
             final statusLabel =
                 experiment.status == ExperimentStatus.completed
-                    ? '已完成'
-                    : '已中止';
+                    ? loc.statusCompleted
+                    : loc.statusAborted;
             final statusColor =
                 experiment.status == ExperimentStatus.completed
                     ? colorScheme.primary

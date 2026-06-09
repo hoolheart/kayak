@@ -1560,4 +1560,122 @@ class AppLocalizationsEn extends AppLocalizations {
   String techInfoFrontend(String version) {
     return 'Frontend: Flutter $version';
   }
+
+  @override
+  String get analysisDevice => 'Device';
+
+  @override
+  String get analysisDeviceHint => 'Please select a device';
+
+  @override
+  String get analysisSelectDeviceFirst => 'Please select an experiment first';
+
+  @override
+  String get analysisNoDevice => 'No devices under this workbench';
+
+  @override
+  String analysisSelectPoints(int max) {
+    return 'Points (max $max selected)';
+  }
+
+  @override
+  String get analysisSelectPointFirst => 'Please select a device first';
+
+  @override
+  String get analysisNoPoints => 'No points for this device';
+
+  @override
+  String analysisSelectedCount(int selected) {
+    return 'Selected: $selected/4';
+  }
+
+  @override
+  String get analysisPointMaxToast => 'Maximum 4 curves can be selected';
+
+  @override
+  String get analysisTimeRange => 'Time Range';
+
+  @override
+  String get analysisTimeRange1h => '1 Hour';
+
+  @override
+  String get analysisTimeRange24h => '24 Hours';
+
+  @override
+  String get analysisTimeRangeAll => 'All';
+
+  @override
+  String get analysisStartTime => 'Start';
+
+  @override
+  String get analysisEndTime => 'End';
+
+  @override
+  String get analysisSelectTime => 'Select time';
+
+  @override
+  String get analysisDownsample => 'Downsample';
+
+  @override
+  String analysisDownsampleCurrent(String count) {
+    return 'Current: $count points';
+  }
+
+  @override
+  String get analysisLoadData => 'Load Data';
+
+  @override
+  String get analysisResetView => 'Reset View';
+
+  @override
+  String get analysisDataTable => 'Data Table';
+
+  @override
+  String analysisDataTableRows(int displayed, int total) {
+    return 'Showing $displayed of $total rows';
+  }
+
+  @override
+  String get analysisColumnTimestamp => 'Timestamp';
+
+  @override
+  String get analysisChartEmptyTitle =>
+      'Select experiment, device and points then load data';
+
+  @override
+  String get analysisChartEmptyDesc =>
+      'Select from the left panel and click Load Data';
+
+  @override
+  String get analysisChartNoData => 'No data in selected range';
+
+  @override
+  String get analysisChartNoDataHint =>
+      'Try adjusting time range or selecting different points';
+
+  @override
+  String get analysisChartLoadFailed => 'Failed to load data';
+
+  @override
+  String get analysisTimeRangeStartBeforeEnd =>
+      'Start time must be before end time';
+
+  @override
+  String get analysisTimeRangeMaxExceeded => 'Time range cannot exceed 30 days';
+
+  @override
+  String get analysisTimeRangeFutureStart =>
+      'Start time cannot be in the future';
+
+  @override
+  String get analysisTimeRangeFutureEnd => 'End time cannot be in the future';
+
+  @override
+  String get analysisSelectExperiment => 'Select Experiment';
+
+  @override
+  String get analysisNoExperiments => 'No completed or aborted experiments';
+
+  @override
+  String get analysisExperiment => 'Experiment';
 }

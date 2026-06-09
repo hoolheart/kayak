@@ -1533,4 +1533,117 @@ class AppLocalizationsZh extends AppLocalizations {
   String techInfoFrontend(String version) {
     return '前端：Flutter $version';
   }
+
+  @override
+  String get analysisDevice => '设备';
+
+  @override
+  String get analysisDeviceHint => '请选择设备';
+
+  @override
+  String get analysisSelectDeviceFirst => '请先选择试验';
+
+  @override
+  String get analysisNoDevice => '该工作台下暂无设备';
+
+  @override
+  String analysisSelectPoints(int max) {
+    return '测点（最多选择 $max 条）';
+  }
+
+  @override
+  String get analysisSelectPointFirst => '请先选择设备';
+
+  @override
+  String get analysisNoPoints => '该设备下暂无测点';
+
+  @override
+  String analysisSelectedCount(int selected) {
+    return '已选择：$selected/4';
+  }
+
+  @override
+  String get analysisPointMaxToast => '最多同时选择 4 条曲线';
+
+  @override
+  String get analysisTimeRange => '时间范围';
+
+  @override
+  String get analysisTimeRange1h => '1小时';
+
+  @override
+  String get analysisTimeRange24h => '24小时';
+
+  @override
+  String get analysisTimeRangeAll => '全部';
+
+  @override
+  String get analysisStartTime => '开始';
+
+  @override
+  String get analysisEndTime => '结束';
+
+  @override
+  String get analysisSelectTime => '选择时间';
+
+  @override
+  String get analysisDownsample => '降采样';
+
+  @override
+  String analysisDownsampleCurrent(String count) {
+    return '当前：$count 点';
+  }
+
+  @override
+  String get analysisLoadData => '加载数据';
+
+  @override
+  String get analysisResetView => '重置视图';
+
+  @override
+  String get analysisDataTable => '数据表格';
+
+  @override
+  String analysisDataTableRows(int displayed, int total) {
+    return '显示前 $displayed 行 / 共 $total 行';
+  }
+
+  @override
+  String get analysisColumnTimestamp => '时间戳';
+
+  @override
+  String get analysisChartEmptyTitle => '请选择试验、设备和测点后加载数据';
+
+  @override
+  String get analysisChartEmptyDesc => '从左侧面板选择试验、设备和测点，然后点击加载数据';
+
+  @override
+  String get analysisChartNoData => '所选范围内无数据';
+
+  @override
+  String get analysisChartNoDataHint => '请尝试调整时间范围或选择其他测点';
+
+  @override
+  String get analysisChartLoadFailed => '加载数据失败';
+
+  @override
+  String get analysisTimeRangeStartBeforeEnd => '开始时间必须早于结束时间';
+
+  @override
+  String get analysisTimeRangeMaxExceeded => '查询时间范围不能超过30天';
+
+  @override
+  String get analysisTimeRangeFutureStart => '开始时间不能是未来时间';
+
+  @override
+  String get analysisTimeRangeFutureEnd => '结束时间不能是未来时间';
+
+  @override
+  String get analysisSelectExperiment => '请选择试验';
+
+  @override
+  String get analysisNoExperiments => '暂无已完成或中止的试验';
+
+  @override
+  String get analysisExperiment => '试验';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 import '../../../widgets/async_value_widget.dart';
 import '../../../widgets/empty_view.dart';
@@ -17,6 +18,7 @@ class ChartArea extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -31,7 +33,7 @@ class ChartArea extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 图表区域
+            // Chart area
             Expanded(
               child: _buildChartContent(
                 context,
@@ -41,10 +43,11 @@ class ChartArea extends ConsumerWidget {
                 textTheme,
                 colorScheme,
                 isEmpty,
+                loc,
               ),
             ),
 
-            // 加载状态指示
+            // Loading indicator
             if (state.isLoadingData)
               const LinearProgressIndicator(),
           ],
@@ -61,29 +64,30 @@ class ChartArea extends ConsumerWidget {
     TextTheme textTheme,
     ColorScheme colorScheme,
     bool isEmpty,
+    AppLocalizations loc,
   ) {
     return AsyncValueWidget<ChartData?>(
       value: chartData,
       skipLoadingOnRefresh: false,
       loadingBuilder: const _ChartLoadingSkeleton(),
-      emptyBuilder: const EmptyView(
+      emptyBuilder: EmptyView(
         icon: Icons.show_chart,
-        title: '请选择试验、设备和测点后加载数据',
-        description: '从左侧面板选择试验、设备和测点，然后点击"加载数据"',
+        title: loc.analysisChartEmptyTitle,
+        description: loc.analysisChartEmptyDesc,
       ),
       emptyCondition: (data) => data == null || data.isEmpty,
       onRetry: () => notifier.loadChartData(),
       errorBuilder: (error, stack) => ErrorView(
-        title: '加载数据失败',
+        title: loc.analysisChartLoadFailed,
         description: '$error',
         onRetry: () => notifier.loadChartData(),
       ),
       dataBuilder: (data) {
         if (data == null || data.isEmpty) {
-          return const EmptyView(
+          return EmptyView(
             icon: Icons.inbox,
-            title: '所选范围内无数据',
-            description: '请尝试调整时间范围或选择其他测点',
+            title: loc.analysisChartNoData,
+            description: loc.analysisChartNoDataHint,
           );
         }
 

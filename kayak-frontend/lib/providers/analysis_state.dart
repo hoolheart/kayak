@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../generated/app_localizations.dart';
 import '../models/device.dart';
 import '../models/experiment.dart';
 import '../models/point.dart';
@@ -218,22 +219,45 @@ extension AnalysisStateX on AnalysisState {
   }
 
   /// 获取时间范围验证错误（null = 无错误）
-  ///
-  /// TODO: 迁移到 l10n（已识别为 Low Issue 13）
   String? get timeRangeError {
+    return _computeTimeRangeError();
+  }
+
+  /// 获取本地化时间范围验证错误
+  ///
+  /// 使用 [loc] 获取当前语言的错误消息。
+  String? timeRangeErrorLocalized(AppLocalizations loc) {
+    final error = _computeTimeRangeError();
+    if (error == null) return null;
+    switch (error) {
+      case 'startBeforeEnd':
+        return loc.analysisTimeRangeStartBeforeEnd;
+      case 'maxExceeded':
+        return loc.analysisTimeRangeMaxExceeded;
+      case 'futureStart':
+        return loc.analysisTimeRangeFutureStart;
+      case 'futureEnd':
+        return loc.analysisTimeRangeFutureEnd;
+      default:
+        return error;
+    }
+  }
+
+  /// 计算时间范围验证错误类型
+  String? _computeTimeRangeError() {
     if (customStart != null && customEnd != null) {
       if (customStart!.isAfter(customEnd!)) {
-        return '开始时间必须早于结束时间';
+        return 'startBeforeEnd';
       }
       final diff = customEnd!.difference(customStart!);
       if (diff.inDays > 30) {
-        return '查询时间范围不能超过30天';
+        return 'maxExceeded';
       }
       if (customStart!.isAfter(DateTime.now())) {
-        return '开始时间不能是未来时间';
+        return 'futureStart';
       }
       if (customEnd!.isAfter(DateTime.now())) {
-        return '结束时间不能是未来时间';
+        return 'futureEnd';
       }
     }
     return null;

@@ -106,9 +106,8 @@ class _QuickActionCardState extends State<QuickActionCard> {
                     padding: EdgeInsets.all(padding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // 图标容器
+                        // Icon container
                         Container(
                           width: iconContainerSize,
                           height: iconContainerSize,
@@ -123,8 +122,8 @@ class _QuickActionCardState extends State<QuickActionCard> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // 标题（Flexible 防止极端窄屏溢出）
-                        Flexible(
+                        // Title
+                        Expanded(
                           child: Text(
                             widget.title,
                             style: theme.textTheme.titleMedium?.copyWith(
@@ -135,8 +134,8 @@ class _QuickActionCardState extends State<QuickActionCard> {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        // 副标题（Flexible 防止极端窄屏溢出）
-                        Flexible(
+                        // Subtitle
+                        Expanded(
                           child: Text(
                             widget.subtitle,
                             style: theme.textTheme.bodySmall?.copyWith(

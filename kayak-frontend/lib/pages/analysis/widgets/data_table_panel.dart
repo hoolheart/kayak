@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 
 /// DataTablePanel — 数据表格面板
@@ -12,6 +13,7 @@ class DataTablePanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -29,11 +31,11 @@ class DataTablePanel extends ConsumerWidget {
         .where((p) => !state.hiddenPointIds.contains(p.pointId))
         .toList(growable: false);
 
-    // 构建列
+    // Build columns
     final columns = <DataColumn>[
       DataColumn(
         label: Text(
-          '时间戳',
+          loc.analysisColumnTimestamp,
           style: textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -100,14 +102,14 @@ class DataTablePanel extends ConsumerWidget {
         ),
         child: Column(
           children: [
-            // 行数提示（Issue 8）
+            // Row count hint
             if (totalRows > displayedRows)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Row(
                   children: [
                     Text(
-                      '显示前 $displayedRows 行 / 共 $totalRows 行',
+                      loc.analysisDataTableRows(displayedRows, totalRows),
                       style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),

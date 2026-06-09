@@ -277,6 +277,8 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
 
       final color = lineColors[point.colorIndex];
 
+      final dotStrokeColor = color.withAlpha(180);
+
       return LineChartBarData(
         spots: spots,
         color: color,
@@ -287,7 +289,7 @@ class _TimeSeriesChartState extends State<TimeSeriesChart> {
               radius: 3,
               color: color,
               strokeWidth: 1,
-              strokeColor: Colors.white,
+              strokeColor: dotStrokeColor,
             );
           },
         ),

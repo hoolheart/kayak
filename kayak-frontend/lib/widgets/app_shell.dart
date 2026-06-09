@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../generated/app_localizations.dart';
+
 /// 导航项定义
 class _NavItem {
   const _NavItem({
-    required this.label,
     required this.icon,
     required this.selectedIcon,
     required this.path,
   });
 
-  final String label;
   final IconData icon;
   final IconData selectedIcon;
   final String path;
@@ -20,42 +20,46 @@ class _NavItem {
 /// 导航项列表
 const _navItems = <_NavItem>[
   _NavItem(
-    label: '首页',
     icon: Icons.dashboard_outlined,
     selectedIcon: Icons.dashboard,
     path: '/dashboard',
   ),
   _NavItem(
-    label: '工作台',
     icon: Icons.build_outlined,
     selectedIcon: Icons.build,
     path: '/workbenches',
   ),
   _NavItem(
-    label: '方法',
     icon: Icons.science_outlined,
     selectedIcon: Icons.science,
     path: '/methods',
   ),
   _NavItem(
-    label: '试验',
     icon: Icons.biotech_outlined,
     selectedIcon: Icons.biotech,
     path: '/experiments',
   ),
   _NavItem(
-    label: '分析',
     icon: Icons.analytics_outlined,
     selectedIcon: Icons.analytics,
     path: '/analysis',
   ),
   _NavItem(
-    label: '设置',
     icon: Icons.settings_outlined,
     selectedIcon: Icons.settings,
     path: '/settings',
   ),
 ];
+
+/// 根据 AppLocalizations 获取导航项标签
+List<String> _navLabels(AppLocalizations loc) => [
+      loc.dashboard,
+      loc.workbenches,
+      loc.methods,
+      loc.experiments,
+      loc.analysis,
+      loc.settings,
+    ];
 
 /// 应用外壳 — 响应式导航布局
 ///
@@ -93,6 +97,8 @@ class _MobileLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentPath = GoRouterState.of(context).matchedLocation;
+    final loc = AppLocalizations.of(context)!;
+    final labels = _navLabels(loc);
 
     return Scaffold(
       body: child,
@@ -103,11 +109,13 @@ class _MobileLayout extends ConsumerWidget {
             context.go(_navItems[index].path);
           }
         },
-        destinations: _navItems.map((item) {
+        destinations: _navItems.asMap().entries.map((entry) {
+          final i = entry.key;
+          final item = entry.value;
           return NavigationDestination(
             icon: Icon(item.icon),
             selectedIcon: Icon(item.selectedIcon),
-            label: item.label,
+            label: i < labels.length ? labels[i] : '',
           );
         }).toList(),
       ),
@@ -131,6 +139,8 @@ class _TabletLayoutState extends ConsumerState<_TabletLayout> {
   @override
   Widget build(BuildContext context) {
     final currentPath = GoRouterState.of(context).matchedLocation;
+    final loc = AppLocalizations.of(context)!;
+    final labels = _navLabels(loc);
 
     return Row(
       children: [
@@ -147,11 +157,13 @@ class _TabletLayoutState extends ConsumerState<_TabletLayout> {
           labelType: _isRailExtended
               ? NavigationRailLabelType.none
               : NavigationRailLabelType.all,
-          destinations: _navItems.map((item) {
+          destinations: _navItems.asMap().entries.map((entry) {
+            final i = entry.key;
+            final item = entry.value;
             return NavigationRailDestination(
               icon: Icon(item.icon),
               selectedIcon: Icon(item.selectedIcon),
-              label: Text(item.label),
+              label: Text(i < labels.length ? labels[i] : ''),
             );
           }).toList(),
         ),
@@ -200,7 +212,7 @@ class _TabletLayoutState extends ConsumerState<_TabletLayout> {
             _isRailExtended = !_isRailExtended;
           });
         },
-        tooltip: _isRailExtended ? '折叠' : '展开',
+        tooltip: _isRailExtended ? 'Collapse' : 'Expand',
       ),
     );
   }
@@ -215,6 +227,8 @@ class _DesktopLayout extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentPath = GoRouterState.of(context).matchedLocation;
+    final loc = AppLocalizations.of(context)!;
+    final labels = _navLabels(loc);
 
     return Row(
       children: [
@@ -229,11 +243,13 @@ class _DesktopLayout extends ConsumerWidget {
           leading: _buildLeading(context),
           labelType: NavigationRailLabelType.none,
           minExtendedWidth: 220,
-          destinations: _navItems.map((item) {
+          destinations: _navItems.asMap().entries.map((entry) {
+            final i = entry.key;
+            final item = entry.value;
             return NavigationRailDestination(
               icon: Icon(item.icon),
               selectedIcon: Icon(item.selectedIcon),
-              label: Text(item.label),
+              label: Text(i < labels.length ? labels[i] : ''),
             );
           }).toList(),
         ),

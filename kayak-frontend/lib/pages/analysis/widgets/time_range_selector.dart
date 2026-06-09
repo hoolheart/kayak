@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 
 /// TimeRangeSelector — 时间范围选择器
@@ -13,6 +14,7 @@ class TimeRangeSelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -23,26 +25,26 @@ class TimeRangeSelector extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '时间范围',
+          loc.analysisTimeRange,
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 8),
-        // 预设按钮组
+        // Preset button group
         SegmentedButton<TimeRangePreset>(
-          segments: const [
+          segments: [
             ButtonSegment(
               value: TimeRangePreset.oneHour,
-              label: Text('1小时'),
+              label: Text(loc.analysisTimeRange1h),
             ),
             ButtonSegment(
               value: TimeRangePreset.twentyFourHours,
-              label: Text('24小时'),
+              label: Text(loc.analysisTimeRange24h),
             ),
             ButtonSegment(
               value: TimeRangePreset.all,
-              label: Text('全部'),
+              label: Text(loc.analysisTimeRangeAll),
             ),
           ],
           selected: isCustom
@@ -60,13 +62,13 @@ class TimeRangeSelector extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 8),
-        // 自定义时间输入
+        // Custom time input
         Row(
           children: [
             Expanded(
               child: _buildDateField(
                 context: context,
-                label: '开始',
+                label: loc.analysisStartTime,
                 value: state.customStart,
                 onTap: () async {
                   final date = await showDatePicker(
@@ -101,7 +103,7 @@ class TimeRangeSelector extends ConsumerWidget {
             Expanded(
               child: _buildDateField(
                 context: context,
-                label: '结束',
+                label: loc.analysisEndTime,
                 value: state.customEnd,
                 onTap: () async {
                   final date = await showDatePicker(
@@ -134,12 +136,12 @@ class TimeRangeSelector extends ConsumerWidget {
             ),
           ],
         ),
-        // 验证错误提示
+        // Validation error
         if (state.timeRangeError != null)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              state.timeRangeError!,
+              state.timeRangeErrorLocalized(loc)!,
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.error,
               ),
@@ -157,6 +159,7 @@ class TimeRangeSelector extends ConsumerWidget {
     required TextTheme textTheme,
     required ColorScheme colorScheme,
   }) {
+    final loc = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -188,7 +191,7 @@ class TimeRangeSelector extends ConsumerWidget {
           value != null
               ? '${value.year}-${_pad(value.month)}-${_pad(value.day)} '
                   '${_pad(value.hour)}:${_pad(value.minute)}'
-              : '选择时间',
+              : loc.analysisSelectTime,
           style: textTheme.bodySmall?.copyWith(
             color: value != null
                 ? colorScheme.onSurface

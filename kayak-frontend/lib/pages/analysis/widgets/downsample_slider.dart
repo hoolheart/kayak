@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 
 /// DownsampleSlider — 降采样滑块
@@ -15,18 +16,19 @@ class DownsampleSlider extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
 
-    // 对数刻度映射：线性值 0~1 → 对数 100~10000
+    // Log scale mapping: linear value 0~1 → log 100~10000
     final sliderValue = _logToLinear(state.downsample);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '降采样',
+          loc.analysisDownsample,
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -35,7 +37,7 @@ class DownsampleSlider extends ConsumerWidget {
         Row(
           children: [
             Text(
-              '当前: ${_formatNumber(state.downsample)} 点',
+              loc.analysisDownsampleCurrent(_formatNumber(state.downsample)),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurface,
               ),

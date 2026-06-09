@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../models/device.dart';
 import '../../../providers/analysis_provider.dart';
 
@@ -14,6 +15,7 @@ class DeviceDropdown extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -26,7 +28,7 @@ class DeviceDropdown extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '设备',
+          loc.analysisDevice,
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -35,11 +37,11 @@ class DeviceDropdown extends ConsumerWidget {
         if (isLoading)
           const _DeviceSkeleton()
         else if (isDisabled)
-          _buildDisabledDropdown(context, '请先选择试验')
+          _buildDisabledDropdown(context, loc.analysisSelectDeviceFirst)
         else if (devices != null && devices.isEmpty)
-          _buildDisabledDropdown(context, '该工作台下暂无设备')
+          _buildDisabledDropdown(context, loc.analysisNoDevice)
         else
-          _buildDropdown(context, devices ?? [], state, notifier),
+          _buildDropdown(context, devices ?? [], state, notifier, loc),
       ],
     );
   }
@@ -49,6 +51,7 @@ class DeviceDropdown extends ConsumerWidget {
     List<Device> devices,
     AnalysisState state,
     AnalysisNotifier notifier,
+    AppLocalizations loc,
   ) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -64,7 +67,7 @@ class DeviceDropdown extends ConsumerWidget {
         child: DropdownButton<String>(
           value: state.selectedDeviceId,
           isExpanded: true,
-          hint: const Text('请选择设备'),
+          hint: Text(loc.analysisDeviceHint),
           isDense: true,
           items: devices.map((device) {
             return DropdownMenuItem<String>(

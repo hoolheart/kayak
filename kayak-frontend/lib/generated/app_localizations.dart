@@ -3025,6 +3025,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Frontend: Flutter {version}'**
   String techInfoFrontend(String version);
+
+  /// Analysis page: device dropdown label
+  ///
+  /// In en, this message translates to:
+  /// **'Device'**
+  String get analysisDevice;
+
+  /// Analysis page: device dropdown hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a device'**
+  String get analysisDeviceHint;
+
+  /// Analysis page: device disabled placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an experiment first'**
+  String get analysisSelectDeviceFirst;
+
+  /// Analysis page: no devices available
+  ///
+  /// In en, this message translates to:
+  /// **'No devices under this workbench'**
+  String get analysisNoDevice;
+
+  /// Analysis page: points section label
+  ///
+  /// In en, this message translates to:
+  /// **'Points (max {max} selected)'**
+  String analysisSelectPoints(int max);
+
+  /// Analysis page: points disabled hint
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a device first'**
+  String get analysisSelectPointFirst;
+
+  /// Analysis page: no points available
+  ///
+  /// In en, this message translates to:
+  /// **'No points for this device'**
+  String get analysisNoPoints;
+
+  /// Analysis page: selected points count
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: {selected}/4'**
+  String analysisSelectedCount(int selected);
+
+  /// Analysis page: max points toast message
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum 4 curves can be selected'**
+  String get analysisPointMaxToast;
+
+  /// Analysis page: time range section label
+  ///
+  /// In en, this message translates to:
+  /// **'Time Range'**
+  String get analysisTimeRange;
+
+  /// Analysis page: 1 hour preset button
+  ///
+  /// In en, this message translates to:
+  /// **'1 Hour'**
+  String get analysisTimeRange1h;
+
+  /// Analysis page: 24 hours preset button
+  ///
+  /// In en, this message translates to:
+  /// **'24 Hours'**
+  String get analysisTimeRange24h;
+
+  /// Analysis page: all time preset button
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get analysisTimeRangeAll;
+
+  /// Analysis page: start time field label
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get analysisStartTime;
+
+  /// Analysis page: end time field label
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get analysisEndTime;
+
+  /// Analysis page: select time placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get analysisSelectTime;
+
+  /// Analysis page: downsample section label
+  ///
+  /// In en, this message translates to:
+  /// **'Downsample'**
+  String get analysisDownsample;
+
+  /// Analysis page: current downsample count
+  ///
+  /// In en, this message translates to:
+  /// **'Current: {count} points'**
+  String analysisDownsampleCurrent(String count);
+
+  /// Analysis page: load data button
+  ///
+  /// In en, this message translates to:
+  /// **'Load Data'**
+  String get analysisLoadData;
+
+  /// Analysis page: reset chart view button
+  ///
+  /// In en, this message translates to:
+  /// **'Reset View'**
+  String get analysisResetView;
+
+  /// Analysis page: data table toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Data Table'**
+  String get analysisDataTable;
+
+  /// Analysis page: data table row count
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {displayed} of {total} rows'**
+  String analysisDataTableRows(int displayed, int total);
+
+  /// Analysis page: data table timestamp column
+  ///
+  /// In en, this message translates to:
+  /// **'Timestamp'**
+  String get analysisColumnTimestamp;
+
+  /// Analysis page: chart empty state title
+  ///
+  /// In en, this message translates to:
+  /// **'Select experiment, device and points then load data'**
+  String get analysisChartEmptyTitle;
+
+  /// Analysis page: chart empty state description
+  ///
+  /// In en, this message translates to:
+  /// **'Select from the left panel and click Load Data'**
+  String get analysisChartEmptyDesc;
+
+  /// Analysis page: chart no data title
+  ///
+  /// In en, this message translates to:
+  /// **'No data in selected range'**
+  String get analysisChartNoData;
+
+  /// Analysis page: chart no data hint
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting time range or selecting different points'**
+  String get analysisChartNoDataHint;
+
+  /// Analysis page: chart load failed title
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load data'**
+  String get analysisChartLoadFailed;
+
+  /// Analysis page: time range validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Start time must be before end time'**
+  String get analysisTimeRangeStartBeforeEnd;
+
+  /// Analysis page: time range max exceeded
+  ///
+  /// In en, this message translates to:
+  /// **'Time range cannot exceed 30 days'**
+  String get analysisTimeRangeMaxExceeded;
+
+  /// Analysis page: future start time error
+  ///
+  /// In en, this message translates to:
+  /// **'Start time cannot be in the future'**
+  String get analysisTimeRangeFutureStart;
+
+  /// Analysis page: future end time error
+  ///
+  /// In en, this message translates to:
+  /// **'End time cannot be in the future'**
+  String get analysisTimeRangeFutureEnd;
+
+  /// Analysis page: experiment dropdown hint
+  ///
+  /// In en, this message translates to:
+  /// **'Select Experiment'**
+  String get analysisSelectExperiment;
+
+  /// Analysis page: no experiments available
+  ///
+  /// In en, this message translates to:
+  /// **'No completed or aborted experiments'**
+  String get analysisNoExperiments;
+
+  /// Analysis page: experiment dropdown label
+  ///
+  /// In en, this message translates to:
+  /// **'Experiment'**
+  String get analysisExperiment;
 }
 
 class _AppLocalizationsDelegate

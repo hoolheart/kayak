@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 import 'device_dropdown.dart';
 import 'downsample_slider.dart';
@@ -18,6 +19,7 @@ class ControlPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -26,7 +28,7 @@ class ControlPanel extends ConsumerWidget {
         state.chartData.value != null &&
         !state.chartData.value!.isEmpty;
 
-    // 响应式宽度：桌面 >1200px 使用 350px，平板 600-1200px 使用 280px（Issue 6）
+    // Responsive width: desktop >1200px uses 350px, tablet 600-1200px uses 280px
     final screenWidth = MediaQuery.of(context).size.width;
     final panelWidth = screenWidth > 1200 ? 350.0 : 280.0;
 
@@ -45,28 +47,28 @@ class ControlPanel extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 试验选择
+            // Experiment selection
             const ExperimentDropdown(),
             const _DividerWithSpacing(),
 
-            // 设备选择
+            // Device selection
             const DeviceDropdown(),
             const _DividerWithSpacing(),
 
-            // 测点选择
+            // Point selection
             const PointCheckboxList(),
             const _DividerWithSpacing(),
 
-            // 时间范围
+            // Time range
             const TimeRangeSelector(),
             const _DividerWithSpacing(),
 
-            // 降采样
+            // Downsample
             const DownsampleSlider(),
             const _DividerWithSpacing(),
 
-            // 操作按钮
-            // 加载数据按钮
+            // Action buttons
+            // Load data button
             SizedBox(
               width: double.infinity,
               height: 48,
@@ -83,28 +85,28 @@ class ControlPanel extends ConsumerWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.refresh, size: 20),
-                label: Text(state.isLoadingData ? '加载中...' : '加载数据'),
+                label: Text(state.isLoadingData ? loc.loading : loc.analysisLoadData),
               ),
             ),
             const SizedBox(height: 8),
 
-            // 重置视图按钮
+            // Reset view button
             SizedBox(
               width: double.infinity,
               height: 40,
               child: OutlinedButton.icon(
                 onPressed: hasChartData ? notifier.resetChart : null,
                 icon: const Icon(Icons.zoom_out_map, size: 20),
-                label: const Text('重置视图'),
+                label: Text(loc.analysisResetView),
               ),
             ),
             const SizedBox(height: 16),
 
-            // 数据表格开关
+            // Data table toggle
             Row(
               children: [
                 Text(
-                  '数据表格',
+                  loc.analysisDataTable,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurface,
                   ),

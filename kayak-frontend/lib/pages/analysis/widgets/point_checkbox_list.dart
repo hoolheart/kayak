@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../generated/app_localizations.dart';
 import '../../../providers/analysis_provider.dart';
 
 /// PointCheckboxList — 测点复选框列表
@@ -13,6 +14,7 @@ class PointCheckboxList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(analysisProvider);
     final notifier = ref.read(analysisProvider.notifier);
+    final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final colorScheme = theme.colorScheme;
@@ -26,7 +28,7 @@ class PointCheckboxList extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '测点 (最多选择 ${4 - state.selectedPointIds.length} 条)',
+          loc.analysisSelectPoints(4 - state.selectedPointIds.length),
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -39,7 +41,7 @@ class PointCheckboxList extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Text(
-                '请先选择设备',
+                loc.analysisSelectPointFirst,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -51,7 +53,7 @@ class PointCheckboxList extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Text(
-                '该设备下暂无测点',
+                loc.analysisNoPoints,
                 style: textTheme.bodyMedium?.copyWith(
                   color: colorScheme.onSurfaceVariant,
                 ),
@@ -71,7 +73,7 @@ class PointCheckboxList extends ConsumerWidget {
               child: InkWell(
                 onTap: canSelect
                     ? () => notifier.togglePoint(point.id)
-                    : () => _showMaxToast(context),
+                    : () => _showMaxToast(context, loc),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
@@ -125,7 +127,7 @@ class PointCheckboxList extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Text(
-              '已选择: ${state.selectedPointIds.length}/4',
+              loc.analysisSelectedCount(state.selectedPointIds.length),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -135,11 +137,11 @@ class PointCheckboxList extends ConsumerWidget {
     );
   }
 
-  void _showMaxToast(BuildContext context) {
+  void _showMaxToast(BuildContext context, AppLocalizations loc) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('最多同时选择 4 条曲线'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(loc.analysisPointMaxToast),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),
     );

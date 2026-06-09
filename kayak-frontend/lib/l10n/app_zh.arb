@@ -2156,5 +2156,174 @@
         "example": "3.19"
       }
     }
+  },
+
+  "analysisDevice": "设备",
+  "@analysisDevice": {
+    "description": "分析页面：设备下拉框标签"
+  },
+  "analysisDeviceHint": "请选择设备",
+  "@analysisDeviceHint": {
+    "description": "分析页面：设备下拉框提示"
+  },
+  "analysisSelectDeviceFirst": "请先选择试验",
+  "@analysisSelectDeviceFirst": {
+    "description": "分析页面：设备禁用占位提示"
+  },
+  "analysisNoDevice": "该工作台下暂无设备",
+  "@analysisNoDevice": {
+    "description": "分析页面：暂无设备"
+  },
+  "analysisSelectPoints": "测点（最多选择 {max} 条）",
+  "@analysisSelectPoints": {
+    "description": "分析页面：测点区域标签",
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "analysisSelectPointFirst": "请先选择设备",
+  "@analysisSelectPointFirst": {
+    "description": "分析页面：测点禁用提示"
+  },
+  "analysisNoPoints": "该设备下暂无测点",
+  "@analysisNoPoints": {
+    "description": "分析页面：暂无测点"
+  },
+  "analysisSelectedCount": "已选择：{selected}/4",
+  "@analysisSelectedCount": {
+    "description": "分析页面：已选测点计数",
+    "placeholders": {
+      "selected": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "analysisPointMaxToast": "最多同时选择 4 条曲线",
+  "@analysisPointMaxToast": {
+    "description": "分析页面：最多选点数提示"
+  },
+  "analysisTimeRange": "时间范围",
+  "@analysisTimeRange": {
+    "description": "分析页面：时间范围区域标签"
+  },
+  "analysisTimeRange1h": "1小时",
+  "@analysisTimeRange1h": {
+    "description": "分析页面：1小时预设按钮"
+  },
+  "analysisTimeRange24h": "24小时",
+  "@analysisTimeRange24h": {
+    "description": "分析页面：24小时预设按钮"
+  },
+  "analysisTimeRangeAll": "全部",
+  "@analysisTimeRangeAll": {
+    "description": "分析页面：全部时间预设按钮"
+  },
+  "analysisStartTime": "开始",
+  "@analysisStartTime": {
+    "description": "分析页面：开始时间字段标签"
+  },
+  "analysisEndTime": "结束",
+  "@analysisEndTime": {
+    "description": "分析页面：结束时间字段标签"
+  },
+  "analysisSelectTime": "选择时间",
+  "@analysisSelectTime": {
+    "description": "分析页面：选择时间占位提示"
+  },
+  "analysisDownsample": "降采样",
+  "@analysisDownsample": {
+    "description": "分析页面：降采样区域标签"
+  },
+  "analysisDownsampleCurrent": "当前：{count} 点",
+  "@analysisDownsampleCurrent": {
+    "description": "分析页面：当前降采样点数",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "1,000"
+      }
+    }
+  },
+  "analysisLoadData": "加载数据",
+  "@analysisLoadData": {
+    "description": "分析页面：加载数据按钮"
+  },
+  "analysisResetView": "重置视图",
+  "@analysisResetView": {
+    "description": "分析页面：重置图表视图按钮"
+  },
+  "analysisDataTable": "数据表格",
+  "@analysisDataTable": {
+    "description": "分析页面：数据表格切换标签"
+  },
+  "analysisDataTableRows": "显示前 {displayed} 行 / 共 {total} 行",
+  "@analysisDataTableRows": {
+    "description": "分析页面：数据表格行数提示",
+    "placeholders": {
+      "displayed": {
+        "type": "int",
+        "example": "100"
+      },
+      "total": {
+        "type": "int",
+        "example": "5000"
+      }
+    }
+  },
+  "analysisColumnTimestamp": "时间戳",
+  "@analysisColumnTimestamp": {
+    "description": "分析页面：数据表格时间戳列"
+  },
+  "analysisChartEmptyTitle": "请选择试验、设备和测点后加载数据",
+  "@analysisChartEmptyTitle": {
+    "description": "分析页面：图表空状态标题"
+  },
+  "analysisChartEmptyDesc": "从左侧面板选择试验、设备和测点，然后点击加载数据",
+  "@analysisChartEmptyDesc": {
+    "description": "分析页面：图表空状态描述"
+  },
+  "analysisChartNoData": "所选范围内无数据",
+  "@analysisChartNoData": {
+    "description": "分析页面：图表无数据标题"
+  },
+  "analysisChartNoDataHint": "请尝试调整时间范围或选择其他测点",
+  "@analysisChartNoDataHint": {
+    "description": "分析页面：图表无数据提示"
+  },
+  "analysisChartLoadFailed": "加载数据失败",
+  "@analysisChartLoadFailed": {
+    "description": "分析页面：图表加载失败标题"
+  },
+  "analysisTimeRangeStartBeforeEnd": "开始时间必须早于结束时间",
+  "@analysisTimeRangeStartBeforeEnd": {
+    "description": "分析页面：时间范围验证错误"
+  },
+  "analysisTimeRangeMaxExceeded": "查询时间范围不能超过30天",
+  "@analysisTimeRangeMaxExceeded": {
+    "description": "分析页面：时间范围超限"
+  },
+  "analysisTimeRangeFutureStart": "开始时间不能是未来时间",
+  "@analysisTimeRangeFutureStart": {
+    "description": "分析页面：开始时间为未来时间错误"
+  },
+  "analysisTimeRangeFutureEnd": "结束时间不能是未来时间",
+  "@analysisTimeRangeFutureEnd": {
+    "description": "分析页面：结束时间为未来时间错误"
+  },
+  "analysisSelectExperiment": "请选择试验",
+  "@analysisSelectExperiment": {
+    "description": "分析页面：试验下拉框提示"
+  },
+  "analysisNoExperiments": "暂无已完成或中止的试验",
+  "@analysisNoExperiments": {
+    "description": "分析页面：暂无已完成的试验"
+  },
+  "analysisExperiment": "试验",
+  "@analysisExperiment": {
+    "description": "分析页面：试验下拉框标签"
   }
 }
